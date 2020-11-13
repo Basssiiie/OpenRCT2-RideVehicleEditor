@@ -4,7 +4,7 @@ import { terser } from 'rollup-plugin-terser';
 export default {
   input: './src/registerPlugin.ts',
   output: {
-    file: './dist/MOD_NAME.js',
+    file: './dist/RideVehicleEditor.js',
     format: 'iife',
   },
   plugins: [
