@@ -1,3 +1,6 @@
 {
-	"noEmit": true 
+	"noEmit": true,
+	"noImplicitAny": true,
+	"noImplicitThis": true,
+	"strict": true
 }
