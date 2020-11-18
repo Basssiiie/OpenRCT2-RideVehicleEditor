@@ -4,11 +4,12 @@
 export function getAvailableRideTypes(): RideType[] {
     return context
         .getAllObjects("ride")
+        .filter(r => r.carsPerFlatRide != 0) // tracked rides == 255, flatrides == 1
         .map(r => new RideType(
             r.index,
             r.name,
             r.vehicles
-                .filter(v => v.baseImageId != 0)
+                .filter(v => v.baseImageId > 0 && v.spriteWidth > 0)
                 .length
         ))
         .sort((a, b) => a.name.localeCompare(b.name));

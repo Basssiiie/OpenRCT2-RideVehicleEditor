@@ -1,8 +1,10 @@
-import { isUiAvailable } from './helpers';
-import { VehicleEditorWindow } from './window';
+import { isUiAvailable, log } from './helpers/utilityHelpers';
+import { VehicleEditorWindow } from './core/window';
 
 
 const main = (): void => {
+	log("Plugin started.");
+
 	if (!isUiAvailable) {
 		return;
 	}

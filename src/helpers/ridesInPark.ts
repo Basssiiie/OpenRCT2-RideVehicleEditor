@@ -1,8 +1,10 @@
+import { log } from "./utilityHelpers";
+
 /**
  * Gets a list of all rides in the park.
  */
 export function getRidesInPark(): ParkRide[] {
-	console.log("Get ride names");
+	log("Get ride names");
 
 	return map
 		.rides
@@ -36,12 +38,12 @@ export class ParkRide {
 	/**
 	 * Get all trains on this ride.
 	 */
-	getTrains(): ParkRideTrain[] {
+	getTrains(): RideTrain[] {
 		const ride = this.getRide();
 
 		return ride
 			.vehicles
-			.map((r, i) => new ParkRideTrain(i, r));
+			.map((r, i) => new RideTrain(i, r));
 	}
 }
 
@@ -49,7 +51,7 @@ export class ParkRide {
 /**
  * Represents a train on a ride in the park.
  */
-export class ParkRideTrain {
+export class RideTrain {
 	/**
 	 * @param index Gets the index of the train for this ride (0-3).
 	 * @param headCarId Gets the entity id for the first car of this train.
@@ -71,14 +73,18 @@ export class ParkRideTrain {
 	/**
 	 * Gets a list of all cars in this train, from front to back.
 	 */
-	getVehicles(): ParkRideVehicle[] {
-		const vehicles: ParkRideVehicle[] = [];
-		let currentId = this.headCarId;
+	getVehicles(): RideVehicle[] {
+		const vehicles: RideVehicle[] = [];
+		let currentId: (number | null) = this.headCarId;
 
-		while (currentId) {
-			vehicles.push(new ParkRideVehicle(currentId));
-
+		while (currentId != null && currentId != 0xFFFF) {
 			const vehicle = map.getEntity(currentId) as Car;
+			if (!vehicle) {
+				log(`Error: car ${currentId} could not be found.`);
+				break;
+			}
+
+			vehicles.push(new RideVehicle(currentId));
 			currentId = vehicle.nextCarOnTrain;
 		}
 		return vehicles;
@@ -86,7 +92,7 @@ export class ParkRideTrain {
 }
 
 
-export class ParkRideVehicle {
+export class RideVehicle {
 	/**
 	 * @param entityId Gets the id of the associated entity in the park.
 	 */
