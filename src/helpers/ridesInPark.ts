@@ -1,13 +1,15 @@
-import { log } from "./utilityHelpers";
+import { error, log } from "./utilityHelpers";
 
 /**
  * Gets a list of all rides in the park.
  */
-export function getRidesInPark(): ParkRide[] {
+export function getRidesInPark(): ParkRide[]
+{
 	log("Get ride names");
 
 	return map
 		.rides
+		.filter(r => r.classification == "ride")
 		.map(r => new ParkRide(r.id, r.name))
 		.sort((a, b) => a.name.localeCompare(b.name));
 }
@@ -16,7 +18,8 @@ export function getRidesInPark(): ParkRide[] {
 /**
  * Represents a ride in the park.
  */
-export class ParkRide {
+export class ParkRide
+{
 	/**
 	 * @param index Gets the id of this ride in the current park.
 	 * @param name Gets the name of the ride.
@@ -30,7 +33,8 @@ export class ParkRide {
 	/**
 	 * Gets the associated ride data from the game.
 	 */
-	getRide(): Ride {
+	getRide(): Ride
+	{
 		return map.getRide(this.rideId);
 	}
 
@@ -38,7 +42,8 @@ export class ParkRide {
 	/**
 	 * Get all trains on this ride.
 	 */
-	getTrains(): RideTrain[] {
+	getTrains(): RideTrain[]
+	{
 		const ride = this.getRide();
 
 		return ride
@@ -51,7 +56,8 @@ export class ParkRide {
 /**
  * Represents a train on a ride in the park.
  */
-export class RideTrain {
+export class RideTrain
+{
 	/**
 	 * @param index Gets the index of the train for this ride (0-3).
 	 * @param headCarId Gets the entity id for the first car of this train.
@@ -65,7 +71,8 @@ export class RideTrain {
 	/**
 	 * Gets the first car of this train.
 	 */
-	getHeadCar(): Car {
+	getHeadCar(): Car
+	{
 		return map.getEntity(this.headCarId) as Car;
 	}
 
@@ -73,14 +80,16 @@ export class RideTrain {
 	/**
 	 * Gets a list of all cars in this train, from front to back.
 	 */
-	getVehicles(): RideVehicle[] {
+	getVehicles(): RideVehicle[]
+	{
 		const vehicles: RideVehicle[] = [];
 		let currentId: (number | null) = this.headCarId;
 
-		while (currentId != null && currentId != 0xFFFF) {
-			const vehicle = map.getEntity(currentId) as Car;
-			if (!vehicle) {
-				log(`Error: car ${currentId} could not be found.`);
+		while (currentId != null && currentId != 0xFFFF)
+		{
+			const vehicle = this.getCarEntity(currentId);
+			if (!vehicle)
+			{
 				break;
 			}
 
@@ -89,10 +98,29 @@ export class RideTrain {
 		}
 		return vehicles;
 	}
+
+
+	private getCarEntity(carId: number): (Car | null)
+	{
+		const entity = map.getEntity(carId);
+		if (!entity)
+		{
+			error(`Entity ${carId} could not be found.`, this.getVehicles.name);
+			return null;
+		}
+		const vehicle = entity as Car;
+		if (!vehicle)
+		{
+			error(`Entity ${entity} is not a car.`, this.getVehicles.name);
+			return null;
+		}
+		return vehicle;
+	}
 }
 
 
-export class RideVehicle {
+export class RideVehicle
+{
 	/**
 	 * @param entityId Gets the id of the associated entity in the park.
 	 */
@@ -104,7 +132,8 @@ export class RideVehicle {
 	/**
 	 * Gets the associated vehicle data from the game.
 	 */
-	getCar(): Car {
+	getCar(): Car
+	{
 		return map.getEntity(this.entityId) as Car;
 	}
 }
