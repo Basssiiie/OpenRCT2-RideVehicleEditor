@@ -10,7 +10,9 @@ const rideSelectGroupId = 'rve-selection-group';
 const rideLabelId = 'rve-ride-label';
 const rideListId = 'rve-ride-list';
 const trainListId = 'rve-train-list';
+const trainSpinnerId = 'rve-train-spinner';
 const vehicleListId = 'rve-vehicle-list';
+const vehicleSpinnerId = 'rve-vehicle-spinner';
 
 const vehicleViewportId = 'rve-vehicle-image';
 const rideTypeListId = 'rve-ride-type-list';
@@ -18,7 +20,7 @@ const variantLabelId = 'rve-variant-label';
 const variantSpinnerId = 'rve-variant-spinner';
 
 const windowStart = 18;
-const windowWidth = 300;
+const windowWidth = 350;
 const widgetLineHeight = 14;
 const groupboxMargin = 5;
 const groupboxItemMargin = (groupboxMargin + 5);
@@ -90,9 +92,9 @@ export class VehicleEditorWindow
 			classification: windowId,
 			title: "Ride vehicle editor",
 			width: windowWidth,
-			height: 200,
+			height: 210,
 			widgets: [
-				// Selection group:
+				// Selection group
 				<Widget>{
 					name: rideSelectGroupId,
 					type: 'groupbox' as WidgetType,
@@ -101,6 +103,7 @@ export class VehicleEditorWindow
 					width: windowWidth - (groupboxMargin * 2),
 					height: 64
 				},
+				// Ride selector
 				<LabelWidget>{
 					name: rideLabelId,
 					type: 'label' as WidgetType,
@@ -121,23 +124,47 @@ export class VehicleEditorWindow
 					selectedIndex: 0,
 					onChange: i => this.selector.setRideIndex(i)
 				},
+				// Train selector
+				<SpinnerWidget>{
+					name: trainSpinnerId,
+					type: 'spinner' as WidgetType,
+					x: groupboxItemMargin,
+					y: windowStart + 43,
+					width: (groupboxItemWidth / 2) - 2,
+					height: widgetLineHeight,
+					text: "",
+					onIncrement: () => this.selector.setTrainIndex(this.selector.trainIndex + 1),
+					onDecrement: () => this.selector.setTrainIndex(this.selector.trainIndex - 1)
+				},
 				<DropdownWidget>{
 					name: trainListId,
 					type: 'dropdown' as WidgetType,
 					x: groupboxItemMargin,
 					y: windowStart + 43,
-					width: (groupboxItemWidth / 2) - 2,
+					width: ((groupboxItemWidth / 2) - (widgetLineHeight * 2)) + 1,
 					height: widgetLineHeight,
 					items: ["No trains available"],
 					selectedIndex: 0,
 					onChange: i => this.selector.setTrainIndex(i)
+				},
+				// Vehicle selector
+				<SpinnerWidget>{
+					name: vehicleSpinnerId,
+					type: 'spinner' as WidgetType,
+					x: groupboxItemMargin + (groupboxItemWidth / 2) + 2,
+					y: windowStart + 43,
+					width: (groupboxItemWidth / 2) - 2,
+					height: widgetLineHeight,
+					text: "",
+					onIncrement: () => this.selector.setVehicleIndex(this.selector.vehicleIndex + 1),
+					onDecrement: () => this.selector.setVehicleIndex(this.selector.vehicleIndex - 1)
 				},
 				<DropdownWidget>{
 					name: vehicleListId,
 					type: 'dropdown' as WidgetType,
 					x: groupboxItemMargin + (groupboxItemWidth / 2) + 2,
 					y: windowStart + 43,
-					width: (groupboxItemWidth / 2) - 2,
+					width: ((groupboxItemWidth / 2) - (widgetLineHeight * 2)) + 1,
 					height: widgetLineHeight,
 					items: ["No vehicles available"],
 					selectedIndex: 0,
@@ -183,7 +210,28 @@ export class VehicleEditorWindow
 					text: "Not available",
 					onIncrement: () => this.editor.setVehicleVariant(this.editor.vehicleVariant + 1),
 					onDecrement: () => this.editor.setVehicleVariant(this.editor.vehicleVariant - 1)
-				}
+				},
+				/*
+				<ButtonWidget>{
+					name: variantSpinnerId,
+					type: 'button' as WidgetType,
+					x: (groupboxMargin + viewportSize + 5) + (controlsSize * 0.4),
+					y: (editorStartY + 18),
+					width: (controlsSize * 0.6),
+					height: widgetLineHeight,
+					image: 1
+				},
+				*/
+				<LabelWidget>{
+					name: variantLabelId,
+					type: 'label' as WidgetType,
+					x: (groupboxMargin + 30),
+					y: (editorStartY + viewportSize) + 4,
+					width: windowWidth,
+					height: widgetLineHeight,
+					text: "github.com/Basssiiie/OpenRCT2-RideVehicleEditor",
+					isDisabled: true
+				},
 			],
 			onClose: () =>
 			{
@@ -243,6 +291,17 @@ export class VehicleEditorWindow
 	}
 
 
+	setSelectedTrain(trainIndex: number)
+	{
+		const trainList = this.tryFindWidget<DropdownWidget>(trainListId);
+
+		if (trainList)
+		{
+			trainList.selectedIndex = trainIndex;
+		}
+	}
+
+
 	setVehicleList(vehicles: RideVehicle[] | null)
 	{
 		const vehicleList = this.tryFindWidget<DropdownWidget>(vehicleListId);
@@ -267,6 +326,17 @@ export class VehicleEditorWindow
 				vehicleList.isDisabled = true;
 				vehicleList.items = ["No vehicles available"];
 			}
+		}
+	}
+
+
+	setSelectedVehicle(vehicleIndex: number)
+	{
+		const vehicleList = this.tryFindWidget<DropdownWidget>(vehicleListId);
+
+		if (vehicleList)
+		{
+			vehicleList.selectedIndex = vehicleIndex;
 		}
 	}
 

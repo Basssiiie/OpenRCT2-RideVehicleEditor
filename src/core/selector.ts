@@ -1,5 +1,5 @@
 import { getRidesInPark, ParkRide, RideTrain, RideVehicle } from "../helpers/ridesInPark";
-import { error, log } from "../helpers/utilityHelpers";
+import { error, log, wrap } from "../helpers/utilityHelpers";
 import { VehicleEditorWindow } from "./window";
 
 
@@ -77,38 +77,45 @@ export class VehicleSelector
 	setTrainIndex(trainIndex: number)
 	{
 		log(`Selected train: ${trainIndex}`);
-		this._selectedTrainIndex = trainIndex;
-
 		if (this._rideTrains && this._rideTrains.length > 0)
 		{
+			trainIndex = wrap(trainIndex, this._rideTrains.length);
+			this._selectedTrainIndex = trainIndex;
+
 			const train = this._rideTrains[trainIndex];
 			this._trainVehicles = train.getVehicles();
 
+			this.window.setSelectedTrain(trainIndex);
 			this.window.setVehicleList(this._trainVehicles);
 			this.setVehicleIndex(0);
 		}
 		else
 		{
+			this._selectedTrainIndex = 0;
+
 			error("This ride has no trains.", this.setTrainIndex.name);
 			this.window.setVehicleList(null);
 			this.window.setEditor(null);
 		}
-
 	}
 
 
 	setVehicleIndex(vehicleIndex: number)
 	{
 		log(`Selected vehicle: ${vehicleIndex}`);
-		this._selectedVehicleIndex = vehicleIndex;
-
 		if (this._trainVehicles && this._trainVehicles.length > 0)
 		{
+			vehicleIndex = wrap(vehicleIndex, this._trainVehicles.length);
+			this._selectedVehicleIndex = vehicleIndex;
+
 			const vehicle = this._trainVehicles[vehicleIndex];
+			this.window.setSelectedVehicle(vehicleIndex);
 			this.window.setEditor(vehicle);
 		}
 		else
 		{
+			this._selectedVehicleIndex = 0;
+
 			error("Error: this train has no vehicles.", this.setVehicleIndex.name);
 			this.window.setEditor(null);
 		}
