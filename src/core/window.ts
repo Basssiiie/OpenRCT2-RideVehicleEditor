@@ -19,6 +19,10 @@ const rideTypeListId = 'rve-ride-type-list';
 const variantLabelId = 'rve-variant-label';
 const variantSpinnerId = 'rve-variant-spinner';
 
+const xPosSpinnerId = 'rve-pos-x-spinner';
+const yPosSpinnerId = 'rve-pos-y-spinner';
+const zPosSpinnerId = 'rve-pos-z-spinner';
+
 const windowStart = 18;
 const windowWidth = 350;
 const widgetLineHeight = 14;
@@ -216,6 +220,40 @@ export class VehicleEditorWindow
 					onIncrement: () => this.editor.setVehicleVariant(this.editor.vehicleVariant + 1),
 					onDecrement: () => this.editor.setVehicleVariant(this.editor.vehicleVariant - 1)
 				},
+				// Vehicle position
+				<SpinnerWidget>{
+					name: xPosSpinnerId,
+					type: 'spinner' as WidgetType,
+					x: (groupboxMargin + viewportSize + 5) + (controlsSize * 0.25),
+					y: (editorStartY + 18 * 2),
+					width: (controlsSize * 0.25) + 2,
+					height: widgetLineHeight,
+					text: "?",
+					onIncrement: () => this.editor.setVehicleX(this.editor.vehiclePosition.x + 1),
+					onDecrement: () => this.editor.setVehicleX(this.editor.vehiclePosition.x - 1)
+				},
+				<SpinnerWidget>{
+					name: yPosSpinnerId,
+					type: 'spinner' as WidgetType,
+					x: (groupboxMargin + viewportSize + 5) + (controlsSize * 0.5) - 1,
+					y: (editorStartY + 18 * 2),
+					width: (controlsSize * 0.25) + 2,
+					height: widgetLineHeight,
+					text: "?",
+					onIncrement: () => this.editor.setVehicleY(this.editor.vehiclePosition.y + 1),
+					onDecrement: () => this.editor.setVehicleY(this.editor.vehiclePosition.y - 1)
+				},
+				<SpinnerWidget>{
+					name: zPosSpinnerId,
+					type: 'spinner' as WidgetType,
+					x: (groupboxMargin + viewportSize + 5) + (controlsSize * 0.75) - 2,
+					y: (editorStartY + 18 * 2),
+					width: (controlsSize * 0.25) + 2,
+					height: widgetLineHeight,
+					text: "?",
+					onIncrement: () => this.editor.setVehicleZ(this.editor.vehiclePosition.z + 10),
+					onDecrement: () => this.editor.setVehicleZ(this.editor.vehiclePosition.z - 10)
+				},
 				/*
 				<ButtonWidget>{
 					name: variantSpinnerId,
@@ -342,6 +380,28 @@ export class VehicleEditorWindow
 		if (vehicleList)
 		{
 			vehicleList.selectedIndex = vehicleIndex;
+		}
+	}
+
+
+	setVehiclePositionSpinners(position: CoordsXYZ | null)
+	{
+		const xPosSpinner = this.tryFindWidget<SpinnerWidget>(xPosSpinnerId);
+		if (xPosSpinner)
+		{
+			xPosSpinner.text = (position) ? position.x.toString() : "?";
+		}
+
+		const yPosSpinner = this.tryFindWidget<SpinnerWidget>(yPosSpinnerId);
+		if (yPosSpinner)
+		{
+			yPosSpinner.text = (position) ? position.y.toString() : "?";
+		}
+
+		const zPosSpinner = this.tryFindWidget<SpinnerWidget>(zPosSpinnerId);
+		if (zPosSpinner)
+		{
+			zPosSpinner.text = (position) ? position.z.toString() : "?";
 		}
 	}
 

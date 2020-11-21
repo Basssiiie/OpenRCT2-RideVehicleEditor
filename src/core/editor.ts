@@ -55,9 +55,10 @@ export class VehicleEditor
 		const car = vehicle.getCar();
 
 		// Viewport
+		this.updateViewportAndPosition();
 		if (!this._viewportUpdater)
 		{
-			this._viewportUpdater = context.subscribe("interval.tick", () => this.updateViewport());
+			this._viewportUpdater = context.subscribe("interval.tick", () => this.updateViewportAndPosition());
 		}		
 
 		// Ride type
@@ -155,6 +156,60 @@ export class VehicleEditor
 	}
 
 
+	setVehicleX(value: number)
+	{
+		if (!this._selectedVehicle)
+		{
+			error("There is no vehicle selected.", this.setVehicleX.name);
+			return;
+		}
+
+		const currentCar = this._selectedVehicle.getCar();
+		currentCar.x = value;
+
+		this.vehiclePosition.x = value;
+		this.window.setVehiclePositionSpinners(this.vehiclePosition);
+
+		log("Car x position updated to " + value);
+	}
+
+
+	setVehicleY(value: number)
+	{
+		if (!this._selectedVehicle)
+		{
+			error("There is no vehicle selected.", this.setVehicleX.name);
+			return;
+		}
+
+		const currentCar = this._selectedVehicle.getCar();
+		currentCar.y = value;
+
+		this.vehiclePosition.y = value;
+		this.window.setVehiclePositionSpinners(this.vehiclePosition);
+
+		log("Car y position updated to " + value);
+	}
+
+
+	setVehicleZ(value: number)
+	{
+		if (!this._selectedVehicle)
+		{
+			error("There is no vehicle selected.", this.setVehicleX.name);
+			return;
+		}
+
+		const currentCar = this._selectedVehicle.getCar();
+		currentCar.z = value;
+
+		this.vehiclePosition.z = value;
+		this.window.setVehiclePositionSpinners(this.vehiclePosition);
+
+		log("Car z position updated to " + value);
+	}
+
+
 	stopViewportUpdater()
 	{
 		if (this._viewportUpdater)
@@ -165,11 +220,11 @@ export class VehicleEditor
 	}
 
 
-	private updateViewport()
+	private updateViewportAndPosition()
 	{
 		if (!this._selectedVehicle)
 		{
-			error("Viewport is still updated despite lack of selected vehicle.", this.updateViewport.name);
+			error("Viewport is still updated despite lack of selected vehicle.", this.updateViewportAndPosition.name);
 			this.stopViewportUpdater();
 			return;
 		}
@@ -178,6 +233,7 @@ export class VehicleEditor
 		this._vehiclePosition = { x: trackedCar.x, y: trackedCar.y, z: trackedCar.z };
 
 		this.window.setViewportPosition(this._vehiclePosition);
+		this.window.setVehiclePositionSpinners(this._vehiclePosition);
 	}
 
 
