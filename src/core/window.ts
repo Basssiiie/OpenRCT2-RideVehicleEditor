@@ -29,6 +29,7 @@ const groupboxItemWidth = windowWidth - (groupboxItemMargin * 2);
 const editorStartY = 90;
 const viewportSize = 100;
 const controlsSize = (windowWidth - (groupboxMargin * 2) - (viewportSize + 5));
+const buttonSize = 24;
 
 
 export class VehicleEditorWindow
@@ -90,7 +91,7 @@ export class VehicleEditorWindow
 
 		this.window = ui.openWindow({
 			classification: windowId,
-			title: "Ride vehicle editor",
+			title: "Ride vehicle editor (v0.2)",
 			width: windowWidth,
 			height: 210,
 			widgets: [
@@ -180,7 +181,6 @@ export class VehicleEditorWindow
 					y: editorStartY,
 					width: viewportSize,
 					height: viewportSize,
-					isDisabled: true,
 					viewport: {}
 				},
 				<DropdownWidget>{
@@ -188,7 +188,7 @@ export class VehicleEditorWindow
 					type: 'dropdown' as WidgetType,
 					x: groupboxMargin + viewportSize + 5,
 					y: editorStartY,
-					width: controlsSize,
+					width: controlsSize - 1,
 					height: widgetLineHeight,
 					items: ["No ride types available"],
 					selectedIndex: 0,
@@ -198,7 +198,7 @@ export class VehicleEditorWindow
 				<LabelWidget>{
 					name: variantLabelId,
 					type: 'label' as WidgetType,
-					x: (groupboxMargin + viewportSize + 5) + 2,
+					x: (groupboxMargin + viewportSize + 5),
 					y: (editorStartY + 18) + 1,
 					width: (controlsSize * 0.3),
 					height: widgetLineHeight,
@@ -216,17 +216,16 @@ export class VehicleEditorWindow
 					onIncrement: () => this.editor.setVehicleVariant(this.editor.vehicleVariant + 1),
 					onDecrement: () => this.editor.setVehicleVariant(this.editor.vehicleVariant - 1)
 				},
-				/*
 				<ButtonWidget>{
 					name: variantSpinnerId,
 					type: 'button' as WidgetType,
-					x: (groupboxMargin + viewportSize + 5) + (controlsSize * 0.4),
-					y: (editorStartY + 18),
-					width: (controlsSize * 0.6),
-					height: widgetLineHeight,
-					image: 1
+					x: (groupboxMargin + viewportSize + 2),
+					y: (editorStartY + (viewportSize - (buttonSize + 2))),
+					width: buttonSize,
+					height: buttonSize,
+					image: 5167, // SPR_LOCATE
+					onClick: () => this.scrollToVehicle()
 				},
-				*/
 				<LabelWidget>{
 					name: variantLabelId,
 					type: 'label' as WidgetType,
@@ -346,29 +345,27 @@ export class VehicleEditorWindow
 	}
 
 
-	setViewportPosition(position: CoordsXYZ)
+	setEditor(vehicle: RideVehicle | null)
+	{
+		this.editor.setVehicle(vehicle);
+	}
+
+
+	setViewportPosition(position: CoordsXYZ | null)
 	{
 		const viewport = this.tryFindWidget<ViewportWidget>(vehicleViewportId);
 
 		if (viewport)
 		{
-			viewport.viewport.moveTo(position);
+			if (position)
+			{
+				viewport.viewport.moveTo(position);
+			}
+			else
+			{
+				viewport.viewport.moveTo({ x: -9000, y: -9000 });
+			}
 		}
-	}
-
-
-	setEditor(vehicle: RideVehicle | null)
-	{
-		if (vehicle)
-		{
-			this.editor.setVehicle(vehicle);
-		}
-		else
-		{
-			this.setSelectedRideType(null);
-			this.setVariantSpinner(null);
-		}
-
 	}
 
 
@@ -427,6 +424,19 @@ export class VehicleEditorWindow
 				variantSpinner.isDisabled = true;
 				variantSpinner.text = "Not available";
 			}
+		}
+	}
+
+
+	private scrollToVehicle()
+	{
+		if (this.editor.selectedVehicle && this.editor.vehiclePosition)
+		{
+			ui.mainViewport.scrollTo(this.editor.vehiclePosition)
+		}
+		else
+		{
+			error("No vehicle has been selected to scroll to.", this.scrollToVehicle.name);
 		}
 	}
 

@@ -70,7 +70,6 @@ export class VehicleSelector
 			this.window.setVehicleList(null);
 			this.window.setEditor(null);
 		}
-
 	}
 
 

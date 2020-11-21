@@ -7,8 +7,17 @@ import { VehicleEditorWindow } from "./window";
 export class VehicleEditor
 {
 	private _rideTypes: RideType[];
-	private _selectedVehicle: (RideVehicle | null) = null;
 	private _viewportUpdater: (IDisposable | null) = null;
+
+
+	/**
+	 * Gets the currently selected vehicle.
+	 */
+	get selectedVehicle(): (RideVehicle | null)
+	{
+		return this._selectedVehicle;
+	}
+	private _selectedVehicle: (RideVehicle | null) = null;
 
 
 	/**
@@ -34,11 +43,11 @@ export class VehicleEditor
 	/**
 	 * Gets the currently selected ride type index.
 	 */
-	get vehiclePosition(): CoordsXYZ
+	get vehiclePosition(): (CoordsXYZ | null)
 	{
 		return this._vehiclePosition;
 	}
-	private _vehiclePosition: CoordsXYZ = { x: 0, y: 0, z: 0 };
+	private _vehiclePosition: (CoordsXYZ | null) = null;
 
 
 	constructor(readonly window: VehicleEditorWindow)
@@ -49,12 +58,32 @@ export class VehicleEditor
 	}
 
 
-	setVehicle(vehicle: RideVehicle)
+	private disable()
 	{
+		this._selectedVehicle = null;
+		this._vehiclePosition = null;
+
+		this.stopViewportUpdater();
+
+		this.window.setViewportPosition(null);
+		this.window.setSelectedRideType(null);
+		this.window.setVariantSpinner(null);
+	}
+
+
+	setVehicle(vehicle: RideVehicle | null)
+	{
+		if (!vehicle)
+		{
+			this.disable();
+			return;
+		}
+
 		this._selectedVehicle = vehicle;
 		const car = vehicle.getCar();
 
 		// Viewport
+		this.updateViewport();
 		if (!this._viewportUpdater)
 		{
 			this._viewportUpdater = context.subscribe("interval.tick", () => this.updateViewport());
@@ -62,7 +91,7 @@ export class VehicleEditor
 
 		// Ride type
 		const rideTypeId = car.rideObject;
-		//const index = this.rideTypes.findIndex(r => r.rideIndex == rideDefinitionId);
+		//this._selectedTypeIndex = this._rideTypes.findIndex(r => r.rideIndex == rideTypeId);		
 		for (let i = 0; i < this._rideTypes.length; i++)
 		{
 			if (this._rideTypes[i].rideIndex == rideTypeId)
@@ -109,14 +138,13 @@ export class VehicleEditor
 		currentCar.rideObject = rideType.rideIndex;
 
 		this.setVehicleVariant(currentCar.vehicleObject);
-
+		
 		// TEMP: log all vehicle types
 		var r = context.getObject("ride", rideType.rideIndex);
 
-		log(`name: ${r.name}, tabVehicle: "${r.tabVehicle}", minCarTrain: ${r.minCarsInTrain}, maxCarTrain: ${r.maxCarsInTrain}, carPerFlatRide: ${r.carsPerFlatRide}, shopItem: ${r.shopItem}, shopItem2: ${r.shopItemSecondary}`);
+		log(`Ride name: ${r.name}, tabVehicle: ${r.tabVehicle}, minCarTrain: ${r.minCarsInTrain}, maxCarTrain: ${r.maxCarsInTrain}, carPerFlatRide: ${r.carsPerFlatRide}, shopItem: ${r.shopItem}, shopItem2: ${r.shopItemSecondary}`);
 
-		r.vehicles.forEach(v => log(`- tabHeight: ${v.tabHeight}, spriteFlags: ${v.spriteFlags}, spriteSize: ${v.spriteWidth}x${v.spriteHeightPositive}, noSeatingRows: ${v.noSeatingRows}, noVehicleImages: ${v.noVehicleImages}, carVisual: ${v.carVisual}, baseImageId: ${v.baseImageId}, spacing: ${v.spacing}, numSeats: ${v.numSeats}, flags: ${v.flags}`));
-
+		r.vehicles.forEach(v => log(`- Vehicle: tabHeight: ${v.tabHeight}, spriteFlags: ${v.spriteFlags}, spriteSize: ${v.spriteWidth}x${v.spriteHeightPositive}, noSeatingRows: ${v.noSeatingRows}, noVehicleImages: ${v.noVehicleImages}, carVisual: ${v.carVisual}, baseImageId: ${v.baseImageId}, spacing: ${v.spacing}, numSeats: ${v.numSeats}, flags: ${v.flags}`));
 	}
 
 
@@ -175,7 +203,16 @@ export class VehicleEditor
 		}
 
 		const trackedCar = this._selectedVehicle.getCar();
-		this._vehiclePosition = { x: trackedCar.x, y: trackedCar.y, z: trackedCar.z };
+
+		if (trackedCar)
+		{
+			this._vehiclePosition = { x: trackedCar.x, y: trackedCar.y, z: trackedCar.z };
+		}
+		else
+		{
+			error("Selected vehicle has disappeared.", this.updateViewport.name);
+			this.setVehicle(null);
+		}
 
 		this.window.setViewportPosition(this._vehiclePosition);
 	}

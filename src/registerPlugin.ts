@@ -4,7 +4,7 @@ import main from './main';
 
 registerPlugin({
 	name: 'RideVehicleEditor',
-	version: '0.1',
+	version: '0.2',
 	authors: ['Basssiiie'],
 	type: 'local',
 	licence: 'MIT',
