@@ -13,7 +13,7 @@ export default {
 			format: {
 				quote_style: 1,
 				wrap_iife: true,
-				preamble: '// Mod powered by https://github.com/wisnia74/openrct2-typescript-mod-template - MIT license',
+				preamble: '// Get the latest version: https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor',
 			},
 		}),
 	],

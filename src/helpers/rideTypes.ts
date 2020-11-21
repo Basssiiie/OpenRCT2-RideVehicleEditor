@@ -1,8 +1,12 @@
+import { log } from "./utilityHelpers";
+
 /**
  * Gets all available ride types that are currently loaded.
  */
 export function getAvailableRideTypes(): RideType[]
 {
+	log("Get ride types");
+
 	return context
 		.getAllObjects("ride")
 		.filter(r => r.carsPerFlatRide != 0) // tracked rides == 255, flatrides >= 1, shops == 0

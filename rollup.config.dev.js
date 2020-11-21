@@ -4,7 +4,7 @@ import { terser } from 'rollup-plugin-terser';
 export default {
 	input: './src/registerPlugin.ts',
 	output: {
-		file: 'D:/bas-c/Documents/OpenRCT2/plugin/RideVehicleEditor.js',
+		file: 'dist/RideVehicleEditor.js', // CHANGE THIS TO YOUR OPENRCT2 PLUGIN FOLDER FOR HOT RELOAD
 		format: 'iife',
 	},
 	plugins: [
@@ -13,7 +13,7 @@ export default {
 			format: {
 				quote_style: 1,
 				wrap_iife: true,
-				preamble: '// Mod powered by https://github.com/wisnia74/openrct2-typescript-mod-template - MIT license',
+				preamble: '// Get the latest version: https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor',
 			},
 		}),
 	],
