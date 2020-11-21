@@ -4,6 +4,9 @@ import { error, log, wrap } from "../helpers/utilityHelpers";
 import { VehicleEditorWindow } from "./window";
 
 
+/**
+ * Service that allows to edit the selected vehicle.
+ */
 export class VehicleEditor
 {
 	private _rideTypes: RideType[];
@@ -50,6 +53,12 @@ export class VehicleEditor
 	private _vehiclePosition: (CoordsXYZ | null) = null;
 
 
+	/**
+	 * Create a new vehicle editor service that can edit the selected vehicle.
+	 *
+	 * @param window A vehicle editor window that should be updated according
+	 * to how the vehicle is edited.
+	 */
 	constructor(readonly window: VehicleEditorWindow)
 	{
 		this._rideTypes = getAvailableRideTypes();

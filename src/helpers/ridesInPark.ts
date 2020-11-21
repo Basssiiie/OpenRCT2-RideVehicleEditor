@@ -100,6 +100,7 @@ export class RideTrain
 	}
 
 
+	// Get the entity for this car id, or print an error if it is not found.
 	private getCarEntity(carId: number): (Car | null)
 	{
 		const entity = map.getEntity(carId);

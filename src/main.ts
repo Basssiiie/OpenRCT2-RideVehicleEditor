@@ -2,6 +2,9 @@ import { isUiAvailable, log } from './helpers/utilityHelpers';
 import { VehicleEditorWindow } from './core/window';
 
 
+/**
+ * Entry point of the plugin.
+ */
 const main = (): void => {
 	log("Plugin started.");
 

@@ -5,9 +5,8 @@ import { VehicleEditor } from "./editor";
 import { VehicleSelector } from "./selector";
 
 
+// All widget ids
 const windowId = 'ride-vehicle-editor';
-const rideSelectGroupId = 'rve-selection-group';
-const rideLabelId = 'rve-ride-label';
 const rideListId = 'rve-ride-list';
 const trainListId = 'rve-train-list';
 const trainSpinnerId = 'rve-train-spinner';
@@ -16,9 +15,10 @@ const vehicleSpinnerId = 'rve-vehicle-spinner';
 
 const vehicleViewportId = 'rve-vehicle-image';
 const rideTypeListId = 'rve-ride-type-list';
-const variantLabelId = 'rve-variant-label';
 const variantSpinnerId = 'rve-variant-spinner';
 
+
+// Shared coordinate constants
 const windowStart = 18;
 const windowWidth = 350;
 const widgetLineHeight = 14;
@@ -34,10 +34,12 @@ const buttonSize = 24;
 
 export class VehicleEditorWindow
 {
-	private selector: VehicleSelector;
-	private editor: VehicleEditor;
+	private static _windowInstance: (VehicleEditorWindow | null);
 
-	private window: Window | null;
+	private _selector: VehicleSelector;
+	private _editor: VehicleEditor;
+
+	private _window: Window | null;
 
 
 	/**
@@ -47,11 +49,10 @@ export class VehicleEditorWindow
 	{
 		log("Open vehicle editor.");
 
-		//if (this.windowInstance == null) {
-		//    this.windowInstance = new VehicleEditorWindow();
-		//}
-		//this.windowInstance.window.bringToFront();
-		return new VehicleEditorWindow();// this.windowInstance;
+		if (!this._windowInstance) {
+		    this._windowInstance = new VehicleEditorWindow();
+		}
+		return this._windowInstance;
 	}
 
 
@@ -63,11 +64,11 @@ export class VehicleEditorWindow
 	 */
 	private constructor()
 	{
-		this.window = ui.getWindow(windowId);
+		this._window = ui.getWindow(windowId);
 
-		if (this.window)
+		if (this._window)
 		{
-			this.window.bringToFront();
+			this._window.bringToFront();
 		}
 		else
 		{
@@ -75,10 +76,10 @@ export class VehicleEditorWindow
 		}
 
 		log("Initializing services.");
-		this.selector = new VehicleSelector(this);
-		this.editor = new VehicleEditor(this);
+		this._selector = new VehicleSelector(this);
+		this._editor = new VehicleEditor(this);
 
-		this.selector.setRideIndex(0);
+		this._selector.selectRide(0);
 	}
 
 
@@ -89,7 +90,7 @@ export class VehicleEditorWindow
 	{
 		log("Open window")
 
-		this.window = ui.openWindow({
+		this._window = ui.openWindow({
 			classification: windowId,
 			title: "Ride vehicle editor (v0.2)",
 			width: windowWidth,
@@ -97,7 +98,6 @@ export class VehicleEditorWindow
 			widgets: [
 				// Selection group
 				<Widget>{
-					name: rideSelectGroupId,
 					type: 'groupbox' as WidgetType,
 					x: groupboxMargin,
 					y: windowStart,
@@ -106,7 +106,6 @@ export class VehicleEditorWindow
 				},
 				// Ride selector
 				<LabelWidget>{
-					name: rideLabelId,
 					type: 'label' as WidgetType,
 					x: groupboxItemMargin,
 					y: windowStart + 10,
@@ -123,7 +122,7 @@ export class VehicleEditorWindow
 					height: widgetLineHeight,
 					items: ["No rides available"],
 					selectedIndex: 0,
-					onChange: i => this.selector.setRideIndex(i)
+					onChange: i => this._selector.selectRide(i)
 				},
 				// Train selector
 				<SpinnerWidget>{
@@ -134,8 +133,8 @@ export class VehicleEditorWindow
 					width: (groupboxItemWidth / 2) - 2,
 					height: widgetLineHeight,
 					text: "",
-					onIncrement: () => this.selector.setTrainIndex(this.selector.trainIndex + 1),
-					onDecrement: () => this.selector.setTrainIndex(this.selector.trainIndex - 1)
+					onIncrement: () => this._selector.selectTrain(this._selector.trainIndex + 1),
+					onDecrement: () => this._selector.selectTrain(this._selector.trainIndex - 1)
 				},
 				<DropdownWidget>{
 					name: trainListId,
@@ -147,7 +146,7 @@ export class VehicleEditorWindow
 					items: ["No trains available"],
 					selectedIndex: 0,
 					isDisabled: true,
-					onChange: i => this.selector.setTrainIndex(i)
+					onChange: i => this._selector.selectTrain(i)
 				},
 				// Vehicle selector
 				<SpinnerWidget>{
@@ -158,8 +157,8 @@ export class VehicleEditorWindow
 					width: (groupboxItemWidth / 2) - 2,
 					height: widgetLineHeight,
 					text: "",
-					onIncrement: () => this.selector.setVehicleIndex(this.selector.vehicleIndex + 1),
-					onDecrement: () => this.selector.setVehicleIndex(this.selector.vehicleIndex - 1)
+					onIncrement: () => this._selector.selectVehicle(this._selector.vehicleIndex + 1),
+					onDecrement: () => this._selector.selectVehicle(this._selector.vehicleIndex - 1)
 				},
 				<DropdownWidget>{
 					name: vehicleListId,
@@ -171,7 +170,7 @@ export class VehicleEditorWindow
 					items: ["No vehicles available"],
 					isDisabled: true,
 					selectedIndex: 0,
-					onChange: i => this.selector.setVehicleIndex(i)
+					onChange: i => this._selector.selectVehicle(i)
 				},
 				// Ride vehicle editor:
 				<ViewportWidget>{
@@ -192,11 +191,10 @@ export class VehicleEditorWindow
 					height: widgetLineHeight,
 					items: ["No ride types available"],
 					selectedIndex: 0,
-					onChange: i => this.editor.setRideType(i)
+					onChange: i => this._editor.setRideType(i)
 				},
 				// Vehicle variant
 				<LabelWidget>{
-					name: variantLabelId,
 					type: 'label' as WidgetType,
 					x: (groupboxMargin + viewportSize + 5),
 					y: (editorStartY + 18) + 1,
@@ -213,11 +211,10 @@ export class VehicleEditorWindow
 					height: widgetLineHeight,
 					text: "Not available",
 					isDisabled: true,
-					onIncrement: () => this.editor.setVehicleVariant(this.editor.vehicleVariant + 1),
-					onDecrement: () => this.editor.setVehicleVariant(this.editor.vehicleVariant - 1)
+					onIncrement: () => this._editor.setVehicleVariant(this._editor.vehicleVariant + 1),
+					onDecrement: () => this._editor.setVehicleVariant(this._editor.vehicleVariant - 1)
 				},
 				<ButtonWidget>{
-					name: variantSpinnerId,
 					type: 'button' as WidgetType,
 					x: (groupboxMargin + viewportSize + 2),
 					y: (editorStartY + (viewportSize - (buttonSize + 2))),
@@ -227,7 +224,6 @@ export class VehicleEditorWindow
 					onClick: () => this.scrollToVehicle()
 				},
 				<LabelWidget>{
-					name: variantLabelId,
 					type: 'label' as WidgetType,
 					x: (groupboxMargin + 33),
 					y: (editorStartY + viewportSize) + 4,
@@ -240,13 +236,20 @@ export class VehicleEditorWindow
 			onClose: () =>
 			{
 				log("Close window");
-				this.editor.stopViewportUpdater();
-				this.window = null;
+				this._editor.stopViewportUpdater();
+				this._window = null;
+
+				VehicleEditorWindow._windowInstance = null;
 			}
 		});
 	}
 
 
+	/**
+	 * Update the ride list with the specified rides in the park.
+	 * 
+	 * @param rides The rides to show in the list.
+	 */
 	setRideList(rides: ParkRide[] | null)
 	{
 		const rideList = this.tryFindWidget<DropdownWidget>(rideListId);
@@ -267,6 +270,11 @@ export class VehicleEditorWindow
 	}
 
 
+	/**
+	 * Update the train list with the specified trains.
+	 * 
+	 * @param trains The trains to show in the list.
+	 */
 	setTrainList(trains: RideTrain[] | null)
 	{
 		const trainList = this.tryFindWidget<DropdownWidget>(trainListId);
@@ -295,6 +303,11 @@ export class VehicleEditorWindow
 	}
 
 
+	/**
+	 * Updates the train list to select the train at the specified index.
+	 * 
+	 * @param trainIndex The index of the train to select from the train list.
+	 */
 	setSelectedTrain(trainIndex: number)
 	{
 		const trainList = this.tryFindWidget<DropdownWidget>(trainListId);
@@ -306,6 +319,11 @@ export class VehicleEditorWindow
 	}
 
 
+	/**
+	 * Updates the vehicle list with the specified vehicles.
+	 * 
+	 * @param vehicles The vehicles to show in the list.
+	 */
 	setVehicleList(vehicles: RideVehicle[] | null)
 	{
 		const vehicleList = this.tryFindWidget<DropdownWidget>(vehicleListId);
@@ -334,6 +352,11 @@ export class VehicleEditorWindow
 	}
 
 
+	/**
+	 * Updates the vehicle list to select the vehicle at the specified index.
+	 *
+	 * @param vehicleIndex The index of the vehicle to select from the vehicle list.
+	 */
 	setSelectedVehicle(vehicleIndex: number)
 	{
 		const vehicleList = this.tryFindWidget<DropdownWidget>(vehicleListId);
@@ -345,12 +368,22 @@ export class VehicleEditorWindow
 	}
 
 
+	/**
+	 * Updates the editor to show the specified vehicle.
+	 * 
+	 * @param vehicle The vehicle to show in the editor.
+	 */
 	setEditor(vehicle: RideVehicle | null)
 	{
-		this.editor.setVehicle(vehicle);
+		this._editor.setVehicle(vehicle);
 	}
 
 
+	/**
+	 * Updates the viewport to show the specified position.
+	 * 
+	 * @param position A position in the world to show in the viewport.
+	 */
 	setViewportPosition(position: CoordsXYZ | null)
 	{
 		const viewport = this.tryFindWidget<ViewportWidget>(vehicleViewportId);
@@ -369,6 +402,11 @@ export class VehicleEditorWindow
 	}
 
 
+	/**
+	 * Updates the ride type list with the specified ride types.
+	 * 
+	 * @param rideTypes The ride types to show in the ride type list.
+	 */
 	setRideTypeList(rideTypes: RideType[])
 	{
 		const typeList = this.tryFindWidget<DropdownWidget>(rideTypeListId);
@@ -389,6 +427,11 @@ export class VehicleEditorWindow
 	}
 
 
+	/**
+	 * Updates the ride type list to select the ride type at the specified index.
+	 *
+	 * @param rideTypeIndex The index of the ride type to select from the ride type list.
+	 */
 	setSelectedRideType(rideTypeIndex: number | null)
 	{
 		const typeList = this.tryFindWidget<DropdownWidget>(rideTypeListId);
@@ -408,6 +451,11 @@ export class VehicleEditorWindow
 	}
 
 
+	/**
+	 * Updates the variant spinner to show the specified number.
+	 * 
+	 * @param number The number of the vehicle variant.
+	 */
 	setVariantSpinner(number: number | null)
 	{
 		const variantSpinner = this.tryFindWidget<SpinnerWidget>(variantSpinnerId);
@@ -428,11 +476,14 @@ export class VehicleEditorWindow
 	}
 
 
+	/**
+	 * Scroll the main viewport to the currently selected vehicle.
+	 */
 	private scrollToVehicle()
 	{
-		if (this.editor.selectedVehicle && this.editor.vehiclePosition)
+		if (this._editor.selectedVehicle && this._editor.vehiclePosition)
 		{
-			ui.mainViewport.scrollTo(this.editor.vehiclePosition)
+			ui.mainViewport.scrollTo(this._editor.vehiclePosition)
 		}
 		else
 		{
@@ -441,15 +492,19 @@ export class VehicleEditorWindow
 	}
 
 
+	/**
+	 * Attempt to find the widget with the specified name, or log an error if it
+	 * could not be found.
+	 */
 	private tryFindWidget<TWidget extends Widget>(name: string): (TWidget | null)
 	{
-		if (!this.window)
+		if (!this._window)
 		{
 			error("Editor is still interacting with window that has been closed.");
 			return null;
 		}
 
-		return this.window.findWidget<TWidget>(name);
+		return this._window.findWidget<TWidget>(name);
 	}
 }
 

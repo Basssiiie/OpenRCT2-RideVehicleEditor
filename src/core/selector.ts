@@ -3,6 +3,9 @@ import { error, log, wrap } from "../helpers/utilityHelpers";
 import { VehicleEditorWindow } from "./window";
 
 
+/**
+ * Service that allows to select a single vehicle in the park.
+ */
 export class VehicleSelector
 {
 	private _parkRides: ParkRide[];
@@ -40,7 +43,12 @@ export class VehicleSelector
 	private _selectedVehicleIndex: number = 0;
 
 
-
+	/**
+	 * Create a new selector service that updates the specified window.
+	 * 
+	 * @param window A vehicle editor window that should be updated according
+	 * to the items that are selected.
+	 */
 	constructor(readonly window: VehicleEditorWindow)
 	{
 		this._parkRides = getRidesInPark();
@@ -49,8 +57,12 @@ export class VehicleSelector
 	}
 
 
-
-	setRideIndex(rideIndex: number)
+	/**
+	 * Select a ride from the list in the park.
+	 * 
+	 * @param rideIndex The index into the ride list.
+	 */
+	selectRide(rideIndex: number)
 	{
 		log("Selected ride: " + rideIndex);
 		this._selectedRideIndex = rideIndex;
@@ -61,11 +73,11 @@ export class VehicleSelector
 			this._rideTrains = parkRide.getTrains();
 
 			this.window.setTrainList(this._rideTrains);
-			this.setTrainIndex(0);
+			this.selectTrain(0);
 		}
 		else
 		{
-			error("This park has no rides.", this.setRideIndex.name);
+			error("This park has no rides.", this.selectRide.name);
 			this.window.setTrainList(null);
 			this.window.setVehicleList(null);
 			this.window.setEditor(null);
@@ -73,7 +85,12 @@ export class VehicleSelector
 	}
 
 
-	setTrainIndex(trainIndex: number)
+	/**
+	 * Selects a train from the list of trains of the selected ride.
+	 * 
+	 * @param trainIndex The index of the train in the train list.
+	 */
+	selectTrain(trainIndex: number)
 	{
 		log(`Selected train: ${trainIndex}`);
 		if (this._rideTrains && this._rideTrains.length > 0)
@@ -86,20 +103,25 @@ export class VehicleSelector
 
 			this.window.setSelectedTrain(trainIndex);
 			this.window.setVehicleList(this._trainVehicles);
-			this.setVehicleIndex(0);
+			this.selectVehicle(0);
 		}
 		else
 		{
 			this._selectedTrainIndex = 0;
 
-			error("This ride has no trains.", this.setTrainIndex.name);
+			error("This ride has no trains.", this.selectTrain.name);
 			this.window.setVehicleList(null);
 			this.window.setEditor(null);
 		}
 	}
 
 
-	setVehicleIndex(vehicleIndex: number)
+	/**
+	 * Selects a vehicle from the list of vehicles of the selected train.
+	 * 
+	 * @param vehicleIndex The index of the vehicle in the vehicle list.
+	 */
+	selectVehicle(vehicleIndex: number)
 	{
 		log(`Selected vehicle: ${vehicleIndex}`);
 		if (this._trainVehicles && this._trainVehicles.length > 0)
@@ -115,7 +137,7 @@ export class VehicleSelector
 		{
 			this._selectedVehicleIndex = 0;
 
-			error("This train has no vehicles.", this.setVehicleIndex.name);
+			error("This train has no vehicles.", this.selectVehicle.name);
 			this.window.setEditor(null);
 		}
 	}

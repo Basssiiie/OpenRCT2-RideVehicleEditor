@@ -5,7 +5,7 @@ export function getAvailableRideTypes(): RideType[]
 {
 	return context
 		.getAllObjects("ride")
-		.filter(r => r.carsPerFlatRide != 0) // tracked rides == 255, flatrides == 1
+		.filter(r => r.carsPerFlatRide != 0) // tracked rides == 255, flatrides >= 1, shops == 0
 		.map(r => new RideType(
 			r.index,
 			r.name,
