@@ -7,7 +7,7 @@ export const isUiAvailable = (typeof ui !== 'undefined');
 /**
  * Returns true if debug mode is enabled, or false otherwise.
  */
-export const isDebugMode = false;
+export const isDebugMode = true;
 
 
 /**
@@ -32,7 +32,7 @@ export function log(message: string): void
  */
 export function error(message: string, method?:string): void
 {
-	console.error((method)
+	console.log((method)
 		? `Error (${method}): ${message}`
 		: `Error: ${message}`);
 }

@@ -31,6 +31,16 @@ export class VehicleEditor
 	private _selectedVariant: number = 0;
 
 
+	/**
+	 * Gets the currently selected ride type index.
+	 */
+	get vehiclePosition(): CoordsXYZ
+	{
+		return this._vehiclePosition;
+	}
+	private _vehiclePosition: CoordsXYZ = { x: 0, y: 0, z: 0 };
+
+
 	constructor(readonly window: VehicleEditorWindow)
 	{
 		this._rideTypes = getAvailableRideTypes();
@@ -76,7 +86,7 @@ export class VehicleEditor
 		}
 		else
 		{
-			this.window.setVariantSpinner(car.vehicleObject);
+			this.window.setVariantSpinner(variant);
 		}
 	}
 
@@ -98,7 +108,7 @@ export class VehicleEditor
 		log(`Set ride type to: ${rideType.name}, variant count: ${rideType.variantCount}`);
 		currentCar.rideObject = rideType.rideIndex;
 
-		this.setVehicleVariant(0);
+		this.setVehicleVariant(currentCar.vehicleObject);
 
 		// TEMP: log all vehicle types
 		var r = context.getObject("ride", rideType.rideIndex);
@@ -114,7 +124,7 @@ export class VehicleEditor
 	{
 		if (!this._selectedVehicle)
 		{
-			error("There is no vehicle selected.", this.setRideType.name);
+			error("There is no vehicle selected.", this.setVehicleVariant.name);
 			return;
 		}
 
@@ -165,7 +175,9 @@ export class VehicleEditor
 		}
 
 		const trackedCar = this._selectedVehicle.getCar();
-		this.window.setViewportPosition({ x: trackedCar.x, y: trackedCar.y, z: trackedCar.z });
+		this._vehiclePosition = { x: trackedCar.x, y: trackedCar.y, z: trackedCar.z };
+
+		this.window.setViewportPosition(this._vehiclePosition);
 	}
 
 

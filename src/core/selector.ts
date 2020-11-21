@@ -116,7 +116,7 @@ export class VehicleSelector
 		{
 			this._selectedVehicleIndex = 0;
 
-			error("Error: this train has no vehicles.", this.setVehicleIndex.name);
+			error("This train has no vehicles.", this.setVehicleIndex.name);
 			this.window.setEditor(null);
 		}
 	}

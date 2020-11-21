@@ -141,10 +141,11 @@ export class VehicleEditorWindow
 					type: 'dropdown' as WidgetType,
 					x: groupboxItemMargin,
 					y: windowStart + 43,
-					width: ((groupboxItemWidth / 2) - (widgetLineHeight * 2)) + 1,
+					width: ((groupboxItemWidth / 2) - (widgetLineHeight * 2)) + 2,
 					height: widgetLineHeight,
 					items: ["No trains available"],
 					selectedIndex: 0,
+					isDisabled: true,
 					onChange: i => this.selector.setTrainIndex(i)
 				},
 				// Vehicle selector
@@ -164,9 +165,10 @@ export class VehicleEditorWindow
 					type: 'dropdown' as WidgetType,
 					x: groupboxItemMargin + (groupboxItemWidth / 2) + 2,
 					y: windowStart + 43,
-					width: ((groupboxItemWidth / 2) - (widgetLineHeight * 2)) + 1,
+					width: ((groupboxItemWidth / 2) - (widgetLineHeight * 2)) + 2,
 					height: widgetLineHeight,
 					items: ["No vehicles available"],
+					isDisabled: true,
 					selectedIndex: 0,
 					onChange: i => this.selector.setVehicleIndex(i)
 				},
@@ -178,6 +180,7 @@ export class VehicleEditorWindow
 					y: editorStartY,
 					width: viewportSize,
 					height: viewportSize,
+					isDisabled: true,
 					viewport: {}
 				},
 				<DropdownWidget>{
@@ -191,23 +194,25 @@ export class VehicleEditorWindow
 					selectedIndex: 0,
 					onChange: i => this.editor.setRideType(i)
 				},
+				// Vehicle variant
 				<LabelWidget>{
 					name: variantLabelId,
 					type: 'label' as WidgetType,
 					x: (groupboxMargin + viewportSize + 5) + 2,
 					y: (editorStartY + 18) + 1,
-					width: (controlsSize * 0.4),
+					width: (controlsSize * 0.3),
 					height: widgetLineHeight,
 					text: "Variant:"
 				},
 				<SpinnerWidget>{
 					name: variantSpinnerId,
 					type: 'spinner' as WidgetType,
-					x: (groupboxMargin + viewportSize + 5) + (controlsSize * 0.4),
+					x: (groupboxMargin + viewportSize + 5) + (controlsSize * 0.25),
 					y: (editorStartY + 18),
-					width: (controlsSize * 0.6),
+					width: (controlsSize * 0.75),
 					height: widgetLineHeight,
 					text: "Not available",
+					isDisabled: true,
 					onIncrement: () => this.editor.setVehicleVariant(this.editor.vehicleVariant + 1),
 					onDecrement: () => this.editor.setVehicleVariant(this.editor.vehicleVariant - 1)
 				},
@@ -225,7 +230,7 @@ export class VehicleEditorWindow
 				<LabelWidget>{
 					name: variantLabelId,
 					type: 'label' as WidgetType,
-					x: (groupboxMargin + 30),
+					x: (groupboxMargin + 33),
 					y: (editorStartY + viewportSize) + 4,
 					width: windowWidth,
 					height: widgetLineHeight,
@@ -436,27 +441,6 @@ export class VehicleEditorWindow
 
 		return this.window.findWidget<TWidget>(name);
 	}
-
-
-	/*
-	private printEntity(id: number, prefix: string): Car {
-		const entity = map.getEntity(id);
-		if (entity) {
-
-			const car = entity as Car;
-			if (car) {
-				log(`${prefix} car ${car.id} - rideObject: ${car.rideObject}, vehicleObject: ${car.vehicleObject}, spriteType: ${car.spriteType}`);
-				return car;
-			}
-			else
-				log(`${prefix} entity ${entity.id} is a ${entity.type}`);
-		}
-		else
-			log(`${prefix} entity is null`);
-
-		return null;
-	}
-	*/
 }
 
 
