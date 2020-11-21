@@ -34,7 +34,7 @@ This project is based on [wisnia74's Typescript modding template](https://github
       - Run command prompt as administrator.
       - `cd` into the root folder of the repository.
       - Run `mklink .\lib\openrct2.d.ts <path to openrct2.d.ts>`.
-5. Run `npm build` (release build) or `npm build:dev` (develop build) to build the project.
+5. Run `npm run build` (release build) or `npm run build:dev` (develop build) to build the project.
     - The default output folder is `(project directory)\dist` and can be changed in `rollup.config.prod.js` and `rollup.config.dev.js` respectively.
 
 ### Hot reload
