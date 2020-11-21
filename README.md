@@ -13,8 +13,6 @@ This plugin lets you edit vehicles on any ride in your park on the fly.
 - Adjust spacing between different vehicles on the same train.
 - Adjust properties like mass, number of seats, (powered) acceleration of each vehicle.
 
-This project is based on [wisnia74's Typescript modding template](https://github.com/wisnia74/openrct2-typescript-mod-template) and uses [Nodemon](https://nodemon.io/), [ESLint](https://eslint.org/) and [TypeScript](https://www.typescriptlang.org/) from this template.
-
 ## Installation
 
 1. Download the latest release from the [Releases page](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/releases).
@@ -25,6 +23,8 @@ This project is based on [wisnia74's Typescript modding template](https://github
 ---
 
 ## Building the source code
+
+This project is based on [wisnia74's Typescript modding template](https://github.com/wisnia74/openrct2-typescript-mod-template) and uses [Nodemon](https://nodemon.io/), [ESLint](https://eslint.org/) and [TypeScript](https://www.typescriptlang.org/) from this template.
 
 1. Install latest versions of [Node](https://nodejs.org/en/) and [npm](https://www.npmjs.com/get-npm).
 2. Clone it anywhere to your PC.
