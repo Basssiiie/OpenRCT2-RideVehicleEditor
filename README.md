@@ -2,7 +2,7 @@
 
 This plugin lets you edit vehicles on any ride in your park on the fly.
 
-![Monorail with changes vehicles](img/monorail.png)
+![(Image of monorail with edited vehicles)](img/monorail.png)
 
 ### Current features
 - Select and switch through all ride vehicles in your park.
