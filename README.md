@@ -17,7 +17,7 @@ This plugin lets you edit vehicles on any ride in your park on the fly.
 
 1. Download the latest release from the [Releases page](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/releases).
 2. To install it, put the downloaded `*.js` file into your `\OpenRCT2\plugin` folder. 
-    - This folder is commonly found in `C:\Users\<USER>\Documents\OpenRCT2\bin` or `C:\Program Files\OpenRCT2\openrct2.d.ts`. 
+    - This folder is commonly found in `C:\Users\<USER>\Documents\OpenRCT2\plugin`. 
 3. Once the file is there, it should show up ingame in the dropdown menu under the map icon.
 
 ---
