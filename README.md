@@ -10,8 +10,8 @@ This plugin lets you edit vehicles on any ride in your park on the fly.
 - Switch through different variants of the same ride type. (E.g. locomotive, tender or passenger car.)
 
 ### Planned features
-- Adjust spacing between different vehicles on the same train.
-- Adjust properties like mass, number of seats, (powered) acceleration of each vehicle.
+- Modify spacing between different vehicles on the same train.
+- Modify properties like mass, number of seats, (powered) acceleration of each vehicle.
 
 ## Installation
 
