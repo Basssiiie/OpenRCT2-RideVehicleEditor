@@ -16,8 +16,8 @@ This plugin lets you edit vehicles on any ride in your park on the fly.
 ## Installation
 
 1. Download the latest release from the [Releases page](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/releases).
-2. To install it, put the downloaded `*.js` file into your `\OpenRCT2\plugin` folder. 
-    - This folder is commonly found in `C:\Users\<USER>\Documents\OpenRCT2\plugin`. 
+2. To install it, put the downloaded `*.js` file into your `/OpenRCT2/plugin` folder. 
+    - This folder is commonly found in `C:/Users/<USER>/Documents/OpenRCT2/plugin`. 
 3. Once the file is there, it should show up ingame in the dropdown menu under the map icon.
 
 ---
@@ -29,13 +29,13 @@ This project is based on [wisnia74's Typescript modding template](https://github
 1. Install latest versions of [Node](https://nodejs.org/en/) and [npm](https://www.npmjs.com/get-npm).
 2. Clone it anywhere to your PC.
 3. Open command prompt, use `cd` to change your current directory to the root folder of this project and run `npm install`.
-4. Find `openrct2.d.ts` TypeScript API declaration file in OpenRCT2 files and copy it to `lib` folder (this file can usually be found in `C:\Users\<USER>\Documents\OpenRCT2\bin` or `C:\Program Files\OpenRCT2\openrct2.d.ts`).
+4. Find `openrct2.d.ts` TypeScript API declaration file in OpenRCT2 files and copy it to `lib` folder (this file can usually be found in `C:/Users/<USER>/Documents/OpenRCT2/bin` or `C:/Program Files/OpenRCT2/openrct2.d.ts`).
     - Alternatively, you can make a symbolic link instead of copying the file, which will keep the file up to date whenever you install new versions of OpenRCT2. To do this on Windows:
       - Run command prompt as administrator.
       - `cd` into the root folder of the repository.
       - Run `mklink .\lib\openrct2.d.ts <path to openrct2.d.ts>`.
 5. Run `npm run build` (release build) or `npm run build:dev` (develop build) to build the project.
-    - The default output folder is `(project directory)\dist` and can be changed in `rollup.config.prod.js` and `rollup.config.dev.js` respectively.
+    - The default output folder is `(project directory)/dist` and can be changed in `rollup.config.prod.js` and `rollup.config.dev.js` respectively.
 
 ### Hot reload
 
