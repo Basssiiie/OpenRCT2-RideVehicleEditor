@@ -19,7 +19,7 @@ class Spinner extends Component
 
 
 	/**
-	 * The maximum possible value that the spinner can reach. (Inclusive)
+	 * The maximum possible value that the spinner can reach. (Exclusive)
 	 */
 	maximum: number = 0;
 
@@ -52,16 +52,10 @@ class Spinner extends Component
 	 */
 	set(value: number)
 	{
-		if (value == this._value)
-		{
-			log(`Spinner is already set to value '${value}'.`);
-			return;
-		}
-
 		const widget = this.getWidget<SpinnerWidget>();
-		if (widget.isDisabled || this.maximum <= 0)
+		if (this.maximum <= 0)
 		{
-			log(`Spinner is disabled, value '${value}' was not applied.`);
+			log(`Spinner maximum is zero or negative, value '${value}' was not applied.`);
 			return;
 		}
 
@@ -80,30 +74,12 @@ class Spinner extends Component
 		}
 
 		this._value = value;
-		log(`Set spinner to ${value}.`);
+		log(`Set spinner to ${value} out of ${this.maximum}. (wrap mode: ${this.wrapMode})`);
 
 		if (this.onChange)
 			this.onChange(value);
 
 		this.refreshWidget(widget);
-	}
-
-
-	/**
-	 * Increments the value in the spinner.
-	 */
-	increment()
-	{
-		this.set(this._value + 1);
-	}
-
-
-	/**
-	 * Decrements the value in the spinner.
-	 */
-	decrement()
-	{
-		this.set(this._value - 1);
 	}
 
 
@@ -116,22 +92,40 @@ class Spinner extends Component
 			...this._description,
 			type: "spinner",
 			text: "",
-			onIncrement: () => this.increment(),
-			onDecrement: () => this.decrement()
+			onIncrement: () => this.onWidgetChange(this._value + 1),
+			onDecrement: () => this.onWidgetChange(this._value - 1)
 		};
+	}
+
+
+	/**
+	 * Triggered when a new item is selected in the the dropdown.
+	 * @param index The number the spinner was set to.
+	 */
+	private onWidgetChange(index: number)
+	{
+		const widget = this.getWidget<DropdownWidget>();
+		if (widget.isDisabled || !this.onChange)
+		{
+			log("Spinner is disabled, no change event triggered.");
+			return;
+		}
+		this.onChange(index);
 	}
 
 
 	/** @inheritdoc */
 	protected refreshWidget(widget: SpinnerWidget)
 	{
-		if (widget.isDisabled || this.maximum <= 0)
+		if (this.maximum <= 0)
 		{
 			widget.text = this.disabledMessage;
+			widget.isDisabled = true;
 		}
 		else
 		{
 			widget.text = this._value.toString();
+			widget.isDisabled = (this.maximum <= 1);
 		}
 	}
 }

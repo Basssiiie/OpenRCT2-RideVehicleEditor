@@ -59,12 +59,14 @@ class Dropdown extends Component
 	 * Triggered when a new item is selected in the the dropdown.
 	 * @param index The number the spinner was set to.
 	 */
-	protected onChange(index: number)
+	protected onWidgetChange(index: number)
 	{
 		const widget = this.getWidget<DropdownWidget>();
 		if (widget.isDisabled || !this.onSelect)
+		{
+			log("Dropdown is disabled, no change event triggered.");
 			return;
-
+		}
 		this.onSelect(index);
 	}
 
@@ -79,7 +81,7 @@ class Dropdown extends Component
 			type: "dropdown",
 			items: this.items,
 			selectedIndex: 0,
-			onChange: i => this.onChange(i)
+			onChange: i => this.onWidgetChange(i)
 		};
 	}
 

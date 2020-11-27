@@ -48,10 +48,10 @@ class DropdownSpinner extends Dropdown
 
 
     /** @inheritdoc */
-    protected onChange(index: number)
+    protected onWidgetChange(index: number)
     {
         this._spinner.set(index);
-        super.onChange(this._spinner.value);
+        super.onWidgetChange(this._spinner.value);
 	}
 
 
