@@ -7,6 +7,7 @@ import { Spinner } from "../ui/spinner";
 import { ViewportComponent } from "../ui/viewport";
 import { VehicleEditor } from "../services/editor";
 import { VehicleSelector } from "../services/selector";
+import pluginVersion from "../version";
 
 
 // Shared coordinate constants
@@ -28,7 +29,7 @@ export class VehicleEditorWindow
 	/**
 	 * The universal identifier that is used for this window.
 	 */
-	static readonly identifier: string = "ride-vehicle-editor";
+	static readonly identifier = "ride-vehicle-editor";
 
 	// Only a single instance allowed at a time, currently.
 	private static _windowInstance: (VehicleEditorWindow | null);
@@ -158,7 +159,7 @@ export class VehicleEditorWindow
 
 		const window = ui.openWindow({
 			classification: VehicleEditorWindow.identifier,
-			title: "Ride vehicle editor (v0.3)",
+			title: `Ride vehicle editor (v${pluginVersion})`,
 			width: windowWidth,
 			height: 210,
 			widgets: [
