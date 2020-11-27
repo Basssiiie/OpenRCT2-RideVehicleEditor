@@ -9,9 +9,6 @@ import { VehicleEditor } from "../services/editor";
 import { VehicleSelector } from "../services/selector";
 
 
-// All widget ids
-const windowId = 'ride-vehicle-editor';
-
 // Shared coordinate constants
 const windowStart = 18;
 const windowWidth = 350;
@@ -28,6 +25,12 @@ const buttonSize = 24;
 
 export class VehicleEditorWindow
 {
+	/**
+	 * The universal identifier that is used for this window.
+	 */
+	static readonly identifier: string = "ride-vehicle-editor";
+
+	// Only a single instance allowed at a time, currently.
 	private static _windowInstance: (VehicleEditorWindow | null);
 
 
@@ -53,6 +56,7 @@ export class VehicleEditorWindow
 		if (this._windowInstance)
 		{
 			log("The ride vehicle editor is already open.");
+			this._windowInstance._window?.bringToFront();
 		}
 		else
 		{
@@ -135,16 +139,7 @@ export class VehicleEditorWindow
 		});
 		this.variantSpinner.onChange = (i => this._editor.setVehicleVariant(i));
 
-		this._window = ui.getWindow(windowId);
-
-		if (this._window)
-		{
-			this._window.bringToFront();
-		}
-		else
-		{
-			this.createWindow();
-		}
+		this._window = this.createWindow();
 
 		log("Initializing services.");
 		this._selector = new VehicleSelector(this);
@@ -157,12 +152,12 @@ export class VehicleEditorWindow
 	/**
 	 * Creates a new editor window.
 	 */
-	private createWindow()
+	private createWindow(): Window
 	{
 		log("Open window")
 
-		this._window = ui.openWindow({
-			classification: windowId,
+		const window = ui.openWindow({
+			classification: VehicleEditorWindow.identifier,
 			title: "Ride vehicle editor (v0.3)",
 			width: windowWidth,
 			height: 210,
@@ -234,14 +229,15 @@ export class VehicleEditorWindow
 			}
 		});
 
-		this.ridesInParkList.bind(this._window);
-		this.trainList.bind(this._window);
-		this.vehicleList.bind(this._window);
-		this.viewport.bind(this._window);
-		this.rideTypeList.bind(this._window);
-		this.variantSpinner.bind(this._window);
+		this.ridesInParkList.bind(window);
+		this.trainList.bind(window);
+		this.vehicleList.bind(window);
+		this.viewport.bind(window);
+		this.rideTypeList.bind(window);
+		this.variantSpinner.bind(window);
 
 		log("Window creation complete.");
+		return window;
 	}
 
 
