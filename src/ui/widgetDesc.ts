@@ -2,7 +2,7 @@
 /**
  * Configurable settings for a custom widget.
  */
-export interface WidgetDesc
+interface WidgetDesc
 {
 	name: string;
 	tooltip?: string;
@@ -11,3 +11,5 @@ export interface WidgetDesc
 	width: number;
 	height: number;
 }
+
+export default WidgetDesc;

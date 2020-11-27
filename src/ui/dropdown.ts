@@ -1,11 +1,11 @@
 import { log } from "../helpers/utilityHelpers";
-import { Component } from "./component";
+import Component from "./component";
 
 
 /**
  * A controller class for a dropdown widget.
  */
-export class Dropdown extends Component
+class Dropdown extends Component
 {
 	/**
 	 * Sets the items that will show up in the dropdown menu.
@@ -99,3 +99,5 @@ export class Dropdown extends Component
 		}
 	}
 }
+
+export default Dropdown;

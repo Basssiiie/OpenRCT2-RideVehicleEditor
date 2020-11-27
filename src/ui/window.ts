@@ -1,12 +1,12 @@
 import { ParkRide, RideTrain, RideVehicle } from "../helpers/ridesInPark";
 import { RideType } from "../helpers/rideTypes";
 import { error, log } from "../helpers/utilityHelpers";
-import { Dropdown } from "../ui/dropdown";
-import { DropdownSpinner } from "../ui/dropdownSpinner";
-import { Spinner } from "../ui/spinner";
-import { ViewportComponent } from "../ui/viewport";
 import { VehicleEditor } from "../services/editor";
 import { VehicleSelector } from "../services/selector";
+import Dropdown from "../ui/dropdown";
+import DropdownSpinner from "../ui/dropdownSpinner";
+import Spinner from "../ui/spinner";
+import ViewportComponent from "../ui/viewport";
 import pluginVersion from "../version";
 
 

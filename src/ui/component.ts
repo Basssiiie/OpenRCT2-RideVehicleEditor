@@ -1,10 +1,10 @@
-import { WidgetDesc } from "./widgetDesc";
+import WidgetDesc from "./widgetDesc";
 
 
 /**
  * Base class for managing and binding a widget controller to a window.
  */
-export abstract class Component
+abstract class Component
 {
 	protected _window: (Window | null) = null;
 	protected _description: WidgetDesc;
@@ -67,3 +67,5 @@ export abstract class Component
 		return this._window.findWidget<TWidget>(this._description.name);
 	}
 }
+
+export default Component;

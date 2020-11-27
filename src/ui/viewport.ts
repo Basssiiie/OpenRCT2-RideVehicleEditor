@@ -1,5 +1,5 @@
 import { error, log } from "../helpers/utilityHelpers";
-import { Component } from "./component";
+import Component from "./component";
 
 
 const farAway: CoordsXY = { x: -9000, y: -9000 };
@@ -8,7 +8,7 @@ const farAway: CoordsXY = { x: -9000, y: -9000 };
 /**
  * A controller class for a viewport widget.
  */
-export class ViewportComponent extends Component
+class ViewportComponent extends Component
 {
 	private _entityId: number = -1;
 	private _updater: (IDisposable | null) = null;
@@ -112,3 +112,5 @@ export class ViewportComponent extends Component
 		}
 	}
 }
+
+export default ViewportComponent;

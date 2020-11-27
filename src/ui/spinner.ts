@@ -1,5 +1,5 @@
 import { log } from "../helpers/utilityHelpers";
-import { Component } from "./component";
+import Component from "./component";
 
 /**
  * Determines whether the spinner value wraps around or clamps to its boundaries.
@@ -10,7 +10,7 @@ type WrapMode = "wrap" | "clamp";
 /**
  * A controller class for a spinner widget.
  */
-export class Spinner extends Component
+class Spinner extends Component
 {
 	/**
 	 * Sets whether the spinner value wraps around or clamps to its boundaries.
@@ -136,4 +136,4 @@ export class Spinner extends Component
 	}
 }
 
-
+export default Spinner;

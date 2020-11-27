@@ -1,12 +1,12 @@
-import { Dropdown } from "./dropdown";
-import { Spinner } from "./spinner";
-import { WidgetDesc } from "./widgetDesc";
+import Dropdown from "./dropdown";
+import Spinner from "./spinner";
+import WidgetDesc from "./widgetDesc";
 
 
 /**
  * A dropdown with a spinner component on the side.
  */
-export class DropdownSpinner extends Dropdown
+class DropdownSpinner extends Dropdown
 {
     // The attached spinner component.
     private _spinner: Spinner;
@@ -64,3 +64,5 @@ export class DropdownSpinner extends Dropdown
         super.refreshWidget(widget);
     }
 }
+
+export default DropdownSpinner;
