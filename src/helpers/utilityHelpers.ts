@@ -7,7 +7,7 @@ export const isUiAvailable = (typeof ui !== 'undefined');
 /**
  * Returns true if debug mode is enabled, or false otherwise.
  */
-export const isDebugMode = false;
+export const isDebugMode = true;
 
 
 /**

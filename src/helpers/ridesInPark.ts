@@ -106,13 +106,13 @@ export class RideTrain
 		const entity = map.getEntity(carId);
 		if (!entity)
 		{
-			error(`Entity ${carId} could not be found.`, this.getVehicles.name);
+			error(`Entity ${carId} could not be found.`, "getVehicles");
 			return null;
 		}
 		const vehicle = entity as Car;
 		if (!vehicle)
 		{
-			error(`Entity ${entity} is not a car.`, this.getVehicles.name);
+			error(`Entity ${entity} is not a car.`, "getVehicles");
 			return null;
 		}
 		return vehicle;
