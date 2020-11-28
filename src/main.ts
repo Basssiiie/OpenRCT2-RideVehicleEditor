@@ -1,5 +1,5 @@
 import { isUiAvailable, log } from './helpers/utilityHelpers';
-import { VehicleEditorWindow } from './ui/window';
+import VehicleEditorWindow from './ui/editorWindow';
 
 
 /**

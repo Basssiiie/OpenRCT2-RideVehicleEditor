@@ -1,6 +1,6 @@
 import { ParkRide, RideTrain, RideVehicle } from "../helpers/ridesInPark";
 import { RideType } from "../helpers/rideTypes";
-import { error, log } from "../helpers/utilityHelpers";
+import { error, isDebugMode, log } from "../helpers/utilityHelpers";
 import { VehicleEditor } from "../services/editor";
 import { VehicleSelector } from "../services/selector";
 import Dropdown from "../ui/dropdown";
@@ -8,6 +8,7 @@ import DropdownSpinner from "../ui/dropdownSpinner";
 import Spinner from "../ui/spinner";
 import ViewportComponent from "../ui/viewport";
 import pluginVersion from "../version";
+import DebugWindow from "./debugWindow";
 
 
 // Shared coordinate constants
@@ -21,10 +22,11 @@ const groupboxItemWidth = windowWidth - (groupboxItemMargin * 2);
 const editorStartY = 90;
 const viewportSize = 100;
 const controlsSize = (windowWidth - (groupboxMargin * 2) - (viewportSize + 5));
+const controlLabelPart = 0.3; // label takes 30%
 const buttonSize = 24;
 
 
-export class VehicleEditorWindow
+class VehicleEditorWindow
 {
 	/**
 	 * The universal identifier that is used for this window.
@@ -41,6 +43,7 @@ export class VehicleEditorWindow
 	readonly viewport: ViewportComponent;
 	readonly rideTypeList: Dropdown;
 	readonly variantSpinner: Spinner;
+	readonly seatCountSpinner: Spinner;
 
 
 	private _selector: VehicleSelector;
@@ -133,12 +136,23 @@ export class VehicleEditorWindow
 		// Variant sprite of the selected vehicle
 		this.variantSpinner = new Spinner({
 			name: "rve-variant-spinner",
-			x: (groupboxMargin + viewportSize + 5) + (controlsSize * 0.25),
+			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
 			y: (editorStartY + 18),
-			width: (controlsSize * 0.75),
+			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
 		this.variantSpinner.onChange = (i => this._editor.setVehicleVariant(i));
+
+		this.seatCountSpinner = new Spinner({
+			name: "rve-seats-spinner",
+			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
+			y: (editorStartY + 36),
+			width: (controlsSize * (1 - controlLabelPart)),
+			height: widgetLineHeight,
+		});
+		//this.seatCountSpinner.wrapMode = "clamp";
+		this.seatCountSpinner.maximum = 128;
+		this.seatCountSpinner.onChange = (i => this._editor.setVehicleSeatCount(i));
 
 		this._window = this.createWindow();
 
@@ -157,9 +171,32 @@ export class VehicleEditorWindow
 	{
 		log("Open window")
 
+		let windowTitle = `Ride vehicle editor (v${pluginVersion})`;
+
+		const debugWidgets: Widget[] = [];
+		if (isDebugMode)
+		{
+			windowTitle += " [DEBUG]";
+			debugWidgets.push(<ButtonWidget>{
+				type: 'button' as WidgetType,
+				x: (groupboxMargin + viewportSize + 2) + buttonSize + 2,
+				y: (editorStartY + (viewportSize - (buttonSize + 2))),
+				width: buttonSize,
+				height: buttonSize,
+				image: 5188, // SPR_TRACK_PEEP
+				onClick: () =>
+				{
+					const vehicle = this._editor.selectedVehicle;
+					if (vehicle)
+						new DebugWindow(vehicle?.entityId)
+				}
+			});
+		}
+
+
 		const window = ui.openWindow({
 			classification: VehicleEditorWindow.identifier,
-			title: `Ride vehicle editor (v${pluginVersion})`,
+			title: windowTitle,
 			width: windowWidth,
 			height: 210,
 			widgets: [
@@ -196,11 +233,22 @@ export class VehicleEditorWindow
 					type: 'label' as WidgetType,
 					x: (groupboxMargin + viewportSize + 5),
 					y: (editorStartY + 18) + 1,
-					width: (controlsSize * 0.3),
+					width: (controlsSize * controlLabelPart),
 					height: widgetLineHeight,
 					text: "Variant:"
 				},
 				this.variantSpinner.createWidget(),
+
+				// Number of seats
+				<LabelWidget>{
+					type: 'label' as WidgetType,
+					x: (groupboxMargin + viewportSize + 5),
+					y: (editorStartY + 36) + 1,
+					width: (controlsSize * controlLabelPart),
+					height: widgetLineHeight,
+					text: "Seats:"
+				},
+				this.seatCountSpinner.createWidget(),
 
 				// Buttons
 				<ButtonWidget>{
@@ -221,6 +269,7 @@ export class VehicleEditorWindow
 					text: "github.com/Basssiiie/OpenRCT2-RideVehicleEditor",
 					isDisabled: true
 				},
+				...debugWidgets
 			],
 			onClose: () =>
 			{
@@ -236,6 +285,7 @@ export class VehicleEditorWindow
 		this.viewport.bind(window);
 		this.rideTypeList.bind(window);
 		this.variantSpinner.bind(window);
+		this.seatCountSpinner.bind(window);
 
 		log("Window creation complete.");
 		return window;
@@ -332,4 +382,4 @@ export class VehicleEditorWindow
 	}
 }
 
-
+export default VehicleEditorWindow;

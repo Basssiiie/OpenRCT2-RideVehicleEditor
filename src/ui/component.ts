@@ -10,6 +10,15 @@ abstract class Component
 	protected _description: WidgetDesc;
 
 
+	/**
+	 * Shortcut to the name of the component.
+	 */
+	protected get _name()
+	{
+		return this._description.name;
+	}
+
+
 	constructor(description: WidgetDesc)
 	{
 		this._description = description;
@@ -62,9 +71,9 @@ abstract class Component
 	protected getWidget<TWidget extends Widget>(): TWidget
 	{
 		if (!this._window)
-			throw new Error("The window is gone.");
+			throw new Error(`(${this._name}) The window is not bound, or gone.`);
 
-		return this._window.findWidget<TWidget>(this._description.name);
+		return this._window.findWidget<TWidget>(this._name);
 	}
 }
 

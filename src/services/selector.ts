@@ -1,6 +1,6 @@
 import { getRidesInPark, ParkRide, RideTrain, RideVehicle } from "../helpers/ridesInPark";
 import { error, log, wrap } from "../helpers/utilityHelpers";
-import { VehicleEditorWindow } from "../ui/window";
+import VehicleEditorWindow from "../ui/editorWindow";
 
 
 /**
@@ -69,12 +69,12 @@ export class VehicleSelector
 		if (this._parkRides && this._parkRides.length > 0)
 		{
 			const parkRide = this._parkRides[rideIndex];
-			log(`Selected ride ${parkRide.name} (index: ${rideIndex})`);
+			log(`(selector) Selected ride ${parkRide.name} (index: ${rideIndex})`);
 
 			this._rideTrains = parkRide.getTrains();
 
 			this.window.setTrainList(this._rideTrains);
-			this.selectTrain(0);
+			this.window.trainList.set(0);
 		}
 		else
 		{
@@ -93,7 +93,7 @@ export class VehicleSelector
 	 */
 	selectTrain(trainIndex: number)
 	{
-		log(`Selected train at index: ${trainIndex}`);
+		log(`(selector) Selected train at index: ${trainIndex}`);
 		if (this._rideTrains && this._rideTrains.length > 0)
 		{
 			trainIndex = wrap(trainIndex, this._rideTrains.length);
@@ -103,7 +103,7 @@ export class VehicleSelector
 			this._trainVehicles = train.getVehicles();
 
 			this.window.setVehicleList(this._trainVehicles);
-			this.selectVehicle(0);
+			this.window.vehicleList.set(0);
 		}
 		else
 		{
@@ -123,7 +123,7 @@ export class VehicleSelector
 	 */
 	selectVehicle(vehicleIndex: number)
 	{
-		log(`Selected vehicle at index ${vehicleIndex}`);
+		log(`(selector) Selected vehicle at index ${vehicleIndex}`);
 		if (this._trainVehicles && this._trainVehicles.length > 0)
 		{
 			vehicleIndex = wrap(vehicleIndex, this._trainVehicles.length);

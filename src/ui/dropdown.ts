@@ -31,6 +31,10 @@ class Dropdown extends Component
 	onSelect?: (index: number) => void;
 
 
+	// Silence events only when updating dropdown.
+	private _silenceEvent: boolean = false;
+
+
 	/**
 	 * Sets the dropdown to the specified index.
 	 * @param index The index of the item to select.
@@ -38,35 +42,47 @@ class Dropdown extends Component
 	set(index: number)
 	{
 		const widget = this.getWidget<DropdownWidget>();
+		/*
 		if (widget.isDisabled)
 		{
-			log(`Dropdown is disabled, index '${index}' was not set.`);
+			log(`(${this._name}) Widget is disabled, index '${index}' was not set.`);
 			return;
 		}
-
 		if (widget.selectedIndex == index)
 		{
-			log(`Dropdown is already set to index '${index}'.`);
+			log(`(${this._name}) Value is already set to index '${index}'.`);
 			return;
 		}
+		*/
 
+		log(`(${this._name}) Set to index ${index}.`);
+
+		this._silenceEvent = true;
 		widget.selectedIndex = index;
+		this._silenceEvent = false;
+
+		if (this.onSelect)
+			this.onSelect(index);
 	}
 
 
 
 	/**
-	 * Triggered when a new item is selected in the the dropdown.
+	 * Triggered when a new item is selected in the dropdown.
 	 * @param index The number the spinner was set to.
 	 */
 	protected onWidgetChange(index: number)
 	{
+		if (this._silenceEvent)
+			return;
+
 		const widget = this.getWidget<DropdownWidget>();
 		if (widget.isDisabled || !this.onSelect)
 		{
-			log("Dropdown is disabled, no change event triggered.");
+			log("(${this._name}) Widget is disabled, no change event triggered.");
 			return;
 		}
+		log(`--->(${this._name}) Try updating ${widget.selectedIndex} -> ${index}.`);
 		this.onSelect(index);
 	}
 

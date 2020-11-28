@@ -20,7 +20,7 @@ class ViewportComponent extends Component
 	 */
 	goTo(position: CoordsXY | CoordsXYZ)
 	{
-		log("Viewport jump to position " + position);
+		log(`(${this._name}) Jump to position ${position}.`);
 		this._entityId = -1;
 
 		const widget = this.getWidget<ViewportWidget>();
@@ -36,7 +36,7 @@ class ViewportComponent extends Component
 	 */
 	follow(entityId: number)
 	{
-		log("Viewport start following entity " + entityId);
+		log(`(${this._name}) Start following entity ${entityId}.`);
 
 		this._entityId = entityId;
 		this.refresh();
@@ -50,7 +50,7 @@ class ViewportComponent extends Component
 	{
 		if (this._updater)
 		{
-			log("Viewport updating has stopped.");
+			log(`(${this._name}) Updating has stopped.`);
 			this._updater.dispose();
 			this._updater = null;
 		}

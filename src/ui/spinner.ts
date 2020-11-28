@@ -37,13 +37,9 @@ class Spinner extends Component
 
 
 	/**
-	 * Gets the selected value in the spinner.
+	 * Gets or sets the selected value in the spinner.
 	 */
-	get value()
-	{
-		return this._value;
-	}
-	private _value: number = 0;
+	value: number = 0;
 
 
 	/**
@@ -55,7 +51,7 @@ class Spinner extends Component
 		const widget = this.getWidget<SpinnerWidget>();
 		if (this.maximum <= 0)
 		{
-			log(`Spinner maximum is zero or negative, value '${value}' was not applied.`);
+			log(`(${this._name}) Maximum is zero or negative, value ${value} was not applied.`);
 			return;
 		}
 
@@ -73,8 +69,8 @@ class Spinner extends Component
 				break;
 		}
 
-		this._value = value;
-		log(`Set spinner to ${value} out of ${this.maximum}. (wrap mode: ${this.wrapMode})`);
+		this.value = value;
+		log(`(${this._name}) Set to ${value}. (max: ${this.maximum}, mode: ${this.wrapMode})`);
 
 		if (this.onChange)
 			this.onChange(value);
@@ -92,8 +88,8 @@ class Spinner extends Component
 			...this._description,
 			type: "spinner",
 			text: "",
-			onIncrement: () => this.onWidgetChange(this._value + 1),
-			onDecrement: () => this.onWidgetChange(this._value - 1)
+			onIncrement: () => this.onWidgetChange(this.value + 1),
+			onDecrement: () => this.onWidgetChange(this.value - 1)
 		};
 	}
 
@@ -104,13 +100,14 @@ class Spinner extends Component
 	 */
 	private onWidgetChange(index: number)
 	{
-		const widget = this.getWidget<DropdownWidget>();
+		const widget = this.getWidget<SpinnerWidget>();
 		if (widget.isDisabled || !this.onChange)
 		{
-			log("Spinner is disabled, no change event triggered.");
+			log(`(${this._name}) Widget is disabled, no change event triggered.`);
 			return;
 		}
-		this.onChange(index);
+		log(`--->(${this._name}) Try updating ${this.value} -> ${index}.`);
+		this.set(index);
 	}
 
 
@@ -124,7 +121,7 @@ class Spinner extends Component
 		}
 		else
 		{
-			widget.text = this._value.toString();
+			widget.text = this.value.toString();
 			widget.isDisabled = (this.maximum <= 1);
 		}
 	}

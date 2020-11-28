@@ -14,7 +14,7 @@ export function getAvailableRideTypes(): RideType[]
 			r.index,
 			r.name,
 			r.vehicles
-				.filter(v => v.baseImageId > 0 && v.spriteWidth > 0)
+				.filter(v => v.baseImageId > 0)
 				.length
 		))
 		.sort((a, b) => a.name.localeCompare(b.name));
