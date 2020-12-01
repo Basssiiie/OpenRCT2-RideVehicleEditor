@@ -41,7 +41,7 @@ export class RideType
 	/*
 	 * Gets the associated ride defintion from the game.
 	 */
-	getDefinition()
+	getDefinition(): RideObject
 	{
 		return context.getObject("ride", this.rideIndex);
 	}

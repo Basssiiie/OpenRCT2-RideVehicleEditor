@@ -8,6 +8,7 @@ abstract class Component
 {
 	protected _window: (Window | null) = null;
 	protected _description: WidgetDesc;
+	protected _isActive: boolean = true;
 
 
 	/**
@@ -41,6 +42,8 @@ abstract class Component
 	 */
 	active(toggle: boolean)
 	{
+		this._isActive = toggle;
+
 		const widget = this.getWidget();
 		widget.isDisabled = !toggle;
 

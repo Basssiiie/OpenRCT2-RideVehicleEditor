@@ -21,6 +21,7 @@ class ViewportComponent extends Component
 	goTo(position: CoordsXY | CoordsXYZ)
 	{
 		log(`(${this._name}) Jump to position ${position}.`);
+		this._isActive = true;
 		this._entityId = -1;
 
 		const widget = this.getWidget<ViewportWidget>();
@@ -38,6 +39,7 @@ class ViewportComponent extends Component
 	{
 		log(`(${this._name}) Start following entity ${entityId}.`);
 
+		this._isActive = true;
 		this._entityId = entityId;
 		this.refresh();
 	}
@@ -76,7 +78,7 @@ class ViewportComponent extends Component
 	/** @inheritdoc */
 	protected refreshWidget(widget: ViewportWidget)
 	{
-		if (this._entityId != -1)
+		if (this._isActive && this._entityId != -1)
 		{
 			if (!this._updater)
 			{

@@ -41,20 +41,9 @@ class Dropdown extends Component
 	 */
 	set(index: number)
 	{
-		const widget = this.getWidget<DropdownWidget>();
-		/*
-		if (widget.isDisabled)
-		{
-			log(`(${this._name}) Widget is disabled, index '${index}' was not set.`);
-			return;
-		}
-		if (widget.selectedIndex == index)
-		{
-			log(`(${this._name}) Value is already set to index '${index}'.`);
-			return;
-		}
-		*/
+		this._isActive = true;
 
+		const widget = this.getWidget<DropdownWidget>();
 		log(`(${this._name}) Set to index ${index}.`);
 
 		this._silenceEvent = true;
@@ -105,7 +94,7 @@ class Dropdown extends Component
 	/** @inheritdoc */
 	protected refreshWidget(widget: DropdownWidget)
 	{
-		if (this.items && this.items.length > 0)
+		if (this._isActive && this.items && this.items.length > 0)
 		{
 			widget.items = this.items;
 			widget.isDisabled = (this.disableSingleItem && this.items.length == 1);

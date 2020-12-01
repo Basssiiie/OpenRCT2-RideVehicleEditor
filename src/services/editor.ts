@@ -1,6 +1,6 @@
 import { RideVehicle } from "../helpers/ridesInPark";
 import { getAvailableRideTypes, RideType } from "../helpers/rideTypes";
-import { error, log } from "../helpers/utilityHelpers";
+import { log } from "../helpers/utilityHelpers";
 import VehicleEditorWindow from "../ui/editorWindow";
 
 
@@ -95,15 +95,9 @@ export class VehicleEditor
 	 */
 	setRideType(rideTypeIndex: number)
 	{
-		if (!this._selectedVehicle)
-		{
-			error("There is no vehicle selected.", "setRideType");
-			return;
-		}
-
 		this._selectedTypeIndex = rideTypeIndex;
 
-		const currentCar = this._selectedVehicle.getCar();
+		const currentCar = this.getSelectedCar();
 		const rideType = this._rideTypes[rideTypeIndex];
 
 		log(`(editor) Set vehicle ride type to: ${rideType.name} (index: ${rideTypeIndex})`);
@@ -121,13 +115,7 @@ export class VehicleEditor
 	 */
 	setVehicleVariant(variantIndex: number)
 	{
-		if (!this._selectedVehicle)
-		{
-			error("There is no vehicle selected.", "setVehicleVariant");
-			return;
-		}
-
-		const currentCar = this._selectedVehicle.getCar();
+		const currentCar = this.getSelectedCar();
 
 		log(`(editor) Set vehicle variant index to: ${variantIndex}.`);
 		currentCar.vehicleObject = variantIndex;
@@ -140,16 +128,49 @@ export class VehicleEditor
 	 */
 	setVehicleSeatCount(numberOfSeats: number)
 	{
-		if (!this._selectedVehicle)
-		{
-			error("There is no vehicle selected.", "setVehicleMaxSeats");
-			return;
-		}
-
-		const currentCar = this._selectedVehicle.getCar();
+		const currentCar = this.getSelectedCar();
 
 		log(`(editor) Set vehicle max seat count to: ${numberOfSeats}.`);
 		currentCar.numSeats = numberOfSeats;
+	}
+
+
+	/**
+	 * Sets the powered acceleration for this vehicle.
+	 * @param power The amount of powered acceleration for this vehicle.
+	 */
+	setVehiclePoweredAcceleration(power: number)
+	{
+		const currentCar = this.getSelectedCar();
+
+		log(`(editor) Set vehicle powered acceleration to: ${power}.`);
+		currentCar.mass = power;
+	}
+
+
+	/**
+	 * Sets the powered maximum speed for this vehicle.
+	 * @param maximumSpeed The powered maximum speed for this vehicle.
+	 */
+	setVehiclePoweredMaximumSpeed(maximumSpeed: number)
+	{
+		const currentCar = this.getSelectedCar();
+
+		log(`(editor) Set vehicle powered acceleration to: ${maximumSpeed}.`);
+		currentCar.poweredMaxSpeed = maximumSpeed;
+	}
+
+
+	/**
+	 * Sets the mass for this vehicle.
+	 * @param mass The amount of mass of this vehicle.
+	 */
+	setVehicleMass(mass: number)
+	{
+		const currentCar = this.getSelectedCar();
+
+		log(`(editor) Set vehicle mass to: ${mass}.`);
+		currentCar.mass = mass;
 	}
 
 
@@ -159,6 +180,7 @@ export class VehicleEditor
 	private refreshProperties(car: Car)
 	{
 		const currentType = this._rideTypes[this._selectedTypeIndex];
+		const isPowered = this.isCarPowered(car);
 
 		// Variant
 		const variant = this.window.variantSpinner;
@@ -171,6 +193,52 @@ export class VehicleEditor
 		seats.value = car.numSeats;
 		seats.refresh();
 
-		log(`(editor) Properties refreshed; variant ${variant.value}/${variant.maximum}; seats: ${seats.value}`);
+		// Powered acceleration
+		const poweredAcceleration = this.window.powAccelerationSpinner;
+		poweredAcceleration.value = car.poweredAcceleration;
+		poweredAcceleration.active(isPowered);
+
+		// Powered maximum speed
+		const poweredMaxSpeed = this.window.powMaxSpeedSpinner;
+		poweredMaxSpeed.value = car.poweredMaxSpeed;
+		poweredMaxSpeed.active(isPowered);
+
+		// Mass
+		const mass = this.window.massSpinner;
+		mass.value = car.mass;
+		mass.refresh();
+
+		log(`(editor) Properties refreshed; variant ${variant.value}/${variant.maximum}; seats: ${seats.value}, powered: ${isPowered}, power: ${poweredAcceleration.value}/${poweredMaxSpeed.value}`);
+	}
+
+
+	/**
+	 * Gets the selected car, or throws if none is selected.
+	 */
+	private getSelectedCar(): Car | never
+	{
+		const vehicle = this._selectedVehicle;
+
+		if (!vehicle)
+			throw new Error("(editor) There is no vehicle selected.");
+
+		return vehicle.getCar();
+	}
+
+
+	/**
+	 * Returns true if this car does use powered acceleration.
+	 * Currently not all vehicle types support this property in
+	 * the openrct2 source code.
+	 *
+	 * @param car The car to check if it is powered.
+	 */
+	private isCarPowered(car: Car): boolean
+	{
+		const rideObject = context.getObject("ride", car.rideObject);
+		const vehicleObject = rideObject.vehicles[car.vehicleObject];
+
+		// 'VEHICLE_ENTRY_FLAG_POWERED' is required.
+		return ((vehicleObject.flags & (1 << 19)) != 0);
 	}
 }

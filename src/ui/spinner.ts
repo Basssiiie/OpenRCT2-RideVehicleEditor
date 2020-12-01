@@ -69,7 +69,9 @@ class Spinner extends Component
 				break;
 		}
 
+		this._isActive = true;
 		this.value = value;
+
 		log(`(${this._name}) Set to ${value}. (max: ${this.maximum}, mode: ${this.wrapMode})`);
 
 		if (this.onChange)
@@ -114,15 +116,15 @@ class Spinner extends Component
 	/** @inheritdoc */
 	protected refreshWidget(widget: SpinnerWidget)
 	{
-		if (this.maximum <= 0)
-		{
-			widget.text = this.disabledMessage;
-			widget.isDisabled = true;
-		}
-		else
+		if (this._isActive && this.maximum > 0)
 		{
 			widget.text = this.value.toString();
 			widget.isDisabled = (this.maximum <= 1);
+		}
+		else
+		{
+			widget.text = this.disabledMessage;
+			widget.isDisabled = true;
 		}
 	}
 }

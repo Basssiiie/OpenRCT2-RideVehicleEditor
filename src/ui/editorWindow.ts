@@ -14,6 +14,7 @@ import DebugWindow from "./debugWindow";
 // Shared coordinate constants
 const windowStart = 18;
 const windowWidth = 350;
+const windowHeight = 221;
 const widgetLineHeight = 14;
 const groupboxMargin = 5;
 const groupboxItemMargin = (groupboxMargin + 5);
@@ -23,6 +24,7 @@ const editorStartY = 90;
 const viewportSize = 100;
 const controlsSize = (windowWidth - (groupboxMargin * 2) - (viewportSize + 5));
 const controlLabelPart = 0.3; // label takes 30%
+const controlHeight = 17;
 const buttonSize = 24;
 
 
@@ -40,11 +42,14 @@ class VehicleEditorWindow
 	readonly ridesInParkList: Dropdown;
 	readonly trainList: DropdownSpinner;
 	readonly vehicleList: DropdownSpinner;
+
 	readonly viewport: ViewportComponent;
 	readonly rideTypeList: Dropdown;
 	readonly variantSpinner: Spinner;
 	readonly seatCountSpinner: Spinner;
-
+	readonly powAccelerationSpinner: Spinner;
+	readonly powMaxSpeedSpinner: Spinner;
+	readonly massSpinner: Spinner;
 
 	private _selector: VehicleSelector;
 	private _editor: VehicleEditor;
@@ -137,22 +142,58 @@ class VehicleEditorWindow
 		this.variantSpinner = new Spinner({
 			name: "rve-variant-spinner",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
-			y: (editorStartY + 18),
+			y: (editorStartY + 1 + controlHeight),
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
 		this.variantSpinner.onChange = (i => this._editor.setVehicleVariant(i));
 
+		// Number of seats of the selected vehicle
 		this.seatCountSpinner = new Spinner({
 			name: "rve-seats-spinner",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
-			y: (editorStartY + 36),
+			y: (editorStartY + + 1 + controlHeight * 2),
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
-		//this.seatCountSpinner.wrapMode = "clamp";
+		this.seatCountSpinner.wrapMode = "clamp";
 		this.seatCountSpinner.maximum = 128;
 		this.seatCountSpinner.onChange = (i => this._editor.setVehicleSeatCount(i));
+
+		// Powered acceleration of the selected vehicle
+		this.powAccelerationSpinner = new Spinner({
+			name: "rve-powered-acceleration-spinner",
+			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
+			y: (editorStartY + 1 + controlHeight * 3),
+			width: (controlsSize * (1 - controlLabelPart)),
+			height: widgetLineHeight,
+		});
+		this.powAccelerationSpinner.maximum = 256;
+		this.powAccelerationSpinner.disabledMessage = "Only on powered vehicles.";
+		this.powAccelerationSpinner.onChange = (i => this._editor.setVehiclePoweredAcceleration(i));
+
+		// Powered maximum speed of the selected vehicle
+		this.powMaxSpeedSpinner = new Spinner({
+			name: "rve-powered-max-speed-spinner",
+			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
+			y: (editorStartY + 1 + controlHeight * 4),
+			width: (controlsSize * (1 - controlLabelPart)),
+			height: widgetLineHeight,
+		});
+		this.powMaxSpeedSpinner.maximum = 256;
+		this.powMaxSpeedSpinner.disabledMessage = "Only on powered vehicles.";
+		this.powMaxSpeedSpinner.onChange = (i => this._editor.setVehiclePoweredMaximumSpeed(i));
+
+		// Total current mass of the selected vehicle
+		this.massSpinner = new Spinner({
+			name: "rve-mass-spinner",
+			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
+			y: (editorStartY + 1 + controlHeight * 5),
+			width: (controlsSize * (1 - controlLabelPart)),
+			height: widgetLineHeight,
+		});
+		this.massSpinner.maximum = 65_536;
+		this.massSpinner.onChange = (i => this._editor.setVehicleMass(i));
 
 		this._window = this.createWindow();
 
@@ -172,33 +213,19 @@ class VehicleEditorWindow
 		log("Open window")
 
 		let windowTitle = `Ride vehicle editor (v${pluginVersion})`;
+		let debugWidgets: Widget[] = [];
 
-		const debugWidgets: Widget[] = [];
 		if (isDebugMode)
 		{
 			windowTitle += " [DEBUG]";
-			debugWidgets.push(<ButtonWidget>{
-				type: 'button' as WidgetType,
-				x: (groupboxMargin + viewportSize + 2) + buttonSize + 2,
-				y: (editorStartY + (viewportSize - (buttonSize + 2))),
-				width: buttonSize,
-				height: buttonSize,
-				image: 5188, // SPR_TRACK_PEEP
-				onClick: () =>
-				{
-					const vehicle = this._editor.selectedVehicle;
-					if (vehicle)
-						new DebugWindow(vehicle?.entityId)
-				}
-			});
+			debugWidgets = this.getDebugWidgets();
 		}
-
 
 		const window = ui.openWindow({
 			classification: VehicleEditorWindow.identifier,
 			title: windowTitle,
 			width: windowWidth,
-			height: 210,
+			height: windowHeight,
 			widgets: [
 				// Selection group
 				<Widget>{
@@ -232,7 +259,7 @@ class VehicleEditorWindow
 				<LabelWidget>{
 					type: 'label' as WidgetType,
 					x: (groupboxMargin + viewportSize + 5),
-					y: (editorStartY + 18) + 1,
+					y: (editorStartY + controlHeight) + 2,
 					width: (controlsSize * controlLabelPart),
 					height: widgetLineHeight,
 					text: "Variant:"
@@ -243,18 +270,51 @@ class VehicleEditorWindow
 				<LabelWidget>{
 					type: 'label' as WidgetType,
 					x: (groupboxMargin + viewportSize + 5),
-					y: (editorStartY + 36) + 1,
+					y: (editorStartY + controlHeight * 2) + 2,
 					width: (controlsSize * controlLabelPart),
 					height: widgetLineHeight,
 					text: "Seats:"
 				},
 				this.seatCountSpinner.createWidget(),
 
+				// Powered acceleration
+				<LabelWidget>{
+					type: 'label' as WidgetType,
+					x: (groupboxMargin + viewportSize + 5),
+					y: (editorStartY + controlHeight * 3) + 2,
+					width: (controlsSize * controlLabelPart),
+					height: widgetLineHeight,
+					text: "Acceleration:"
+				},
+				this.powAccelerationSpinner.createWidget(),
+
+				// Powered maximum speed
+				<LabelWidget>{
+					type: 'label' as WidgetType,
+					x: (groupboxMargin + viewportSize + 5),
+					y: (editorStartY + controlHeight * 4) + 2,
+					width: (controlsSize * controlLabelPart),
+					height: widgetLineHeight,
+					text: "Max. speed:"
+				},
+				this.powMaxSpeedSpinner.createWidget(),
+
+				// Mass
+				<LabelWidget>{
+					type: 'label' as WidgetType,
+					x: (groupboxMargin + viewportSize + 5),
+					y: (editorStartY + controlHeight * 5) + 2,
+					width: (controlsSize * controlLabelPart),
+					height: widgetLineHeight,
+					text: "Mass:"
+				},
+				this.massSpinner.createWidget(),
+
 				// Buttons
 				<ButtonWidget>{
 					type: 'button' as WidgetType,
-					x: (groupboxMargin + viewportSize + 2),
-					y: (editorStartY + (viewportSize - (buttonSize + 2))),
+					x: (groupboxMargin),
+					y: (editorStartY + viewportSize + 2),
 					width: buttonSize,
 					height: buttonSize,
 					image: 5167, // SPR_LOCATE
@@ -263,7 +323,7 @@ class VehicleEditorWindow
 				<LabelWidget>{
 					type: 'label' as WidgetType,
 					x: (groupboxMargin + 33),
-					y: (editorStartY + viewportSize) + 4,
+					y: (editorStartY + viewportSize + (buttonSize / 2)) - 3,
 					width: windowWidth,
 					height: widgetLineHeight,
 					text: "github.com/Basssiiie/OpenRCT2-RideVehicleEditor",
@@ -282,10 +342,14 @@ class VehicleEditorWindow
 		this.ridesInParkList.bind(window);
 		this.trainList.bind(window);
 		this.vehicleList.bind(window);
+
 		this.viewport.bind(window);
 		this.rideTypeList.bind(window);
 		this.variantSpinner.bind(window);
 		this.seatCountSpinner.bind(window);
+		this.powAccelerationSpinner.bind(window);
+		this.powMaxSpeedSpinner.bind(window);
+		this.massSpinner.bind(window);
 
 		log("Window creation complete.");
 		return window;
@@ -339,6 +403,9 @@ class VehicleEditorWindow
 		const toggle = (vehicle != null);
 		this.rideTypeList.active(toggle);
 		this.variantSpinner.active(toggle);
+		this.seatCountSpinner.active(toggle);
+		this.powAccelerationSpinner.active(toggle);
+		this.powMaxSpeedSpinner.active(toggle);
 
 		if (vehicle)
 		{
@@ -379,6 +446,30 @@ class VehicleEditorWindow
 		{
 			error("No vehicle has been selected to scroll to.", "scrollToVehicle");
 		}
+	}
+
+
+	/**
+	 * Gets the widgets that only show in debug mode.
+	 */
+	private getDebugWidgets(): Widget[]
+	{
+		return [
+			<ButtonWidget>{
+				type: 'button' as WidgetType,
+				x: (windowWidth - (buttonSize + groupboxMargin)),
+				y: (editorStartY + viewportSize + 2),
+				width: buttonSize,
+				height: buttonSize,
+				image: 5188, // SPR_TRACK_PEEP
+				onClick: () =>
+				{
+					const vehicle = this._editor.selectedVehicle;
+					if (vehicle)
+						new DebugWindow(vehicle?.entityId)
+				}
+			}
+		];
 	}
 }
 
