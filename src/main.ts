@@ -1,5 +1,19 @@
 import { isUiAvailable, log } from './helpers/utilityHelpers';
+import VehicleSelector from './services/selector';
+import VehicleEditor from './services/editor';
 import VehicleEditorWindow from './ui/editorWindow';
+
+
+/**
+ * Opens the ride editor window.
+ */
+function openEditorWindow()
+{
+	const window = VehicleEditorWindow.show();
+
+	const selector = new VehicleSelector(window);
+	new VehicleEditor(selector, window);
+}
 
 
 /**
@@ -21,9 +35,9 @@ const main = (): void => {
 	}
 	*/
 
-	ui.registerMenuItem("Edit ride vehicles", () => {
-		VehicleEditorWindow.show();
-	})
+	ui.registerMenuItem("Edit ride vehicles", () => openEditorWindow());
 };
+
+
 
 export default main;

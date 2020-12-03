@@ -6,41 +6,27 @@ import VehicleEditorWindow from "../ui/editorWindow";
 /**
  * Service that allows to select a single vehicle in the park.
  */
-export class VehicleSelector
+export default class VehicleSelector
 {
+	/**
+	 * Returns the currently selected vehicle, if any was selected.
+	 */
+	get selectedVehicle(): (RideVehicle | null)
+	{
+		return this._selectedVehicle;
+	}
+	private _selectedVehicle: (RideVehicle | null) = null;
+
+
+	/**
+	 * Triggers when a new vehicle is selected.
+	 */
+	onSelect?: (vehicle: RideVehicle | null) => void;
+
+
 	private _parkRides: ParkRide[];
 	private _rideTrains!: RideTrain[];
 	private _trainVehicles!: RideVehicle[];
-
-
-	/**
-	 * Gets the currently selected ride index.
-	 */
-	get rideIndex(): number
-	{
-		return this._selectedRideIndex;
-	}
-	private _selectedRideIndex: number = 0;
-
-
-	/**
-	 * Gets the currently selected train index.
-	 */
-	get trainIndex(): number
-	{
-		return this._selectedTrainIndex;
-	}
-	private _selectedTrainIndex: number = 0;
-
-
-	/**
-	 * Gets the currently selected vehicle index.
-	 */
-	get vehicleIndex(): number
-	{
-		return this._selectedVehicleIndex;
-	}
-	private _selectedVehicleIndex: number = 0;
 
 
 	/**
@@ -52,8 +38,13 @@ export class VehicleSelector
 	constructor(readonly window: VehicleEditorWindow)
 	{
 		this._parkRides = getRidesInPark();
-
 		window.setRideList(this._parkRides);
+
+		this.selectRide(0);
+
+		window.ridesInParkList.onSelect = (i => this.selectRide(i));
+		window.trainList.onSelect = (i => this.selectTrain(i));
+		window.vehicleList.onSelect = (i => this.selectVehicle(i));
 	}
 
 
@@ -64,8 +55,6 @@ export class VehicleSelector
 	 */
 	selectRide(rideIndex: number)
 	{
-		this._selectedRideIndex = rideIndex;
-
 		if (this._parkRides && this._parkRides.length > 0)
 		{
 			const parkRide = this._parkRides[rideIndex];
@@ -82,7 +71,7 @@ export class VehicleSelector
 			error("This park has no rides.", "selectRide");
 			this.window.setTrainList(null);
 			this.window.setVehicleList(null);
-			this.window.setEditor(null);
+			this.setSelectionToNull();
 		}
 	}
 
@@ -98,7 +87,6 @@ export class VehicleSelector
 		if (this._rideTrains && this._rideTrains.length > 0)
 		{
 			trainIndex = wrap(trainIndex, this._rideTrains.length);
-			this._selectedTrainIndex = trainIndex;
 
 			const train = this._rideTrains[trainIndex];
 			this._trainVehicles = train.getVehicles();
@@ -109,11 +97,9 @@ export class VehicleSelector
 		}
 		else
 		{
-			this._selectedTrainIndex = 0;
-
 			error("This ride has no trains.", "selectTrain");
 			this.window.setVehicleList(null);
-			this.window.setEditor(null);
+			this.setSelectionToNull();
 		}
 	}
 
@@ -129,17 +115,35 @@ export class VehicleSelector
 		if (this._trainVehicles && this._trainVehicles.length > 0)
 		{
 			vehicleIndex = wrap(vehicleIndex, this._trainVehicles.length);
-			this._selectedVehicleIndex = vehicleIndex;
 
 			const vehicle = this._trainVehicles[vehicleIndex];
-			this.window.setEditor(vehicle);
+			this._selectedVehicle = vehicle;
+
+			if (this.onSelect)
+			{
+				this.onSelect(vehicle);
+			}
+
 		}
 		else
 		{
-			this._selectedVehicleIndex = 0;
-
 			error("This train has no vehicles.", "selectVehicle");
-			this.window.setEditor(null);
+			this.setSelectionToNull();
+		}
+	}
+
+
+	/**
+	 * Disables the editor controls and sets the selected vehicle to null.
+	 */
+	private setSelectionToNull()
+	{
+		this._selectedVehicle = null;
+		this.window.disableEditorControls();
+
+		if (this.onSelect)
+		{
+			this.onSelect(null);
 		}
 	}
 }

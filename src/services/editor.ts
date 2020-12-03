@@ -1,34 +1,17 @@
 import { RideVehicle } from "../helpers/ridesInPark";
 import { getAvailableRideTypes, RideType } from "../helpers/rideTypes";
-import { log } from "../helpers/utilityHelpers";
+import { error, log } from "../helpers/utilityHelpers";
 import VehicleEditorWindow from "../ui/editorWindow";
+import VehicleSelector from "./selector";
 
 
 /**
  * Service that allows to edit the selected vehicle.
  */
-export class VehicleEditor
+export default class VehicleEditor
 {
 	private _rideTypes: RideType[];
-
-
-	/**
-	 * Gets the currently selected vehicle.
-	 */
-	get selectedVehicle(): (RideVehicle | null)
-	{
-		return this._selectedVehicle;
-	}
 	private _selectedVehicle: (RideVehicle | null) = null;
-
-
-	/**
-	 * Gets the currently selected ride type index.
-	 */
-	get rideTypeIndex(): number
-	{
-		return this._selectedTypeIndex;
-	}
 	private _selectedTypeIndex: number = 0;
 
 
@@ -38,11 +21,26 @@ export class VehicleEditor
 	 * @param window A vehicle editor window that should be updated according
 	 * to how the vehicle is edited.
 	 */
-	constructor(readonly window: VehicleEditorWindow)
+	constructor(selector: VehicleSelector, readonly window: VehicleEditorWindow)
 	{
 		this._rideTypes = getAvailableRideTypes();
-
 		window.setRideTypeList(this._rideTypes);
+
+		window.rideTypeList.onSelect = (i => this.setRideType(i));
+		window.variantSpinner.onChange = (i => this.setVehicleVariant(i));
+		window.seatCountSpinner.onChange = (i => this.setVehicleSeatCount(i));
+		window.powAccelerationSpinner.onChange = (i => this.setVehiclePoweredAcceleration(i));
+		window.powMaxSpeedSpinner.onChange = (i => this.setVehiclePoweredMaximumSpeed(i));
+		window.massSpinner.onChange = (i => this.setVehicleMass(i));
+		window.onLocateVehicle = (() => this.scrollToCar());
+
+		const selectedVehicle = selector.selectedVehicle;
+		if (selectedVehicle)
+		{
+			this.setVehicle(selectedVehicle);
+		}
+
+		selector.onSelect = (v => (v) ? this.setVehicle(v) : this.disable());
 	}
 
 
@@ -241,5 +239,23 @@ export class VehicleEditor
 
 		// 'VEHICLE_ENTRY_FLAG_POWERED' is required.
 		return ((vehicleObject.flags & (1 << 19)) != 0);
+	}
+
+
+	/**
+	 * Scroll the main viewport to the currently selected vehicle.
+	 */
+	private scrollToCar()
+	{
+		const vehicle = this._selectedVehicle;
+		if (vehicle)
+		{
+			const car = vehicle.getCar();
+			ui.mainViewport.scrollTo({ x: car.x, y: car.y, z: car.z });
+		}
+		else
+		{
+			error("No vehicle has been selected to scroll to.", "scrollToVehicle");
+		}
 	}
 }

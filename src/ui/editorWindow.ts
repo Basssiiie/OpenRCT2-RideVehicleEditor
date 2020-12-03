@@ -1,19 +1,16 @@
 import { ParkRide, RideTrain, RideVehicle } from "../helpers/ridesInPark";
 import { RideType } from "../helpers/rideTypes";
-import { error, isDebugMode, log } from "../helpers/utilityHelpers";
-import { VehicleEditor } from "../services/editor";
-import { VehicleSelector } from "../services/selector";
+import { isDebugMode, log } from "../helpers/utilityHelpers";
 import Dropdown from "../ui/dropdown";
 import DropdownSpinner from "../ui/dropdownSpinner";
 import Spinner from "../ui/spinner";
 import ViewportComponent from "../ui/viewport";
 import pluginVersion from "../version";
-import DebugWindow from "./debugWindow";
 
 
 // Shared coordinate constants
 const windowStart = 18;
-const windowWidth = 360;
+const windowWidth = 375;
 const windowHeight = 221;
 const widgetLineHeight = 14;
 const groupboxMargin = 5;
@@ -35,6 +32,7 @@ class VehicleEditorWindow
 	 */
 	static readonly identifier = "ride-vehicle-editor";
 
+
 	// Only a single instance allowed at a time, currently.
 	private static _windowInstance: (VehicleEditorWindow | null);
 
@@ -51,8 +49,12 @@ class VehicleEditorWindow
 	readonly powMaxSpeedSpinner: Spinner;
 	readonly massSpinner: Spinner;
 
-	private _selector: VehicleSelector;
-	private _editor: VehicleEditor;
+
+	/**
+	 * Event that triggers when the user presses the 'locate vehicle' button.
+	 */
+	onLocateVehicle?: () => void;
+
 
 	private _window: Window;
 
@@ -93,7 +95,6 @@ class VehicleEditorWindow
 			height: widgetLineHeight
 		});
 		this.ridesInParkList.disableSingleItem = false;
-		this.ridesInParkList.onSelect = (i => this._selector.selectRide(i));
 
 		// Trains on the selected ride
 		this.trainList = new DropdownSpinner({
@@ -104,7 +105,6 @@ class VehicleEditorWindow
 			height: widgetLineHeight
 		});
 		this.trainList.disabledMessage = "No trains available";
-		this.trainList.onSelect = (i => this._selector.selectTrain(i));
 
 		// Vehicles in the selected train
 		this.vehicleList = new DropdownSpinner({
@@ -115,7 +115,6 @@ class VehicleEditorWindow
 			height: widgetLineHeight
 		});
 		this.vehicleList.disabledMessage = "No vehicles available";
-		this.vehicleList.onSelect = (i => this._selector.selectVehicle(i));
 
 		// Viewport
 		this.viewport = new ViewportComponent({
@@ -136,7 +135,6 @@ class VehicleEditorWindow
 		});
 		this.rideTypeList.disabledMessage = "No ride types available";
 		this.rideTypeList.disableSingleItem = false;
-		this.rideTypeList.onSelect = (i => this._editor.setRideType(i));
 
 		// Variant sprite of the selected vehicle
 		this.variantSpinner = new Spinner({
@@ -146,7 +144,6 @@ class VehicleEditorWindow
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
-		this.variantSpinner.onChange = (i => this._editor.setVehicleVariant(i));
 
 		// Number of seats of the selected vehicle
 		this.seatCountSpinner = new Spinner({
@@ -158,7 +155,6 @@ class VehicleEditorWindow
 		});
 		this.seatCountSpinner.wrapMode = "clamp";
 		this.seatCountSpinner.maximum = 128;
-		this.seatCountSpinner.onChange = (i => this._editor.setVehicleSeatCount(i));
 
 		// Powered acceleration of the selected vehicle
 		this.powAccelerationSpinner = new Spinner({
@@ -171,8 +167,7 @@ class VehicleEditorWindow
 		this.powAccelerationSpinner.wrapMode = "clamp";
 		this.powAccelerationSpinner.maximum = 256;
 		this.powAccelerationSpinner.disabledMessage = "Only on powered vehicles.";
-		this.powAccelerationSpinner.onChange = (i => this._editor.setVehiclePoweredAcceleration(i));
-
+		
 		// Powered maximum speed of the selected vehicle
 		this.powMaxSpeedSpinner = new Spinner({
 			name: "rve-powered-max-speed-spinner",
@@ -185,8 +180,7 @@ class VehicleEditorWindow
 		this.powMaxSpeedSpinner.minimum = 1;
 		this.powMaxSpeedSpinner.maximum = 256;
 		this.powMaxSpeedSpinner.disabledMessage = "Only on powered vehicles.";
-		this.powMaxSpeedSpinner.onChange = (i => this._editor.setVehiclePoweredMaximumSpeed(i));
-
+		
 		// Total current mass of the selected vehicle
 		this.massSpinner = new Spinner({
 			name: "rve-mass-spinner",
@@ -197,15 +191,8 @@ class VehicleEditorWindow
 		});
 		this.massSpinner.wrapMode = "clamp";
 		this.massSpinner.maximum = 65_536;
-		this.massSpinner.onChange = (i => this._editor.setVehicleMass(i));
 
 		this._window = this.createWindow();
-
-		log("Initializing services.");
-		this._selector = new VehicleSelector(this);
-		this._editor = new VehicleEditor(this);
-
-		this._selector.selectRide(0);
 	}
 
 
@@ -217,12 +204,12 @@ class VehicleEditorWindow
 		log("Open window")
 
 		let windowTitle = `Ride vehicle editor (v${pluginVersion})`;
-		let debugWidgets: Widget[] = [];
+		//let debugWidgets: Widget[] = [];
 
 		if (isDebugMode)
 		{
 			windowTitle += " [DEBUG]";
-			debugWidgets = this.getDebugWidgets();
+			//debugWidgets = this.getDebugWidgets();
 		}
 
 		const window = ui.openWindow({
@@ -322,7 +309,11 @@ class VehicleEditorWindow
 					width: buttonSize,
 					height: buttonSize,
 					image: 5167, // SPR_LOCATE
-					onClick: () => this.scrollToVehicle()
+					onClick: () =>
+					{
+						if (this.onLocateVehicle)
+							this.onLocateVehicle();
+					}
 				},
 				<LabelWidget>{
 					type: 'label' as WidgetType,
@@ -333,7 +324,7 @@ class VehicleEditorWindow
 					text: "github.com/Basssiiie/OpenRCT2-RideVehicleEditor",
 					isDisabled: true
 				},
-				...debugWidgets
+				//...debugWidgets
 			],
 			onClose: () =>
 			{
@@ -398,28 +389,17 @@ class VehicleEditorWindow
 
 
 	/**
-	 * Updates the editor to show the specified vehicle.
-	 * 
-	 * @param vehicle The vehicle to show in the editor.
+	 * Disables the editor controls.
 	 */
-	setEditor(vehicle: RideVehicle | null)
+	disableEditorControls()
 	{
-		const toggle = (vehicle != null);
-		this.rideTypeList.active(toggle);
-		this.variantSpinner.active(toggle);
-		this.seatCountSpinner.active(toggle);
-		this.powAccelerationSpinner.active(toggle);
-		this.powMaxSpeedSpinner.active(toggle);
-
-		if (vehicle)
-		{
-			this._editor.setVehicle(vehicle);
-		}
-		else
-		{
-			this._editor.disable();
-			this.viewport.stop();
-		}
+		this.rideTypeList.active(false);
+		this.variantSpinner.active(false);
+		this.seatCountSpinner.active(false);
+		this.powAccelerationSpinner.active(false);
+		this.powMaxSpeedSpinner.active(false);
+		this.massSpinner.active(false);
+		this.viewport.stop();
 	}
 
 
@@ -436,27 +416,9 @@ class VehicleEditorWindow
 
 
 	/**
-	 * Scroll the main viewport to the currently selected vehicle.
-	 */
-	private scrollToVehicle()
-	{
-		const vehicle = this._editor.selectedVehicle;
-		if (vehicle)
-		{
-			const car = vehicle.getCar();
-			ui.mainViewport.scrollTo({ x: car.x, y: car.y, z: car.z });
-		}
-		else
-		{
-			error("No vehicle has been selected to scroll to.", "scrollToVehicle");
-		}
-	}
-
-
-	/**
 	 * Gets the widgets that only show in debug mode.
 	 */
-	private getDebugWidgets(): Widget[]
+	/*private getDebugWidgets(): Widget[]
 	{
 		return [
 			<ButtonWidget>{
@@ -474,7 +436,7 @@ class VehicleEditorWindow
 				}
 			}
 		];
-	}
+	}*/
 }
 
 export default VehicleEditorWindow;
