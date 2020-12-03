@@ -102,6 +102,7 @@ export class VehicleEditor
 
 		log(`(editor) Set vehicle ride type to: ${rideType.name} (index: ${rideTypeIndex})`);
 		currentCar.rideObject = rideType.rideIndex;
+		currentCar.vehicleObject = 0;
 
 		// Update properties
 		this.refreshProperties(currentCar);

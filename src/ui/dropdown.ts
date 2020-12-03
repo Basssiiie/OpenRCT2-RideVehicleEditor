@@ -49,9 +49,6 @@ class Dropdown extends Component
 		this._silenceEvent = true;
 		widget.selectedIndex = index;
 		this._silenceEvent = false;
-
-		if (this.onSelect)
-			this.onSelect(index);
 	}
 
 
@@ -66,13 +63,15 @@ class Dropdown extends Component
 			return;
 
 		const widget = this.getWidget<DropdownWidget>();
-		if (widget.isDisabled || !this.onSelect)
+		if (widget.isDisabled)
 		{
 			log("(${this._name}) Widget is disabled, no change event triggered.");
 			return;
 		}
 		log(`--->(${this._name}) Try updating ${widget.selectedIndex} -> ${index}.`);
-		this.onSelect(index);
+
+		if (this.onSelect)
+			this.onSelect(index);
 	}
 
 

@@ -75,6 +75,7 @@ export class VehicleSelector
 
 			this.window.setTrainList(this._rideTrains);
 			this.window.trainList.set(0);
+			this.selectTrain(0);
 		}
 		else
 		{
@@ -104,6 +105,7 @@ export class VehicleSelector
 
 			this.window.setVehicleList(this._trainVehicles);
 			this.window.vehicleList.set(0);
+			this.selectVehicle(0);
 		}
 		else
 		{

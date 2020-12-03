@@ -13,7 +13,7 @@ import DebugWindow from "./debugWindow";
 
 // Shared coordinate constants
 const windowStart = 18;
-const windowWidth = 350;
+const windowWidth = 360;
 const windowHeight = 221;
 const widgetLineHeight = 14;
 const groupboxMargin = 5;
@@ -168,6 +168,7 @@ class VehicleEditorWindow
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
+		this.powAccelerationSpinner.wrapMode = "clamp";
 		this.powAccelerationSpinner.maximum = 256;
 		this.powAccelerationSpinner.disabledMessage = "Only on powered vehicles.";
 		this.powAccelerationSpinner.onChange = (i => this._editor.setVehiclePoweredAcceleration(i));
@@ -180,6 +181,8 @@ class VehicleEditorWindow
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
+		this.powMaxSpeedSpinner.wrapMode = "clamp";
+		this.powMaxSpeedSpinner.minimum = 1;
 		this.powMaxSpeedSpinner.maximum = 256;
 		this.powMaxSpeedSpinner.disabledMessage = "Only on powered vehicles.";
 		this.powMaxSpeedSpinner.onChange = (i => this._editor.setVehiclePoweredMaximumSpeed(i));
@@ -192,6 +195,7 @@ class VehicleEditorWindow
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
+		this.massSpinner.wrapMode = "clamp";
 		this.massSpinner.maximum = 65_536;
 		this.massSpinner.onChange = (i => this._editor.setVehicleMass(i));
 

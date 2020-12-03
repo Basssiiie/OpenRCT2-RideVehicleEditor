@@ -19,9 +19,21 @@ class Spinner extends Component
 
 
 	/**
+	 * The minimum possible value that the spinner can reach. (Inclusive)
+	 */
+	minimum: number = 0;
+
+
+	/**
 	 * The maximum possible value that the spinner can reach. (Exclusive)
 	 */
 	maximum: number = 0;
+
+
+	/**
+	 * The amount to increment or decrement per interaction.
+	 */
+	increment = 1;
 
 
 	/**
@@ -49,35 +61,44 @@ class Spinner extends Component
 	set(value: number)
 	{
 		const widget = this.getWidget<SpinnerWidget>();
-		if (this.maximum <= 0)
+		if (this.minimum >= this.maximum)
 		{
-			log(`(${this._name}) Maximum is zero or negative, value ${value} was not applied.`);
+			log(`(${this._name}) Minimum is equal to or larger than maximum, value ${value} was not applied.`);
 			return;
 		}
 
+		this._isActive = true;
+		this.value = this.performWrapMode(value);
+
+		log(`(${this._name}) Set to ${this.value}. (max: ${this.maximum}, mode: ${this.wrapMode})`);
+
+		this.refreshWidget(widget);
+	}
+
+
+	/**
+	 * Wrap or clamp based on the setting in this spinner.
+	 */
+	private performWrapMode(value: number): number
+	{
 		switch (this.wrapMode)
 		{
 			case "wrap":
-				value = (value < 0) ? (this.maximum - 1) : (value % this.maximum);
+				if (value < this.minimum)
+					value = (this.maximum - 1);
+				else if (value >= this.maximum)
+					value = this.minimum;
 				break;
 
 			case "clamp":
-				if (value < 0)
-					value = 0;
+				if (value < this.minimum)
+					value = this.minimum;
 				else if (value >= this.maximum)
 					value = (this.maximum - 1);
 				break;
 		}
 
-		this._isActive = true;
-		this.value = value;
-
-		log(`(${this._name}) Set to ${value}. (max: ${this.maximum}, mode: ${this.wrapMode})`);
-
-		if (this.onChange)
-			this.onChange(value);
-
-		this.refreshWidget(widget);
+		return value;
 	}
 
 
@@ -90,8 +111,8 @@ class Spinner extends Component
 			...this._description,
 			type: "spinner",
 			text: "",
-			onIncrement: () => this.onWidgetChange(this.value + 1),
-			onDecrement: () => this.onWidgetChange(this.value - 1)
+			onIncrement: () => this.onWidgetChange(this.value + this.increment),
+			onDecrement: () => this.onWidgetChange(this.value - this.increment)
 		};
 	}
 
@@ -110,6 +131,9 @@ class Spinner extends Component
 		}
 		log(`--->(${this._name}) Try updating ${this.value} -> ${index}.`);
 		this.set(index);
+
+		if (this.onChange)
+			this.onChange(this.value);
 	}
 
 

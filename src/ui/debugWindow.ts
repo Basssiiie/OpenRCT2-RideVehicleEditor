@@ -36,7 +36,7 @@ class DebugWindow
 							width: 130
 						},
 						<ListViewColumn>{
-							header: "Value(s)"
+							header: "Value(s)"				
 						}
 					],
 					showColumnHeaders: true,
@@ -172,9 +172,17 @@ class DebugWindow
 		this.set(data);
 	}
 
-
+	private _nextUpdate: number = 0;
 	private set(items: ListViewItem[])
 	{
+		const elapsed = date.ticksElapsed;
+		if (this._nextUpdate > elapsed)
+		{
+			return;
+		}
+
+		this._nextUpdate = elapsed + 10;
+
 		const list = this._window.findWidget<ListView>("rve-debug-list");
 		list.width = (this._window.width - 10);
 		list.height = (this._window.height - 25);
