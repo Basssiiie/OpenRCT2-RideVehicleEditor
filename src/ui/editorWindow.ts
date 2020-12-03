@@ -220,7 +220,7 @@ class VehicleEditorWindow
 			widgets: [
 				// Selection group
 				<Widget>{
-					type: 'groupbox' as WidgetType,
+					type: "groupbox",
 					x: groupboxMargin,
 					y: windowStart,
 					width: windowWidth - (groupboxMargin * 2),
@@ -229,7 +229,7 @@ class VehicleEditorWindow
 
 				// Ride selector
 				<LabelWidget>{
-					type: 'label' as WidgetType,
+					type: "label",
 					x: groupboxItemMargin,
 					y: windowStart + 10,
 					width: groupboxItemWidth,
@@ -248,7 +248,7 @@ class VehicleEditorWindow
 
 				// Vehicle variant
 				<LabelWidget>{
-					type: 'label' as WidgetType,
+					type: "label",
 					x: (groupboxMargin + viewportSize + 5),
 					y: (editorStartY + controlHeight) + 2,
 					width: (controlsSize * controlLabelPart),
@@ -259,7 +259,7 @@ class VehicleEditorWindow
 
 				// Number of seats
 				<LabelWidget>{
-					type: 'label' as WidgetType,
+					type: "label",
 					x: (groupboxMargin + viewportSize + 5),
 					y: (editorStartY + controlHeight * 2) + 2,
 					width: (controlsSize * controlLabelPart),
@@ -270,7 +270,7 @@ class VehicleEditorWindow
 
 				// Powered acceleration
 				<LabelWidget>{
-					type: 'label' as WidgetType,
+					type: "label",
 					x: (groupboxMargin + viewportSize + 5),
 					y: (editorStartY + controlHeight * 3) + 2,
 					width: (controlsSize * controlLabelPart),
@@ -281,7 +281,7 @@ class VehicleEditorWindow
 
 				// Powered maximum speed
 				<LabelWidget>{
-					type: 'label' as WidgetType,
+					type: "label",
 					x: (groupboxMargin + viewportSize + 5),
 					y: (editorStartY + controlHeight * 4) + 2,
 					width: (controlsSize * controlLabelPart),
@@ -292,7 +292,7 @@ class VehicleEditorWindow
 
 				// Mass
 				<LabelWidget>{
-					type: 'label' as WidgetType,
+					type: "label",
 					x: (groupboxMargin + viewportSize + 5),
 					y: (editorStartY + controlHeight * 5) + 2,
 					width: (controlsSize * controlLabelPart),
