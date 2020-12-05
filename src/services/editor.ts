@@ -102,14 +102,13 @@ export default class VehicleEditor
 		this._selectedTypeIndex = rideTypeIndex;
 
 		const currentCar = this.getSelectedCar();
-		const rideType = this._rideTypes[rideTypeIndex];
+		const rideType = this.getSelectedRideType();
 
 		log(`(editor) Set vehicle ride type to: ${rideType.name} (index: ${rideTypeIndex})`);
 		currentCar.rideObject = rideType.rideIndex;
 		currentCar.vehicleObject = 0;
 
-		// Update properties
-		this.refreshProperties(currentCar);
+		this.setPropertiesToDefaultOfType(currentCar, rideType, 0);
 	}
 
 
@@ -124,6 +123,8 @@ export default class VehicleEditor
 
 		log(`(editor) Set vehicle variant index to: ${variantIndex}.`);
 		currentCar.vehicleObject = variantIndex;
+
+		this.setPropertiesToDefaultOfType(currentCar, this.getSelectedRideType(), variantIndex);
 	}
 
 
@@ -215,6 +216,56 @@ export default class VehicleEditor
 		}
 
 		log(`(editor) Properties refreshed; variant ${variant.value}/${variant.maximum}; seats: ${seats.value}, powered: ${isPowered}, power: ${poweredAcceleration.value}/${poweredMaxSpeed.value}`);
+	}
+
+
+	/**
+	 * Sets the properties of the specified car to the default properties of the
+	 * specified ride type.
+	 * 
+	 * @param car The car to modify the properties of.
+	 * @param rideType The ride type.
+	 * @param variant The vehicle variant to take the properties from.
+	 */
+	private setPropertiesToDefaultOfType(car: Car, rideType: RideType, variant: number)
+	{
+		log("(editor) All car properties have been reset to the default value.")
+
+		// Set all properties according to definition.
+		const rideObject = rideType.getDefinition();
+		const baseVehicle = rideObject.vehicles[variant];
+
+		car.numSeats = baseVehicle.numSeats;
+		car.poweredAcceleration = baseVehicle.poweredAcceleration;
+		car.poweredMaxSpeed = baseVehicle.poweredMaxSpeed;
+
+		// Recalculate mass with peeps.
+		let newTotalMass = baseVehicle.carMass;
+		for (let i = 0; i < car.peeps.length; i++)
+		{
+			const peepId = car.peeps[i];
+			if (peepId != null)
+			{
+				const peep = map.getEntity(peepId) as Guest;
+				if (peep)
+				{
+					newTotalMass += peep.mass;
+				}
+			}
+		}
+		car.mass = newTotalMass;
+
+		// Update properties
+		this.refreshProperties(car);
+	}
+
+
+	/**
+	 * Gets the selected ride type.
+	 */
+	private getSelectedRideType(): RideType
+	{
+		return this._rideTypes[this._selectedTypeIndex];
 	}
 
 
