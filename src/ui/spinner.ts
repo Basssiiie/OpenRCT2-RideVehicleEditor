@@ -140,10 +140,10 @@ class Spinner extends Component
 	/** @inheritdoc */
 	protected refreshWidget(widget: SpinnerWidget)
 	{
-		if (this._isActive && this.maximum > 0)
+		if (this._isActive && this.minimum < this.maximum)
 		{
 			widget.text = this.value.toString();
-			widget.isDisabled = (this.maximum <= 1);
+			widget.isDisabled = (this.minimum >= (this.maximum - 1));
 		}
 		else
 		{

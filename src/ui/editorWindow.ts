@@ -11,7 +11,7 @@ import pluginVersion from "../version";
 // Shared coordinate constants
 const windowStart = 18;
 const windowWidth = 375;
-const windowHeight = 221;
+const windowHeight = 223;
 const widgetLineHeight = 14;
 const groupboxMargin = 5;
 const groupboxItemMargin = (groupboxMargin + 5);
@@ -48,6 +48,8 @@ class VehicleEditorWindow
 	readonly powAccelerationSpinner: Spinner;
 	readonly powMaxSpeedSpinner: Spinner;
 	readonly massSpinner: Spinner;
+
+	readonly multiplierDropdown: Dropdown;
 
 
 	/**
@@ -86,6 +88,8 @@ class VehicleEditorWindow
 	 */
 	private constructor()
 	{
+		log("(window) Open window");
+
 		// Rides in park
 		this.ridesInParkList = new Dropdown({
 			name: "rve-ride-list",
@@ -125,18 +129,18 @@ class VehicleEditorWindow
 			height: viewportSize
 		});
 
-		// Available ride types
+		// Available ride types.
 		this.rideTypeList = new Dropdown({
 			name: "rve-ride-type-list",
 			x: groupboxMargin + viewportSize + 5,
 			y: editorStartY,
-			width: controlsSize - 1,
+			width: controlsSize,
 			height: widgetLineHeight
 		});
 		this.rideTypeList.disabledMessage = "No ride types available";
 		this.rideTypeList.disableSingleItem = false;
 
-		// Variant sprite of the selected vehicle
+		// Variant sprite of the selected vehicle.
 		this.variantSpinner = new Spinner({
 			name: "rve-variant-spinner",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
@@ -145,7 +149,7 @@ class VehicleEditorWindow
 			height: widgetLineHeight,
 		});
 
-		// Number of seats of the selected vehicle
+		// Number of seats of the selected vehicle.
 		this.seatCountSpinner = new Spinner({
 			name: "rve-seats-spinner",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
@@ -156,11 +160,22 @@ class VehicleEditorWindow
 		this.seatCountSpinner.wrapMode = "clamp";
 		this.seatCountSpinner.maximum = 128;
 
-		// Powered acceleration of the selected vehicle
+		// Total current mass of the selected vehicle.
+		this.massSpinner = new Spinner({
+			name: "rve-mass-spinner",
+			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
+			y: (editorStartY + 1 + controlHeight * 3),
+			width: (controlsSize * (1 - controlLabelPart)),
+			height: widgetLineHeight,
+		});
+		this.massSpinner.wrapMode = "clamp";
+		this.massSpinner.maximum = 65_536;
+
+		// Powered acceleration of the selected vehicle.
 		this.powAccelerationSpinner = new Spinner({
 			name: "rve-powered-acceleration-spinner",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
-			y: (editorStartY + 1 + controlHeight * 3),
+			y: (editorStartY + 1 + controlHeight * 4),
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
@@ -168,11 +183,11 @@ class VehicleEditorWindow
 		this.powAccelerationSpinner.maximum = 256;
 		this.powAccelerationSpinner.disabledMessage = "Only on powered vehicles.";
 		
-		// Powered maximum speed of the selected vehicle
+		// Powered maximum speed of the selected vehicle.
 		this.powMaxSpeedSpinner = new Spinner({
 			name: "rve-powered-max-speed-spinner",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
-			y: (editorStartY + 1 + controlHeight * 4),
+			y: (editorStartY + 1 + controlHeight * 5),
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
@@ -180,17 +195,17 @@ class VehicleEditorWindow
 		this.powMaxSpeedSpinner.minimum = 1;
 		this.powMaxSpeedSpinner.maximum = 256;
 		this.powMaxSpeedSpinner.disabledMessage = "Only on powered vehicles.";
-		
-		// Total current mass of the selected vehicle
-		this.massSpinner = new Spinner({
-			name: "rve-mass-spinner",
-			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
-			y: (editorStartY + 1 + controlHeight * 5),
-			width: (controlsSize * (1 - controlLabelPart)),
+
+		// Dropdown to multiply the spinner increments.
+		this.multiplierDropdown = new Dropdown({
+			name: "rve-multiplier-dropdown",
+			x: (windowWidth - (groupboxMargin + 45)),
+			y: (editorStartY + controlHeight * 6) + 1,
+			width: 45,
 			height: widgetLineHeight,
 		});
-		this.massSpinner.wrapMode = "clamp";
-		this.massSpinner.maximum = 65_536;
+		this.multiplierDropdown.items = ["x1", "x10", "x100"];
+		this.multiplierDropdown.onSelect = (i => this.updateMultiplier(i));
 
 		this._window = this.createWindow();
 	}
@@ -201,15 +216,11 @@ class VehicleEditorWindow
 	 */
 	private createWindow(): Window
 	{
-		log("Open window")
-
 		let windowTitle = `Ride vehicle editor (v${pluginVersion})`;
-		//let debugWidgets: Widget[] = [];
 
 		if (isDebugMode)
 		{
 			windowTitle += " [DEBUG]";
-			//debugWidgets = this.getDebugWidgets();
 		}
 
 		const window = ui.openWindow({
@@ -268,11 +279,22 @@ class VehicleEditorWindow
 				},
 				this.seatCountSpinner.createWidget(),
 
-				// Powered acceleration
+				// Mass
 				<LabelWidget>{
 					type: "label",
 					x: (groupboxMargin + viewportSize + 5),
 					y: (editorStartY + controlHeight * 3) + 2,
+					width: (controlsSize * controlLabelPart),
+					height: widgetLineHeight,
+					text: "Mass:"
+				},
+				this.massSpinner.createWidget(),
+
+				// Powered acceleration
+				<LabelWidget>{
+					type: "label",
+					x: (groupboxMargin + viewportSize + 5),
+					y: (editorStartY + controlHeight * 4) + 2,
 					width: (controlsSize * controlLabelPart),
 					height: widgetLineHeight,
 					text: "Acceleration:"
@@ -283,29 +305,19 @@ class VehicleEditorWindow
 				<LabelWidget>{
 					type: "label",
 					x: (groupboxMargin + viewportSize + 5),
-					y: (editorStartY + controlHeight * 4) + 2,
+					y: (editorStartY + controlHeight * 5) + 2,
 					width: (controlsSize * controlLabelPart),
 					height: widgetLineHeight,
 					text: "Max. speed:"
 				},
 				this.powMaxSpeedSpinner.createWidget(),
 
-				// Mass
-				<LabelWidget>{
-					type: "label",
-					x: (groupboxMargin + viewportSize + 5),
-					y: (editorStartY + controlHeight * 5) + 2,
-					width: (controlsSize * controlLabelPart),
-					height: widgetLineHeight,
-					text: "Mass:"
-				},
-				this.massSpinner.createWidget(),
-
-				// Buttons
+				// Toolbar
+				this.multiplierDropdown.createWidget(),
 				<ButtonWidget>{
 					type: 'button' as WidgetType,
 					x: (groupboxMargin),
-					y: (editorStartY + viewportSize + 2),
+					y: (editorStartY + viewportSize + 4),
 					width: buttonSize,
 					height: buttonSize,
 					image: 5167, // SPR_LOCATE
@@ -317,9 +329,9 @@ class VehicleEditorWindow
 				},
 				<LabelWidget>{
 					type: 'label' as WidgetType,
-					x: (groupboxMargin + 33),
-					y: (editorStartY + viewportSize + (buttonSize / 2)) - 3,
-					width: windowWidth,
+					x: (groupboxMargin + 35),
+					y: (editorStartY + viewportSize + (buttonSize / 2)) - 2,
+					width: 275,
 					height: widgetLineHeight,
 					text: "github.com/Basssiiie/OpenRCT2-RideVehicleEditor",
 					isDisabled: true
@@ -328,7 +340,7 @@ class VehicleEditorWindow
 			],
 			onClose: () =>
 			{
-				log("Close window");
+				log("(window) Close window.");
 				this.viewport.stop();
 				VehicleEditorWindow._windowInstance = null;
 			}
@@ -342,11 +354,12 @@ class VehicleEditorWindow
 		this.rideTypeList.bind(window);
 		this.variantSpinner.bind(window);
 		this.seatCountSpinner.bind(window);
+		this.massSpinner.bind(window);
 		this.powAccelerationSpinner.bind(window);
 		this.powMaxSpeedSpinner.bind(window);
-		this.massSpinner.bind(window);
+		this.multiplierDropdown.bind(window);
 
-		log("Window creation complete.");
+		log("(window) Window creation complete.");
 		return window;
 	}
 
@@ -416,27 +429,31 @@ class VehicleEditorWindow
 
 
 	/**
-	 * Gets the widgets that only show in debug mode.
+	 * Updates the multiplier based on which checkbox was updated.
+	 * @param selectedIndex The index of the multiplier option that was selected.
 	 */
-	/*private getDebugWidgets(): Widget[]
+	private updateMultiplier(selectedIndex: number)
 	{
-		return [
-			<ButtonWidget>{
-				type: 'button' as WidgetType,
-				x: (windowWidth - (buttonSize + groupboxMargin)),
-				y: (editorStartY + viewportSize + 2),
-				width: buttonSize,
-				height: buttonSize,
-				image: 5188, // SPR_TRACK_PEEP
-				onClick: () =>
-				{
-					const vehicle = this._editor.selectedVehicle;
-					if (vehicle)
-						new DebugWindow(vehicle?.entityId)
-				}
-			}
-		];
-	}*/
+		let increment = (10 ** selectedIndex);
+		log(`(window) Updated multiplier to ${increment}. (index: ${selectedIndex})`)
+
+		this.setSpinnerIncrement(this.seatCountSpinner, increment);
+		this.setSpinnerIncrement(this.powAccelerationSpinner, increment);
+		this.setSpinnerIncrement(this.powMaxSpeedSpinner, increment);
+		this.setSpinnerIncrement(this.massSpinner, increment);
+	}
+
+
+	/**
+	 * Sets the increment of the spinner to the specified amount, and refreshes it.
+	 * @param spinner The spinner to update.
+	 * @param increment The increment the spinner should use.
+	 */
+	private setSpinnerIncrement(spinner: Spinner, increment: number)
+	{
+		spinner.increment = increment;
+		spinner.refresh();
+	}
 }
 
 export default VehicleEditorWindow;
