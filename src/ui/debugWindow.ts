@@ -1,23 +1,28 @@
 import { log } from "../helpers/utilityHelpers";
 
+
 /**
  * Window for debugging various car and ride values.
  */
 class DebugWindow
 {
+	static readonly identifier = "rve-debug-window";
+
+
 	private _window: Window;
 
 
 	constructor(private entityId: number)
 	{
-		this._window = this.createWindow();
+		this._window = ui.getWindow(DebugWindow.identifier)
+			?? this.createWindow();
 	}
 
 
 	private createWindow()
 	{
 		return ui.openWindow({
-			classification: "rve-debug-window",
+			classification: DebugWindow.identifier,
 			title: `debug info: entity ${this.entityId}`,
 			width: 300,
 			height: 500,
@@ -172,17 +177,8 @@ class DebugWindow
 		this.set(data);
 	}
 
-	private _nextUpdate: number = 0;
 	private set(items: ListViewItem[])
 	{
-		const elapsed = date.ticksElapsed;
-		if (this._nextUpdate > elapsed)
-		{
-			return;
-		}
-
-		this._nextUpdate = elapsed + 10;
-
 		const list = this._window.findWidget<ListView>("rve-debug-list");
 		list.width = (this._window.width - 10);
 		list.height = (this._window.height - 25);
