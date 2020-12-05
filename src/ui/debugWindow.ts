@@ -14,8 +14,13 @@ class DebugWindow
 
 	constructor(private entityId: number)
 	{
-		this._window = ui.getWindow(DebugWindow.identifier)
-			?? this.createWindow();
+		this._window = ui.getWindow(DebugWindow.identifier);
+		if (this._window)
+		{
+			this._window.close();
+		}
+
+		this._window = this.createWindow();
 	}
 
 
