@@ -51,7 +51,11 @@ class Spinner extends Component
 	/**
 	 * Gets or sets the selected value in the spinner.
 	 */
-	value: number = 0;
+	get value()
+	{
+		return this._value;
+	}
+	private _value: number = 0;
 
 
 	/**
@@ -68,9 +72,9 @@ class Spinner extends Component
 		}
 
 		this._isActive = true;
-		this.value = this.performWrapMode(value);
+		this._value = this.performWrapMode(value);
 
-		log(`(${this._name}) Set to ${this.value}. (max: ${this.maximum}, mode: ${this.wrapMode})`);
+		log(`(${this._name}) Set to ${this._value}. (max: ${this.maximum}, mode: ${this.wrapMode})`);
 
 		this.refreshWidget(widget);
 	}
@@ -111,8 +115,8 @@ class Spinner extends Component
 			...this._description,
 			type: "spinner",
 			text: "",
-			onIncrement: () => this.onWidgetChange(this.value + this.increment),
-			onDecrement: () => this.onWidgetChange(this.value - this.increment)
+			onIncrement: () => this.onWidgetChange(this._value + this.increment),
+			onDecrement: () => this.onWidgetChange(this._value - this.increment)
 		};
 	}
 
@@ -124,16 +128,16 @@ class Spinner extends Component
 	private onWidgetChange(index: number)
 	{
 		const widget = this.getWidget<SpinnerWidget>();
-		if (widget.isDisabled || !this.onChange)
+		if (widget.isDisabled)
 		{
 			log(`(${this._name}) Widget is disabled, no change event triggered.`);
 			return;
 		}
-		log(`--->(${this._name}) Try updating ${this.value} -> ${index}.`);
+		log(`--->(${this._name}) Try updating ${this._value} -> ${index}.`);
 		this.set(index);
 
 		if (this.onChange)
-			this.onChange(this.value);
+			this.onChange(this._value);
 	}
 
 
@@ -142,7 +146,7 @@ class Spinner extends Component
 	{
 		if (this._isActive && this.minimum < this.maximum)
 		{
-			widget.text = this.value.toString();
+			widget.text = this._value.toString();
 			widget.isDisabled = (this.minimum >= (this.maximum - 1));
 		}
 		else

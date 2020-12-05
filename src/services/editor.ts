@@ -189,29 +189,30 @@ export default class VehicleEditor
 
 		// Variant
 		const variant = this.window.variantSpinner;
-		variant.value = car.vehicleObject;
 		variant.maximum = currentType.variantCount;
-		variant.refresh();
+		variant.set(car.vehicleObject);
 
 		// Number of seats
 		const seats = this.window.seatCountSpinner;
-		seats.value = car.numSeats;
-		seats.refresh();
-
-		// Powered acceleration
-		const poweredAcceleration = this.window.powAccelerationSpinner;
-		poweredAcceleration.value = car.poweredAcceleration;
-		poweredAcceleration.active(isPowered);
-
-		// Powered maximum speed
-		const poweredMaxSpeed = this.window.powMaxSpeedSpinner;
-		poweredMaxSpeed.value = car.poweredMaxSpeed;
-		poweredMaxSpeed.active(isPowered);
+		seats.set(car.numSeats);
 
 		// Mass
 		const mass = this.window.massSpinner;
-		mass.value = car.mass;
-		mass.refresh();
+		mass.set(car.mass);
+
+		// Powered acceleration & maximum speed
+		const poweredAcceleration = this.window.powAccelerationSpinner;
+		const poweredMaxSpeed = this.window.powMaxSpeedSpinner;
+		if (isPowered)
+		{
+			poweredAcceleration.set(car.poweredAcceleration);
+			poweredMaxSpeed.set(car.poweredMaxSpeed);
+		}
+		else
+		{
+			poweredAcceleration.active(false);
+			poweredMaxSpeed.active(false);
+		}
 
 		log(`(editor) Properties refreshed; variant ${variant.value}/${variant.maximum}; seats: ${seats.value}, powered: ${isPowered}, power: ${poweredAcceleration.value}/${poweredMaxSpeed.value}`);
 	}

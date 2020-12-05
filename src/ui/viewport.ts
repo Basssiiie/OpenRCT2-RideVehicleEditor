@@ -50,12 +50,8 @@ class ViewportComponent extends Component
 	 */
 	stop()
 	{
-		if (this._updater)
-		{
-			log(`(${this._name}) Updating has stopped.`);
-			this._updater.dispose();
-			this._updater = null;
-		}
+		this._entityId = -1;
+		this.active(false);
 	}
 
 
@@ -86,9 +82,12 @@ class ViewportComponent extends Component
 			}
 			this.update();
 		}
-		else
+		else if (this._updater) 
 		{
-			this.stop();
+			log(`(${this._name}) Updating has stopped.`);
+			this._updater.dispose();
+			this._updater = null;
+
 			widget.viewport.moveTo(farAway)
 		}
 	}

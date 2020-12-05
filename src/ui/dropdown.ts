@@ -41,14 +41,18 @@ class Dropdown extends Component
 	 */
 	set(index: number)
 	{
-		this._isActive = true;
-
 		const widget = this.getWidget<DropdownWidget>();
 		log(`(${this._name}) Set to index ${index}.`);
 
 		this._silenceEvent = true;
 		widget.selectedIndex = index;
 		this._silenceEvent = false;
+
+		if (!this._isActive)
+		{
+			this._isActive = true;
+			this.refreshWidget(widget);
+		}
 	}
 
 
