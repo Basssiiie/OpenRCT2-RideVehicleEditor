@@ -39,15 +39,37 @@ export function error(message: string, method?:string): void
 
 
 /**
- * Wraps the specified value in a range from 0 to 'maximum'.
+ * Wraps the specified value in a range from 'minimum' to 'maximum'.
  * 
  * @param value The specified value.
- * @param maximum The maximum amount of the range.
+ * @param minimum The minimum amount of the range (inclusive).
+ * @param maximum The maximum amount of the range (inclusive).
  */
-export function wrap(value: number, maximum: number): number
+export function wrap(value: number, minimum: number, maximum: number): number
 {
-	return (value < 0)
-		? (maximum - 1)
-		: (value % maximum);
+	if (value < minimum)
+		value = maximum;
+	else if (value > maximum)
+		value = minimum;
+	
+	return value;
 }
 
+
+
+/**
+ * Clamps the specified value in a range from 'minimum' to 'maximum'.
+ * 
+ * @param value The specified value.
+ * @param minimum The minimum amount of the range (inclusive).
+ * @param maximum The maximum amount of the range (inclusive).
+ */
+export function clamp(value: number, minimum: number, maximum: number): number
+{
+	if (value < minimum)
+		value = maximum;
+	else if (value > maximum)
+		value = minimum;
+
+	return value;
+}

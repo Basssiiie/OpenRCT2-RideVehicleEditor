@@ -1,4 +1,4 @@
-import { log } from "../helpers/utilityHelpers";
+import { clamp, log, wrap } from "../helpers/utilityHelpers";
 import Component from "./component";
 
 /**
@@ -10,7 +10,7 @@ type WrapMode = "wrap" | "clamp";
 /**
  * A controller class for a spinner widget.
  */
-class Spinner extends Component
+class SpinnerComponent extends Component
 {
 	/**
 	 * Sets whether the spinner value wraps around or clamps to its boundaries.
@@ -88,21 +88,11 @@ class Spinner extends Component
 		switch (this.wrapMode)
 		{
 			case "wrap":
-				if (value < this.minimum)
-					value = (this.maximum - 1);
-				else if (value >= this.maximum)
-					value = this.minimum;
-				break;
+				return wrap(value, this.minimum, this.maximum - 1);
 
 			case "clamp":
-				if (value < this.minimum)
-					value = this.minimum;
-				else if (value >= this.maximum)
-					value = (this.maximum - 1);
-				break;
+				return clamp(value, this.minimum, this.maximum - 1);
 		}
-
-		return value;
 	}
 
 
@@ -157,4 +147,4 @@ class Spinner extends Component
 	}
 }
 
-export default Spinner;
+export default SpinnerComponent;

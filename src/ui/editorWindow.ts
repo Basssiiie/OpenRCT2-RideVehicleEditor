@@ -1,9 +1,9 @@
 import { ParkRide, RideTrain, RideVehicle } from "../helpers/ridesInPark";
 import { RideType } from "../helpers/rideTypes";
 import { isDebugMode, log } from "../helpers/utilityHelpers";
-import Dropdown from "../ui/dropdown";
-import DropdownSpinner from "../ui/dropdownSpinner";
-import Spinner from "../ui/spinner";
+import DropdownComponent from "../ui/dropdown";
+import DropdownSpinnerComponent from "../ui/dropdownSpinner";
+import SpinnerComponent from "../ui/spinner";
 import ViewportComponent from "../ui/viewport";
 import pluginVersion from "../version";
 
@@ -33,23 +33,19 @@ class VehicleEditorWindow
 	static readonly identifier = "ride-vehicle-editor";
 
 
-	// Only a single instance allowed at a time, currently.
-	private static _windowInstance: (VehicleEditorWindow | null);
-
-
-	readonly ridesInParkList: Dropdown;
-	readonly trainList: DropdownSpinner;
-	readonly vehicleList: DropdownSpinner;
+	readonly ridesInParkList: DropdownComponent;
+	readonly trainList: DropdownSpinnerComponent;
+	readonly vehicleList: DropdownSpinnerComponent;
 
 	readonly viewport: ViewportComponent;
-	readonly rideTypeList: Dropdown;
-	readonly variantSpinner: Spinner;
-	readonly seatCountSpinner: Spinner;
-	readonly powAccelerationSpinner: Spinner;
-	readonly powMaxSpeedSpinner: Spinner;
-	readonly massSpinner: Spinner;
+	readonly rideTypeList: DropdownComponent;
+	readonly variantSpinner: SpinnerComponent;
+	readonly seatCountSpinner: SpinnerComponent;
+	readonly powAccelerationSpinner: SpinnerComponent;
+	readonly powMaxSpeedSpinner: SpinnerComponent;
+	readonly massSpinner: SpinnerComponent;
 
-	readonly multiplierDropdown: Dropdown;
+	readonly multiplierDropdown: DropdownComponent;
 
 
 	/**
@@ -58,40 +54,24 @@ class VehicleEditorWindow
 	onLocateVehicle?: () => void;
 
 
-	private _window: Window;
-
-
 	/**
-	 * Creates a new vehicle editor, or shows the currently opened one.
+	 * Event that triggers when the window is closed.
 	 */
-	static show(): VehicleEditorWindow
-	{
-		if (this._windowInstance)
-		{
-			log("The ride vehicle editor is already open.");
-			this._windowInstance._window?.bringToFront();
-		}
-		else
-		{
-			log("Open the ride vehicle editor.");
-		    this._windowInstance = new VehicleEditorWindow();
-		}
-		return this._windowInstance;
-	}
+	onClose?: () => void;
+
+
+	private _window?: Window;
 
 
 	/**
 	 * Creates a new window for the specified editor.
-	 *
-	 * @param selector The associated editor which will select a vehicle.
-	 * @param editor The associated editor which will edit the vehicle.
 	 */
-	private constructor()
+	constructor()
 	{
 		log("(window) Open window");
 
 		// Rides in park
-		this.ridesInParkList = new Dropdown({
+		this.ridesInParkList = new DropdownComponent({
 			name: "rve-ride-list",
 			x: groupboxItemMargin,
 			y: windowStart + 25,
@@ -101,7 +81,7 @@ class VehicleEditorWindow
 		this.ridesInParkList.disableSingleItem = false;
 
 		// Trains on the selected ride
-		this.trainList = new DropdownSpinner({
+		this.trainList = new DropdownSpinnerComponent({
 			name: "rve-train-list",
 			x: groupboxItemMargin,
 			y: windowStart + 43,
@@ -111,7 +91,7 @@ class VehicleEditorWindow
 		this.trainList.disabledMessage = "No trains available";
 
 		// Vehicles in the selected train
-		this.vehicleList = new DropdownSpinner({
+		this.vehicleList = new DropdownSpinnerComponent({
 			name: "rve-vehicle-list",
 			x: groupboxItemMargin + (groupboxItemWidth / 2) + 2,
 			y: windowStart + 43,
@@ -130,7 +110,7 @@ class VehicleEditorWindow
 		});
 
 		// Available ride types.
-		this.rideTypeList = new Dropdown({
+		this.rideTypeList = new DropdownComponent({
 			name: "rve-ride-type-list",
 			x: groupboxMargin + viewportSize + 5,
 			y: editorStartY,
@@ -141,7 +121,7 @@ class VehicleEditorWindow
 		this.rideTypeList.disableSingleItem = false;
 
 		// Variant sprite of the selected vehicle.
-		this.variantSpinner = new Spinner({
+		this.variantSpinner = new SpinnerComponent({
 			name: "rve-variant-spinner",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
 			y: (editorStartY + 1 + controlHeight),
@@ -150,7 +130,7 @@ class VehicleEditorWindow
 		});
 
 		// Number of seats of the selected vehicle.
-		this.seatCountSpinner = new Spinner({
+		this.seatCountSpinner = new SpinnerComponent({
 			name: "rve-seats-spinner",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
 			y: (editorStartY + + 1 + controlHeight * 2),
@@ -161,7 +141,7 @@ class VehicleEditorWindow
 		this.seatCountSpinner.maximum = 128;
 
 		// Total current mass of the selected vehicle.
-		this.massSpinner = new Spinner({
+		this.massSpinner = new SpinnerComponent({
 			name: "rve-mass-spinner",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
 			y: (editorStartY + 1 + controlHeight * 3),
@@ -172,7 +152,7 @@ class VehicleEditorWindow
 		this.massSpinner.maximum = 65_536;
 
 		// Powered acceleration of the selected vehicle.
-		this.powAccelerationSpinner = new Spinner({
+		this.powAccelerationSpinner = new SpinnerComponent({
 			name: "rve-powered-acceleration-spinner",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
 			y: (editorStartY + 1 + controlHeight * 4),
@@ -184,7 +164,7 @@ class VehicleEditorWindow
 		this.powAccelerationSpinner.disabledMessage = "Only on powered vehicles.";
 		
 		// Powered maximum speed of the selected vehicle.
-		this.powMaxSpeedSpinner = new Spinner({
+		this.powMaxSpeedSpinner = new SpinnerComponent({
 			name: "rve-powered-max-speed-spinner",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
 			y: (editorStartY + 1 + controlHeight * 5),
@@ -197,7 +177,7 @@ class VehicleEditorWindow
 		this.powMaxSpeedSpinner.disabledMessage = "Only on powered vehicles.";
 
 		// Dropdown to multiply the spinner increments.
-		this.multiplierDropdown = new Dropdown({
+		this.multiplierDropdown = new DropdownComponent({
 			name: "rve-multiplier-dropdown",
 			x: (windowWidth - (groupboxMargin + 45)),
 			y: (editorStartY + controlHeight * 6) + 1,
@@ -206,8 +186,24 @@ class VehicleEditorWindow
 		});
 		this.multiplierDropdown.items = ["x1", "x10", "x100"];
 		this.multiplierDropdown.onSelect = (i => this.updateMultiplier(i));
+	}
 
-		this._window = this.createWindow();
+
+	/**
+	 * Creates a new vehicle editor, or shows the currently opened one.
+	 */
+	show()
+	{
+		if (this._window)
+		{
+			log("The ride vehicle editor is already shown.");
+			this._window.bringToFront();
+		}
+		else
+		{
+			log("Open the ride vehicle editor.");
+			this._window = this.createWindow();
+		}
 	}
 
 
@@ -336,13 +332,14 @@ class VehicleEditorWindow
 					text: "github.com/Basssiiie/OpenRCT2-RideVehicleEditor",
 					isDisabled: true
 				},
-				//...debugWidgets
 			],
 			onClose: () =>
 			{
 				log("(window) Close window.");
 				this.viewport.stop();
-				VehicleEditorWindow._windowInstance = null;
+
+				if (this.onClose)
+					this.onClose();
 			}
 		});
 
@@ -449,7 +446,7 @@ class VehicleEditorWindow
 	 * @param spinner The spinner to update.
 	 * @param increment The increment the spinner should use.
 	 */
-	private setSpinnerIncrement(spinner: Spinner, increment: number)
+	private setSpinnerIncrement(spinner: SpinnerComponent, increment: number)
 	{
 		spinner.increment = increment;
 		spinner.refresh();

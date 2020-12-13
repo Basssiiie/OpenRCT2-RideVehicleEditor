@@ -5,7 +5,7 @@ import Component from "./component";
 /**
  * A controller class for a dropdown widget.
  */
-class Dropdown extends Component
+class DropdownComponent extends Component
 {
 	/**
 	 * Sets the items that will show up in the dropdown menu.
@@ -110,4 +110,4 @@ class Dropdown extends Component
 	}
 }
 
-export default Dropdown;
+export default DropdownComponent;

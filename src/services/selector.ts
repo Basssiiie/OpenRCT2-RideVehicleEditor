@@ -1,5 +1,5 @@
 import { getRidesInPark, ParkRide, RideTrain, RideVehicle } from "../helpers/ridesInPark";
-import { error, log, wrap } from "../helpers/utilityHelpers";
+import { error, log } from "../helpers/utilityHelpers";
 import VehicleEditorWindow from "../ui/editorWindow";
 
 
@@ -24,7 +24,7 @@ export default class VehicleSelector
 	onSelect?: (vehicle: RideVehicle | null) => void;
 
 
-	private _parkRides: ParkRide[];
+	private _parkRides!: ParkRide[];
 	private _rideTrains!: RideTrain[];
 	private _trainVehicles!: RideVehicle[];
 
@@ -37,14 +37,23 @@ export default class VehicleSelector
 	 */
 	constructor(readonly window: VehicleEditorWindow)
 	{
-		this._parkRides = getRidesInPark();
-		window.setRideList(this._parkRides);
-
+		this.reloadRideList();
 		this.selectRide(0);
 
 		window.ridesInParkList.onSelect = (i => this.selectRide(i));
 		window.trainList.onSelect = (i => this.selectTrain(i));
 		window.vehicleList.onSelect = (i => this.selectVehicle(i));
+	}
+
+
+	/**
+	 * Reloads the list with rides in the park.
+	 */
+	reloadRideList()
+	{
+		log("(selector) Reloaded the list of rides in the park.");
+		this._parkRides = getRidesInPark();
+		this.window.setRideList(this._parkRides);
 	}
 
 
@@ -71,7 +80,7 @@ export default class VehicleSelector
 			error("This park has no rides.", "selectRide");
 			this.window.setTrainList(null);
 			this.window.setVehicleList(null);
-			this.setSelectionToNull();
+			this.deselectVehicle();
 		}
 	}
 
@@ -86,8 +95,6 @@ export default class VehicleSelector
 		log(`(selector) Selected train at index: ${trainIndex}`);
 		if (this._rideTrains && this._rideTrains.length > 0)
 		{
-			trainIndex = wrap(trainIndex, this._rideTrains.length);
-
 			const train = this._rideTrains[trainIndex];
 			this._trainVehicles = train.getVehicles();
 
@@ -99,7 +106,7 @@ export default class VehicleSelector
 		{
 			error("This ride has no trains.", "selectTrain");
 			this.window.setVehicleList(null);
-			this.setSelectionToNull();
+			this.deselectVehicle();
 		}
 	}
 
@@ -114,8 +121,6 @@ export default class VehicleSelector
 		log(`(selector) Selected vehicle at index ${vehicleIndex}`);
 		if (this._trainVehicles && this._trainVehicles.length > 0)
 		{
-			vehicleIndex = wrap(vehicleIndex, this._trainVehicles.length);
-
 			const vehicle = this._trainVehicles[vehicleIndex];
 			this._selectedVehicle = vehicle;
 
@@ -128,7 +133,7 @@ export default class VehicleSelector
 		else
 		{
 			error("This train has no vehicles.", "selectVehicle");
-			this.setSelectionToNull();
+			this.deselectVehicle();
 		}
 	}
 
@@ -136,7 +141,7 @@ export default class VehicleSelector
 	/**
 	 * Disables the editor controls and sets the selected vehicle to null.
 	 */
-	private setSelectionToNull()
+	deselectVehicle()
 	{
 		this._selectedVehicle = null;
 		this.window.disableEditorControls();

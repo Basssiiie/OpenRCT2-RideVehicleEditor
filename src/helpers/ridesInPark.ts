@@ -1,12 +1,10 @@
-import { error, log } from "./utilityHelpers";
+import { error } from "./utilityHelpers";
 
 /**
  * Gets a list of all rides in the park.
  */
 export function getRidesInPark(): ParkRide[]
 {
-	log("Get ride names");
-
 	return map
 		.rides
 		.filter(r => r.classification == "ride")

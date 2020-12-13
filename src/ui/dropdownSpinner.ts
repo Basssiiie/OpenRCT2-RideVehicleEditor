@@ -1,15 +1,15 @@
-import Dropdown from "./dropdown";
-import Spinner from "./spinner";
+import DropdownComponent from "./dropdown";
+import SpinnerComponent from "./spinner";
 import WidgetDesc from "./widgetDesc";
 
 
 /**
  * A dropdown with a spinner component on the side.
  */
-class DropdownSpinner extends Dropdown
+class DropdownSpinnerComponent extends DropdownComponent
 {
 	// The attached spinner component.
-	private _spinner: Spinner;
+	private _spinner: SpinnerComponent;
 
 
 	constructor(description: WidgetDesc)
@@ -18,7 +18,7 @@ class DropdownSpinner extends Dropdown
 			...description,
 			width: (description.width - 24)
 		});
-		this._spinner = new Spinner({
+		this._spinner = new SpinnerComponent({
 			...description,
 			name: (description.name + "-spinner"),
 		});
@@ -79,4 +79,4 @@ class DropdownSpinner extends Dropdown
 	}
 }
 
-export default DropdownSpinner;
+export default DropdownSpinnerComponent;
