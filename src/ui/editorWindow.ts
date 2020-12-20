@@ -40,6 +40,7 @@ class VehicleEditorWindow
 	readonly viewport: ViewportComponent;
 	readonly rideTypeList: DropdownComponent;
 	readonly variantSpinner: SpinnerComponent;
+	readonly trackProgressSpinner: SpinnerComponent;
 	readonly seatCountSpinner: SpinnerComponent;
 	readonly powAccelerationSpinner: SpinnerComponent;
 	readonly powMaxSpeedSpinner: SpinnerComponent;
@@ -129,11 +130,23 @@ class VehicleEditorWindow
 			height: widgetLineHeight,
 		});
 
+		// Sets the track progress of the current vehicle
+		this.trackProgressSpinner = new SpinnerComponent({
+			name: "rve-track-progress-spinner",
+			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
+			y: (editorStartY + 1 + controlHeight * 2),
+			width: (controlsSize * (1 - controlLabelPart)),
+			height: widgetLineHeight,
+		});
+		this.trackProgressSpinner.wrapMode = "clamp";
+		this.trackProgressSpinner.minimum = -32_768;
+		this.trackProgressSpinner.maximum =  32_767;
+
 		// Number of seats of the selected vehicle.
 		this.seatCountSpinner = new SpinnerComponent({
 			name: "rve-seats-spinner",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
-			y: (editorStartY + + 1 + controlHeight * 2),
+			y: (editorStartY + + 1 + controlHeight * 3),
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
@@ -144,7 +157,7 @@ class VehicleEditorWindow
 		this.massSpinner = new SpinnerComponent({
 			name: "rve-mass-spinner",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
-			y: (editorStartY + 1 + controlHeight * 3),
+			y: (editorStartY + 1 + controlHeight * 4),
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
@@ -155,7 +168,7 @@ class VehicleEditorWindow
 		this.powAccelerationSpinner = new SpinnerComponent({
 			name: "rve-powered-acceleration-spinner",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
-			y: (editorStartY + 1 + controlHeight * 4),
+			y: (editorStartY + 1 + controlHeight * 5),
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
@@ -167,7 +180,7 @@ class VehicleEditorWindow
 		this.powMaxSpeedSpinner = new SpinnerComponent({
 			name: "rve-powered-max-speed-spinner",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
-			y: (editorStartY + 1 + controlHeight * 5),
+			y: (editorStartY + 1 + controlHeight * 6),
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
@@ -180,7 +193,7 @@ class VehicleEditorWindow
 		this.multiplierDropdown = new DropdownComponent({
 			name: "rve-multiplier-dropdown",
 			x: (windowWidth - (groupboxMargin + 45)),
-			y: (editorStartY + controlHeight * 6) + 1,
+			y: (editorStartY + controlHeight * 7) + 1,
 			width: 45,
 			height: widgetLineHeight,
 		});
@@ -264,11 +277,22 @@ class VehicleEditorWindow
 				},
 				this.variantSpinner.createWidget(),
 
-				// Number of seats
+				// Track progress
 				<LabelWidget>{
 					type: "label",
 					x: (groupboxMargin + viewportSize + 5),
 					y: (editorStartY + controlHeight * 2) + 2,
+					width: (controlsSize * controlLabelPart),
+					height: widgetLineHeight,
+					text: "Track progress:"
+				},
+				this.trackProgressSpinner.createWidget(),
+
+				// Number of seats
+				<LabelWidget>{
+					type: "label",
+					x: (groupboxMargin + viewportSize + 5),
+					y: (editorStartY + controlHeight * 3) + 2,
 					width: (controlsSize * controlLabelPart),
 					height: widgetLineHeight,
 					text: "Seats:"
@@ -279,7 +303,7 @@ class VehicleEditorWindow
 				<LabelWidget>{
 					type: "label",
 					x: (groupboxMargin + viewportSize + 5),
-					y: (editorStartY + controlHeight * 3) + 2,
+					y: (editorStartY + controlHeight * 4) + 2,
 					width: (controlsSize * controlLabelPart),
 					height: widgetLineHeight,
 					text: "Mass:"
@@ -290,7 +314,7 @@ class VehicleEditorWindow
 				<LabelWidget>{
 					type: "label",
 					x: (groupboxMargin + viewportSize + 5),
-					y: (editorStartY + controlHeight * 4) + 2,
+					y: (editorStartY + controlHeight * 5) + 2,
 					width: (controlsSize * controlLabelPart),
 					height: widgetLineHeight,
 					text: "Acceleration:"
@@ -301,7 +325,7 @@ class VehicleEditorWindow
 				<LabelWidget>{
 					type: "label",
 					x: (groupboxMargin + viewportSize + 5),
-					y: (editorStartY + controlHeight * 5) + 2,
+					y: (editorStartY + controlHeight * 6) + 2,
 					width: (controlsSize * controlLabelPart),
 					height: widgetLineHeight,
 					text: "Max. speed:"
@@ -350,6 +374,7 @@ class VehicleEditorWindow
 		this.viewport.bind(window);
 		this.rideTypeList.bind(window);
 		this.variantSpinner.bind(window);
+		this.trackProgressSpinner.bind(window);
 		this.seatCountSpinner.bind(window);
 		this.massSpinner.bind(window);
 		this.powAccelerationSpinner.bind(window);
@@ -405,6 +430,7 @@ class VehicleEditorWindow
 	{
 		this.rideTypeList.active(false);
 		this.variantSpinner.active(false);
+		this.trackProgressSpinner.active(false);
 		this.seatCountSpinner.active(false);
 		this.powAccelerationSpinner.active(false);
 		this.powMaxSpeedSpinner.active(false);
@@ -431,9 +457,10 @@ class VehicleEditorWindow
 	 */
 	private updateMultiplier(selectedIndex: number)
 	{
-		let increment = (10 ** selectedIndex);
+		const increment = (10 ** selectedIndex);
 		log(`(window) Updated multiplier to ${increment}. (index: ${selectedIndex})`)
 
+		this.setSpinnerIncrement(this.trackProgressSpinner, increment);
 		this.setSpinnerIncrement(this.seatCountSpinner, increment);
 		this.setSpinnerIncrement(this.powAccelerationSpinner, increment);
 		this.setSpinnerIncrement(this.powMaxSpeedSpinner, increment);

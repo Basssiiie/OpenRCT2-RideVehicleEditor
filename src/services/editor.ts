@@ -28,6 +28,7 @@ export default class VehicleEditor
 
 		window.rideTypeList.onSelect = (i => this.setRideType(i));
 		window.variantSpinner.onChange = (i => this.setVehicleVariant(i));
+		window.trackProgressSpinner.onChange = (i => this.setVehicleTrackProgress(i));
 		window.seatCountSpinner.onChange = (i => this.setVehicleSeatCount(i));
 		window.powAccelerationSpinner.onChange = (i => this.setVehiclePoweredAcceleration(i));
 		window.powMaxSpeedSpinner.onChange = (i => this.setVehiclePoweredMaximumSpeed(i));
@@ -148,6 +149,27 @@ export default class VehicleEditor
 
 
 	/**
+	 * Sets the vehicles progress on the current track element.
+	 * 
+	 * @param progress The amount of progress in steps.
+	 */
+	setVehicleTrackProgress(progress: number): void
+	{
+		const currentCar = this.getSelectedCar();
+		if (currentCar)
+		{
+			log(`(editor) Set vehicle track progress to: ${progress}.`);
+			// @ts-expect-error
+			currentCar.trackProgress = progress;
+
+			// @ts-expect-error
+			const recalculatedProgress = currentCar.trackProgress;
+			this.window.trackProgressSpinner.set(recalculatedProgress);
+		}
+	}
+
+
+	/**
 	 * Sets the maximum number of seats for this vehicle.
 	 * @param numberOfSeats The amount of seats on this vehicle.
 	 */
@@ -219,6 +241,11 @@ export default class VehicleEditor
 		const variant = this.window.variantSpinner;
 		variant.maximum = currentType.variantCount;
 		variant.set(car.vehicleObject);
+
+		// Track progress
+		const progress = this.window.trackProgressSpinner;
+		// @ts-expect-error
+		progress.set(car.trackProgress);
 
 		// Number of seats
 		const seats = this.window.seatCountSpinner;

@@ -105,7 +105,12 @@ class DebugWindow
 					["Powered acceleration:", car.poweredAcceleration.toString()],
 					["Powered max. speed:", car.poweredMaxSpeed.toString()],
 					["Status:", car.status.toString()],
-					["Peeps:", car.peeps.map(p => (p == null) ? "null" : p.toString()).toString()]
+					["Peeps:", car.peeps.map(p => (p == null) ? "null" : p.toString()).toString()],
+					["", ""],
+					// @ts-expect-error
+					["Track location", `${car.trackLocation.x}, ${car.trackLocation.y}, ${car.trackLocation.z}, dir: ${car.trackLocation.direction}`],
+					// @ts-expect-error
+					["Track progress", car.trackProgress.toString()],
 				]);
 
 
