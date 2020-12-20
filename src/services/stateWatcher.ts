@@ -39,8 +39,6 @@ class StateWatcher implements IDisposable
 				this.selector.reloadRideList();
 				break;
 		}
-
-		log(`(state) Action exectued: ${args.action} (args: ${JSON.stringify(args)})`);
 	}
 
 

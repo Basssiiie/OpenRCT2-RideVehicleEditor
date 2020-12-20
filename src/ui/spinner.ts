@@ -74,7 +74,7 @@ class SpinnerComponent extends Component
 		this._isActive = true;
 		this._value = this.performWrapMode(value);
 
-		log(`(${this._name}) Set to ${this._value}. (max: ${this.maximum}, mode: ${this.wrapMode})`);
+		log(`(${this._name}) Set to ${this._value}. (min: ${this.minimum}, max: ${this.maximum}, mode: ${this.wrapMode})`);
 
 		this.refreshWidget(widget);
 	}
