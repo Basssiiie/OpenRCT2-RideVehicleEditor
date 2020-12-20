@@ -26,7 +26,7 @@ function openEditorWindow()
 	const selector = new VehicleSelector(window);
 	const editor = new VehicleEditor(selector, window);
 
-	const watcher = new StateWatcher(selector, editor);
+	const watcher = new StateWatcher(window, selector, editor);
 
 	window.onClose = (() =>
 	{

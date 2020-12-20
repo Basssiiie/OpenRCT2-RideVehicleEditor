@@ -109,8 +109,8 @@ class DebugWindow
 					["", ""],
 					// @ts-expect-error
 					["Track location", `${car.trackLocation.x}, ${car.trackLocation.y}, ${car.trackLocation.z}, dir: ${car.trackLocation.direction}`],
-					// @ts-expect-error
 					["Track progress", car.trackProgress.toString()],
+					["Remaining distance", car.remainingDistance.toString()],
 				]);
 
 

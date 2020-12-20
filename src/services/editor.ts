@@ -6,6 +6,10 @@ import VehicleEditorWindow from "../ui/editorWindow";
 import VehicleSelector from "./selector";
 
 
+// The distance of a single step for moving the vehicle.
+const moveDistanceStep = 9_000;
+
+
 /**
  * Service that allows to edit the selected vehicle.
  */
@@ -26,13 +30,13 @@ export default class VehicleEditor
 	{
 		this.reloadRideTypes();
 
-		window.rideTypeList.onSelect = (i => this.setRideType(i));
-		window.variantSpinner.onChange = (i => this.setVehicleVariant(i));
-		window.trackProgressSpinner.onChange = (i => this.setVehicleTrackProgress(i));
-		window.seatCountSpinner.onChange = (i => this.setVehicleSeatCount(i));
-		window.powAccelerationSpinner.onChange = (i => this.setVehiclePoweredAcceleration(i));
-		window.powMaxSpeedSpinner.onChange = (i => this.setVehiclePoweredMaximumSpeed(i));
-		window.massSpinner.onChange = (i => this.setVehicleMass(i));
+		window.rideTypeList.onSelect = (v => this.setRideType(v));
+		window.variantSpinner.onChange = (v => this.setVehicleVariant(v));
+		window.trackProgressSpinner.onChange = ((_, i) => this.moveVehicleRelativeDistance(i));
+		window.seatCountSpinner.onChange = (v => this.setVehicleSeatCount(v));
+		window.powAccelerationSpinner.onChange = (v => this.setVehiclePoweredAcceleration(v));
+		window.powMaxSpeedSpinner.onChange = (v => this.setVehiclePoweredMaximumSpeed(v));
+		window.massSpinner.onChange = (v => this.setVehicleMass(v));
 		window.onLocateVehicle = (() => this.scrollToCar());
 
 		const selectedVehicle = selector.selectedVehicle;
@@ -149,20 +153,18 @@ export default class VehicleEditor
 
 
 	/**
-	 * Sets the vehicles progress on the current track element.
+	 * Moves the vehicle a relative distance along the track.
 	 * 
-	 * @param progress The amount of progress in steps.
+	 * @param distance The amount of distance in steps of about 8 to 14k.
 	 */
-	setVehicleTrackProgress(progress: number): void
+	moveVehicleRelativeDistance(distance: number): void
 	{
 		const currentCar = this.getSelectedCar();
 		if (currentCar)
 		{
-			log(`(editor) Set vehicle track progress to: ${progress}.`);
-			// @ts-expect-error
-			currentCar.trackProgress = progress;
+			log(`(editor) Move vehicle a distance of: ${distance}.`);
+			currentCar.move(distance * moveDistanceStep);
 
-			// @ts-expect-error
 			const recalculatedProgress = currentCar.trackProgress;
 			this.window.trackProgressSpinner.set(recalculatedProgress);
 		}
@@ -244,7 +246,6 @@ export default class VehicleEditor
 
 		// Track progress
 		const progress = this.window.trackProgressSpinner;
-		// @ts-expect-error
 		progress.set(car.trackProgress);
 
 		// Number of seats

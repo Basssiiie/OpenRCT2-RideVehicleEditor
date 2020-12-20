@@ -1,4 +1,5 @@
 import { log } from "../helpers/utilityHelpers";
+import VehicleEditorWindow from "../ui/editorWindow";
 import VehicleEditor from "./editor";
 import VehicleSelector from "./selector";
 
@@ -13,6 +14,7 @@ class StateWatcher implements IDisposable
 
 
 	constructor(
+		readonly window: VehicleEditorWindow,
 		readonly selector: VehicleSelector,
 		readonly editor: VehicleEditor)
 	{
@@ -53,6 +55,11 @@ class StateWatcher implements IDisposable
 			if (!car)
 			{
 				this.selector.deselectVehicle();
+			}
+			else
+			{
+				this.window.trackProgressSpinner.set(car.remainingDistance);
+				this.window.massSpinner.set(car.mass);
 			}
 		}
 	}

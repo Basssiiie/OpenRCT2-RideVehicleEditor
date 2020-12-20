@@ -43,9 +43,16 @@ class SpinnerComponent extends Component
 
 
 	/**
-	 * Triggers when the spinner value changes.
+	 * Triggers when the spinner value changes. The adjustment specifies the change
+	 * that has been applied to the value in the spinner.
 	 */
-	onChange?: (index: number) => void;
+	onChange?: (value: number, adjustment: number) => void;
+
+
+	/**
+	 * Allows for a custom formatted display every time the value gets refreshed.
+	 */
+	format?: (value: number) => string;
 
 
 	/**
@@ -68,6 +75,10 @@ class SpinnerComponent extends Component
 		if (this.minimum >= this.maximum)
 		{
 			log(`(${this._name}) Minimum is equal to or larger than maximum, value ${value} was not applied.`);
+			return;
+		}
+		if (value === this._value)
+		{
 			return;
 		}
 
@@ -105,17 +116,17 @@ class SpinnerComponent extends Component
 			...this._description,
 			type: "spinner",
 			text: "",
-			onIncrement: () => this.onWidgetChange(this._value + this.increment),
-			onDecrement: () => this.onWidgetChange(this._value - this.increment)
+			onIncrement: () => this.onWidgetChange(this._value,  this.increment),
+			onDecrement: () => this.onWidgetChange(this._value, -this.increment)
 		};
 	}
 
 
 	/**
-	 * Triggered when a new item is selected in the the dropdown.
-	 * @param index The number the spinner was set to.
+	 * Triggered when a value is selected in the spinner.
+	 * @param value The number the spinner was set to.
 	 */
-	private onWidgetChange(index: number)
+	private onWidgetChange(value: number, adjustment: number)
 	{
 		const widget = this.getWidget<SpinnerWidget>();
 		if (widget.isDisabled)
@@ -123,11 +134,13 @@ class SpinnerComponent extends Component
 			log(`(${this._name}) Widget is disabled, no change event triggered.`);
 			return;
 		}
-		log(`--->(${this._name}) Try updating ${this._value} -> ${index}.`);
-		this.set(index);
+		value += adjustment;
+		log(`--->(${this._name}) Try updating ${this._value} -> ${value}, adjustment: ${adjustment}.`);
+
+		this.set(value);
 
 		if (this.onChange)
-			this.onChange(this._value);
+			this.onChange(this._value, adjustment);
 	}
 
 
@@ -136,7 +149,10 @@ class SpinnerComponent extends Component
 	{
 		if (this._isActive && this.minimum < this.maximum)
 		{
-			widget.text = this._value.toString();
+			widget.text = (this.format)
+				? this.format(this.value)
+				: this._value.toString();
+
 			widget.isDisabled = (this.minimum >= (this.maximum - 1));
 		}
 		else
