@@ -11,7 +11,7 @@ import pluginVersion from "../version";
 // Shared coordinate constants
 const windowStart = 18;
 const windowWidth = 375;
-const windowHeight = 223;
+const windowHeight = 232;
 const widgetLineHeight = 14;
 const groupboxMargin = 5;
 const groupboxItemMargin = (groupboxMargin + 5);
@@ -20,7 +20,7 @@ const groupboxItemWidth = windowWidth - (groupboxItemMargin * 2);
 const editorStartY = 90;
 const viewportSize = 100;
 const controlsSize = (windowWidth - (groupboxMargin * 2) - (viewportSize + 5));
-const controlLabelPart = 0.3; // label takes 30%
+const controlLabelPart = 0.35; // label takes 35%
 const controlHeight = 17;
 const buttonSize = 24;
 
@@ -350,7 +350,7 @@ class VehicleEditorWindow
 				<LabelWidget>{
 					type: 'label' as WidgetType,
 					x: (groupboxMargin + 35),
-					y: (editorStartY + viewportSize + (buttonSize / 2)) - 2,
+					y: (windowHeight - (widgetLineHeight + groupboxMargin)),
 					width: 275,
 					height: widgetLineHeight,
 					text: "github.com/Basssiiie/OpenRCT2-RideVehicleEditor",
