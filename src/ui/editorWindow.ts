@@ -73,6 +73,7 @@ class VehicleEditorWindow
 		// Rides in park
 		this.ridesInParkList = new DropdownComponent({
 			name: "rve-ride-list",
+			tooltip: "List of rides in the park",
 			x: groupboxItemMargin,
 			y: windowStart + 25,
 			width: groupboxItemWidth,
@@ -83,6 +84,7 @@ class VehicleEditorWindow
 		// Trains on the selected ride
 		this.trainList = new DropdownSpinnerComponent({
 			name: "rve-train-list",
+			tooltip: "List of trains on the currently selected ride",
 			x: groupboxItemMargin,
 			y: windowStart + 43,
 			width: (groupboxItemWidth / 2) - 2,
@@ -93,6 +95,7 @@ class VehicleEditorWindow
 		// Vehicles in the selected train
 		this.vehicleList = new DropdownSpinnerComponent({
 			name: "rve-vehicle-list",
+			tooltip: "List of vehicles on the currently selected train",
 			x: groupboxItemMargin + (groupboxItemWidth / 2) + 2,
 			y: windowStart + 43,
 			width: (groupboxItemWidth / 2) - 2,
@@ -112,6 +115,7 @@ class VehicleEditorWindow
 		// Available ride types.
 		this.rideTypeList = new DropdownComponent({
 			name: "rve-ride-type-list",
+			tooltip: "All ride types currently available in the park",
 			x: groupboxMargin + viewportSize + 5,
 			y: editorStartY,
 			width: controlsSize,
@@ -123,6 +127,7 @@ class VehicleEditorWindow
 		// Variant sprite of the selected vehicle.
 		this.variantSpinner = new SpinnerComponent({
 			name: "rve-variant-spinner",
+			tooltip: "Sprite variant to use from the selected ride type",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
 			y: (editorStartY + 1 + controlHeight),
 			width: (controlsSize * (1 - controlLabelPart)),
@@ -132,6 +137,7 @@ class VehicleEditorWindow
 		// Number of seats of the selected vehicle.
 		this.seatCountSpinner = new SpinnerComponent({
 			name: "rve-seats-spinner",
+			tooltip: "Total amount of passengers that can cuddle up in this vehicle",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
 			y: (editorStartY + + 1 + controlHeight * 2),
 			width: (controlsSize * (1 - controlLabelPart)),
@@ -143,6 +149,7 @@ class VehicleEditorWindow
 		// Total current mass of the selected vehicle.
 		this.massSpinner = new SpinnerComponent({
 			name: "rve-mass-spinner",
+			tooltip: "Total amount of mass (weight) of this vehicle, including all its passengers and your mom",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
 			y: (editorStartY + 1 + controlHeight * 3),
 			width: (controlsSize * (1 - controlLabelPart)),
@@ -154,6 +161,7 @@ class VehicleEditorWindow
 		// Powered acceleration of the selected vehicle.
 		this.powAccelerationSpinner = new SpinnerComponent({
 			name: "rve-powered-acceleration-spinner",
+			tooltip: "Cranks up the engines to accelerate faster, self-powered vehicles only",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
 			y: (editorStartY + 1 + controlHeight * 4),
 			width: (controlsSize * (1 - controlLabelPart)),
@@ -166,6 +174,7 @@ class VehicleEditorWindow
 		// Powered maximum speed of the selected vehicle.
 		this.powMaxSpeedSpinner = new SpinnerComponent({
 			name: "rve-powered-max-speed-spinner",
+			tooltip: "The (il)legal speed limit for your vehicle, self-powered vehicles only",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
 			y: (editorStartY + 1 + controlHeight * 5),
 			width: (controlsSize * (1 - controlLabelPart)),
@@ -179,6 +188,7 @@ class VehicleEditorWindow
 		// Dropdown to multiply the spinner increments.
 		this.multiplierDropdown = new DropdownComponent({
 			name: "rve-multiplier-dropdown",
+			tooltip: "Multiplies all spinner controls by the specified amount",
 			x: (windowWidth - (groupboxMargin + 45)),
 			y: (editorStartY + controlHeight * 6) + 1,
 			width: 45,
@@ -255,6 +265,7 @@ class VehicleEditorWindow
 
 				// Vehicle variant
 				<LabelWidget>{
+					tooltip: this.variantSpinner.description.tooltip,
 					type: "label",
 					x: (groupboxMargin + viewportSize + 5),
 					y: (editorStartY + controlHeight) + 2,
@@ -266,6 +277,7 @@ class VehicleEditorWindow
 
 				// Number of seats
 				<LabelWidget>{
+					tooltip: this.seatCountSpinner.description.tooltip,
 					type: "label",
 					x: (groupboxMargin + viewportSize + 5),
 					y: (editorStartY + controlHeight * 2) + 2,
@@ -277,6 +289,7 @@ class VehicleEditorWindow
 
 				// Mass
 				<LabelWidget>{
+					tooltip: this.massSpinner.description.tooltip,
 					type: "label",
 					x: (groupboxMargin + viewportSize + 5),
 					y: (editorStartY + controlHeight * 3) + 2,
@@ -288,6 +301,7 @@ class VehicleEditorWindow
 
 				// Powered acceleration
 				<LabelWidget>{
+					tooltip: this.powAccelerationSpinner.description.tooltip,
 					type: "label",
 					x: (groupboxMargin + viewportSize + 5),
 					y: (editorStartY + controlHeight * 4) + 2,
@@ -299,6 +313,7 @@ class VehicleEditorWindow
 
 				// Powered maximum speed
 				<LabelWidget>{
+					tooltip: this.powMaxSpeedSpinner.description.tooltip,
 					type: "label",
 					x: (groupboxMargin + viewportSize + 5),
 					y: (editorStartY + controlHeight * 5) + 2,
@@ -311,7 +326,8 @@ class VehicleEditorWindow
 				// Toolbar
 				this.multiplierDropdown.createWidget(),
 				<ButtonWidget>{
-					type: 'button' as WidgetType,
+					tooltip: "Locate your vehicle when you've lost it (again)",
+					type: "button",
 					x: (groupboxMargin),
 					y: (editorStartY + viewportSize + 4),
 					width: buttonSize,
@@ -324,7 +340,8 @@ class VehicleEditorWindow
 					}
 				},
 				<LabelWidget>{
-					type: 'label' as WidgetType,
+					tooltip: "Go to this URL to check for the latest updates",
+					type: "label",
 					x: (groupboxMargin + 35),
 					y: (editorStartY + viewportSize + (buttonSize / 2)) - 2,
 					width: 275,

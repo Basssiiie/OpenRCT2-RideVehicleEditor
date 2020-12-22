@@ -20,6 +20,15 @@ abstract class Component
 	}
 
 
+	/**
+	 * Gets the widget description for this component.
+	 */
+	get description()
+	{
+		return this._description;
+	}
+
+
 	constructor(description: WidgetDesc)
 	{
 		this._description = description;
