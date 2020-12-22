@@ -146,7 +146,7 @@ class VehicleEditorWindow
 		this.seatCountSpinner = new SpinnerComponent({
 			name: "rve-seats-spinner",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
-			y: (editorStartY + + 1 + controlHeight * 3),
+			y: (editorStartY + 1 + controlHeight * 3),
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});

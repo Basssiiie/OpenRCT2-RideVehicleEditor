@@ -42,7 +42,7 @@ class StateWatcher implements IDisposable
 				break;
 		}
 
-		log(`(state) Action exectued: ${args.action} (args: ${JSON.stringify(args)})`);
+		log(`<${action}>\n\t- type: ${args.type}\n\t- args: ${JSON.stringify(args.args)}\n\t- result: ${JSON.stringify(args.result)}`)
 	}
 
 
@@ -58,7 +58,7 @@ class StateWatcher implements IDisposable
 			}
 			else
 			{
-				this.window.trackProgressSpinner.set(car.remainingDistance);
+				this.window.trackProgressSpinner.set(car.trackProgress);
 				this.window.massSpinner.set(car.mass);
 			}
 		}

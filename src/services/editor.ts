@@ -167,6 +167,9 @@ export default class VehicleEditor
 
 			const recalculatedProgress = currentCar.trackProgress;
 			this.window.trackProgressSpinner.set(recalculatedProgress);
+
+			// If the game is paused, the viewport will not update automatically.
+			this.window.viewport.refresh();
 		}
 	}
 
