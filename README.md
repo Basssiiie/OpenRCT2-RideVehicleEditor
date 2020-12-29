@@ -14,6 +14,13 @@ This plugin lets you edit vehicles on any ride in your park on the fly.
 ### Planned features
 - Buttons to apply changes to all vehicles or all trains.
 
+## See it in action
+
+A few people made some great videos showcasing how to use the plugin.
+
+- **[Git Gud at OpenRCT2 #93: Vehicle hacking with the Ride Vehicle Editor Plugin!](https://youtu.be/xSzyTD7xFss)**, by Deurklink (using v1.0)
+- **[The Joy of Hacking OpenRCT2: Vehicle Hacking 101](https://youtu.be/gqQHDqQQRDw)**, by Zarathustra (using v0.3)
+
 ## Installation
 
 1. Download the latest release from the [Releases page](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/releases).
