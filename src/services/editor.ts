@@ -163,7 +163,7 @@ export default class VehicleEditor
 		if (currentCar)
 		{
 			log(`(editor) Move vehicle a distance of: ${distance}.`);
-			currentCar.move(distance * moveDistanceStep);
+			currentCar.travelBy(distance * moveDistanceStep);
 
 			const recalculatedProgress = currentCar.trackProgress;
 			this.window.trackProgressSpinner.set(recalculatedProgress);
