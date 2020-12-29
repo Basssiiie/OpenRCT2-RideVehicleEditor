@@ -73,3 +73,15 @@ export function clamp(value: number, minimum: number, maximum: number): number
 
 	return value;
 }
+
+
+/**
+ * Checks if the index is a valid index for this array.
+ * 
+ * @param array The array to check.
+ * @param index The index to check.
+ */
+export function isValidIndex(array: any[] | null, index: number): boolean
+{
+	return (array !== null && index >= 0 && index < array.length)
+}

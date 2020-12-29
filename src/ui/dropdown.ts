@@ -69,7 +69,7 @@ class DropdownComponent extends Component
 		const widget = this.getWidget<DropdownWidget>();
 		if (widget.isDisabled)
 		{
-			log("(${this._name}) Widget is disabled, no change event triggered.");
+			log(`(${this._name}) Widget is disabled, no change event triggered.`);
 			return;
 		}
 		log(`--->(${this._name}) Try updating ${widget.selectedIndex} -> ${index}.`);

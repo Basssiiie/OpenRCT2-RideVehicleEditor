@@ -1,7 +1,6 @@
 import { RideVehicle } from "../helpers/ridesInPark";
 import { getAvailableRideTypes, RideType } from "../helpers/rideTypes";
-import { isDebugMode, log } from "../helpers/utilityHelpers";
-import DebugWindow from "../ui/debugWindow";
+import { log } from "../helpers/utilityHelpers";
 import VehicleEditorWindow from "../ui/editorWindow";
 import VehicleSelector from "./selector";
 
@@ -102,11 +101,6 @@ export default class VehicleEditor
 
 			// Vehicle type properties
 			this.refreshProperties(car);
-
-			if (isDebugMode)
-			{
-				new DebugWindow(car.id);
-			}
 		}
 	}
 

@@ -77,7 +77,7 @@ class SpinnerComponent extends Component
 			log(`(${this._name}) Minimum is equal to or larger than maximum, value ${value} was not applied.`);
 			return;
 		}
-		if (value === this._value)
+		if (value === this._value && this._isActive)
 		{
 			return;
 		}
@@ -85,7 +85,7 @@ class SpinnerComponent extends Component
 		this._isActive = true;
 		this._value = this.performWrapMode(value);
 
-		log(`(${this._name}) Set to ${this._value}. (min: ${this.minimum}, max: ${this.maximum}, mode: ${this.wrapMode})`);
+		//log(`(${this._name}) Set to ${this._value}. (min: ${this.minimum}, max: ${this.maximum}, mode: ${this.wrapMode})`);
 
 		this.refreshWidget(widget);
 	}

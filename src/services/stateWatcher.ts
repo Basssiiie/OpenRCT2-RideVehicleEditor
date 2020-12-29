@@ -5,6 +5,24 @@ import VehicleSelector from "./selector";
 
 
 /**
+ * Returned arguments for the 'ridesetstatus' action.
+ */
+interface RideSetStatusArgs
+{
+	/**
+	 * The id of the ride that was changed.
+	 */
+	ride: number;
+
+
+	/**
+	 * The new status for the ride. (0 = closed, 1 = open, 2 = test-mode)
+	 */
+	status: number;
+}
+
+
+/**
  * Watches the state of the game, and updates relevant services if necessary.
  */
 class StateWatcher implements IDisposable
@@ -31,16 +49,29 @@ class StateWatcher implements IDisposable
 	}
 
 
-	private onActionExecuted(args: GameActionEventArgs)
+	private onActionExecuted(event: GameActionEventArgs)
 	{
-		const action = args.action as ActionType;
+		const action = event.action as ActionType;
 		switch (action)
 		{
 			case "ridecreate":
 			case "ridedemolish":
 				this.selector.reloadRideList();
 				break;
+
+			case "ridesetstatus": // close/reopen ride
+				const ride = this.selector.selectedRide;
+				const statusUpdate = event.args as RideSetStatusArgs;
+
+				if (ride && ride.rideId === statusUpdate.ride)
+				{
+					log("(state) Ride status changed.");
+					this.selector.refresh();
+				}
+				break;
 		}
+
+		log(`<${action}>\n\t- type: ${event.type}\n\t- args: ${JSON.stringify(event.args)}\n\t- result: ${JSON.stringify(event.result)}`)
 	}
 
 
@@ -52,7 +83,7 @@ class StateWatcher implements IDisposable
 			const car = vehicle.getCar();
 			if (!car)
 			{
-				this.selector.deselectVehicle();
+				this.selector.deselect();
 			}
 			else
 			{
