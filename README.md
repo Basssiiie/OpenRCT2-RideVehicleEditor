@@ -2,16 +2,16 @@
 
 This plugin lets you edit vehicles on any ride in your park on the fly.
 
-![(Image of monorail with edited vehicles)](img/monorail.png)
+![(Image of train with edited vehicles)](img/train.png)
 
 ### Current features
 - Select and switch through all ride vehicles in your park.
 - Change the vehicle type for each vehicle independently.
 - Switch through different variants of the same ride type. (E.g. locomotive, tender or passenger car.)
 - Modify properties like mass, number of seats, (powered) acceleration of each vehicle.
+- Modify spacing between different vehicles on the same train.
 
 ### Planned features
-- Modify spacing between different vehicles on the same train.
 - Buttons to apply changes to all vehicles or all trains.
 
 ## Installation
