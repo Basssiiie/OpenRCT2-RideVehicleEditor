@@ -1,6 +1,6 @@
 /**
  * Returns the current version of the plugin.
  */
-const pluginVersion = "0.3";
+const pluginVersion = "1.0";
 
 export default pluginVersion;
