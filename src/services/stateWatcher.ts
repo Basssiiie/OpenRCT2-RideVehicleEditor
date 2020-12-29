@@ -87,8 +87,21 @@ class StateWatcher implements IDisposable
 			}
 			else
 			{
-				this.window.trackProgressSpinner.set(car.trackProgress);
-				this.window.massSpinner.set(car.mass);
+				const progress = car.trackProgress;
+				const progressSpinner = this.window.trackProgressSpinner;
+
+				if (progress !== progressSpinner.value)
+				{
+					progressSpinner.set(progress);
+				}
+
+				const mass = car.mass;
+				const massSpinner = this.window.massSpinner;
+
+				if (mass !== massSpinner.value)
+				{
+					massSpinner.set(mass);
+				}
 			}
 		}
 	}

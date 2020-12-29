@@ -67,6 +67,7 @@ class SpinnerComponent extends Component
 
 	/**
 	 * Sets the spinner to the specified value.
+	 * 
 	 * @param value The number to set the spinner to.
 	 */
 	set(value: number)
@@ -75,10 +76,6 @@ class SpinnerComponent extends Component
 		if (this.minimum >= this.maximum)
 		{
 			log(`(${this._name}) Minimum is equal to or larger than maximum, value ${value} was not applied.`);
-			return;
-		}
-		if (value === this._value && this._isActive)
-		{
 			return;
 		}
 
@@ -124,6 +121,7 @@ class SpinnerComponent extends Component
 
 	/**
 	 * Triggered when a value is selected in the spinner.
+	 * 
 	 * @param value The number the spinner was set to.
 	 */
 	private onWidgetChange(value: number, adjustment: number)

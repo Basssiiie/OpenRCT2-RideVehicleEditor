@@ -157,7 +157,7 @@ class VehicleEditorWindow
 			height: widgetLineHeight,
 		});
 		this.seatCountSpinner.wrapMode = "clamp";
-		this.seatCountSpinner.maximum = 128;
+		this.seatCountSpinner.maximum = 32;
 
 		// Total current mass of the selected vehicle.
 		this.massSpinner = new SpinnerComponent({
