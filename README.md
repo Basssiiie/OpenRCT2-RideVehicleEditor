@@ -65,6 +65,6 @@ This project supports the [OpenRCT2 hot reload feature](https://github.com/OpenR
 
 ## Notes
 
-Don't touch `app.js`, even though it's just an empty file. Its existence makes Nodemon happy, and Nodemon is what does the watches your files for changes & fires off new dev builds for hot reloading.
+Don't touch `app.js`, even though it's just an empty file. Its existence makes Nodemon happy, and Nodemon is what watches your files for changes & fires off new dev builds for hot reloading.
 
 Thanks to [wisnia74](https://github.com/wisnia74/openrct2-typescript-mod-template) for providing the template for this mod and readme.
