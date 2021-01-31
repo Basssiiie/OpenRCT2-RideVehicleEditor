@@ -24,7 +24,7 @@
 		"@rollup/plugin-typescript": "^8.1.0",
 		"@typescript-eslint/eslint-plugin": "^4.0.0",
 		"@typescript-eslint/parser": "^3.10.1",
-		"eslint": "^7.18.0",
+		"eslint": "^7.19.0",
 		"eslint-plugin-import": "^2.22.1",
 		"nodemon": "^2.0.7",
 		"rollup": "^2.38.1",
