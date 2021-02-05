@@ -21,7 +21,7 @@
 	},
 	"homepage": "https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor#readme",
 	"devDependencies": {
-		"@rollup/plugin-typescript": "^8.1.0",
+		"@rollup/plugin-typescript": "^8.1.1",
 		"@typescript-eslint/eslint-plugin": "^4.0.0",
 		"@typescript-eslint/parser": "^3.10.1",
 		"eslint": "^7.19.0",
