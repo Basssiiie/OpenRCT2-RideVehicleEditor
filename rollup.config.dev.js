@@ -1,3 +1,4 @@
+import replace from '@rollup/plugin-replace';
 import typescript from '@rollup/plugin-typescript';
 import { terser } from 'rollup-plugin-terser';
 
@@ -8,6 +9,10 @@ export default {
 		format: 'iife',
 	},
 	plugins: [
+		replace({
+			__BUILD_CONFIGURATION__: JSON.stringify("development"),
+			include: "./src/environment.ts"
+		}),
 		typescript(),
 		terser({
 			format: {

@@ -1,11 +1,11 @@
 import { ParkRide, RideTrain, RideVehicle } from "../helpers/ridesInPark";
 import { RideType } from "../helpers/rideTypes";
-import { isDebugMode, log } from "../helpers/utilityHelpers";
+import { log } from "../helpers/utilityHelpers";
+import { isDevelopment, pluginVersion } from "../environment";
 import DropdownComponent from "../ui/dropdown";
 import DropdownSpinnerComponent from "../ui/dropdownSpinner";
 import SpinnerComponent from "../ui/spinner";
 import ViewportComponent from "../ui/viewport";
-import pluginVersion from "../version";
 
 
 // Shared coordinate constants
@@ -237,7 +237,7 @@ class VehicleEditorWindow
 	{
 		let windowTitle = `Ride vehicle editor (v${pluginVersion})`;
 
-		if (isDebugMode)
+		if (isDevelopment)
 		{
 			windowTitle += " [DEBUG]";
 		}

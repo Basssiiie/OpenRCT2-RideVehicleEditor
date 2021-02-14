@@ -1,13 +1,9 @@
+import { isDevelopment } from "../environment";
+
 /**
  * Returns true if the UI is available, or false if the game is running in headless mode.
  */
 export const isUiAvailable = (typeof ui !== 'undefined');
-
-
-/**
- * Returns true if debug mode is enabled, or false otherwise.
- */
-export const isDebugMode = false;
 
 
 /**
@@ -17,7 +13,7 @@ export const isDebugMode = false;
  */
 export function log(message: string): void
 {
-	if (isDebugMode)
+	if (isDevelopment)
 	{
 		console.log(message);
 	}
