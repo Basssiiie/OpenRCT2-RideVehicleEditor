@@ -56,6 +56,7 @@ class StateWatcher implements IDisposable
 		{
 			case "ridecreate":
 			case "ridedemolish":
+			case "ridesetname":
 				this.selector.reloadRideList();
 				break;
 
