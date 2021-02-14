@@ -1,6 +1,13 @@
 import { getRidesInPark, ParkRide, RideTrain, RideVehicle } from "../helpers/ridesInPark";
-import { error, isValidIndex, log } from "../helpers/utilityHelpers";
+import { clamp, error, isValidIndex, log } from "../helpers/utilityHelpers";
 import VehicleEditorWindow from "../ui/editorWindow";
+
+
+// Records of the last selected ride, train and vehicle, for restoring
+// after the window is reopened again.
+let lastSelectedRideId: number;
+let lastSelectedTrainIndex: number;
+let lastSelectedVehicleIndex: number;
 
 
 /**
@@ -16,6 +23,7 @@ export default class VehicleSelector
 		return (isValidIndex(this._parkRides, this._selectedRideIndex))
 			? this._parkRides[this._selectedRideIndex] : null;
 	}
+	// Index into the 'parkRides' array for the selected ride.
 	private _selectedRideIndex: number = -1;
 
 
@@ -27,6 +35,7 @@ export default class VehicleSelector
 		return (isValidIndex(this._rideTrains, this._selectedTrainIndex))
 			? this._rideTrains![this._selectedTrainIndex] : null;
 	}
+	// Index into the 'rideTrains' array for the selected train.
 	private _selectedTrainIndex: number = -1;
 
 
@@ -38,6 +47,7 @@ export default class VehicleSelector
 		return (isValidIndex(this._trainVehicles, this._selectedVehicleIndex))
 			? this._trainVehicles![this._selectedVehicleIndex] : null;
 	}
+	// Index into the 'trainVehicles' array for the selected vehicle.
 	private _selectedVehicleIndex: number = -1;
 
 
@@ -61,7 +71,21 @@ export default class VehicleSelector
 	constructor(readonly window: VehicleEditorWindow)
 	{
 		this.reloadRideList();
-		this.selectRide(0);
+
+		// Restore last selected ride, train and vehicle.
+		const rideIndex = this.findRideIndexFromRideId(lastSelectedRideId);
+		if (rideIndex !== null)
+		{
+			log("(selector) Restore previous selection succesfull.");
+			this.window.ridesInParkList.set(rideIndex);
+			this.selectRide(rideIndex, lastSelectedTrainIndex, lastSelectedVehicleIndex);
+		}
+		else
+		{
+			// Not found, select first available ride.
+			log("(selector) Restore selection failed: ride not found.");
+			this.selectRide(0);
+		}
 
 		window.ridesInParkList.onSelect = (i => this.selectRide(i));
 		window.trainList.onSelect = (i => this.selectTrain(i));
@@ -83,16 +107,18 @@ export default class VehicleSelector
 		if (currentRideId && currentRideId !== this.selectedRide?.rideId)
 		{
 			// Ride index has changed; find the new index.
-			for (let i = 0; i < this._parkRides.length; i++)
+			const rideIndex = this.findRideIndexFromRideId(currentRideId);
+
+			if (rideIndex === null)
 			{
-				if (currentRideId === this._parkRides[i].rideId)
-				{
-					this._selectedRideIndex = i;
-					this.window.ridesInParkList.set(i);
-					return;
-				}
+				// Not found, reset to ride at index 0.
+				this.selectRide(0);
+				return;
 			}
-			this.selectRide(0);
+
+			// Only need to update the dropdown, rest of UI needs no refresh.
+			this._selectedRideIndex = rideIndex;
+			this.window.ridesInParkList.set(rideIndex);
 		}
 	}
 
@@ -101,21 +127,24 @@ export default class VehicleSelector
 	 * Select a ride from the list in the park.
 	 * 
 	 * @param rideIndex The index into the ride list.
+	 * @param trainIndex The index of the train in the train list.
+	 * @param vehicleIndex The index of the vehicle in the vehicle list.
 	 */
-	selectRide(rideIndex: number)
+	selectRide(rideIndex: number, trainIndex: number = 0, vehicleIndex: number = 0)
 	{
 		if (this._parkRides && this._parkRides.length > 0)
 		{
-			this._selectedRideIndex = rideIndex;
+			this._selectedRideIndex = rideIndex = clamp(rideIndex, 0, this._parkRides.length - 1);
 
 			const parkRide = this._parkRides[rideIndex];
 			log(`(selector) Selected ride ${parkRide.name} (index: ${rideIndex})`);
 
 			this._rideTrains = parkRide.getTrains();
+			this.selectTrain(trainIndex, vehicleIndex);
+			
 			this.window.setTrainList(this._rideTrains);
-			this.window.trainList.set(0);
-
-			this.selectTrain(0);
+			this.window.trainList.set(this._selectedTrainIndex);
+			lastSelectedRideId = parkRide.rideId;
 		}
 		else
 		{
@@ -130,20 +159,24 @@ export default class VehicleSelector
 	 * Selects a train from the list of trains of the selected ride.
 	 * 
 	 * @param trainIndex The index of the train in the train list.
+	 * @param vehicleIndex The index of the vehicle in the vehicle list.
 	 */
-	selectTrain(trainIndex: number)
+	selectTrain(trainIndex: number, vehicleIndex: number = 0)
 	{
 		log(`(selector) Selected train at index: ${trainIndex}`);
+
 		if (this._rideTrains && this._rideTrains.length > 0)
 		{
-			this._selectedTrainIndex = trainIndex;
+			this._selectedTrainIndex = trainIndex = clamp(trainIndex, 0, this._rideTrains.length - 1);
 
 			const train = this._rideTrains[trainIndex];
 			this._trainVehicles = train.getVehicles();
 
+			this.selectVehicle(vehicleIndex);
+
 			this.window.setVehicleList(this._trainVehicles);
-			this.window.vehicleList.set(0);
-			this.selectVehicle(0);
+			this.window.vehicleList.set(this._selectedVehicleIndex);			
+			lastSelectedTrainIndex = trainIndex;
 		}
 		else
 		{
@@ -163,13 +196,15 @@ export default class VehicleSelector
 		log(`(selector) Selected vehicle at index ${vehicleIndex}`);
 		if (this._trainVehicles && this._trainVehicles.length > 0)
 		{
-			this._selectedVehicleIndex = vehicleIndex;
+			this._selectedVehicleIndex = vehicleIndex = clamp(vehicleIndex, 0, this._trainVehicles.length - 1);
 
 			const vehicle = this._trainVehicles[vehicleIndex];
 			if (this.onSelect)
 			{
 				this.onSelect(vehicle);
 			}
+			
+			lastSelectedVehicleIndex = vehicleIndex;
 		}
 		else
 		{
@@ -244,5 +279,23 @@ export default class VehicleSelector
 		this.window.vehicleList.set(vehicleIndex);
 
 		this.selectVehicle(vehicleIndex);
+	}
+
+
+	/**
+	 * Finds the index into the 'parkRides' array for the specified ride id.
+	 * 
+	 * @param rideId The id of the ride in the loaded park.
+	 */
+	private findRideIndexFromRideId(rideId: number): number | null
+	{
+		for (let i = 0; i < this._parkRides.length; i++)
+		{
+			if (rideId === this._parkRides[i].rideId)
+			{
+				return i;
+			}
+		}
+		return null;
 	}
 }

@@ -56,7 +56,7 @@ class SpinnerComponent extends Component
 
 
 	/**
-	 * Gets or sets the selected value in the spinner.
+	 * Gets the selected value in the spinner.
 	 */
 	get value()
 	{
