@@ -41,7 +41,7 @@ A few people made some great videos showcasing how to use the plugin.
 **Answer:** yes, all changes to vehicles will still work if the player does not have the plugin installed. The plugin is only required to make any new changes.
 
 ### I want to add 100 to a vehicle's property without clicking a 100 times, how?
-**Answer:** in the bottom right corner of the editor window, there's a dropdown with the value `1x`. Change it to `10x` or `100x` to add or subtract by tens or hundreds respectively.
+**Answer:** in the bottom right corner of the editor window, there's a dropdown with the value `x1`. Change it to `x10` or `x100` to add or subtract by tens or hundreds respectively.
 
 ### Can I reset the changes I made to a ride?
 **Answer:** yes, you can reset the ride by closing it twice (to remove the vehicles) and reopening it again. All vehicles will respawn with the original values.
