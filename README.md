@@ -32,6 +32,26 @@ A few people made some great videos showcasing how to use the plugin.
     - If you already had this plugin installed before, you can safely overwrite the old file.
 4. Once the file is there, it should show up ingame in the dropdown menu under the map icon.
 
+## FAQ
+
+### Does it transfer over save games?
+**Answer:** yes, all changes will be saved with your save game.
+
+### Can someone who doesn't have the plugin still open my park after I edited my vehicles?
+**Answer:** yes, all changes to vehicles will still work if the player does not have the plugin installed. The plugin is only required to make any new changes.
+
+### Can I reset the changes I made to a ride?
+**Answer:** yes, you can reset the ride by closing it twice (to remove the vehicles) and reopening it again. All vehicles will respawn with the original values.
+
+### Is this cheating?
+**Answer:** yes, I suppose so. This plugin replaces a previous technique involving memory hacking, which is similar to how cheat engines work. This "cheat" is not active until you have made changes in the editor window though!
+
+### Can I still play without it when I have it installed?
+**Answer:** yes, the plugin does not do anything if you do not open the editor window.
+
+###  Is it safe to uninstall the plugin if I don't want it anymore?
+**Answer:** yes, uninstalling the plugin (by removing it from the Plugins folder) does not break your game or save files.
+
 ---
 
 ## Building the source code
