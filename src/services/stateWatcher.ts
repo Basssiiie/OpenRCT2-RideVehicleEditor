@@ -30,6 +30,9 @@ class StateWatcher implements IDisposable
 	private _onActionHook: IDisposable;
 	private _onUpdateHook: IDisposable;
 
+	private _recordedViewportRotation: number;
+	private _isDisposed: boolean = false;
+
 
 	constructor(
 		readonly window: VehicleEditorWindow,
@@ -37,8 +40,11 @@ class StateWatcher implements IDisposable
 		readonly editor: VehicleEditor)
 	{
 		log("(state) Watcher initialized");
+		this._recordedViewportRotation = ui.mainViewport.rotation;
+
 		this._onActionHook = context.subscribe("action.execute", e => this.onActionExecuted(e));
-		this._onUpdateHook = context.subscribe("interval.tick", () => this.onTickUpdate());
+		this._onUpdateHook = context.subscribe("interval.tick", () => this.onGameTickUpdate());
+		window.onUpdate = () => this.onWindowUpdate();
 	}
 
 
@@ -46,11 +52,20 @@ class StateWatcher implements IDisposable
 	{
 		this._onActionHook.dispose();
 		this._onUpdateHook.dispose();
+		this._isDisposed = true;
 	}
 
 
+	/**
+	 * Triggers for every executed player action.
+	 * 
+	 * @param event The arguments describing the executed action.
+	 */
 	private onActionExecuted(event: GameActionEventArgs)
 	{
+		if (this._isDisposed)
+			return;
+
 		const action = event.action as ActionType;
 		switch (action)
 		{
@@ -62,7 +77,7 @@ class StateWatcher implements IDisposable
 
 			case "ridesetstatus": // close/reopen ride
 				const ride = this.selector.selectedRide;
-				const statusUpdate = event.args as RideSetStatusArgs;
+				const statusUpdate = (event.args as RideSetStatusArgs);
 
 				if (ride && ride.rideId === statusUpdate.ride)
 				{
@@ -76,8 +91,15 @@ class StateWatcher implements IDisposable
 	}
 
 
-	private onTickUpdate()
+	/**
+	 * Triggers every game tick. Does not trigger in pause mode.
+	 */
+	private onGameTickUpdate()
 	{
+		if (this._isDisposed)
+			return;
+
+		// Update the vehicle controls if things have changed.
 		const vehicle = this.selector.selectedVehicle;
 		if (vehicle)
 		{
@@ -104,6 +126,27 @@ class StateWatcher implements IDisposable
 					massSpinner.set(mass);
 				}
 			}
+		}
+	}
+
+
+	/**
+	 * Triggers every tick the window UI is updated.
+	 */
+	private onWindowUpdate()
+	{
+		if (this._isDisposed)
+			return;
+		
+		// Update the viewport if the current rotation has changed.
+		const currentRotation = ui.mainViewport.rotation;
+
+		if (currentRotation !== this._recordedViewportRotation)
+		{
+			log(`(state) Detected viewport rotation change: ${this._recordedViewportRotation} -> ${currentRotation}`);
+
+			this.window.viewport.refresh();
+			this._recordedViewportRotation = currentRotation;
 		}
 	}
 }

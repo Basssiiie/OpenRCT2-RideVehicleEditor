@@ -56,6 +56,12 @@ class VehicleEditorWindow
 
 
 	/**
+	 * Event that triggers every frame update of the window.
+	 */
+	onUpdate?: () => void;
+
+
+	/**
 	 * Event that triggers when the window is closed.
 	 */
 	onClose?: () => void;
@@ -213,33 +219,6 @@ class VehicleEditorWindow
 
 
 	/**
-	 * Creates a new vehicle editor, or shows the currently opened one.
-	 */
-	show()
-	{
-		if (this._window)
-		{
-			log("The ride vehicle editor is already shown.");
-			this._window.bringToFront();
-		}
-		else
-		{
-			log("Open the ride vehicle editor.");
-			this._window = this.createWindow();
-		}
-	}
-
-
-	/**
-	 * Closes the currently opened window.
-	 */
-	close()
-	{
-		ui.closeWindows(VehicleEditorWindow.identifier);
-	}
-
-
-	/**
 	 * Creates a new editor window.
 	 */
 	private createWindow(): Window
@@ -383,6 +362,11 @@ class VehicleEditorWindow
 					isDisabled: true
 				},
 			],
+			onUpdate: () =>
+			{
+				if (this.onUpdate)
+					this.onUpdate();
+			},
 			onClose: () =>
 			{
 				log("(window) Close window.");
@@ -409,6 +393,33 @@ class VehicleEditorWindow
 
 		log("(window) Window creation complete.");
 		return window;
+	}
+
+
+	/**
+	 * Creates a new vehicle editor, or shows the currently opened one.
+	 */
+	show()
+	{
+		if (this._window)
+		{
+			log("The ride vehicle editor is already shown.");
+			this._window.bringToFront();
+		}
+		else
+		{
+			log("Open the ride vehicle editor.");
+			this._window = this.createWindow();
+		}
+	}
+
+
+	/**
+	 * Closes the currently opened window.
+	 */
+	close()
+	{
+		ui.closeWindows(VehicleEditorWindow.identifier);
 	}
 
 
