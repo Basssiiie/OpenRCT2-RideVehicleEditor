@@ -110,6 +110,14 @@ class StateWatcher implements IDisposable
 			}
 			else
 			{
+				const variant = car.vehicleObject;
+				const variantSpinner = this.window.variantSpinner;
+
+				if (variant !== variantSpinner.value)
+				{
+					variantSpinner.set(variant);
+				}
+
 				const progress = car.trackProgress;
 				const progressSpinner = this.window.trackProgressSpinner;
 
