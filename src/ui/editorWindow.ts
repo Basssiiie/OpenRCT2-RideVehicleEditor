@@ -231,6 +231,15 @@ class VehicleEditorWindow
 
 
 	/**
+	 * Closes the currently opened window.
+	 */
+	close()
+	{
+		ui.closeWindows(VehicleEditorWindow.identifier);
+	}
+
+
+	/**
 	 * Creates a new editor window.
 	 */
 	private createWindow(): Window
