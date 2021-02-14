@@ -150,8 +150,8 @@ class VehicleEditorWindow
 			height: widgetLineHeight,
 		});
 		this.trackProgressSpinner.wrapMode = "clamp";
-		this.trackProgressSpinner.minimum = -32_768;
-		this.trackProgressSpinner.maximum = 32_767;
+		this.trackProgressSpinner.minimum = -2_147_483_648;
+		this.trackProgressSpinner.maximum = 2_147_483_647;
 
 		// Number of seats of the selected vehicle.
 		this.seatCountSpinner = new SpinnerComponent({
