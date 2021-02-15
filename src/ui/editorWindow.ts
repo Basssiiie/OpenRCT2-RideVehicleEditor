@@ -144,6 +144,7 @@ class VehicleEditorWindow
 		// Sets the track progress of the current vehicle
 		this.trackProgressSpinner = new SpinnerComponent({
 			name: "rve-track-progress-spinner",
+			tooltip: "Distance in steps of how far the vehicle has progressed along the current track piece",
 			x: (groupboxMargin + viewportSize + 5) + (controlsSize * controlLabelPart),
 			y: (editorStartY + 1 + controlHeight * 2),
 			width: (controlsSize * (1 - controlLabelPart)),
