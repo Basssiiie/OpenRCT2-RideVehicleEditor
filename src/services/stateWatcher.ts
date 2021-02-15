@@ -79,7 +79,7 @@ class StateWatcher implements IDisposable
 				const ride = this.selector.selectedRide;
 				const statusUpdate = (event.args as RideSetStatusArgs);
 
-				if (ride && ride.rideId === statusUpdate.ride)
+				if (ride !== null && ride.rideId === statusUpdate.ride)
 				{
 					log("(state) Ride status changed.");
 					this.selector.refresh();

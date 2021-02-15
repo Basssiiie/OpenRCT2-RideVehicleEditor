@@ -248,17 +248,16 @@ export default class VehicleSelector
 
 		log(`(selector) Reselect current ride '${ride.name}'.`);
 
-		const trainIndex = this._selectedTrainIndex;
-		const vehicleIndex = this._selectedVehicleIndex;
+		let trainIndex = this._selectedTrainIndex;
+		let vehicleIndex = this._selectedVehicleIndex;
 
 		this._rideTrains = ride.getTrains();
 
 		// Check if this train still exists.
 		if (!isValidIndex(this._rideTrains, trainIndex))
 		{
-			log(`(selector) Reselection failed; selected train is gone.`);
-			this.deselect();
-			return;
+			log(`(selector) Reselection failed; selected train ${trainIndex} is gone, set to train 0.`);
+			trainIndex = 0;
 		}
 
 		this.window.setTrainList(this._rideTrains);
@@ -270,9 +269,8 @@ export default class VehicleSelector
 		// Check if this vehicle still exists.
 		if (!isValidIndex(this._trainVehicles, vehicleIndex))
 		{
-			log(`(selector) Reselection failed; selected vehicle is gone.`);
-			this.deselect();
-			return;
+			log(`(selector) Reselection failed; selected vehicle ${vehicleIndex} is gone, set to vehicle 0.`);
+			vehicleIndex = 0;
 		}
 
 		this.window.setVehicleList(this._trainVehicles);
