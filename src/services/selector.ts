@@ -134,7 +134,7 @@ export default class VehicleSelector
 	{
 		if (this._parkRides && this._parkRides.length > 0)
 		{
-			this._selectedRideIndex = rideIndex = clamp(rideIndex, 0, this._parkRides.length - 1);
+			this._selectedRideIndex = rideIndex = clamp(rideIndex, 0, this._parkRides.length);
 
 			const parkRide = this._parkRides[rideIndex];
 			log(`(selector) Selected ride ${parkRide.name} (index: ${rideIndex})`);
@@ -167,7 +167,7 @@ export default class VehicleSelector
 
 		if (this._rideTrains && this._rideTrains.length > 0)
 		{
-			this._selectedTrainIndex = trainIndex = clamp(trainIndex, 0, this._rideTrains.length - 1);
+			this._selectedTrainIndex = trainIndex = clamp(trainIndex, 0, this._rideTrains.length);
 
 			const train = this._rideTrains[trainIndex];
 			this._trainVehicles = train.getVehicles();
@@ -196,7 +196,7 @@ export default class VehicleSelector
 		log(`(selector) Selected vehicle at index ${vehicleIndex}`);
 		if (this._trainVehicles && this._trainVehicles.length > 0)
 		{
-			this._selectedVehicleIndex = vehicleIndex = clamp(vehicleIndex, 0, this._trainVehicles.length - 1);
+			this._selectedVehicleIndex = vehicleIndex = clamp(vehicleIndex, 0, this._trainVehicles.length);
 
 			const vehicle = this._trainVehicles[vehicleIndex];
 			if (this.onSelect)

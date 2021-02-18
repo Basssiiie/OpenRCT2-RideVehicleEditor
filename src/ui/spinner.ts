@@ -4,7 +4,7 @@ import Component from "./component";
 /**
  * Determines whether the spinner value wraps around or clamps to its boundaries.
  */
-type WrapMode = "wrap" | "clamp";
+type WrapMode = "wrap" | "clamp" | "clampThenWrap";
 
 
 /**
@@ -25,7 +25,7 @@ class SpinnerComponent extends Component
 
 
 	/**
-	 * The maximum possible value that the spinner can reach. (Exclusive)
+	 * The maximum possible value that the spinner can reach. (Inclusive)
 	 */
 	maximum: number = 0;
 
@@ -91,13 +91,23 @@ class SpinnerComponent extends Component
 	 */
 	private performWrapMode(value: number): number
 	{
+		const min = this.minimum;
+		const max = this.maximum;
+
 		switch (this.wrapMode)
 		{
 			case "wrap":
-				return wrap(value, this.minimum, this.maximum - 1);
+				return wrap(value, min, max + 1);
 
 			case "clamp":
-				return clamp(value, this.minimum, this.maximum - 1);
+				return clamp(value, min, max + 1);
+
+			case "clampThenWrap":
+				// Wrap if old value is at the limit, otherwise clamp.
+				return (this._value === min || this._value === max)
+					? wrap(value, min, max + 1)
+					: clamp(value, min, max + 1);
+				
 		}
 	}
 

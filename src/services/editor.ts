@@ -238,7 +238,7 @@ export default class VehicleEditor
 
 		// Variant
 		const variant = this.window.variantSpinner;
-		variant.maximum = currentType.variantCount;
+		variant.maximum = (currentType.variantCount - 1);
 		variant.set(car.vehicleObject);
 
 		// Track progress

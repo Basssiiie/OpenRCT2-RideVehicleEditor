@@ -150,7 +150,7 @@ class VehicleEditorWindow
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
-		this.trackProgressSpinner.wrapMode = "clamp";
+		this.trackProgressSpinner.wrapMode = "clampThenWrap";
 		this.trackProgressSpinner.minimum = -2_147_483_648;
 		this.trackProgressSpinner.maximum = 2_147_483_647;
 
@@ -163,8 +163,8 @@ class VehicleEditorWindow
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
-		this.seatCountSpinner.wrapMode = "wrap";
-		this.seatCountSpinner.maximum = 32;
+		this.seatCountSpinner.wrapMode = "clampThenWrap";
+		this.seatCountSpinner.maximum = 32; // vehicles refuse more than 32 guests, leaving them stuck just before entering.
 
 		// Total current mass of the selected vehicle.
 		this.massSpinner = new SpinnerComponent({
@@ -175,7 +175,7 @@ class VehicleEditorWindow
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
-		this.massSpinner.wrapMode = "wrap";
+		this.massSpinner.wrapMode = "clampThenWrap";
 		this.massSpinner.maximum = 65_536;
 
 		// Powered acceleration of the selected vehicle.
@@ -187,8 +187,8 @@ class VehicleEditorWindow
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
-		this.powAccelerationSpinner.wrapMode = "wrap";
-		this.powAccelerationSpinner.maximum = 256;
+		this.powAccelerationSpinner.wrapMode = "clampThenWrap";
+		this.powAccelerationSpinner.maximum = 255;
 		this.powAccelerationSpinner.disabledMessage = "Only on powered vehicles.";
 		
 		// Powered maximum speed of the selected vehicle.
@@ -200,9 +200,9 @@ class VehicleEditorWindow
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
-		this.powMaxSpeedSpinner.wrapMode = "wrap";
+		this.powMaxSpeedSpinner.wrapMode = "clampThenWrap";
 		this.powMaxSpeedSpinner.minimum = 1;
-		this.powMaxSpeedSpinner.maximum = 256;
+		this.powMaxSpeedSpinner.maximum = 255;
 		this.powMaxSpeedSpinner.disabledMessage = "Only on powered vehicles.";
 
 		// Dropdown to multiply the spinner increments.
