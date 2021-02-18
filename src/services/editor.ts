@@ -193,7 +193,7 @@ export default class VehicleEditor
 		if (currentCar)
 		{
 			log(`(editor) Set vehicle powered acceleration to: ${power}.`);
-			currentCar.mass = power;
+			currentCar.poweredAcceleration = power;
 		}
 	}
 
