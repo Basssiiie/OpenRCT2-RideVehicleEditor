@@ -63,9 +63,9 @@ export function wrap(value: number, minimum: number, maximum: number): number
 export function clamp(value: number, minimum: number, maximum: number): number
 {
 	if (value < minimum)
-		value = maximum;
-	else if (value > maximum)
 		value = minimum;
+	else if (value > maximum)
+		value = maximum;
 
 	return value;
 }

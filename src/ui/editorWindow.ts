@@ -163,7 +163,7 @@ class VehicleEditorWindow
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
-		this.seatCountSpinner.wrapMode = "clamp";
+		this.seatCountSpinner.wrapMode = "wrap";
 		this.seatCountSpinner.maximum = 32;
 
 		// Total current mass of the selected vehicle.
@@ -175,7 +175,7 @@ class VehicleEditorWindow
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
-		this.massSpinner.wrapMode = "clamp";
+		this.massSpinner.wrapMode = "wrap";
 		this.massSpinner.maximum = 65_536;
 
 		// Powered acceleration of the selected vehicle.
@@ -187,7 +187,7 @@ class VehicleEditorWindow
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
-		this.powAccelerationSpinner.wrapMode = "clamp";
+		this.powAccelerationSpinner.wrapMode = "wrap";
 		this.powAccelerationSpinner.maximum = 256;
 		this.powAccelerationSpinner.disabledMessage = "Only on powered vehicles.";
 		
@@ -200,7 +200,7 @@ class VehicleEditorWindow
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
 		});
-		this.powMaxSpeedSpinner.wrapMode = "clamp";
+		this.powMaxSpeedSpinner.wrapMode = "wrap";
 		this.powMaxSpeedSpinner.minimum = 1;
 		this.powMaxSpeedSpinner.maximum = 256;
 		this.powMaxSpeedSpinner.disabledMessage = "Only on powered vehicles.";
