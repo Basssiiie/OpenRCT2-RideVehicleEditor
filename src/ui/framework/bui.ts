@@ -18,7 +18,7 @@ module BUI
 	 * @param template The template to use for the window.
 	 * @param viewModels The viewmodels to bind to.
 	 */
-	export function OpenWindow<TDescription>(template: WindowTemplate<TDescription>, ...viewModels: unknown[]): Window<TDescription>
+	export function openWindow<TDescription>(template: WindowTemplate<TDescription>, ...viewModels: unknown[]): Window<TDescription>
 	{
 		const onlyOneInstance = template.params.onlyOneInstance;
 		if (onlyOneInstance && activeWindows !== null)
@@ -31,7 +31,7 @@ module BUI
 			}
 		}
 
-		const window = new Window(template, viewModels);
+		const window = new Window(template, ...viewModels);
 		if (onlyOneInstance)
 		{
 			if (activeWindows === null)

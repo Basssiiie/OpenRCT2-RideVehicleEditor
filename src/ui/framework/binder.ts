@@ -37,7 +37,7 @@ export type Bindings<TViewModel, TView> = BindingBase<TViewModel, ToTarget<TView
  * Applies a specific binding to the view-model, returns true if succesful or false 
  * if it could not find a suitable observable to bind to.
  */
-function ApplyBinding<TView, TViewModel>(context: BindingContext<TView>, viewmodel: TViewModel, bindings: Bindings<TViewModel, TView>, bindSource: Extract<keyof TViewModel, string>): boolean
+function applyBinding<TView, TViewModel>(context: BindingContext<TView>, viewmodel: TViewModel, bindings: Bindings<TViewModel, TView>, bindSource: Extract<keyof TViewModel, string>): boolean
 {
 	const observable = viewmodel[bindSource];
 	if (observable === undefined)
@@ -46,6 +46,7 @@ function ApplyBinding<TView, TViewModel>(context: BindingContext<TView>, viewmod
 	}
 	if (!(observable instanceof Observable))
 	{
+		Log.debug(`Binding failed: Observable is not an observable, but of type '${typeof observable}'`);
 		return false;
 	}
 
@@ -54,19 +55,30 @@ function ApplyBinding<TView, TViewModel>(context: BindingContext<TView>, viewmod
 	{
 		const toTarget = binding as ToTarget<TView>;
 
+		context.setField(toTarget, observable.get());
 		observable.subscribe(value => context.setField(toTarget, value));
+
+		Log.debug(`Binding created: '${bindSource}' -> '${toTarget}'`);
 	}
 	else if ("update" in binding)
 	{
-		const toSource = binding as ToSource<TView>; // one way to source
+		// one way to source
+		const toSource = binding as ToSource<TView>; 
 		context.setField(toSource.update, <any>((v: unknown) => observable.set(v)));
 
 		if ("bind" in binding) // two way
 		{
 			const twoWay = binding as TwoWay<TView>;
-			const target = twoWay.bind;
+			const toTarget = twoWay.bind;
 
-			observable.subscribe(value => context.setField(target, value));
+			context.setField(toTarget, observable.get());
+			observable.subscribe(value => context.setField(toTarget, value));
+
+			Log.debug(`Binding created: '${bindSource}' <-> '${toTarget}:${twoWay.update}'`);
+		}
+		else
+		{
+			Log.debug(`Binding created: '${bindSource}' <- '${toSource.update}'`);
 		}
 	}
 	return true;
@@ -85,11 +97,11 @@ module Binder
 	 * @param viewmodel The viewmodel (source) to bind to.
 	 * @param bindings The properties to bind to.
 	 */
-	export function Apply<TView, TViewModel>(context: BindingContext<TView>, viewmodel: TViewModel, bindings: Bindings<TViewModel, TView>)
+	export function apply<TView, TViewModel>(context: BindingContext<TView>, viewmodel: TViewModel, bindings: Bindings<TViewModel, TView>)
 	{
 		for (let bindSource in bindings) // on the viewmodel
 		{
-			if (!ApplyBinding(context, viewmodel, bindings, bindSource))
+			if (!applyBinding(context, viewmodel, bindings, bindSource))
 			{
 				Log.warning(`Could not find observable property on viewmodel for '${bindSource}'`);
 			}
@@ -104,15 +116,14 @@ module Binder
 	 * @param viewmodels The viewmodels (source) to bind to.
 	 * @param bindings The properties to bind to.
 	 */
-	export function ApplyAll<TView, TViewModel>(context: BindingContext<TView>, viewmodels: TViewModel[], bindings: Bindings<TViewModel, TView>)
+	export function applyAll<TView, TViewModel>(context: BindingContext<TView>, viewmodels: TViewModel[], bindings: Bindings<TViewModel, TView>)
 	{
-		Log.debug(JSON.stringify(bindings));
 		for (let bindSource in bindings) // on the viewmodel
 		{
 			let success = false;
 			for (let vm of viewmodels)
 			{
-				success = (ApplyBinding(context, vm, bindings, bindSource) || success);
+				success = (applyBinding(context, vm, bindings, bindSource) || success);
 			}
 
 			if (!success)

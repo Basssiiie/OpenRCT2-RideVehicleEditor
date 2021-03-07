@@ -1,4 +1,8 @@
+import Log from './helpers/logger';
+import { getRidesInPark } from './helpers/ridesInPark';
 import { isUiAvailable } from './helpers/utilityHelpers';
+import EditVehicleViewModel from './models/editVehicleViewModel';
+import SelectionViewModel from './models/selectionViewModel';
 //import VehicleSelector from './services/selector';
 //import VehicleEditor from './services/editor';
 //import StateWatcher from './services/stateWatcher';
@@ -52,7 +56,7 @@ function openEditorWindow()
 		const message = "The version of OpenRCT2 you are currently playing is too old for this plugin.";
 
 		ui.showError(title, message);
-		console.log(`[RideVehicleEditor] ${title} ${message}`);
+		Log.error(`${title} ${message}`);
 		return;
 	}
 
@@ -63,7 +67,13 @@ function openEditorWindow()
 		return;
 	}
 	
-	BUI.OpenWindow(editor);
+	const selection = new SelectionViewModel();
+	const vehicle = new EditVehicleViewModel();
+
+	selection.rideList.set(getRidesInPark().map(r => r.name));
+
+	BUI.openWindow(editor, selection, vehicle);
+	//vm.rideList.set(getRidesInPark().map(r => r.name));
 
 	/*
 	const window = new VehicleEditorWindow();
@@ -92,7 +102,7 @@ function main()
 
 	if (!isUiAvailable) 
 	{
-		console.log("[RideVehicleEditor] UI unavailable, plugin disabled.");
+		Log.warning("Game is running headless, plugin is disabled.");
 		return;
 	}
 

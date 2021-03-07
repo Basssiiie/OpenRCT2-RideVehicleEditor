@@ -10,10 +10,13 @@ export type DropdownParams = Params<DropdownWidget> & DisabledMessage &
 
 export default class Dropdown extends Element<DropdownParams>
 {
-	constructor(widget: DropdownParams)
+	constructor(params: DropdownParams)
 	{
-		super(widget);
-		if (widget.disabledMessage)
+		const widget = params as DropdownWidget;
+		widget.type = "dropdown";
+
+		super(params);
+		if (params.disabledMessage)
 		{
 			//this.binding<Dropdown>({}) ??
 		}

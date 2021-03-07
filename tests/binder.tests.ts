@@ -47,7 +47,7 @@ test("Viewmodel updates view 'isChecked'", t =>
 		toggle: new Observable<boolean>(false) 
 	};
 	
-	Binder.Apply(context, viewmodel, 
+	Binder.apply(context, viewmodel, 
 	{
 		toggle: "isChecked",
 	});
@@ -67,7 +67,7 @@ test("Viewmodel updates view 'text'", t =>
 		text: new Observable<string>(checkbox.name!) 
 	};
 	
-	Binder.Apply(context, viewmodel, 
+	Binder.apply(context, viewmodel, 
 	{
 		text: "text",
 	});
@@ -87,7 +87,7 @@ test("Viewmodel updates view 'width'", t =>
 		value: new Observable<number>(checkbox.width) 
 	};
 	
-	Binder.Apply(context, viewmodel, 
+	Binder.apply(context, viewmodel, 
 	{
 		value: "width",
 	});
@@ -107,7 +107,7 @@ test("(2-way) Viewmodel updates view 'isChecked'", t =>
 		toggle: new Observable<boolean>(false) 
 	};
 	
-	Binder.Apply(context, viewmodel, 
+	Binder.apply(context, viewmodel, 
 	{
 		toggle: { bind: "isChecked", update: "onChange" },
 	});
@@ -127,7 +127,7 @@ test("(2-way) View updates viewmodel 'isChecked'", t =>
 		toggle: new Observable<boolean>(false) 
 	};
 	
-	Binder.Apply(context, viewmodel, 
+	Binder.apply(context, viewmodel, 
 	{
 		toggle: { bind: "isChecked", update: "onChange" },
 	});

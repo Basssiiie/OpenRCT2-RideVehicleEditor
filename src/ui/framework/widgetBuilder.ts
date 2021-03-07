@@ -1,13 +1,13 @@
 import type { Params } from "./components/parameters";
 import Dropdown, { DropdownParams } from "./components/dropdown";
-import { SpinnerParams } from "./components/spinner";
+import DropdownSpinner, { DropdownSpinnerParams } from "./components/dropdownSpinner";
 import Element from "./components/element";
+import Spinner, { SpinnerParams } from "./components/spinner";
 
 
 
 export default class WidgetBuilder
 {
-	private readonly _widgets: Widget[] = []
 	private readonly _views: Element<WidgetBase>[] = []
 
 
@@ -29,19 +29,17 @@ export default class WidgetBuilder
 
 	dropdown(params: DropdownParams): Dropdown
 	{
-		const widget = params as DropdownWidget;
-		widget.type = "dropdown";
-		this._widgets.push(widget);
-
-		const view = new Dropdown(widget);
+		const view = new Dropdown(params);
 		this._views.push(view);
 		return view;
 	}
 
 
-	dropdownSpinner(params: any): any
+	dropdownSpinner(params: DropdownSpinnerParams): DropdownSpinner
 	{
-		return params;
+		const view = new DropdownSpinner(params);
+		this._views.push(view);
+		return view;
 	}
 
 
@@ -61,11 +59,11 @@ export default class WidgetBuilder
 	}
 
 
-	spinner(params: SpinnerParams): Element<SpinnerWidget>
+	spinner(params: SpinnerParams): Spinner
 	{
-		const widget = params as SpinnerWidget;
-		widget.type = "spinner";
-		return this.add(widget);
+		const view = new Spinner(params);
+		this._views.push(view);
+		return view;
 	}
 
 

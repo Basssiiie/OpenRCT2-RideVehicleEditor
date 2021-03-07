@@ -1,44 +1,16 @@
 import { isDevelopment, pluginVersion } from "../environment";
+import EditVehicleViewModel from "../models/editVehicleViewModel";
+import SelectionViewModel from "../models/selectionViewModel";
 import Dropdown from "./framework/components/dropdown";
+import DropdownSpinner from "./framework/components/dropdownSpinner";
 import Element from "./framework/components/element";
-import Observable from "./framework/observable";
+import Spinner from "./framework/components/spinner";
 import WindowTemplate from "./framework/windowTemplate";
 
 
-
-interface EditorWindow
-{
-	ride: Dropdown;
-	train: DropdownWidget;
-	vehicle: DropdownWidget;
-	
-	rideType: Dropdown;
-	variant: Element<SpinnerWidget>;
-	trackProgress: Element<SpinnerWidget>;
-	maxSeats: Element<SpinnerWidget>;
-	mass: Element<SpinnerWidget>;
-	poweredAcceleration: Element<SpinnerWidget>;
-	poweredMaxSpeed: Element<SpinnerWidget>;
-	
-	viewport: Element<ViewportWidget>;
-	multiplier: Dropdown;
-}
-
-
-interface SelectionViewModel
-{
-	rideList: Observable<string[]>;
-	selectedRide: Observable<number>;
-
-	trainList: Observable<string[]>;
-	selectedTrain: Observable<number>
-
-	vehicleList: Observable<string[]>;
-	selectedVehicle: Observable<number>;
-}
-
-
-
+/**
+ * All strings used in the editor.
+ */
 const strings = 
 {
 	title: `Ride Vehicle Editor (v${pluginVersion})${isDevelopment ? " (DEBUG)" : ""}`,
@@ -81,6 +53,31 @@ const strings =
 }
 
 
+/**
+ * Accessible elements on the ride vehicle editor window.
+ */
+interface EditorWindow
+{
+	ride: Dropdown;
+	train: DropdownSpinner;
+	vehicle: DropdownSpinner;
+	
+	rideType: Dropdown;
+	variant: Spinner;
+	trackProgress: Spinner;
+	maxSeats: Spinner;
+	mass: Spinner;
+	poweredAcceleration: Spinner;
+	poweredMaxSpeed: Spinner;
+	
+	viewport: Element<ViewportWidget>;
+	multiplier: Dropdown;
+}
+
+
+/**
+ * Creates a window template for the ride vehicle editor.
+ */
 function createWindow()
 {
 	// Shared coordinate constants
@@ -134,7 +131,7 @@ function createWindow()
 
 				tooltip: strings.ridesTip,
 			})
-			.binding<SelectionViewModel>({
+			.bind<SelectionViewModel>({
 				rideList: "items",
 				selectedRide: { bind: "selectedIndex", update: "onChange" },
 			}),
@@ -149,6 +146,10 @@ function createWindow()
 				tooltip: strings.trainsTip,
 				disabledMessage: strings.noTrains,
 				disableOnSingleItem: true,
+			})
+			.bind<SelectionViewModel>({
+				trainList: "items",
+				selectedTrain: { bind: "selectedIndex", update: "onChange" },
 			}),
 
 		vehicle: wb
@@ -161,6 +162,10 @@ function createWindow()
 				tooltip: strings.vehiclesTip,
 				disabledMessage: strings.noVehicles,
 				disableOnSingleItem: true,
+			})
+			.bind<SelectionViewModel>({
+				vehicleList: "items",
+				selectedVehicle: { bind: "selectedIndex", update: "onChange" },
 			}),
 
 		// Select ride type
@@ -173,6 +178,10 @@ function createWindow()
 
 				tooltip: strings.rideTypesTip,
 				disabledMessage: strings.noRideTypes,
+			})
+			.bind<EditVehicleViewModel>({
+				rideTypeList: "items",
+				rideType: { bind: "selectedIndex", update: "onChange" }
 			}),
 
 		// Vehicle variant
@@ -195,6 +204,9 @@ function createWindow()
 				height: widgetLineHeight,
 
 				tooltip: strings.variantTip,
+			})
+			.bind<EditVehicleViewModel>({
+				variant: { bind: "value", update: "onChange" }
 			}),
 
 		// Vehicle track progress
@@ -220,6 +232,9 @@ function createWindow()
 				wrapMode: "clampThenWrap",
 				minimum: -2_147_483_648,
 				maximum: 2_147_483_647,
+			})
+			.bind<EditVehicleViewModel>({
+				trackProgress: { bind: "value", update: "onChange" }
 			}),
 
 		// Vehicle seats
@@ -244,6 +259,9 @@ function createWindow()
 				tooltip: strings.maxSeatsTip,
 				wrapMode: "clampThenWrap",
 				maximum: 32, // vehicles refuse more than 32 guests, leaving them stuck just before entering.
+			})
+			.bind<EditVehicleViewModel>({
+				seatCount: { bind: "value", update: "onChange" }
 			}),
 
 		// Vehicle mass
@@ -268,6 +286,9 @@ function createWindow()
 				tooltip: strings.massTip,
 				wrapMode: "clampThenWrap",
 				maximum: 65_536,
+			})
+			.bind<EditVehicleViewModel>({
+				mass: { bind: "value", update: "onChange" }
 			}),
 
 		// Vehicle powered acceleration
@@ -293,6 +314,9 @@ function createWindow()
 				disabledMessage: strings.poweredOnlyTip,
 				wrapMode: "clampThenWrap",
 				maximum: 255,
+			})
+			.bind<EditVehicleViewModel>({
+				poweredAcceleration: { bind: "value", update: "onChange" }
 			}),
 
 		// Vehicle powered max speed
@@ -319,6 +343,9 @@ function createWindow()
 				wrapMode: "clampThenWrap",
 				minimum: 1,
 				maximum: 255,
+			})
+			.bind<EditVehicleViewModel>({
+				poweredMaxSpeed: { bind: "value", update: "onChange" }
 			}),
 		
 		// Misc.
@@ -366,4 +393,7 @@ function createWindow()
 }
 
 
+/**
+ * The window template of the ride vehicle editor.
+ */
 export const editor = createWindow();

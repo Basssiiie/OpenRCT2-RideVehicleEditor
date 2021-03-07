@@ -63,18 +63,9 @@ export default class WindowTemplate<TDescription>
 
 
 	/**
-	 * Get all elements that have any bindings on them.
-	 */
-	getBoundElements(): readonly Element<WidgetBase>[]
-	{
-		return this._elements.filter(e => e.bindings && e.bindings.length > 0);
-	}
-
-
-	/**
 	 * Get all elements on this window, including the ones without bindings.
 	 */
-	getAllElements(): readonly Element<WidgetBase>[]
+	getElements(): readonly Element<WidgetBase>[]
 	{
 		return this._elements;
 	}

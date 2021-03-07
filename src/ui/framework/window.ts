@@ -8,28 +8,41 @@ import WindowTemplate, { createUniqueId } from "./windowTemplate";
  */
 export default class Window<TDescription>
 {
+	/**
+	 * Unique id of this window. Will equal the id of its template if the template
+	 * only allows one single instance.
+	 */
 	readonly id: string;
 
 	private readonly _params: WindowDesc;
-	private readonly _viewModels: unknown[];
 	private readonly _widgetContexts: WidgetBindingContext<WidgetBase>[] = [];
 
 
+	/**
+	 * Creates a new window instance from a template and binds the specified 
+	 * viewmodels to it.
+	 * 
+	 * @param template The template to use for the user interface.
+	 * @param viewModels The viewmodels to bind to this window.
+	 */
 	constructor(template: WindowTemplate<TDescription>, ...viewModels: unknown[])
 	{
 		this.id = (template.params.onlyOneInstance) ? template.id : createUniqueId();
-
 		this._params = template.params as WindowDesc;
-		this._viewModels = viewModels;
 
 		if (viewModels.length > 0)
 		{
-			for (let element of template.getBoundElements())
+			for (let element of template.getElements())
 			{
-				const context = new WidgetBindingContext(element.widget.name);
+				if (!element.bindings)
+				{
+					continue;
+				}
+
+				const context = new WidgetBindingContext(element.widget);
 				this._widgetContexts.push(context);
 
-				Binder.ApplyAll(context, this._viewModels, element.bindings);
+				Binder.applyAll(context, viewModels, element.bindings);
 			}
 		}
 	}
