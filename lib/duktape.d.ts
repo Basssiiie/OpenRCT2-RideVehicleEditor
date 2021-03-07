@@ -15,6 +15,12 @@ interface Duktape
 	 * Returns an entry on the call stack.
 	 */
 	act(depth: number): DukStackEntry;
+
+
+	/**
+	 * Callback that gets triggered after an ECMAScript error has occured.
+	 */
+	errCreate: (e: Error) => Error;
 }
 
 

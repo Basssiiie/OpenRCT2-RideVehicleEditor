@@ -13,7 +13,7 @@ type LogLevel = "debug" | "warning" | "error";
  */
 function print(level: LogLevel, message: string)
 {
-	console.log(`[RVE/${level}] ${message}`);
+	console.log(`<RVE/${level}> ${message}`);
 }
 
 
@@ -27,13 +27,32 @@ function stacktrace(): string
 		return "  (stacktrace unavailable)\r\n";
 	}
 
+	const depth = -4; // skips act(), stacktrace() and the calling method.
 	let entry: DukStackEntry, result: string = "";
 
-	for (let i = -1; (entry = Duktape.act(i)); i--) 
+	for (let i = depth; (entry = Duktape.act(i)); i--) 
 	{
-		result += `  at ${entry.function.name} (line: ${entry.lineNumber})\r\n`;
+		const functionName = entry.function.name;
+		const prettyName = functionName 
+			? (functionName + "()") 
+			: "<anonymous>";
+
+		result += `   -> ${prettyName}: line ${entry.lineNumber}\r\n`;
 	}
 	return result;
+}
+
+
+/**
+ * Enable stack-traces on errors in development mode.
+ */
+if (isDevelopment)
+{
+	Duktape.errCreate = function onError(error) 
+	{
+		error.message += ("\r\n" + stacktrace());
+		return error;
+	};
 }
 
 
