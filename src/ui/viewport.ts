@@ -25,7 +25,10 @@ class ViewportComponent extends Component
 		this._entityId = -1;
 
 		const widget = this.getWidget<ViewportWidget>();
-		widget.viewport.moveTo(position)
+		if (widget.viewport)
+		{
+			widget.viewport.moveTo(position);
+		}
 
 		this.refreshWidget(widget);
 	}
@@ -88,7 +91,10 @@ class ViewportComponent extends Component
 			this._updater.dispose();
 			this._updater = null;
 
-			widget.viewport.moveTo(farAway)
+			if (widget.viewport)
+			{
+				widget.viewport.moveTo(farAway);
+			}
 		}
 	}
 
@@ -109,7 +115,10 @@ class ViewportComponent extends Component
 		if (entity)
 		{
 			const widget = this.getWidget<ViewportWidget>();
-			widget.viewport.moveTo({ x: entity.x, y: entity.y, z: entity.z });
+			if (widget.viewport)
+			{
+				widget.viewport.moveTo({ x: entity.x, y: entity.y, z: entity.z });
+			}
 		}
 	}
 }

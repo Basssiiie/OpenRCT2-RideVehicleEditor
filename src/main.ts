@@ -1,8 +1,10 @@
 import { isUiAvailable } from './helpers/utilityHelpers';
-import VehicleSelector from './services/selector';
-import VehicleEditor from './services/editor';
-import StateWatcher from './services/stateWatcher';
+//import VehicleSelector from './services/selector';
+//import VehicleEditor from './services/editor';
+//import StateWatcher from './services/stateWatcher';
 import VehicleEditorWindow from './ui/editorWindow';
+import { editor } from './ui/editorWindow2';
+import BUI from './ui/framework/bui';
 
 
 // Stores whether the game is outdated check has been performed and what the result is.
@@ -13,8 +15,8 @@ let editorInstance: VehicleEditorWindow | null;
 
 
 /**
- * Returns true if the game is outdated, may return false if the plugin cannot determine if the ga
- * 
+ * Returns true if the game is outdated, may return false if the plugin cannot determine 
+ * if the game is outdated. 
  */
 function checkIsGameOutdated(): boolean
 {
@@ -61,6 +63,9 @@ function openEditorWindow()
 		return;
 	}
 	
+	BUI.OpenWindow(editor);
+
+	/*
 	const window = new VehicleEditorWindow();
 	window.show();
 
@@ -75,6 +80,7 @@ function openEditorWindow()
 		editorInstance = null;
 	});
 	editorInstance = window;
+	*/
 }
 
 
@@ -86,7 +92,7 @@ function main()
 
 	if (!isUiAvailable) 
 	{
-		console.log("UI unavailable, plugin disabled.");
+		console.log("[RideVehicleEditor] UI unavailable, plugin disabled.");
 		return;
 	}
 
