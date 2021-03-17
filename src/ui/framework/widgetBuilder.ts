@@ -30,7 +30,7 @@ export default class WidgetBuilder
 	dropdown(params: DropdownParams): Dropdown
 	{
 		const view = new Dropdown(params);
-		this._views.push(view);
+		this._views.push(view as Element<WidgetBase>);
 		return view;
 	}
 
@@ -38,7 +38,7 @@ export default class WidgetBuilder
 	dropdownSpinner(params: DropdownSpinnerParams): DropdownSpinner
 	{
 		const view = new DropdownSpinner(params);
-		this._views.push(view);
+		this._views.push(view as Element<WidgetBase>);
 		return view;
 	}
 
@@ -62,7 +62,7 @@ export default class WidgetBuilder
 	spinner(params: SpinnerParams): Spinner
 	{
 		const view = new Spinner(params);
-		this._views.push(view);
+		this._views.push(view as Element<WidgetBase>);
 		return view;
 	}
 
@@ -80,10 +80,10 @@ export default class WidgetBuilder
 	 * 
 	 * @param params Flat widget parameters for the specified widget.
 	 */
-	add<TWidget extends Widget>(params: TWidget): Element<TWidget>
+	add<TWidget extends WidgetBase>(params: TWidget): Element<TWidget>
 	{
-		const view = new Element(params);
-		this._views.push(view);
+		const view = new Element<TWidget>(params);
+		this._views.push(view as Element<WidgetBase>);
 		return view;
 	}
 

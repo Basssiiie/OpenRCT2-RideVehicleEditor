@@ -7,6 +7,18 @@ export const isUiAvailable = (typeof ui !== 'undefined');
 
 
 /**
+ * Returns all keys of type T that return type R.
+ */
+export type KeyOfType<T, R> = { [k in keyof T]: T[k] extends R ? k : never }[keyof T];
+
+
+ /**
+  * Filters out all properties in T that do not return type R.
+  */
+export type Filter<T, R> = { [k in KeyOfType<Required<T>, R>]: R };
+
+
+/**
  * Logs a message is debug mode is enabled, or does nothing otherwise.
  *
  * @param message The error message to be logged.

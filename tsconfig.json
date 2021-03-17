@@ -1,11 +1,11 @@
 {
 	"compilerOptions": {
+		"lib": [ "es5" ],
 		"noImplicitAny": true,
 		"noImplicitReturns": true,
 		"noImplicitThis": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
-		"lib": [ "es5" ],
 		"target": "es5",
 		"strict": true
 	},

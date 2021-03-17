@@ -13,8 +13,8 @@ export default class Window<TDescription>
 	 * only allows one single instance.
 	 */
 	readonly id: string;
+	readonly description: WindowDesc;
 
-	private readonly _params: WindowDesc;
 	private readonly _widgetContexts: WidgetBindingContext<WidgetBase>[] = [];
 
 
@@ -28,7 +28,7 @@ export default class Window<TDescription>
 	constructor(template: WindowTemplate<TDescription>, ...viewModels: unknown[])
 	{
 		this.id = (template.params.onlyOneInstance) ? template.id : createUniqueId();
-		this._params = template.params as WindowDesc;
+		this.description = template.params as WindowDesc;
 
 		if (viewModels.length > 0)
 		{
@@ -39,7 +39,7 @@ export default class Window<TDescription>
 					continue;
 				}
 
-				const context = new WidgetBindingContext(element.widget);
+				const context = new WidgetBindingContext(element.template);
 				this._widgetContexts.push(context);
 
 				Binder.applyAll(context, viewModels, element.bindings);
@@ -53,8 +53,8 @@ export default class Window<TDescription>
 	 */
 	open()
 	{
-		this._params.classification = this.id;
-		const window = ui.openWindow(this._params);
+		this.description.classification = this.id;
+		const window = ui.openWindow(this.description);
 		
 		// Bind new window to all widget contexts
 		for (let context of this._widgetContexts)

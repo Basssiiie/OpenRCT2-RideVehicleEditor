@@ -9,6 +9,12 @@ type LogLevel = "debug" | "warning" | "error";
 
 
 /**
+ * Returns true if Duktape is available, or false if not.
+ */
+ const isDuktapeAvailable = (typeof Duktape !== 'undefined');
+
+
+/**
  * Prints a message with the specified logging and plugin identifier.
  */
 function print(level: LogLevel, message: string)
@@ -22,7 +28,7 @@ function print(level: LogLevel, message: string)
  */
 function stacktrace(): string
 {
-	if (typeof Duktape === 'undefined')
+	if (!isDuktapeAvailable)
 	{
 		return "  (stacktrace unavailable)\r\n";
 	}
@@ -46,7 +52,7 @@ function stacktrace(): string
 /**
  * Enable stack-traces on errors in development mode.
  */
-if (isDevelopment)
+if (isDevelopment && isDuktapeAvailable)
 {
 	Duktape.errCreate = function onError(error) 
 	{

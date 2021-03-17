@@ -1,7 +1,7 @@
-/// <reference path="../lib/openrct2.d.ts" />
+/// <reference path="../../lib/openrct2.d.ts" />
 
 import test from 'ava';
-import Observable from '../src/ui/framework/observable';
+import Observable from '../../src/ui/framework/observable';
 
 
 test("get() returns string from constructor", t =>

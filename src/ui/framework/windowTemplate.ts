@@ -52,7 +52,7 @@ export default class WindowTemplate<TDescription>
 		const allWidgets: WidgetBase[] = [];
 		for (let view of views)
 		{
-			allWidgets.push(view.widget);
+			allWidgets.push(view.template);
 			this._elements.push(view);
 		}
 

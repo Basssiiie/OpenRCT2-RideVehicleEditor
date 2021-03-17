@@ -6,7 +6,7 @@ let widgetIdUpperBound: number = 0;
 
 
 // Type that ensures T has the required name.
-type Named<T> = T & { name: string };
+type WidgetTemplate<T> = Readonly<T>;
 
 
 /**
@@ -16,11 +16,11 @@ type Named<T> = T & { name: string };
 export default class Element<TWidget extends WidgetBase>
 {
 	/**
-	 * The widget configuration for this element.
+	 * The widget template for this element.
 	 */
-	readonly widget: Named<TWidget>;
+	readonly template: WidgetTemplate<TWidget>;
 
-	private _internalBindings?: Bindings<unknown, TWidget>;
+	private _internalBindings?: Bindings<any, TWidget>;
 
 
 	/**
@@ -35,14 +35,14 @@ export default class Element<TWidget extends WidgetBase>
 			params.name = `w[${widgetIdUpperBound.toString(36)}]${params.type}`;
 			widgetIdUpperBound++;
 		}
-		this.widget = params as Named<TWidget>;
+		this.template = params as WidgetTemplate<TWidget>;
 	}
 
 
 	/**
 	 * Gets all bindings attached to this element, if it has any.
 	 */
-	get bindings(): Bindings<unknown, TWidget> | undefined
+	get bindings(): Bindings<any, TWidget> | undefined
 	{
 		return this._internalBindings;
 	}
@@ -65,7 +65,7 @@ export default class Element<TWidget extends WidgetBase>
 		{
 			this._internalBindings = 
 			{ 
-				...this.bindings, // new bindings
+				...bindings, // new bindings
 				...this._internalBindings, // old overwrites any duplicate new ones
 			}
 		}

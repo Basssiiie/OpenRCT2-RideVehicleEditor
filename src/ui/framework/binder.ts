@@ -1,4 +1,5 @@
 import Log from "../../helpers/logger";
+import { Filter } from "../../helpers/utilityHelpers";
 import BindingContext from "./contexts/bindingContext";
 import Observable from "./observable";
 
@@ -16,14 +17,14 @@ export type ToTarget<TView> = keyof TView;
 /**
  * A binding that only updates a viewmodel (the source) when the view has changed.
  */
-export type ToSource<TView> = { update: keyof TView };
+export type ToSource<TView> = { update: keyof Filter<TView, Function> };
 
 
 /**
  * A binding that only updates a view (the target) when the viewmodel (the source) 
  * has changed, and also updates the viewmodel when the view has changed.
  */
-export type TwoWay<TView> = { bind: keyof TView, update: keyof TView };
+export type TwoWay<TView> = { bind: keyof TView } & ToSource<TView>;
 
 
 /**
@@ -51,36 +52,26 @@ function applyBinding<TView, TViewModel>(context: BindingContext<TView>, viewmod
 	}
 
 	const binding = bindings[bindSource];
-	if (typeof (binding) === "string") // one way to target
-	{
-		const toTarget = binding as ToTarget<TView>;
 
+	const toTarget = Binder.getBindingToTarget<TView>(binding);
+	if (toTarget !== null)
+	{
 		context.setField(toTarget, observable.get());
 		observable.subscribe(value => context.setField(toTarget, value));
-
-		Log.debug(`Binding created: '${bindSource}' -> '${toTarget}'`);
 	}
-	else if ("update" in binding)
+
+	const toSource = Binder.getBindingToSource<TView>(binding);
+	if (toSource !== null)
 	{
-		// one way to source
 		const toSource = binding as ToSource<TView>; 
 		context.setField(toSource.update, <any>((v: unknown) => observable.set(v)));
-
-		if ("bind" in binding) // two way
-		{
-			const twoWay = binding as TwoWay<TView>;
-			const toTarget = twoWay.bind;
-
-			context.setField(toTarget, observable.get());
-			observable.subscribe(value => context.setField(toTarget, value));
-
-			Log.debug(`Binding created: '${bindSource}' <-> '${toTarget}:${twoWay.update}'`);
-		}
-		else
-		{
-			Log.debug(`Binding created: '${bindSource}' <- '${toSource.update}'`);
-		}
 	}
+
+	Log.debug("Binding created: " + (
+		(toTarget === null) ? `'${bindSource}' <- '${toSource}'` :
+		(toSource === null) ? `'${bindSource}' -> '${toTarget}'` :
+		`'${bindSource}' <-> '${toTarget}:${toSource}'`
+	));
 	return true;
 }
 
@@ -90,6 +81,30 @@ function applyBinding<TView, TViewModel>(context: BindingContext<TView>, viewmod
  */
 module Binder
 {
+	export function getBindingToTarget<TView>(binding?: ToTarget<TView> | ToSource<TView> | TwoWay<TView>): keyof TView | null
+	{
+		if (typeof(binding) === "string")
+		{
+			return binding as ToTarget<TView>;
+		}
+		else if (typeof(binding) === "object" && binding !== null && "bind" in binding) 
+		{
+			return (binding as TwoWay<TView>).bind;
+		}
+		return null;
+	}
+
+
+	export function getBindingToSource<TView>(binding?: ToTarget<TView> | ToSource<TView> | TwoWay<TView>): keyof TView | null
+	{
+		if (typeof(binding) === "object" && binding !== null && "update" in binding) 
+		{
+			return (binding as ToSource<TView>).update;
+		}
+		return null;
+	}
+
+
 	/**
 	 * Binds a view context to a viewmodel through selected bindings.
 	 * 
