@@ -1,3 +1,6 @@
+import Log from "../../helpers/logger";
+import Event from "./event";
+
 /**
  * An object that can be subscribed to and whose subscriptions will be notified 
  * when the value has changed.
@@ -5,7 +8,7 @@
 export default class Observable<T>
 {
 	private _value: T;
-	private _subscriptions?: Array<(value: T) => void>; 
+	private _subscriptions?: Event<Observable<T>>; 
 
 
 	/**
@@ -41,7 +44,9 @@ export default class Observable<T>
 		if (this._value !== value)
 		{
 			this._value = value;
-			this.invoke();
+			this._subscriptions?.invoke(this, value);
+			
+			Log.debug(`Value modified to '${value}'.`);
 		}
 	}
 
@@ -57,26 +62,8 @@ export default class Observable<T>
 	{
 		if (!this._subscriptions)
 		{
-			this._subscriptions = [ callback ];
+			this._subscriptions = new Event();
 		}
-		else
-		{
-			this._subscriptions.push(callback);
-		}
-	}
-
-
-	/**
-	 * Notifies all subscriptions that the value has been changed.
-	 */
-	private invoke()
-	{
-		if (this._subscriptions)
-		{
-			for (let subscription of this._subscriptions)
-			{
-				subscription(this._value);
-			}
-		}
+		this._subscriptions.add(callback);
 	}
 }

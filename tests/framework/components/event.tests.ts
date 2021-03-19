@@ -1,7 +1,7 @@
 /// <reference path="../../../lib/openrct2.d.ts" />
 
 import test from 'ava';
-import Event from '../../../src/ui/framework/components/event';
+import Event from '../../../src/ui/framework/event';
 
 
 test("added callback gets invoked once", t =>

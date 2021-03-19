@@ -1,13 +1,13 @@
 import Log from './helpers/logger';
-import { getRidesInPark } from './helpers/ridesInPark';
-import { isUiAvailable } from './helpers/utilityHelpers';
-import EditVehicleViewModel from './models/editVehicleViewModel';
-import SelectionViewModel from './models/selectionViewModel';
+import { isUiAvailable } from './helpers/utility';
+import EditVehicleViewModel from './viewModels/editVehicleViewModel';
+import SelectionViewModel from './viewModels/selectionViewModel';
 //import VehicleSelector from './services/selector';
 //import VehicleEditor from './services/editor';
 //import StateWatcher from './services/stateWatcher';
 import VehicleEditorWindow from './ui/editorWindow';
-import { editor } from './ui/editorWindow2';
+import createEditorWindowTemplate from './ui/editorWindow2';
+import Window from './ui/framework/window';
 import BUI from './ui/framework/bui';
 
 
@@ -44,6 +44,8 @@ function checkIsGameOutdated(): boolean
 }
 
 
+let window: Window<any> | null;
+
 /**
  * Opens the ride editor window.
  */
@@ -68,11 +70,10 @@ function openEditorWindow()
 	}
 	
 	const selection = new SelectionViewModel();
-	const vehicle = new EditVehicleViewModel();
+	const vehicle = new EditVehicleViewModel(selection);
 
-	selection.rideList.set(getRidesInPark().map(r => r.name));
-
-	BUI.openWindow(editor, selection, vehicle);
+	const editor = createEditorWindowTemplate();
+	window = BUI.openWindow(editor, selection, vehicle);
 	//vm.rideList.set(getRidesInPark().map(r => r.name));
 
 	/*

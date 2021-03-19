@@ -1,4 +1,4 @@
-import { log } from "./utilityHelpers";
+import { log } from "./utility";
 
 /**
  * Gets all available ride types that are currently loaded.

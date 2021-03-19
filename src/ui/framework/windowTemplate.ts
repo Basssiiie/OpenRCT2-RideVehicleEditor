@@ -1,4 +1,4 @@
-import Element from "./components/element";
+import Element from "./controls/element";
 import WidgetBuilder from "./widgetBuilder";
 
 

@@ -1,6 +1,6 @@
 import { RideVehicle } from "../helpers/ridesInPark";
 import { getAvailableRideTypes, RideType } from "../helpers/rideTypes";
-import { log } from "../helpers/utilityHelpers";
+import { log } from "../helpers/utility";
 import VehicleEditorWindow from "../ui/editorWindow";
 import VehicleSelector from "./selector";
 

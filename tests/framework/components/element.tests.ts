@@ -1,7 +1,7 @@
 /// <reference path="../../../lib/openrct2.d.ts" />
 
 import test from 'ava';
-import Element from '../../../src/ui/framework/components/element';
+import Element from '../../../src/ui/framework/controls/element';
 import Observable from '../../../src/ui/framework/observable';
 
 

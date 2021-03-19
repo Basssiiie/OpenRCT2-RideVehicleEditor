@@ -1,4 +1,4 @@
-import { log } from "../helpers/utilityHelpers";
+import { log } from "../helpers/utility";
 import VehicleEditorWindow from "../ui/editorWindow";
 import VehicleEditor from "./editor";
 import VehicleSelector from "./selector";

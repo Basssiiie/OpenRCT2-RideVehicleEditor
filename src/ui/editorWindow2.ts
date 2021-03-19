@@ -1,10 +1,10 @@
 import { isDevelopment, pluginVersion } from "../environment";
-import EditVehicleViewModel from "../models/editVehicleViewModel";
-import SelectionViewModel from "../models/selectionViewModel";
-import Dropdown from "./framework/components/dropdown";
-import DropdownSpinner from "./framework/components/dropdownSpinner";
-import Element from "./framework/components/element";
-import Spinner from "./framework/components/spinner";
+import EditVehicleViewModel from "../viewModels/editVehicleViewModel";
+import SelectionViewModel from "../viewModels/selectionViewModel";
+import Dropdown from "./framework/controls/dropdown";
+import DropdownSpinner from "./framework/controls/dropdownSpinner";
+import Element from "./framework/controls/element";
+import Spinner from "./framework/controls/spinner";
 import WindowTemplate from "./framework/windowTemplate";
 
 
@@ -78,7 +78,7 @@ interface EditorWindow
 /**
  * Creates a window template for the ride vehicle editor.
  */
-function createWindow()
+export default function createEditorWindowTemplate()
 {
 	// Shared coordinate constants
 	const windowWidth = 375;
@@ -365,6 +365,9 @@ function createWindow()
 				height: widgetLineHeight,
 
 				items: ["x1", "x10", "x100"],
+			})
+			.bind<EditVehicleViewModel>({
+				multiplier: { update: "onChange" }
 			}),
 
 		locate: wb
@@ -391,9 +394,3 @@ function createWindow()
 			})
 	}));
 }
-
-
-/**
- * The window template of the ride vehicle editor.
- */
-export const editor = createWindow();

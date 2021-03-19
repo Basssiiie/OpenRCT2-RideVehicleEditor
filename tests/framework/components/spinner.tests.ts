@@ -1,7 +1,7 @@
 /// <reference path="../../../lib/openrct2.d.ts" />
 
 import test from 'ava';
-import Spinner from '../../../src/ui/framework/components/spinner';
+import Spinner from '../../../src/ui/framework/controls/spinner';
 
 
 test("template has correct values", t =>

@@ -18,7 +18,13 @@ export default class Element<TWidget extends WidgetBase>
 	/**
 	 * The widget template for this element.
 	 */
-	readonly template: WidgetTemplate<TWidget>;
+	get template(): WidgetTemplate<TWidget>
+	{
+		return this._template;
+	}
+
+
+	protected readonly _template: TWidget
 
 	private _internalBindings?: Bindings<any, TWidget>;
 
@@ -35,7 +41,7 @@ export default class Element<TWidget extends WidgetBase>
 			params.name = `w[${widgetIdUpperBound.toString(36)}]${params.type}`;
 			widgetIdUpperBound++;
 		}
-		this.template = params as WidgetTemplate<TWidget>;
+		this._template = params as WidgetTemplate<TWidget>;
 	}
 
 

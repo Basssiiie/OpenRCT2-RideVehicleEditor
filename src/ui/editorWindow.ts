@@ -1,6 +1,6 @@
 import { ParkRide, RideTrain, RideVehicle } from "../helpers/ridesInPark";
 import { RideType } from "../helpers/rideTypes";
-import { log } from "../helpers/utilityHelpers";
+import { log } from "../helpers/utility";
 import { isDevelopment, pluginVersion } from "../environment";
 import DropdownComponent from "../ui/dropdown";
 import DropdownSpinnerComponent from "../ui/dropdownSpinner";

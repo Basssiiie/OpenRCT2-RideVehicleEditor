@@ -1,4 +1,4 @@
-import { error } from "./utilityHelpers";
+import { error } from "./utility";
 
 /**
  * Gets a list of all rides in the park.

@@ -14,6 +14,7 @@ export default class Window<TDescription>
 	 */
 	readonly id: string;
 	readonly description: WindowDesc;
+	readonly viewmodels: ReadonlyArray<unknown>;
 
 	private readonly _widgetContexts: WidgetBindingContext<WidgetBase>[] = [];
 
@@ -29,6 +30,7 @@ export default class Window<TDescription>
 	{
 		this.id = (template.params.onlyOneInstance) ? template.id : createUniqueId();
 		this.description = template.params as WindowDesc;
+		this.viewmodels = viewModels;
 
 		if (viewModels.length > 0)
 		{

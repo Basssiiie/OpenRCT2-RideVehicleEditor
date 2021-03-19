@@ -1,5 +1,7 @@
 import { getRidesInPark, ParkRide, RideTrain, RideVehicle } from "../helpers/ridesInPark";
-import { clamp, error, isValidIndex, log } from "../helpers/utilityHelpers";
+import { error, log } from "../helpers/utility";
+import Array from "../helpers/array";
+import Math from "../helpers/math";
 import VehicleEditorWindow from "../ui/editorWindow";
 
 
@@ -20,7 +22,7 @@ export default class VehicleSelector
 	 */
 	get selectedRide(): (ParkRide | null)
 	{
-		return (isValidIndex(this._parkRides, this._selectedRideIndex))
+		return (Array.isValidIndex(this._parkRides, this._selectedRideIndex))
 			? this._parkRides[this._selectedRideIndex] : null;
 	}
 	// Index into the 'parkRides' array for the selected ride.
@@ -32,7 +34,7 @@ export default class VehicleSelector
 	 */
 	get selectedTrain(): (RideTrain | null)
 	{
-		return (isValidIndex(this._rideTrains, this._selectedTrainIndex))
+		return (Array.isValidIndex(this._rideTrains, this._selectedTrainIndex))
 			? this._rideTrains![this._selectedTrainIndex] : null;
 	}
 	// Index into the 'rideTrains' array for the selected train.
@@ -44,7 +46,7 @@ export default class VehicleSelector
 	 */
 	get selectedVehicle(): (RideVehicle | null)
 	{
-		return (isValidIndex(this._trainVehicles, this._selectedVehicleIndex))
+		return (Array.isValidIndex(this._trainVehicles, this._selectedVehicleIndex))
 			? this._trainVehicles![this._selectedVehicleIndex] : null;
 	}
 	// Index into the 'trainVehicles' array for the selected vehicle.
@@ -134,7 +136,7 @@ export default class VehicleSelector
 	{
 		if (this._parkRides && this._parkRides.length > 0)
 		{
-			this._selectedRideIndex = rideIndex = clamp(rideIndex, 0, this._parkRides.length);
+			this._selectedRideIndex = rideIndex = Math.clamp(rideIndex, 0, this._parkRides.length);
 
 			const parkRide = this._parkRides[rideIndex];
 			log(`(selector) Selected ride ${parkRide.name} (index: ${rideIndex})`);
@@ -167,7 +169,7 @@ export default class VehicleSelector
 
 		if (this._rideTrains && this._rideTrains.length > 0)
 		{
-			this._selectedTrainIndex = trainIndex = clamp(trainIndex, 0, this._rideTrains.length);
+			this._selectedTrainIndex = trainIndex = Math.clamp(trainIndex, 0, this._rideTrains.length);
 
 			const train = this._rideTrains[trainIndex];
 			this._trainVehicles = train.getVehicles();
@@ -196,7 +198,7 @@ export default class VehicleSelector
 		log(`(selector) Selected vehicle at index ${vehicleIndex}`);
 		if (this._trainVehicles && this._trainVehicles.length > 0)
 		{
-			this._selectedVehicleIndex = vehicleIndex = clamp(vehicleIndex, 0, this._trainVehicles.length);
+			this._selectedVehicleIndex = vehicleIndex = Math.clamp(vehicleIndex, 0, this._trainVehicles.length);
 
 			const vehicle = this._trainVehicles[vehicleIndex];
 			if (this.onSelect)
@@ -254,7 +256,7 @@ export default class VehicleSelector
 		this._rideTrains = ride.getTrains();
 
 		// Check if this train still exists.
-		if (!isValidIndex(this._rideTrains, trainIndex))
+		if (!Array.isValidIndex(this._rideTrains, trainIndex))
 		{
 			log(`(selector) Reselection failed; selected train ${trainIndex} is gone, set to train 0.`);
 			trainIndex = 0;
@@ -267,7 +269,7 @@ export default class VehicleSelector
 		this._trainVehicles = train.getVehicles();
 
 		// Check if this vehicle still exists.
-		if (!isValidIndex(this._trainVehicles, vehicleIndex))
+		if (!Array.isValidIndex(this._trainVehicles, vehicleIndex))
 		{
 			log(`(selector) Reselection failed; selected vehicle ${vehicleIndex} is gone, set to vehicle 0.`);
 			vehicleIndex = 0;

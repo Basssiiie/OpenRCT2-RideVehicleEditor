@@ -1,4 +1,4 @@
-import { Filter } from "../../../helpers/utilityHelpers";
+import { Filter } from "../../helpers/utility";
 
 
 /**
@@ -14,7 +14,7 @@ type EventTrigger = Function & { targetEvent?: Event<any> };
 export default class Event<TSource>
 {
 	// All callbacks to call when the event gets invoked.
-	private _listeners: Function[] = [];
+	private _listeners?: Function[] = [];
 
 
 	/**
@@ -25,7 +25,14 @@ export default class Event<TSource>
 	 */
 	add(callback: Function)
 	{
-		this._listeners.push(callback);
+		if (!this._listeners)
+		{
+			this._listeners = [ callback ];
+		}
+		else
+		{
+			this._listeners.push(callback);
+		}
 	}
 
 
@@ -37,10 +44,13 @@ export default class Event<TSource>
 	 */
 	invoke(source?: TSource, ...args: any[])
 	{
-		for (let i = 0; i < this._listeners.length; i++)
+		if (this._listeners)
 		{
-			const callback = this._listeners[i];
-			callback.apply(source, args);
+			for (let i = 0; i < this._listeners.length; i++)
+			{
+				const callback = this._listeners[i];
+				callback.apply(source, args);
+			}
 		}
 	}
 

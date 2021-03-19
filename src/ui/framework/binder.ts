@@ -1,5 +1,5 @@
 import Log from "../../helpers/logger";
-import { Filter } from "../../helpers/utilityHelpers";
+import { Filter } from "../../helpers/utility";
 import BindingContext from "./contexts/bindingContext";
 import Observable from "./observable";
 

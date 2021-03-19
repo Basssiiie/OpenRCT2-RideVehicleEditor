@@ -1,8 +1,8 @@
-import type { Params } from "./components/parameters";
-import Dropdown, { DropdownParams } from "./components/dropdown";
-import DropdownSpinner, { DropdownSpinnerParams } from "./components/dropdownSpinner";
-import Element from "./components/element";
-import Spinner, { SpinnerParams } from "./components/spinner";
+import type { Params } from "./controls/parameters";
+import Dropdown, { DropdownParams } from "./controls/dropdown";
+import DropdownSpinner, { DropdownSpinnerParams } from "./controls/dropdownSpinner";
+import Element from "./controls/element";
+import Spinner, { SpinnerParams } from "./controls/spinner";
 
 
 

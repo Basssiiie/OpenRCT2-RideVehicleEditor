@@ -1,4 +1,4 @@
-import { error, log } from "../helpers/utilityHelpers";
+import { error, log } from "../helpers/utility";
 import Component from "./component";
 
 

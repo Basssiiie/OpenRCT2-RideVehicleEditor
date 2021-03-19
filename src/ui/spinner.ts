@@ -1,4 +1,5 @@
-import { clamp, log, wrap } from "../helpers/utilityHelpers";
+import { log } from "../helpers/utility";
+import Math from "../helpers/math";
 import Component from "./component";
 
 /**
@@ -97,16 +98,16 @@ class SpinnerComponent extends Component
 		switch (this.wrapMode)
 		{
 			case "wrap":
-				return wrap(value, min, max + 1);
+				return Math.wrap(value, min, max + 1);
 
 			case "clamp":
-				return clamp(value, min, max + 1);
+				return Math.clamp(value, min, max + 1);
 
 			case "clampThenWrap":
 				// Wrap if old value is at the limit, otherwise clamp.
 				return (this._value === min || this._value === max)
-					? wrap(value, min, max + 1)
-					: clamp(value, min, max + 1);
+					? Math.wrap(value, min, max + 1)
+					: Math.clamp(value, min, max + 1);
 				
 		}
 	}
