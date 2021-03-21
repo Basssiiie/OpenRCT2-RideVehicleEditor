@@ -1,4 +1,4 @@
-import { error } from "./utilityHelpers";
+import Log from "./logger";
 
 /**
  * Gets a list of all rides in the park.
@@ -104,13 +104,13 @@ export class RideTrain
 		const entity = map.getEntity(carId);
 		if (!entity)
 		{
-			error(`Entity ${carId} could not be found.`, "getVehicles");
+			Log.error(`Entity ${carId} could not be found.`);
 			return null;
 		}
 		const vehicle = entity as Car;
 		if (!vehicle)
 		{
-			error(`Entity ${entity} is not a car.`, "getVehicles");
+			Log.error(`Entity ${entity} is not a car.`);
 			return null;
 		}
 		return vehicle;

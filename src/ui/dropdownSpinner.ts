@@ -72,7 +72,7 @@ class DropdownSpinnerComponent extends DropdownComponent
 	/** @inheritdoc */
 	protected refreshWidget(widget: DropdownWidget): void
 	{
-		this._spinner.maximum = (this.items.length - 1);
+		this._spinner.maximum = this.items.length;
 		this._spinner.refresh();
 
 		super.refreshWidget(widget);

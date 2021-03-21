@@ -1,5 +1,7 @@
+import ArrayHelper from "../helpers/arrayHelper";
+import Log from "../helpers/logger";
 import { getRidesInPark, ParkRide, RideTrain, RideVehicle } from "../helpers/ridesInPark";
-import { clamp, error, isValidIndex, log } from "../helpers/utilityHelpers";
+import { clamp } from "../helpers/utilityHelpers";
 import VehicleEditorWindow from "../ui/editorWindow";
 
 
@@ -20,8 +22,7 @@ export default class VehicleSelector
 	 */
 	get selectedRide(): (ParkRide | null)
 	{
-		return (isValidIndex(this._parkRides, this._selectedRideIndex))
-			? this._parkRides[this._selectedRideIndex] : null;
+		return ArrayHelper.getAtIndex(this._parkRides, this._selectedRideIndex);
 	}
 	// Index into the 'parkRides' array for the selected ride.
 	private _selectedRideIndex: number = -1;
@@ -32,8 +33,7 @@ export default class VehicleSelector
 	 */
 	get selectedTrain(): (RideTrain | null)
 	{
-		return (isValidIndex(this._rideTrains, this._selectedTrainIndex))
-			? this._rideTrains![this._selectedTrainIndex] : null;
+		return ArrayHelper.getAtIndex(this._rideTrains, this._selectedTrainIndex);
 	}
 	// Index into the 'rideTrains' array for the selected train.
 	private _selectedTrainIndex: number = -1;
@@ -44,8 +44,7 @@ export default class VehicleSelector
 	 */
 	get selectedVehicle(): (RideVehicle | null)
 	{
-		return (isValidIndex(this._trainVehicles, this._selectedVehicleIndex))
-			? this._trainVehicles![this._selectedVehicleIndex] : null;
+		return ArrayHelper.getAtIndex(this._trainVehicles, this._selectedVehicleIndex);
 	}
 	// Index into the 'trainVehicles' array for the selected vehicle.
 	private _selectedVehicleIndex: number = -1;
@@ -76,14 +75,14 @@ export default class VehicleSelector
 		const rideIndex = this.findRideIndexFromRideId(lastSelectedRideId);
 		if (rideIndex !== null)
 		{
-			log("(selector) Restore previous selection succesfull.");
+			Log.debug("(selector) Restore previous selection succesfull.");
 			this.window.ridesInParkList.set(rideIndex);
 			this.selectRide(rideIndex, lastSelectedTrainIndex, lastSelectedVehicleIndex);
 		}
 		else
 		{
 			// Not found, select first available ride.
-			log("(selector) Restore selection failed: ride not found.");
+			Log.debug("(selector) Restore selection failed: ride not found.");
 			this.selectRide(0);
 		}
 
@@ -98,7 +97,7 @@ export default class VehicleSelector
 	 */
 	reloadRideList()
 	{
-		log("(selector) Reloaded the list of rides in the park.");
+		Log.debug("(selector) Reloaded the list of rides in the park.");
 		const currentRideId = this.selectedRide?.rideId;
 
 		this._parkRides = getRidesInPark();
@@ -137,7 +136,7 @@ export default class VehicleSelector
 			this._selectedRideIndex = rideIndex = clamp(rideIndex, 0, this._parkRides.length);
 
 			const parkRide = this._parkRides[rideIndex];
-			log(`(selector) Selected ride ${parkRide.name} (index: ${rideIndex})`);
+			Log.debug(`(selector) Selected ride ${parkRide.name} (index: ${rideIndex})`);
 
 			this._rideTrains = parkRide.getTrains();
 			this.selectTrain(trainIndex, vehicleIndex);
@@ -148,7 +147,7 @@ export default class VehicleSelector
 		}
 		else
 		{
-			error("This park has no rides.", "selectRide");
+			Log.debug("(selector) This park has no rides.");
 			this._selectedRideIndex = -1;
 			this.deselect();
 		}
@@ -163,7 +162,7 @@ export default class VehicleSelector
 	 */
 	selectTrain(trainIndex: number, vehicleIndex: number = 0)
 	{
-		log(`(selector) Selected train at index: ${trainIndex}`);
+		Log.debug(`(selector) Selected train at index: ${trainIndex}`);
 
 		if (this._rideTrains && this._rideTrains.length > 0)
 		{
@@ -180,7 +179,7 @@ export default class VehicleSelector
 		}
 		else
 		{
-			error("This ride has no trains.", "selectTrain");
+			Log.debug("(selector) This ride has no trains.");
 			this.deselect();
 		}
 	}
@@ -193,7 +192,7 @@ export default class VehicleSelector
 	 */
 	selectVehicle(vehicleIndex: number)
 	{
-		log(`(selector) Selected vehicle at index ${vehicleIndex}`);
+		Log.debug(`(selector) Selected vehicle at index ${vehicleIndex}`);
 		if (this._trainVehicles && this._trainVehicles.length > 0)
 		{
 			this._selectedVehicleIndex = vehicleIndex = clamp(vehicleIndex, 0, this._trainVehicles.length);
@@ -208,7 +207,7 @@ export default class VehicleSelector
 		}
 		else
 		{
-			error("This train has no vehicles.", "selectVehicle");
+			Log.debug("(selector) This train has no vehicles.");
 			this.deselect();
 		}
 	}
@@ -242,11 +241,11 @@ export default class VehicleSelector
 
 		if (!ride)
 		{
-			log(`(selector) Reselection failed; no ride selected.`);
+			Log.debug(`(selector) Reselection failed; no ride selected.`);
 			return;
 		}
 
-		log(`(selector) Reselect current ride '${ride.name}'.`);
+		Log.debug(`(selector) Reselect current ride '${ride.name}'.`);
 
 		let trainIndex = this._selectedTrainIndex;
 		let vehicleIndex = this._selectedVehicleIndex;
@@ -254,9 +253,9 @@ export default class VehicleSelector
 		this._rideTrains = ride.getTrains();
 
 		// Check if this train still exists.
-		if (!isValidIndex(this._rideTrains, trainIndex))
+		if (!ArrayHelper.isValidIndex(this._rideTrains, trainIndex))
 		{
-			log(`(selector) Reselection failed; selected train ${trainIndex} is gone, set to train 0.`);
+			Log.debug(`(selector) Reselection failed; selected train ${trainIndex} is gone, set to train 0.`);
 			trainIndex = 0;
 		}
 
@@ -267,9 +266,9 @@ export default class VehicleSelector
 		this._trainVehicles = train.getVehicles();
 
 		// Check if this vehicle still exists.
-		if (!isValidIndex(this._trainVehicles, vehicleIndex))
+		if (!ArrayHelper.isValidIndex(this._trainVehicles, vehicleIndex))
 		{
-			log(`(selector) Reselection failed; selected vehicle ${vehicleIndex} is gone, set to vehicle 0.`);
+			Log.debug(`(selector) Reselection failed; selected vehicle ${vehicleIndex} is gone, set to vehicle 0.`);
 			vehicleIndex = 0;
 		}
 

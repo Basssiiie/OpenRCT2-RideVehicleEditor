@@ -1,4 +1,5 @@
-import { clamp, log, wrap } from "../helpers/utilityHelpers";
+import Log from "../helpers/logger";
+import { clamp, wrap } from "../helpers/utilityHelpers";
 import Component from "./component";
 
 /**
@@ -75,7 +76,7 @@ class SpinnerComponent extends Component
 		const widget = this.getWidget<SpinnerWidget>();
 		if (this.minimum >= this.maximum)
 		{
-			log(`(${this._name}) Minimum is equal to or larger than maximum, value ${value} was not applied.`);
+			Log.debug(`(${this._name}) Minimum is equal to or larger than maximum, value ${value} was not applied.`);
 			return;
 		}
 
@@ -118,7 +119,7 @@ class SpinnerComponent extends Component
 	createWidget(): SpinnerWidget
 	{
 		return {
-			...this._description,
+			...this.description,
 			type: "spinner",
 			text: "",
 			onIncrement: () => this.onWidgetChange(this._value,  this.increment),
@@ -137,11 +138,11 @@ class SpinnerComponent extends Component
 		const widget = this.getWidget<SpinnerWidget>();
 		if (widget.isDisabled)
 		{
-			log(`(${this._name}) Widget is disabled, no change event triggered.`);
+			Log.debug(`(${this._name}) Widget is disabled, no change event triggered.`);
 			return;
 		}
 		value += adjustment;
-		log(`--->(${this._name}) Try updating ${this._value} -> ${value}, adjustment: ${adjustment}.`);
+		Log.debug(`--->(${this._name}) Try updating ${this._value} -> ${value}, adjustment: ${adjustment}.`);
 
 		this.set(value);
 

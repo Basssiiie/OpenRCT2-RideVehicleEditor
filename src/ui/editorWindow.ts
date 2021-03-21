@@ -1,17 +1,19 @@
 import { ParkRide, RideTrain, RideVehicle } from "../helpers/ridesInPark";
 import { RideType } from "../helpers/rideTypes";
-import { log } from "../helpers/utilityHelpers";
 import { isDevelopment, pluginVersion } from "../environment";
 import DropdownComponent from "../ui/dropdown";
 import DropdownSpinnerComponent from "../ui/dropdownSpinner";
 import SpinnerComponent from "../ui/spinner";
 import ViewportComponent from "../ui/viewport";
+import DropdownButtonComponent from "./dropdownButton";
+import Log from "../helpers/logger";
+import { VehicleSettings } from "../services/editor";
 
 
 // Shared coordinate constants
 const windowStart = 18;
 const windowWidth = 375;
-const windowHeight = 232;
+const windowHeight = 248;
 const widgetLineHeight = 14;
 const groupboxMargin = 5;
 const groupboxItemMargin = (groupboxMargin + 5);
@@ -23,6 +25,9 @@ const controlsSize = (windowWidth - (groupboxMargin * 2) - (viewportSize + 5));
 const controlLabelPart = 0.35; // label takes 35%
 const controlHeight = 17;
 const buttonSize = 24;
+
+
+let copiedVehicleSettings: VehicleSettings | null = null;
 
 
 class VehicleEditorWindow
@@ -46,6 +51,7 @@ class VehicleEditorWindow
 	readonly powMaxSpeedSpinner: SpinnerComponent;
 	readonly massSpinner: SpinnerComponent;
 
+	readonly applyToOthersButton: DropdownButtonComponent;
 	readonly multiplierDropdown: DropdownComponent;
 
 
@@ -53,6 +59,24 @@ class VehicleEditorWindow
 	 * Event that triggers when the user presses the 'locate vehicle' button.
 	 */
 	onLocateVehicle?: () => void;
+
+	
+	/**
+	 * Event that triggers when the user clicks a vehicle with the vehicle picker button.
+	 */
+	onPickVehicle?: () => void;
+
+	
+	/**
+	 * Event that triggers when the user presses the 'copy vehicle' button.
+	 */
+	onCopyVehicle?: () => VehicleSettings | null;
+	 
+	
+	/**
+	 * Event that triggers when the user presses the 'copy vehicle' button.
+	 */
+	onPasteVehicle?: (settings: VehicleSettings) => void;
 
 
 	/**
@@ -75,7 +99,7 @@ class VehicleEditorWindow
 	 */
 	constructor()
 	{
-		log("(window) Open window");
+		Log.debug("(window) Open window");
 
 		// Rides in park
 		this.ridesInParkList = new DropdownComponent({
@@ -205,12 +229,28 @@ class VehicleEditorWindow
 		this.powMaxSpeedSpinner.maximum = 255;
 		this.powMaxSpeedSpinner.disabledMessage = "Only on powered vehicles.";
 
+		// Dropdown button to apply current settings to other vehicles
+		this.applyToOthersButton = new DropdownButtonComponent({
+			name: "rve-apply-to-others-button",
+			tooltip: "Apply the current vehicle settings to a specific set of other vehicles on this ride",
+			x: (groupboxMargin + viewportSize + 5),
+			y: (editorStartY + controlHeight * 7) + 2,
+			width: 211,
+			height: (widgetLineHeight + 1),
+		});
+		this.applyToOthersButton.buttons = [
+			{ text: "Apply to all vehicles", onClick: () => Log.debug("all vehicles") },
+			{ text: "Apply to vehicles after this", onClick: () => Log.debug("next vehicles") },
+			{ text: "Apply to vehicles before this", onClick: () => Log.debug("previous vehicles") },
+			{ text: "Apply to all trains", onClick: () => Log.debug("all trains") },
+		];
+
 		// Dropdown to multiply the spinner increments.
 		this.multiplierDropdown = new DropdownComponent({
 			name: "rve-multiplier-dropdown",
 			tooltip: "Multiplies all spinner controls by the specified amount",
 			x: (windowWidth - (groupboxMargin + 45)),
-			y: (editorStartY + controlHeight * 7) + 1,
+			y: (editorStartY + controlHeight * 7) + 2,
 			width: 45,
 			height: widgetLineHeight,
 		});
@@ -337,26 +377,73 @@ class VehicleEditorWindow
 				this.powMaxSpeedSpinner.createWidget(),
 
 				// Toolbar
+				...this.applyToOthersButton.createWidgets(),
 				this.multiplierDropdown.createWidget(),
+
 				<ButtonWidget>{
 					tooltip: "Locate your vehicle when you've lost it (again)",
 					type: "button",
-					x: (groupboxMargin),
-					y: (editorStartY + viewportSize + 4),
+					x: (groupboxMargin + 1),
+					y: (editorStartY + viewportSize + 8),
 					width: buttonSize,
 					height: buttonSize,
 					image: 5167, // SPR_LOCATE
 					onClick: () =>
 					{
 						if (this.onLocateVehicle)
+						{
 							this.onLocateVehicle();
+						}
+					}
+				},
+				<ButtonWidget>{
+					tooltip: "Use the picker to select a vehicle by clicking it",
+					type: "button",
+					x: (groupboxMargin + buttonSize + 2),
+					y: (editorStartY + viewportSize + 8),
+					width: buttonSize,
+					height: buttonSize,
+					image: 29467, // SPR_G2_EYEDROPPER
+					onClick: () =>
+					{
+					}
+				},
+				<ButtonWidget>{
+					tooltip: "Copies the current vehicle settings to your clipboard",
+					name: "rve-copy-button",
+					type: "button",
+					x: (groupboxMargin + (buttonSize + 1) * 2) + 1,
+					y: (editorStartY + viewportSize + 8),
+					width: buttonSize,
+					height: buttonSize,
+					isPressed: (copiedVehicleSettings !== null),
+					image: 29434, // SPR_G2_COPY
+					onClick: () => this.onClickCopy()
+				},
+				<ButtonWidget>{
+					tooltip: "Pastes the previously copied vehicle settings over the currently selected vehicle",
+					name: "rve-paste-button",
+					type: "button",
+					x: (groupboxMargin + (buttonSize + 1) * 3) + 1,
+					y: (editorStartY + viewportSize + 8),
+					width: buttonSize,
+					height: buttonSize,
+					isDisabled: (copiedVehicleSettings === null),
+					image: 29435, // SPR_G2_PASTE
+					onClick: () =>
+					{
+						if (copiedVehicleSettings !== null && this.onPasteVehicle)
+						{
+							Log.debug(`(window) Paste settings: ${JSON.stringify(copiedVehicleSettings)}`);
+							this.onPasteVehicle(copiedVehicleSettings);
+						}
 					}
 				},
 				<LabelWidget>{
 					tooltip: "Go to this URL to check for the latest updates",
 					type: "label",
 					x: (groupboxMargin + 35),
-					y: (windowHeight - (widgetLineHeight + groupboxMargin)),
+					y: (windowHeight - (widgetLineHeight + 3)),
 					width: 275,
 					height: widgetLineHeight,
 					text: "github.com/Basssiiie/OpenRCT2-RideVehicleEditor",
@@ -370,7 +457,7 @@ class VehicleEditorWindow
 			},
 			onClose: () =>
 			{
-				log("(window) Close window.");
+				Log.debug("(window) Close window.");
 				this.viewport.stop();
 
 				if (this.onClose)
@@ -382,7 +469,6 @@ class VehicleEditorWindow
 		this.trainList.bind(window);
 		this.vehicleList.bind(window);
 
-		this.viewport.bind(window);
 		this.rideTypeList.bind(window);
 		this.variantSpinner.bind(window);
 		this.trackProgressSpinner.bind(window);
@@ -390,9 +476,12 @@ class VehicleEditorWindow
 		this.massSpinner.bind(window);
 		this.powAccelerationSpinner.bind(window);
 		this.powMaxSpeedSpinner.bind(window);
+
+		this.viewport.bind(window);
+		this.applyToOthersButton.bind(window);
 		this.multiplierDropdown.bind(window);
 
-		log("(window) Window creation complete.");
+		Log.debug("(window) Window creation complete.");
 		return window;
 	}
 
@@ -404,12 +493,12 @@ class VehicleEditorWindow
 	{
 		if (this._window)
 		{
-			log("The ride vehicle editor is already shown.");
+			Log.debug("The ride vehicle editor is already shown.");
 			this._window.bringToFront();
 		}
 		else
 		{
-			log("Open the ride vehicle editor.");
+			Log.debug("Open the ride vehicle editor.");
 			this._window = this.createWindow();
 		}
 	}
@@ -431,7 +520,11 @@ class VehicleEditorWindow
 	 */
 	setRideList(rides: ParkRide[] | null)
 	{
-		this.ridesInParkList.items = (rides) ? rides.map(r => r.name) : [];
+		this.ridesInParkList.items = (rides) 
+			? (isDevelopment) 
+				? rides.map(r => `[${r.rideId}] ${r.name}`) 
+				: rides.map(r => r.name) 
+			: [];
 		this.ridesInParkList.refresh();
 	}
 	
@@ -484,19 +577,22 @@ class VehicleEditorWindow
 	 */
 	setRideTypeList(rideTypes: RideType[])
 	{
-		this.rideTypeList.items = rideTypes.map(t => t.name);
+		this.rideTypeList.items = (isDevelopment) 
+			? rideTypes.map(t => `[${t.rideIndex}] ${t.name}`) 
+			: rideTypes.map(t => t.name);
 		this.rideTypeList.refresh();
 	}
 
 
 	/**
 	 * Updates the multiplier based on which checkbox was updated.
+	 * 
 	 * @param selectedIndex The index of the multiplier option that was selected.
 	 */
 	private updateMultiplier(selectedIndex: number)
 	{
 		const increment = (10 ** selectedIndex);
-		log(`(window) Updated multiplier to ${increment}. (index: ${selectedIndex})`)
+		Log.debug(`(window) Updated multiplier to ${increment}. (index: ${selectedIndex})`)
 
 		this.setSpinnerIncrement(this.trackProgressSpinner, increment);
 		this.setSpinnerIncrement(this.seatCountSpinner, increment);
@@ -508,6 +604,7 @@ class VehicleEditorWindow
 
 	/**
 	 * Sets the increment of the spinner to the specified amount, and refreshes it.
+	 * 
 	 * @param spinner The spinner to update.
 	 * @param increment The increment the spinner should use.
 	 */
@@ -515,6 +612,48 @@ class VehicleEditorWindow
 	{
 		spinner.increment = increment;
 		spinner.refresh();
+	}
+
+
+	/**
+	 * Enables and disables the copy/paste buttons depending on the copy state.
+	 */
+	private onClickCopy()
+	{
+		const copyWidget = this.getWidget<ButtonWidget>("rve-copy-button");
+		if (copyWidget.isPressed)
+		{
+			copyWidget.isPressed = false;
+			copiedVehicleSettings = null;
+		}
+		else if (this.onCopyVehicle)
+		{
+			copiedVehicleSettings = this.onCopyVehicle();
+			if (copiedVehicleSettings !== null)
+			{
+				copyWidget.isPressed = true;
+			}
+		}
+		Log.debug(`(window) Copied: ${copyWidget.isPressed}`);
+
+		const pasteWidget = this.getWidget<ButtonWidget>("rve-paste-button");
+		pasteWidget.isDisabled = !copyWidget.isPressed;
+	}
+
+
+	/**
+	 * Returns the widget with the specified name, if the window is active.
+	 * 
+	 * @param name The name of the widget.
+	 */
+	private getWidget<TWidget extends Widget>(name: string): TWidget
+	{
+		const widget = ui.getWindow(VehicleEditorWindow.identifier)?.findWidget<TWidget>(name);
+		if (!widget)
+		{
+			throw `Cannot find widget '${name}' in editor window.`;
+		}
+		return widget;
 	}
 }
 

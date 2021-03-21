@@ -1,4 +1,4 @@
-import { log } from "../helpers/utilityHelpers";
+import Log from "../helpers/logger";
 import VehicleEditorWindow from "../ui/editorWindow";
 import VehicleEditor from "./editor";
 import VehicleSelector from "./selector";
@@ -39,7 +39,7 @@ class StateWatcher implements IDisposable
 		readonly selector: VehicleSelector,
 		readonly editor: VehicleEditor)
 	{
-		log("(state) Watcher initialized");
+		Log.debug("(state) Watcher initialized");
 		this._recordedViewportRotation = ui.mainViewport.rotation;
 
 		this._onActionHook = context.subscribe("action.execute", e => this.onActionExecuted(e));
@@ -81,13 +81,13 @@ class StateWatcher implements IDisposable
 
 				if (ride !== null && ride.rideId === statusUpdate.ride)
 				{
-					log("(state) Ride status changed.");
+					Log.debug("(state) Ride status changed.");
 					this.selector.refresh();
 				}
 				break;
 		}
 
-		log(`<${action}>\n\t- type: ${event.type}\n\t- args: ${JSON.stringify(event.args)}\n\t- result: ${JSON.stringify(event.result)}`)
+		Log.debug(`<${action}>\n\t- type: ${event.type}\n\t- args: ${JSON.stringify(event.args)}\n\t- result: ${JSON.stringify(event.result)}`)
 	}
 
 
@@ -151,7 +151,7 @@ class StateWatcher implements IDisposable
 
 		if (currentRotation !== this._recordedViewportRotation)
 		{
-			log(`(state) Detected viewport rotation change: ${this._recordedViewportRotation} -> ${currentRotation}`);
+			Log.debug(`(state) Detected viewport rotation change: ${this._recordedViewportRotation} -> ${currentRotation}`);
 
 			this.window.viewport.refresh();
 			this._recordedViewportRotation = currentRotation;

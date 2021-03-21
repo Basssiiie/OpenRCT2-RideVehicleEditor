@@ -1,4 +1,4 @@
-import { error, log } from "../helpers/utilityHelpers";
+import Log from "../helpers/logger";
 import Component from "./component";
 
 
@@ -20,12 +20,12 @@ class ViewportComponent extends Component
 	 */
 	goTo(position: CoordsXY | CoordsXYZ)
 	{
-		log(`(${this._name}) Jump to position ${position}.`);
+		Log.debug(`(${this._name}) Jump to position ${position}.`);
 		this._isActive = true;
 		this._entityId = -1;
 
 		const widget = this.getWidget<ViewportWidget>();
-		widget.viewport.moveTo(position)
+		widget.viewport?.moveTo(position)
 
 		this.refreshWidget(widget);
 	}
@@ -37,7 +37,7 @@ class ViewportComponent extends Component
 	 */
 	follow(entityId: number)
 	{
-		log(`(${this._name}) Start following entity ${entityId}.`);
+		Log.debug(`(${this._name}) Start following entity ${entityId}.`);
 
 		this._isActive = true;
 		this._entityId = entityId;
@@ -61,7 +61,7 @@ class ViewportComponent extends Component
 	createWidget(): ViewportWidget
 	{
 		return {
-			...this._description,
+			...this.description,
 			type: "viewport",
 			viewport: <Viewport>{
 				left: farAway.x,
@@ -84,11 +84,11 @@ class ViewportComponent extends Component
 		}
 		else if (this._updater) 
 		{
-			log(`(${this._name}) Updating has stopped.`);
+			Log.debug(`(${this._name}) Updating has stopped.`);
 			this._updater.dispose();
 			this._updater = null;
 
-			widget.viewport.moveTo(farAway)
+			widget.viewport?.moveTo(farAway)
 		}
 	}
 
@@ -100,8 +100,8 @@ class ViewportComponent extends Component
 	{
 		if (this._entityId == -1)
 		{
-			error("Viewport tick update called while there is no entity to follow.", "viewport.update")
 			this.stop();
+			Log.error("Viewport tick update called while there is no entity to follow.");
 			return;
 		}
 
@@ -109,7 +109,7 @@ class ViewportComponent extends Component
 		if (entity)
 		{
 			const widget = this.getWidget<ViewportWidget>();
-			widget.viewport.moveTo({ x: entity.x, y: entity.y, z: entity.z });
+			widget.viewport?.moveTo({ x: entity.x, y: entity.y, z: entity.z });
 		}
 	}
 }

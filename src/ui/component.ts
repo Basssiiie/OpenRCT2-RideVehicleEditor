@@ -7,8 +7,13 @@ import WidgetDesc from "./widgetDesc";
 abstract class Component
 {
 	protected _window: (Window | null) = null;
-	protected _description: WidgetDesc;
 	protected _isActive: boolean = true;
+
+
+	/**
+	 * Gets the widget description for this component.
+	 */
+	readonly description: WidgetDesc;
 
 
 	/**
@@ -16,22 +21,13 @@ abstract class Component
 	 */
 	protected get _name()
 	{
-		return this._description.name;
-	}
-
-
-	/**
-	 * Gets the widget description for this component.
-	 */
-	get description()
-	{
-		return this._description;
+		return this.description.name;
 	}
 
 
 	constructor(description: WidgetDesc)
 	{
-		this._description = description;
+		this.description = description;
 	}
 
 

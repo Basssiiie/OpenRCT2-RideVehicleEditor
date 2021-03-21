@@ -1,4 +1,4 @@
-import { log } from "../helpers/utilityHelpers";
+import Log from "../helpers/logger";
 import Component from "./component";
 
 
@@ -42,7 +42,7 @@ class DropdownComponent extends Component
 	set(index: number)
 	{
 		const widget = this.getWidget<DropdownWidget>();
-		log(`(${this._name}) Set to index ${index}.`);
+		Log.debug(`(${this._name}) Set to index ${index}.`);
 
 		if (!this._isActive)
 		{
@@ -69,10 +69,10 @@ class DropdownComponent extends Component
 		const widget = this.getWidget<DropdownWidget>();
 		if (widget.isDisabled)
 		{
-			log(`(${this._name}) Widget is disabled, no change event triggered.`);
+			Log.debug(`(${this._name}) Widget is disabled, no change event triggered.`);
 			return;
 		}
-		log(`--->(${this._name}) Try updating ${widget.selectedIndex} -> ${index}.`);
+		Log.debug(`--->(${this._name}) Try updating ${widget.selectedIndex} -> ${index}.`);
 
 		if (this.onSelect)
 			this.onSelect(index);
@@ -85,7 +85,7 @@ class DropdownComponent extends Component
 	createWidget(): DropdownWidget
 	{
 		return {
-			...this._description,
+			...this.description,
 			type: "dropdown",
 			items: this.items,
 			selectedIndex: 0,

@@ -1,11 +1,11 @@
-import { log } from "./utilityHelpers";
+import Log from "./logger";
 
 /**
  * Gets all available ride types that are currently loaded.
  */
 export function getAvailableRideTypes(): RideType[]
 {
-	log("Get ride types");
+	Log.debug("Get ride types");
 
 	return context
 		.getAllObjects("ride")

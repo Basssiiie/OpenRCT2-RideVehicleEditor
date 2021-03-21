@@ -1,12 +1,27 @@
+import ArrayHelper from "../helpers/arrayHelper";
+import Log from "../helpers/logger";
 import { RideVehicle } from "../helpers/ridesInPark";
 import { getAvailableRideTypes, RideType } from "../helpers/rideTypes";
-import { log } from "../helpers/utilityHelpers";
 import VehicleEditorWindow from "../ui/editorWindow";
 import VehicleSelector from "./selector";
 
 
 // The distance of a single step for moving the vehicle.
 const moveDistanceStep = 9_000;
+
+
+/**
+ * A set of settings for a specific vehicle.
+ */
+export interface VehicleSettings
+{
+	rideIndex: number;
+	variant: number;
+	seats: number;
+	mass: number;
+	poweredAcceleration?: number;
+	poweredMaxSpeed?: number;
+}
 
 
 /**
@@ -36,6 +51,8 @@ export default class VehicleEditor
 		window.powAccelerationSpinner.onChange = (v => this.setVehiclePoweredAcceleration(v));
 		window.powMaxSpeedSpinner.onChange = (v => this.setVehiclePoweredMaximumSpeed(v));
 		window.massSpinner.onChange = (v => this.setVehicleMass(v));
+		window.onCopyVehicle = (() => this.getVehicleSettings());
+		window.onPasteVehicle = (s => this.applyVehicleSettings(s));
 		window.onLocateVehicle = (() => this.scrollToCar());
 
 		const selectedVehicle = selector.selectedVehicle;
@@ -53,8 +70,6 @@ export default class VehicleEditor
 	 */
 	reloadRideTypes()
 	{
-		//const currentType = this._rideTypes[this._selectedTypeIndex].rideIndex;		
-
 		this._rideTypes = getAvailableRideTypes();
 		this.window.setRideTypeList(this._rideTypes);
 	}
@@ -76,7 +91,7 @@ export default class VehicleEditor
 	 */
 	setVehicle(vehicle: RideVehicle)
 	{
-		log(`(editor) Vehicle set, entity id: ${vehicle.entityId}`);
+		Log.debug(`(editor) Vehicle set, entity id: ${vehicle.entityId}`);
 
 		this._selectedVehicle = vehicle;
 		const car = this.getSelectedCar();
@@ -88,16 +103,12 @@ export default class VehicleEditor
 
 			// Ride type
 			const rideTypeId = car.rideObject;
-			for (let i = 0; i < this._rideTypes.length; i++)
+			const rideTypeIndex = ArrayHelper.findIndex(this._rideTypes, t => t.rideIndex === rideTypeId);
+			if (rideTypeIndex !== null)
 			{
-				if (this._rideTypes[i].rideIndex == rideTypeId)
-				{
-					this._selectedTypeIndex = i;
-					break;
-				}
+				this._selectedTypeIndex = rideTypeIndex;
+				this.window.rideTypeList.set(this._selectedTypeIndex);
 			}
-
-			this.window.rideTypeList.set(this._selectedTypeIndex);
 
 			// Vehicle type properties
 			this.refreshProperties(car);
@@ -119,7 +130,7 @@ export default class VehicleEditor
 		{
 			const rideType = this.getSelectedRideType();
 
-			log(`(editor) Set vehicle ride type to: ${rideType.name} (index: ${rideTypeIndex})`);
+			Log.debug(`(editor) Set vehicle ride type to: ${rideType.name} (index: ${rideTypeIndex})`);
 			currentCar.rideObject = rideType.rideIndex;
 			currentCar.vehicleObject = 0;
 
@@ -138,7 +149,7 @@ export default class VehicleEditor
 		const currentCar = this.getSelectedCar();
 		if (currentCar)
 		{
-			log(`(editor) Set vehicle variant index to: ${variantIndex}.`);
+			Log.debug(`(editor) Set vehicle variant index to: ${variantIndex}.`);
 			currentCar.vehicleObject = variantIndex;
 
 			this.setPropertiesToDefaultOfType(currentCar, this.getSelectedRideType(), variantIndex);
@@ -156,7 +167,7 @@ export default class VehicleEditor
 		const currentCar = this.getSelectedCar();
 		if (currentCar)
 		{
-			log(`(editor) Move vehicle a distance of: ${distance}.`);
+			Log.debug(`(editor) Move vehicle a distance of: ${distance}.`);
 			currentCar.travelBy(distance * moveDistanceStep);
 
 			const recalculatedProgress = currentCar.trackProgress;
@@ -177,7 +188,7 @@ export default class VehicleEditor
 		const currentCar = this.getSelectedCar();
 		if (currentCar)
 		{
-			log(`(editor) Set vehicle max seat count to: ${numberOfSeats}.`);
+			Log.debug(`(editor) Set vehicle max seat count to: ${numberOfSeats}.`);
 			currentCar.numSeats = numberOfSeats;
 		}
 	}
@@ -192,7 +203,7 @@ export default class VehicleEditor
 		const currentCar = this.getSelectedCar();
 		if (currentCar)
 		{
-			log(`(editor) Set vehicle powered acceleration to: ${power}.`);
+			Log.debug(`(editor) Set vehicle powered acceleration to: ${power}.`);
 			currentCar.poweredAcceleration = power;
 		}
 	}
@@ -207,7 +218,7 @@ export default class VehicleEditor
 		const currentCar = this.getSelectedCar();
 		if (currentCar)
 		{
-			log(`(editor) Set vehicle powered acceleration to: ${maximumSpeed}.`);
+			Log.debug(`(editor) Set vehicle powered acceleration to: ${maximumSpeed}.`);
 			currentCar.poweredMaxSpeed = maximumSpeed;
 		}
 	}
@@ -222,9 +233,77 @@ export default class VehicleEditor
 		const currentCar = this.getSelectedCar();
 		if (currentCar)
 		{
-			log(`(editor) Set vehicle mass to: ${mass}.`);
+			Log.debug(`(editor) Set vehicle mass to: ${mass}.`);
 			currentCar.mass = mass;
 		}
+	}
+
+	
+	/**
+	 * Gets the settings of the currently selected vehicle.
+	 */
+	getVehicleSettings(): VehicleSettings | null
+	{
+		const currentCar = this.getSelectedCar();
+		if (!currentCar)
+		{
+			Log.debug(`(editor) No car selected to get settings from.`);
+			return null;
+		}
+
+		const settings: VehicleSettings = {
+			rideIndex: this.getSelectedRideType().rideIndex,
+			variant: this.window.variantSpinner.value,
+			seats: this.window.seatCountSpinner.value,
+			mass:  this.window.massSpinner.value,
+		}
+
+		if (this.isCarPowered(currentCar))
+		{
+			settings.poweredAcceleration = this.window.powAccelerationSpinner.value;
+			settings.poweredMaxSpeed = this.window.powMaxSpeedSpinner.value;
+		}
+		return settings;
+	}
+
+
+	/**
+	 * Applies all the specified settings to the currently selected vehicle.
+	 */
+	applyVehicleSettings(settings: VehicleSettings): void
+	{
+		const selectedCar = this.getSelectedCar();
+		if (selectedCar === null)
+		{
+			Log.debug(`No car was selected, apply settings has failed.`);
+			return;
+		}
+
+		const rideType = ArrayHelper.findIndex(this._rideTypes, t => t.rideIndex === settings.rideIndex);
+		if (rideType !== null)
+		{
+			this._selectedTypeIndex = rideType;
+			selectedCar.rideObject = this.getSelectedRideType().rideIndex;
+			
+			this.window.rideTypeList.set(this._selectedTypeIndex);
+		}
+
+		selectedCar.vehicleObject = settings.variant;
+		selectedCar.numSeats = settings.seats;
+		selectedCar.mass = settings.mass;
+
+		if (this.isCarPowered(selectedCar))
+		{
+			if (settings.poweredAcceleration !== undefined)
+			{
+				selectedCar.poweredAcceleration = settings.poweredAcceleration;
+			}
+			if (settings.poweredMaxSpeed !== undefined)
+			{
+				selectedCar.poweredMaxSpeed = settings.poweredMaxSpeed;
+			}
+		}
+		this.refreshProperties(selectedCar);
 	}
 
 
@@ -233,12 +312,12 @@ export default class VehicleEditor
 	 */
 	private refreshProperties(car: Car)
 	{
-		const currentType = this._rideTypes[this._selectedTypeIndex];
+		const currentType = this.getSelectedRideType();
 		const isPowered = this.isCarPowered(car);
 
 		// Variant
 		const variant = this.window.variantSpinner;
-		variant.maximum = (currentType.variantCount - 1);
+		variant.maximum = currentType.variantCount;
 		variant.set(car.vehicleObject);
 
 		// Track progress
@@ -267,7 +346,7 @@ export default class VehicleEditor
 			poweredMaxSpeed.active(false);
 		}
 
-		log(`(editor) Properties refreshed; variant ${variant.value}/${variant.maximum}; seats: ${seats.value}, powered: ${isPowered}, power: ${poweredAcceleration.value}/${poweredMaxSpeed.value}`);
+		Log.debug(`(editor) Properties refreshed; variant ${variant.value}/${variant.maximum}; seats: ${seats.value}, powered: ${isPowered}, power: ${poweredAcceleration.value}/${poweredMaxSpeed.value}`);
 	}
 
 
@@ -281,7 +360,7 @@ export default class VehicleEditor
 	 */
 	private setPropertiesToDefaultOfType(car: Car, rideType: RideType, variant: number)
 	{
-		log("(editor) All car properties have been reset to the default value.")
+		Log.debug("(editor) All car properties have been reset to the default value.")
 
 		// Set all properties according to definition.
 		const rideObject = rideType.getDefinition();
@@ -334,7 +413,7 @@ export default class VehicleEditor
 		const car = vehicle.getCar();
 		if (!car)
 		{
-			log("(editor) Selected vehicle does not exist anymore.");
+			Log.debug("(editor) Selected vehicle does not exist anymore.");
 
 			this.deselect();
 			this.window.disableEditorControls();
