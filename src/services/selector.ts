@@ -72,7 +72,7 @@ export default class VehicleSelector
 		this.reloadRideList();
 
 		// Restore last selected ride, train and vehicle.
-		const rideIndex = this.findRideIndexFromRideId(lastSelectedRideId);
+		const rideIndex = ArrayHelper.findIndex(this._parkRides, r => r.rideId === lastSelectedRideId);
 		if (rideIndex !== null)
 		{
 			Log.debug("(selector) Restore previous selection succesfull.");
@@ -89,6 +89,8 @@ export default class VehicleSelector
 		window.ridesInParkList.onSelect = (i => this.selectRide(i));
 		window.trainList.onSelect = (i => this.selectTrain(i));
 		window.vehicleList.onSelect = (i => this.selectVehicle(i));
+
+		window.onPickVehicle = (e => this.selectEntity(e));
 	}
 
 
@@ -106,7 +108,7 @@ export default class VehicleSelector
 		if (currentRideId && currentRideId !== this.selectedRide?.rideId)
 		{
 			// Ride index has changed; find the new index.
-			const rideIndex = this.findRideIndexFromRideId(currentRideId);
+			const rideIndex = ArrayHelper.findIndex(this._parkRides, r => r.rideId === currentRideId);
 
 			if (rideIndex === null)
 			{
@@ -214,6 +216,51 @@ export default class VehicleSelector
 
 
 	/**
+	 * Selects a vehicle from an entity id.
+	 * @param entityId 
+	 * @returns 
+	 */
+	selectEntity(entityId: number)
+	{
+		const entity = map.getEntity(entityId);
+		if (!entity || entity.type !== "car")
+		{
+			Log.debug(`(selector) Invalid entity selected: ${entityId}`);
+			return;
+		}
+
+		const car = entity as Car;
+		const rideId = car.ride;
+		
+		const selectedRideIndex = ArrayHelper.findIndex(this._parkRides, r => r.rideId === rideId);
+		if (selectedRideIndex === null)
+		{
+			Log.debug(`(selector) Could not find ride id ${selectedRideIndex} for selected entity.`);
+			return;
+		}
+
+		this.selectRide(selectedRideIndex);
+		this.window.ridesInParkList.set(this._selectedRideIndex);
+
+		if (this._rideTrains)
+		{
+			let trainIndex = 0, vehicleIndex: number | null = null;
+			for (let train of this._rideTrains)
+			{
+				vehicleIndex = train.getCarIndex(entityId);
+				if (vehicleIndex !== null)
+				{
+					this.selectTrain(trainIndex, vehicleIndex);
+					this.window.trainList.set(this._selectedTrainIndex);
+					break;
+				}
+				trainIndex++;
+			}
+		}		
+	}
+
+
+	/**
 	 * Disables the editor controls and sets the selected train and vehicle to null.
 	 */
 	deselect()
@@ -276,23 +323,5 @@ export default class VehicleSelector
 		this.window.vehicleList.set(vehicleIndex);
 
 		this.selectVehicle(vehicleIndex);
-	}
-
-
-	/**
-	 * Finds the index into the 'parkRides' array for the specified ride id.
-	 * 
-	 * @param rideId The id of the ride in the loaded park.
-	 */
-	private findRideIndexFromRideId(rideId: number): number | null
-	{
-		for (let i = 0; i < this._parkRides.length; i++)
-		{
-			if (rideId === this._parkRides[i].rideId)
-			{
-				return i;
-			}
-		}
-		return null;
 	}
 }

@@ -64,7 +64,7 @@ class VehicleEditorWindow
 	/**
 	 * Event that triggers when the user clicks a vehicle with the vehicle picker button.
 	 */
-	onPickVehicle?: () => void;
+	onPickVehicle?: (entity: number) => void;
 
 	
 	/**
@@ -398,15 +398,14 @@ class VehicleEditorWindow
 				},
 				<ButtonWidget>{
 					tooltip: "Use the picker to select a vehicle by clicking it",
+					name: "rve-picker-button",
 					type: "button",
 					x: (groupboxMargin + buttonSize + 2),
 					y: (editorStartY + viewportSize + 8),
 					width: buttonSize,
 					height: buttonSize,
 					image: 29467, // SPR_G2_EYEDROPPER
-					onClick: () =>
-					{
-					}
+					onClick: () => this.pickVehicle()
 				},
 				<ButtonWidget>{
 					tooltip: "Copies the current vehicle settings to your clipboard",
@@ -612,6 +611,45 @@ class VehicleEditorWindow
 	{
 		spinner.increment = increment;
 		spinner.refresh();
+	}
+
+
+	/**
+	 * Starts a tool that allows the user to click on a vehicle to select it.
+	 */
+	private pickVehicle()
+	{
+		const pickerButton = this.getWidget<ButtonWidget>("rve-picker-button");
+		if (pickerButton.isPressed)
+		{
+			const tool = ui.tool;
+			if (tool && tool.id === "rve-pick-vehicle")
+			{
+				tool.cancel();
+			}
+			pickerButton.isPressed = false;
+		}
+		else
+		{
+			ui.activateTool({
+				id: "rve-pick-vehicle",
+				cursor: "cross_hair",
+				onDown: a => 
+				{
+					if (a.entityId && this.onPickVehicle)
+					{
+						this.onPickVehicle(a.entityId);
+						ui.tool?.cancel();
+					}
+				},
+				onFinish: () =>
+				{
+					const pickerButton = this.getWidget<ButtonWidget>("rve-picker-button");
+					pickerButton.isPressed = false;
+				}
+			});
+			pickerButton.isPressed = true;
+		}
 	}
 
 

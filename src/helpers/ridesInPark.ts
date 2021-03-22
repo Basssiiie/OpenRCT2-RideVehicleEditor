@@ -76,6 +76,33 @@ export class RideTrain
 
 
 	/**
+	 * Gets the index at which the specified car is located within the train.
+	 * Returns 'null' if the specified car is not part of this train.
+	 */
+	getCarIndex(carId: number): number | null
+	{
+		let currentId: number | null = this.headCarId;
+		let index = 0;
+		while (currentId !== null && currentId != 0xFFFF)
+		{
+			if (currentId === carId)
+			{
+				return index;
+			}
+
+			const car = this.getCarEntity(currentId);
+			if (car === null)
+			{
+				break;
+			}
+			currentId = car.nextCarOnTrain;
+			index++;
+		}
+		return null;
+	}
+
+
+	/**
 	 * Gets a list of all cars in this train, from front to back.
 	 */
 	getVehicles(): RideVehicle[]
