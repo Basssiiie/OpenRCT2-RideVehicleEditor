@@ -1,29 +1,46 @@
-import DropdownComponent from "./dropdown";
-import SpinnerComponent from "./spinner";
-import WidgetDesc from "./widgetDesc";
+import DropdownControl, { DropdownParams } from "./dropdown";
+import SpinnerControl, { SpinnerParams } from "./spinner";
 
 
 /**
- * A dropdown with a spinner component on the side.
+ * The parameters for configuring the spinner.
  */
-class DropdownSpinnerComponent extends DropdownComponent
+export type DropdownSpinnerParams = DropdownParams & Partial<SpinnerParams>;
+
+
+/**
+ * A dropdown with a spinner control on the side.
+ */
+export default class DropdownSpinnerControl extends DropdownControl
 {
-	// The attached spinner component.
-	private _spinner: SpinnerComponent;
+	/** @inheritdoc */
+	get params(): Required<DropdownSpinnerParams>
+	{
+		return this._params as Required<DropdownSpinnerParams>;
+	}
 
 
-	constructor(description: WidgetDesc)
+	// The attached spinner control.
+	private _spinner: SpinnerControl;
+
+
+	/**
+	 * The parameters for configuring the dropdown spinner.
+	 */
+	constructor(params: DropdownSpinnerParams)
 	{
 		super({
-			...description,
-			width: (description.width - 24)
+			...params,
+			width: (params.width - 24)
 		});
-		this._spinner = new SpinnerComponent({
-			...description,
-			name: (description.name + "-spinner"),
+		this._spinner = new SpinnerControl({
+			...params,
+			name: (params.name + "-spinner"),
+			disabledMessage: "",
+			minimum: 0,
+			maximum: params.items?.length ?? 1,
+			onChange: i => this.onSpinnerChange(i)
 		});
-		this._spinner.disabledMessage = "";
-		this._spinner.onChange = (i => this.onSpinnerChange(i));
 	}
 
 
@@ -72,11 +89,9 @@ class DropdownSpinnerComponent extends DropdownComponent
 	/** @inheritdoc */
 	protected refreshWidget(widget: DropdownWidget): void
 	{
-		this._spinner.maximum = this.items.length;
+		this._spinner.params.maximum = this.params.items.length;
 		this._spinner.refresh();
 
 		super.refreshWidget(widget);
 	}
 }
-
-export default DropdownSpinnerComponent;

@@ -1,11 +1,11 @@
 /// <reference path="../lib/openrct2.d.ts" />
 
+import Environment from './environment';
 import main from './main';
-import { pluginVersion } from './environment';
 
 registerPlugin({
 	name: 'RideVehicleEditor',
-	version: pluginVersion,
+	version: Environment.pluginVersion,
 	authors: ['Basssiiie'],
 	type: 'local',
 	licence: 'MIT',

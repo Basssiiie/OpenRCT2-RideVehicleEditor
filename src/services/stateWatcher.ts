@@ -1,4 +1,4 @@
-import Log from "../helpers/logger";
+import Log from "../utilities/logger";
 import VehicleEditorWindow from "../ui/editorWindow";
 import VehicleEditor from "./editor";
 import VehicleSelector from "./selector";
@@ -25,7 +25,7 @@ interface RideSetStatusArgs
 /**
  * Watches the state of the game, and updates relevant services if necessary.
  */
-class StateWatcher implements IDisposable
+export default class StateWatcher implements IDisposable
 {
 	private _onActionHook: IDisposable;
 	private _onUpdateHook: IDisposable;
@@ -39,7 +39,7 @@ class StateWatcher implements IDisposable
 		readonly selector: VehicleSelector,
 		readonly editor: VehicleEditor)
 	{
-		Log.debug("(state) Watcher initialized");
+		Log.debug("(watcher) Watcher initialized");
 		this._recordedViewportRotation = ui.mainViewport.rotation;
 
 		this._onActionHook = context.subscribe("action.execute", e => this.onActionExecuted(e));
@@ -58,7 +58,6 @@ class StateWatcher implements IDisposable
 
 	/**
 	 * Triggers for every executed player action.
-	 * 
 	 * @param event The arguments describing the executed action.
 	 */
 	private onActionExecuted(event: GameActionEventArgs)
@@ -76,13 +75,17 @@ class StateWatcher implements IDisposable
 				break;
 
 			case "ridesetstatus": // close/reopen ride
-				const ride = this.selector.selectedRide;
-				const statusUpdate = (event.args as RideSetStatusArgs);
-
-				if (ride !== null && ride.rideId === statusUpdate.ride)
+				const index = this.selector.rideIndex;
+				if (index !== null)
 				{
-					Log.debug("(state) Ride status changed.");
-					this.selector.refresh();
+					const ride = this.selector.ride.get();
+					const statusUpdate = (event.args as RideSetStatusArgs);
+
+					if (ride !== null && ride.rideId === statusUpdate.ride)
+					{
+						Log.debug("(watcher) Ride status changed.");
+						this.selector.selectRide(index);
+					}
 				}
 				break;
 		}
@@ -100,7 +103,7 @@ class StateWatcher implements IDisposable
 			return;
 
 		// Update the vehicle controls if things have changed.
-		const vehicle = this.selector.selectedVehicle;
+		const vehicle = this.selector.vehicle.get();
 		if (vehicle)
 		{
 			const car = vehicle.getCar();
@@ -145,18 +148,16 @@ class StateWatcher implements IDisposable
 	{
 		if (this._isDisposed)
 			return;
-		
+
 		// Update the viewport if the current rotation has changed.
 		const currentRotation = ui.mainViewport.rotation;
 
 		if (currentRotation !== this._recordedViewportRotation)
 		{
-			Log.debug(`(state) Detected viewport rotation change: ${this._recordedViewportRotation} -> ${currentRotation}`);
+			Log.debug(`(watcher) Detected viewport rotation change: ${this._recordedViewportRotation} -> ${currentRotation}`);
 
 			this.window.viewport.refresh();
 			this._recordedViewportRotation = currentRotation;
 		}
 	}
 }
-
-export default StateWatcher;

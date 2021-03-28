@@ -1,46 +1,49 @@
-import Log from "../helpers/logger";
-import { clamp, wrap } from "../helpers/utilityHelpers";
-import Component from "./component";
+import Log from "../utilities/logger";
+import MathHelper from "../utilities/mathHelper";
+import Control, { ControlParams } from "./control";
 
 /**
  * Determines whether the spinner value wraps around or clamps to its boundaries.
  */
-type WrapMode = "wrap" | "clamp" | "clampThenWrap";
+export type WrapMode = "wrap" | "clamp" | "clampThenWrap";
 
 
 /**
- * A controller class for a spinner widget.
+ * The parameters for configuring the spinner.
  */
-class SpinnerComponent extends Component
+export interface SpinnerParams extends ControlParams
 {
-	/**
-	 * Sets whether the spinner value wraps around or clamps to its boundaries.
-	 */
-	wrapMode: WrapMode = "wrap";
-
-
 	/**
 	 * The minimum possible value that the spinner can reach. (Inclusive)
 	 */
-	minimum: number = 0;
+	minimum: number;
 
 
 	/**
-	 * The maximum possible value that the spinner can reach. (Inclusive)
+	 * The maximum possible value that the spinner can reach. (Exclusive)
 	 */
-	maximum: number = 0;
+	maximum: number;
 
 
 	/**
 	 * The amount to increment or decrement per interaction.
+	 * @default 1
 	 */
-	increment = 1;
+	increment?: number;
+
+
+	/**
+	 * Sets whether the spinner value wraps around or clamps to its boundaries.
+	 * @default "wrap"
+	 */
+	wrapMode?: WrapMode;
 
 
 	/**
 	 * Sets the message that will show when the spinner is not available.
+	 * @default "Not available"
 	 */
-	disabledMessage: string = "Not available";
+	disabledMessage?: string;
 
 
 	/**
@@ -54,8 +57,14 @@ class SpinnerComponent extends Component
 	 * Allows for a custom formatted display every time the value gets refreshed.
 	 */
 	format?: (value: number) => string;
+}
 
 
+/**
+ * A controller class for a spinner widget.
+ */
+export default class SpinnerControl extends Control<SpinnerParams>
+{
 	/**
 	 * Gets the selected value in the spinner.
 	 */
@@ -67,49 +76,53 @@ class SpinnerComponent extends Component
 
 
 	/**
-	 * Sets the spinner to the specified value.
-	 * 
-	 * @param value The number to set the spinner to.
+	 * Create a spinner control with the specified parameters.
+	 * @param params The parameters for the control.
 	 */
-	set(value: number)
+	constructor(params: SpinnerParams)
 	{
-		const widget = this.getWidget<SpinnerWidget>();
-		if (this.minimum >= this.maximum)
-		{
-			Log.debug(`(${this._name}) Minimum is equal to or larger than maximum, value ${value} was not applied.`);
-			return;
-		}
-
-		this._isActive = true;
-		this._value = this.performWrapMode(value);
-
-		this.refreshWidget(widget);
+		super(params);
+		params.increment ??= 1;
+		params.wrapMode ??= "wrap";
+		params.disabledMessage ??= "Not available";
 	}
 
 
 	/**
-	 * Wrap or clamp based on the setting in this spinner.
+	 * Sets the spinner to the specified value.
+	 * @param value The number to set the spinner to.
 	 */
-	private performWrapMode(value: number): number
+	set(value: number)
 	{
-		const min = this.minimum;
-		const max = this.maximum;
+		const min = this.params.minimum;
+		const max = this.params.maximum;
 
-		switch (this.wrapMode)
+		if (min >= max)
 		{
-			case "wrap":
-				return wrap(value, min, max + 1);
+			Log.debug(`(${this.params.name}) Minimum ${min} is equal to or larger than maximum ${max}, value ${value} was not applied.`);
+			return;
+		}
+
+		this._isActive = true;
+		switch (this.params.wrapMode)
+		{
+			default:
+				this._value = MathHelper.wrap(value, min, max);
 
 			case "clamp":
-				return clamp(value, min, max + 1);
+				this._value = MathHelper.clamp(value, min, max);
 
 			case "clampThenWrap":
 				// Wrap if old value is at the limit, otherwise clamp.
-				return (this._value === min || this._value === max)
-					? wrap(value, min, max + 1)
-					: clamp(value, min, max + 1);
-				
+				this._value = (value < min && this._value === min) || (value >= max && this._value === (max - 1))
+					? MathHelper.wrap(value, min, max)
+					: MathHelper.clamp(value, min, max);
 		}
+
+		//Log.debug(`(${this.params.name}) Spinner value is changed to ${this._value}. (unwrapped: ${value}, range: ${min}<->${max})`);
+
+		const widget = this.getWidget<SpinnerWidget>();
+		this.refreshWidget(widget);
 	}
 
 
@@ -119,18 +132,17 @@ class SpinnerComponent extends Component
 	createWidget(): SpinnerWidget
 	{
 		return {
-			...this.description,
+			...this.params,
 			type: "spinner",
 			text: "",
-			onIncrement: () => this.onWidgetChange(this._value,  this.increment),
-			onDecrement: () => this.onWidgetChange(this._value, -this.increment)
+			onIncrement: () => this.onWidgetChange(this._value,  this.params.increment),
+			onDecrement: () => this.onWidgetChange(this._value, -this.params.increment)
 		};
 	}
 
 
 	/**
 	 * Triggered when a value is selected in the spinner.
-	 * 
 	 * @param value The number the spinner was set to.
 	 */
 	private onWidgetChange(value: number, adjustment: number)
@@ -138,36 +150,34 @@ class SpinnerComponent extends Component
 		const widget = this.getWidget<SpinnerWidget>();
 		if (widget.isDisabled)
 		{
-			Log.debug(`(${this._name}) Widget is disabled, no change event triggered.`);
+			Log.debug(`(${this.params.name}) Widget is disabled, no change event triggered.`);
 			return;
 		}
 		value += adjustment;
-		Log.debug(`--->(${this._name}) Try updating ${this._value} -> ${value}, adjustment: ${adjustment}.`);
-
 		this.set(value);
 
-		if (this.onChange)
-			this.onChange(this._value, adjustment);
+		if (this.params.onChange)
+		{
+			this.params.onChange(this._value, adjustment);
+		}
 	}
 
 
 	/** @inheritdoc */
 	protected refreshWidget(widget: SpinnerWidget)
 	{
-		if (this._isActive && this.minimum < this.maximum)
+		if (this._isActive && this.params.minimum < this.params.maximum)
 		{
-			widget.text = (this.format)
-				? this.format(this.value)
+			widget.text = (this.params.format)
+				? this.params.format(this.value)
 				: this._value.toString();
 
-			widget.isDisabled = (this.minimum >= (this.maximum - 1));
+			widget.isDisabled = (this.params.minimum >= (this.params.maximum - 1));
 		}
 		else
 		{
-			widget.text = this.disabledMessage;
+			widget.text = this.params.disabledMessage;
 			widget.isDisabled = true;
 		}
 	}
 }
-
-export default SpinnerComponent;

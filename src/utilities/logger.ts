@@ -1,6 +1,6 @@
 /// <reference path="../../lib/duktape.d.ts" />
-import { isDevelopment } from "../environment";
 
+import Environment from "../environment";
 
 /**
  * The available levels of logging.
@@ -11,7 +11,7 @@ type LogLevel = "debug" | "warning" | "error";
 /**
  * Returns true if Duktape is available, or false if not.
  */
- const isDuktapeAvailable = (typeof Duktape !== 'undefined');
+const isDuktapeAvailable = (typeof Duktape !== 'undefined');
 
 
 /**
@@ -52,7 +52,7 @@ function stacktrace(): string
 /**
  * Enable stack-traces on errors in development mode.
  */
-if (isDevelopment && isDuktapeAvailable)
+if (Environment.isDevelopment && isDuktapeAvailable)
 {
 	Duktape.errCreate = function onError(error) 
 	{
@@ -72,7 +72,7 @@ module Log
 	 */
 	export function debug(message: string)
 	{
-		if (isDevelopment)
+		if (Environment.isDevelopment)
 		{
 			print("debug", message);
 		}
@@ -94,7 +94,7 @@ module Log
 	 */
 	export function error(message: string)
 	{
-		if (isDevelopment)
+		if (Environment.isDevelopment)
 		{
 			message += ("\r\n" + stacktrace());
 		}

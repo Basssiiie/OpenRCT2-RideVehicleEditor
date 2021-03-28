@@ -1,38 +1,60 @@
-import Log from "../helpers/logger";
-import Component from "./component";
+import Log from "../utilities/logger";
+import Control, { ControlParams } from "./control";
+
+
+/**
+ * The parameters for configuring the dropdown.
+ */
+export interface DropdownParams extends ControlParams
+{
+	/**
+	 * Sets the items that will show up in the dropdown menu.
+	 * @default []
+	 */
+	items?: string[];
+
+
+	/**
+	 * Sets the message that will show when the dropdown is not available.
+	 * @default "Not available"
+	 */
+	disabledMessage?: string;
+
+
+	/**
+	 * Automatically disables the dropdown if it has a single item.
+	 * @default true
+	 */
+	disableSingleItem?: boolean;
+
+
+	/**
+	 * Triggers when the selected dropdown item changes.
+	 */
+	onSelect?: (index: number) => void;
+}
 
 
 /**
  * A controller class for a dropdown widget.
  */
-class DropdownComponent extends Component
+export default class DropdownControl extends Control<DropdownParams>
 {
-	/**
-	 * Sets the items that will show up in the dropdown menu.
-	 */
-	items: string[] = [];
-
-
-	/**
-	 * Sets the message that will show when the dropdown is not available.
-	 */
-	disabledMessage: string = "Not available";
-
-
-	/**
-	 * Automatically disables the dropdown if it has a single item.
-	 */
-	disableSingleItem: boolean = true;
-
-
-	/**
-	 * Triggers when the spinner value changes.
-	 */
-	onSelect?: (index: number) => void;
-
-
 	// Silence events only when updating dropdown.
 	private _silenceEvent: boolean = false;
+
+
+	/**
+	 * Create a dropdown control with the specified parameters.
+	 * @param params The parameters for the control.
+	 */
+	constructor(params: DropdownParams)
+	{
+		super(params);
+		params.items ??= [];
+		params.disabledMessage ??= "Not available";
+		params.disableSingleItem ??= true;
+	}
 
 
 	/**
@@ -42,7 +64,7 @@ class DropdownComponent extends Component
 	set(index: number)
 	{
 		const widget = this.getWidget<DropdownWidget>();
-		Log.debug(`(${this._name}) Set to index ${index}.`);
+		Log.debug(`(${this.params.name}) Dropdown selected index changed to ${index}.`);
 
 		if (!this._isActive)
 		{
@@ -55,6 +77,19 @@ class DropdownComponent extends Component
 		this._silenceEvent = false;
 	}
 
+
+	/**
+	 * Creates a new dropdown widget for a window.
+	 */
+	createWidget(): DropdownWidget
+	{
+		return {
+			...this.params,
+			type: "dropdown",
+			selectedIndex: 0,
+			onChange: i => this.onWidgetChange(i)
+		};
+	}
 
 
 	/**
@@ -69,45 +104,28 @@ class DropdownComponent extends Component
 		const widget = this.getWidget<DropdownWidget>();
 		if (widget.isDisabled)
 		{
-			Log.debug(`(${this._name}) Widget is disabled, no change event triggered.`);
+			Log.debug(`(${this.params.name}) Widget is disabled, no change event triggered.`);
 			return;
 		}
-		Log.debug(`--->(${this._name}) Try updating ${widget.selectedIndex} -> ${index}.`);
 
-		if (this.onSelect)
-			this.onSelect(index);
-	}
-
-
-	/**
-	 * Creates a new dropdown widget for a window.
-	 */
-	createWidget(): DropdownWidget
-	{
-		return {
-			...this.description,
-			type: "dropdown",
-			items: this.items,
-			selectedIndex: 0,
-			onChange: i => this.onWidgetChange(i)
-		};
+		if (this.params.onSelect)
+			this.params.onSelect(index);
 	}
 
 
 	/** @inheritdoc */
 	protected refreshWidget(widget: DropdownWidget)
 	{
-		if (this._isActive && this.items && this.items.length > 0)
+		const items = this.params.items;
+		if (this._isActive && items && items.length > 0)
 		{
-			widget.items = this.items;
-			widget.isDisabled = (this.disableSingleItem && this.items.length == 1);
+			widget.items = items;
+			widget.isDisabled = (this._params.disableSingleItem && items.length == 1);
 		}
 		else
 		{
-			widget.items = [this.disabledMessage];
+			widget.items = [ this._params.disabledMessage ];
 			widget.isDisabled = true;
 		}
 	}
 }
-
-export default DropdownComponent;

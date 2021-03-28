@@ -1,5 +1,5 @@
-import Log from "../helpers/logger";
-import Component from "./component";
+import Log from "../utilities/logger";
+import Control, { ControlParams } from "./control";
 
 
 const farAway: CoordsXY = { x: -9000, y: -9000 };
@@ -8,7 +8,7 @@ const farAway: CoordsXY = { x: -9000, y: -9000 };
 /**
  * A controller class for a viewport widget.
  */
-class ViewportComponent extends Component
+export default class ViewportControl extends Control<ControlParams>
 {
 	private _entityId: number = -1;
 	private _updater: (IDisposable | null) = null;
@@ -20,7 +20,7 @@ class ViewportComponent extends Component
 	 */
 	goTo(position: CoordsXY | CoordsXYZ)
 	{
-		Log.debug(`(${this._name}) Jump to position ${position}.`);
+		Log.debug(`(${this.params.name}) Jump to position ${position}.`);
 		this._isActive = true;
 		this._entityId = -1;
 
@@ -37,7 +37,7 @@ class ViewportComponent extends Component
 	 */
 	follow(entityId: number)
 	{
-		Log.debug(`(${this._name}) Start following entity ${entityId}.`);
+		Log.debug(`(${this.params.name}) Start following entity ${entityId}.`);
 
 		this._isActive = true;
 		this._entityId = entityId;
@@ -61,7 +61,7 @@ class ViewportComponent extends Component
 	createWidget(): ViewportWidget
 	{
 		return {
-			...this.description,
+			...this.params,
 			type: "viewport",
 			viewport: <Viewport>{
 				left: farAway.x,
@@ -84,7 +84,7 @@ class ViewportComponent extends Component
 		}
 		else if (this._updater) 
 		{
-			Log.debug(`(${this._name}) Updating has stopped.`);
+			Log.debug(`(${this.params.name}) Updating has stopped.`);
 			this._updater.dispose();
 			this._updater = null;
 
@@ -101,7 +101,7 @@ class ViewportComponent extends Component
 		if (this._entityId == -1)
 		{
 			this.stop();
-			Log.error("Viewport tick update called while there is no entity to follow.");
+			Log.error(`(${this.params.name}) Viewport tick update called while there is no entity to follow.`);
 			return;
 		}
 
@@ -113,5 +113,3 @@ class ViewportComponent extends Component
 		}
 	}
 }
-
-export default ViewportComponent;

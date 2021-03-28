@@ -1,15 +1,10 @@
-import ArrayHelper from "../helpers/arrayHelper";
-import Log from "../helpers/logger";
-import { getRidesInPark, ParkRide, RideTrain, RideVehicle } from "../helpers/ridesInPark";
-import { clamp } from "../helpers/utilityHelpers";
-import VehicleEditorWindow from "../ui/editorWindow";
-
-
-// Records of the last selected ride, train and vehicle, for restoring
-// after the window is reopened again.
-let lastSelectedRideId: number;
-let lastSelectedTrainIndex: number;
-let lastSelectedVehicleIndex: number;
+import ArrayHelper from "../utilities/arrayHelper";
+import Log from "../utilities/logger";
+import Observable from "../utilities/observable";
+import Park, { ParkRide } from "../objects/park";
+import RideTrain from "../objects/rideTrain";
+import RideVehicle from "../objects/rideVehicle";
+import MathHelper from "../utilities/mathHelper";
 
 
 /**
@@ -17,81 +12,57 @@ let lastSelectedVehicleIndex: number;
  */
 export default class VehicleSelector
 {
+	readonly ridesInPark = new Observable<ParkRide[]>();
+	readonly trainsOnRide = new Observable<RideTrain[]>();
+	readonly vehiclesOnTrain = new Observable<RideVehicle[]>();
+
+
 	/**
 	 * Returns the currently selected ride, if any was selected.
 	 */
-	get selectedRide(): (ParkRide | null)
-	{
-		return ArrayHelper.getAtIndex(this._parkRides, this._selectedRideIndex);
-	}
-	// Index into the 'parkRides' array for the selected ride.
-	private _selectedRideIndex: number = -1;
+	readonly ride = new Observable<ParkRide | null>(null);
 
 
 	/**
 	 * Returns the currently selected train, if any was selected.
 	 */
-	get selectedTrain(): (RideTrain | null)
-	{
-		return ArrayHelper.getAtIndex(this._rideTrains, this._selectedTrainIndex);
-	}
-	// Index into the 'rideTrains' array for the selected train.
-	private _selectedTrainIndex: number = -1;
+	readonly train = new Observable<RideTrain | null>(null);
 
 
 	/**
 	 * Returns the currently selected vehicle, if any was selected.
 	 */
-	get selectedVehicle(): (RideVehicle | null)
-	{
-		return ArrayHelper.getAtIndex(this._trainVehicles, this._selectedVehicleIndex);
-	}
-	// Index into the 'trainVehicles' array for the selected vehicle.
-	private _selectedVehicleIndex: number = -1;
+	readonly vehicle = new Observable<RideVehicle | null>(null);
 
 
 	/**
-	 * Triggers when a new vehicle is selected.
+	 * Index into the 'ridesInPark' array for the selected ride.
 	 */
-	onSelect?: (vehicle: RideVehicle | null) => void;
-
-
-	private _parkRides!: ParkRide[];
-	private _rideTrains: (RideTrain[] | null) = null;
-	private _trainVehicles: (RideVehicle[] | null) = null;
+	get rideIndex(): number | null
+	{
+		return this._rideIndex;
+	}
+	private _rideIndex: number | null = null;
 
 
 	/**
-	 * Create a new selector service that updates the specified window.
-	 * 
-	 * @param window A vehicle editor window that should be updated according
-	 * to the items that are selected.
+	 * Returns the currently selected train, if any was selected.
 	 */
-	constructor(readonly window: VehicleEditorWindow)
+	get trainIndex(): number | null
 	{
-		this.reloadRideList();
-
-		// Restore last selected ride, train and vehicle.
-		const rideIndex = ArrayHelper.findIndex(this._parkRides, r => r.rideId === lastSelectedRideId);
-		if (rideIndex !== null)
-		{
-			Log.debug("(selector) Restore previous selection succesfull.");
-			this.window.ridesInParkList.set(rideIndex);
-			this.selectRide(rideIndex, lastSelectedTrainIndex, lastSelectedVehicleIndex);
-		}
-		else
-		{
-			// Not found, select first available ride.
-			Log.debug("(selector) Restore selection failed: ride not found.");
-			this.selectRide(0);
-		}
-
-		window.ridesInParkList.onSelect = (i => this.selectRide(i));
-		window.trainList.onSelect = (i => this.selectTrain(i));
-		window.vehicleList.onSelect = (i => this.selectVehicle(i));
-
-		window.onPickVehicle = (e => this.selectEntity(e));
+		return this._trainIndex;
 	}
+	private _trainIndex: number | null = null;
+
+
+	/**
+	 * Returns the currently selected vehicle, if any was selected.
+	 */
+	get vehicleIndex(): number | null
+	{
+		return this._vehicleIndex;
+	}
+	private _vehicleIndex: number | null = null;
 
 
 	/**
@@ -99,164 +70,155 @@ export default class VehicleSelector
 	 */
 	reloadRideList()
 	{
-		Log.debug("(selector) Reloaded the list of rides in the park.");
-		const currentRideId = this.selectedRide?.rideId;
+		const lastSelectedRide = this.ride.get();
+		Log.debug(`(selector) Reloading the list of rides in the park. (last selected: '${lastSelectedRide?.name}', idx: ${this._rideIndex})`);
 
-		this._parkRides = getRidesInPark();
-		this.window.setRideList(this._parkRides);
+		const rides = Park.getRides();
+		this.ridesInPark.set(rides);
 
-		if (currentRideId && currentRideId !== this.selectedRide?.rideId)
+		if (lastSelectedRide && this._rideIndex !== null)
 		{
-			// Ride index has changed; find the new index.
-			const rideIndex = ArrayHelper.findIndex(this._parkRides, r => r.rideId === currentRideId);
+			const newlySelectedRide = rides[this._rideIndex];
+			if (lastSelectedRide.rideId === newlySelectedRide.rideId)
+			{
+				// Position is still the same in the new list.
+				return;
+			}
 
+			// Ride index has changed; find the new index.
+			const rideIndex = ArrayHelper.findIndex(rides, r => r.rideId === lastSelectedRide.rideId);
 			if (rideIndex === null)
 			{
 				// Not found, reset to ride at index 0.
+				Log.debug(`(selector) Last selected ride not found, reset first in list.`);
 				this.selectRide(0);
 				return;
 			}
 
 			// Only need to update the dropdown, rest of UI needs no refresh.
-			this._selectedRideIndex = rideIndex;
-			this.window.ridesInParkList.set(rideIndex);
+			Log.debug(`(selector) Last selected ride has moved: idx ${this._rideIndex} -> idx ${rideIndex}.`);
+			this._rideIndex = rideIndex;
+			this.ride.set(newlySelectedRide);
 		}
 	}
 
 
 	/**
 	 * Select a ride from the list in the park.
-	 * 
 	 * @param rideIndex The index into the ride list.
 	 * @param trainIndex The index of the train in the train list.
 	 * @param vehicleIndex The index of the vehicle in the vehicle list.
 	 */
 	selectRide(rideIndex: number, trainIndex: number = 0, vehicleIndex: number = 0)
 	{
-		if (this._parkRides && this._parkRides.length > 0)
-		{
-			this._selectedRideIndex = rideIndex = clamp(rideIndex, 0, this._parkRides.length);
+		const ridesInPark = this.ridesInPark.get();
 
-			const parkRide = this._parkRides[rideIndex];
-			Log.debug(`(selector) Selected ride ${parkRide.name} (index: ${rideIndex})`);
-
-			this._rideTrains = parkRide.getTrains();
-			this.selectTrain(trainIndex, vehicleIndex);
-			
-			this.window.setTrainList(this._rideTrains);
-			this.window.trainList.set(this._selectedTrainIndex);
-			lastSelectedRideId = parkRide.rideId;
-		}
-		else
+		if (ridesInPark.length === 0)
 		{
-			Log.debug("(selector) This park has no rides.");
-			this._selectedRideIndex = -1;
+			Log.debug("(selector) Cannot select ride, this park has no rides.");
+			this._rideIndex = null;
+			this.ride.set(null);
 			this.deselect();
+			return;
 		}
+
+		this._rideIndex = rideIndex = MathHelper.clamp(rideIndex, 0, ridesInPark.length);
+
+		const ride = this.ridesInPark.get()[rideIndex];
+		Log.debug(`(selector) Selected ride '${ride.name}' (index: ${rideIndex}, range: 0<->${ridesInPark.length}))`);
+		this.ride.set(ride);
+
+		this.trainsOnRide.set(ride.getTrains());
+		this.selectTrain(trainIndex, vehicleIndex);
 	}
 
 
 	/**
 	 * Selects a train from the list of trains of the selected ride.
-	 * 
 	 * @param trainIndex The index of the train in the train list.
 	 * @param vehicleIndex The index of the vehicle in the vehicle list.
 	 */
 	selectTrain(trainIndex: number, vehicleIndex: number = 0)
 	{
-		Log.debug(`(selector) Selected train at index: ${trainIndex}`);
+		const trains = this.trainsOnRide.get();
 
-		if (this._rideTrains && this._rideTrains.length > 0)
+		if (trains.length === 0)
 		{
-			this._selectedTrainIndex = trainIndex = clamp(trainIndex, 0, this._rideTrains.length);
-
-			const train = this._rideTrains[trainIndex];
-			this._trainVehicles = train.getVehicles();
-
-			this.selectVehicle(vehicleIndex);
-
-			this.window.setVehicleList(this._trainVehicles);
-			this.window.vehicleList.set(this._selectedVehicleIndex);			
-			lastSelectedTrainIndex = trainIndex;
-		}
-		else
-		{
-			Log.debug("(selector) This ride has no trains.");
+			Log.debug("(selector) Cannot select train, this ride has no trains.");
 			this.deselect();
+			return;
 		}
+
+		this._trainIndex = trainIndex = MathHelper.clamp(trainIndex, 0, trains.length);
+
+		const train = trains[trainIndex];
+		Log.debug(`(selector) Selected train at index ${trainIndex} (range: 0<->${trains.length}).`);
+		this.train.set(train);
+
+		this.vehiclesOnTrain.set(train.getVehicles());
+		this.selectVehicle(vehicleIndex);
 	}
 
 
 	/**
 	 * Selects a vehicle from the list of vehicles of the selected train.
-	 * 
 	 * @param vehicleIndex The index of the vehicle in the vehicle list.
 	 */
 	selectVehicle(vehicleIndex: number)
 	{
-		Log.debug(`(selector) Selected vehicle at index ${vehicleIndex}`);
-		if (this._trainVehicles && this._trainVehicles.length > 0)
-		{
-			this._selectedVehicleIndex = vehicleIndex = clamp(vehicleIndex, 0, this._trainVehicles.length);
+		const vehicles = this.vehiclesOnTrain.get();
 
-			const vehicle = this._trainVehicles[vehicleIndex];
-			if (this.onSelect)
-			{
-				this.onSelect(vehicle);
-			}
-			
-			lastSelectedVehicleIndex = vehicleIndex;
-		}
-		else
+		if (vehicles.length === 0)
 		{
 			Log.debug("(selector) This train has no vehicles.");
 			this.deselect();
+			return;
 		}
+
+		this._vehicleIndex = vehicleIndex = MathHelper.clamp(vehicleIndex, 0, vehicles.length);
+
+		const vehicle = vehicles[vehicleIndex];
+		Log.debug(`(selector) Selected vehicle at index ${vehicleIndex}. (range: 0<->${vehicles.length})`);
+		this.vehicle.set(vehicle);
 	}
 
 
 	/**
 	 * Selects a vehicle from an entity id.
-	 * @param entityId 
-	 * @returns 
+	 * @param entityId The id of the entity in the game.
 	 */
 	selectEntity(entityId: number)
 	{
 		const entity = map.getEntity(entityId);
 		if (!entity || entity.type !== "car")
 		{
-			Log.debug(`(selector) Invalid entity selected: ${entityId}`);
+			Log.debug(`(selector) Invalid entity id selected: ${entityId}.`);
 			return;
 		}
 
 		const car = entity as Car;
 		const rideId = car.ride;
-		
-		const selectedRideIndex = ArrayHelper.findIndex(this._parkRides, r => r.rideId === rideId);
-		if (selectedRideIndex === null)
+
+		const carRideIndex = ArrayHelper.findIndex(this.ridesInPark.get(), r => r.rideId === rideId);
+		if (carRideIndex === null)
 		{
-			Log.debug(`(selector) Could not find ride id ${selectedRideIndex} for selected entity.`);
+			Log.debug(`(selector) Could not find ride id ${carRideIndex} for selected entity id ${entityId}.`);
 			return;
 		}
 
-		this.selectRide(selectedRideIndex);
-		this.window.ridesInParkList.set(this._selectedRideIndex);
+		this.selectRide(carRideIndex);
 
-		if (this._rideTrains)
+		let trainIndex = 0, vehicleIndex: number | null = null;
+		for (let train of this.trainsOnRide.get())
 		{
-			let trainIndex = 0, vehicleIndex: number | null = null;
-			for (let train of this._rideTrains)
+			vehicleIndex = train.getCarIndex(entityId);
+			if (vehicleIndex !== null)
 			{
-				vehicleIndex = train.getCarIndex(entityId);
-				if (vehicleIndex !== null)
-				{
-					this.selectTrain(trainIndex, vehicleIndex);
-					this.window.trainList.set(this._selectedTrainIndex);
-					break;
-				}
-				trainIndex++;
+				this.selectTrain(trainIndex, vehicleIndex);
+				break;
 			}
-		}		
+			trainIndex++;
+		}
 	}
 
 
@@ -265,63 +227,15 @@ export default class VehicleSelector
 	 */
 	deselect()
 	{
-		this._rideTrains = null;
-		this._trainVehicles = null;
+		Log.debug(`(selector) Deselect vehicle.`);
 
-		this.window.setTrainList(null);
-		this.window.setVehicleList(null);
-		this.window.disableEditorControls();
+		this.trainsOnRide.set([]);
+		this.vehiclesOnTrain.set([]);
 
-		if (this.onSelect)
-		{
-			this.onSelect(null);
-		}
-	}
+		this._trainIndex = null;
+		this._vehicleIndex = null;
 
-
-	/**
-	 * Refreshes the currently selected ride, train and vehicle.
-	 */
-	refresh()
-	{
-		const ride = this.selectedRide;
-
-		if (!ride)
-		{
-			Log.debug(`(selector) Reselection failed; no ride selected.`);
-			return;
-		}
-
-		Log.debug(`(selector) Reselect current ride '${ride.name}'.`);
-
-		let trainIndex = this._selectedTrainIndex;
-		let vehicleIndex = this._selectedVehicleIndex;
-
-		this._rideTrains = ride.getTrains();
-
-		// Check if this train still exists.
-		if (!ArrayHelper.isValidIndex(this._rideTrains, trainIndex))
-		{
-			Log.debug(`(selector) Reselection failed; selected train ${trainIndex} is gone, set to train 0.`);
-			trainIndex = 0;
-		}
-
-		this.window.setTrainList(this._rideTrains);
-		this.window.trainList.set(trainIndex);
-
-		const train = this._rideTrains[trainIndex];
-		this._trainVehicles = train.getVehicles();
-
-		// Check if this vehicle still exists.
-		if (!ArrayHelper.isValidIndex(this._trainVehicles, vehicleIndex))
-		{
-			Log.debug(`(selector) Reselection failed; selected vehicle ${vehicleIndex} is gone, set to vehicle 0.`);
-			vehicleIndex = 0;
-		}
-
-		this.window.setVehicleList(this._trainVehicles);
-		this.window.vehicleList.set(vehicleIndex);
-
-		this.selectVehicle(vehicleIndex);
+		this.train.set(null);
+		this.vehicle.set(null);
 	}
 }

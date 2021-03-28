@@ -1,36 +1,45 @@
-import Component from "./component";
-import WidgetDesc from "./widgetDesc";
+import DropdownControl, { DropdownParams } from "./dropdown";
 
 
-type DropdownButtonAction = 
-{ 
-	text: string, 
-	onClick: () => void 
+/**
+ * A single selectable option in the dropdown button.
+ */
+export interface DropdownButtonAction
+{
+	text: string,
+	onClick: () => void
+}
+
+
+/**
+ * The parameters for configuring the dropdown button.
+ */
+export interface DropdownButtonParams extends DropdownParams
+{
+	/**
+	 * All the available buttons in this dropdown button.
+	 */
+	buttons: DropdownButtonAction[];
 }
 
 
 /**
  * A dropdown with a button on the side.
  */
-class DropdownButtonComponent extends Component
+export default class DropdownButtonComponent extends DropdownControl
 {
-	/**
-	 * All the available buttons in this dropdown button.
-	 */
-	buttons: DropdownButtonAction[] = [];
+	// The currently selected index into the button list.
+	private _selectedIndex: number = 0;
 
 
 	/**
-	 * The currently selected index into the button list.
+	 * Create a dropdown button control with the specified parameters.
+	 * @param params The parameters for the control.
 	 */
-	selectedIndex: number = 0;
-
-
-	constructor(description: WidgetDesc)
+	constructor(params: DropdownButtonParams)
 	{
-		super({
-			...description,
-		});
+		super(params);
+		params.items = params.buttons.map(b => b.text);
 	}
 
 
@@ -39,21 +48,20 @@ class DropdownButtonComponent extends Component
 	 */
 	createWidgets(): Widget[]
 	{
+		const params = this.params as DropdownButtonParams;
+		const dropdown = super.createWidget();
+		dropdown.items = params.buttons?.map(b => b.text);
+
 		return [
+			dropdown,
 			{
-				...this.description,
-				type: "dropdown",
-				name: (this.description.name + "-dropdown"),
-				items: this.buttons.map(b => b.text),
-				onChange: v => this.onDropdownChange(v),
-			},
-			{
-				...this.description,
+				...params,
 				type: "button",
-				x: (this.description.x + 1),
-				y: (this.description.y + 1),
-				width: (this.description.width - 13),
-				height: (this.description.height - 2),
+				name: (params.name + "-button"),
+				x: (params.x + 1),
+				y: (params.y + 1),
+				width: (params.width - 13),
+				height: (params.height - 2),
 				onClick: () => this.onButtonClick(),
 			}
 		];
@@ -66,26 +74,41 @@ class DropdownButtonComponent extends Component
 	 */
 	private onButtonClick()
 	{
-		this.buttons[this.selectedIndex]?.onClick();
-	}
-
-
-	/**
-	 * Triggered when a new button is selected from the dropdown.
-	 * @param index The index of the selected button.
-	 */
-	private onDropdownChange(index: number)
-	{
-		this.selectedIndex = index;
-		this.refresh();
+		const params = this.params as DropdownButtonParams;
+		params.buttons[this._selectedIndex]?.onClick();
 	}
 
 
 	/** @inheritdoc */
-	protected refreshWidget(widget: ButtonWidget): void
+	protected onWidgetChange(index: number)
 	{
-		widget.text = this.buttons[this.selectedIndex].text;
+		super.onWidgetChange(index);
+		this._selectedIndex = index;
+		this.refreshButton();
+	}
+
+
+	/** @inheritdoc */
+	protected refreshWidget(widget: DropdownWidget): void
+	{
+		super.refreshWidget(widget);
+		this.refreshButton();
+	}
+
+
+	/**
+	 * Refreshes just the state of the button, not the dropdown.
+	 */
+	private refreshButton()
+	{
+		const dropdown = this.getWidget<DropdownWidget>();
+		const button = this._window?.findWidget<ButtonWidget>(this.params.name + "-button");
+		if (button)
+		{
+			button.isDisabled = dropdown.isDisabled;
+
+			const params = this.params as DropdownButtonParams;
+			button.text = params.buttons[this._selectedIndex].text;
+		}
 	}
 }
-
-export default DropdownButtonComponent;

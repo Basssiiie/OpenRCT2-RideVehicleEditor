@@ -1,9 +1,10 @@
-import ArrayHelper from "../helpers/arrayHelper";
-import Log from "../helpers/logger";
-import { RideVehicle } from "../helpers/ridesInPark";
-import { getAvailableRideTypes, RideType } from "../helpers/rideTypes";
-import VehicleEditorWindow from "../ui/editorWindow";
+import ArrayHelper from "../utilities/arrayHelper";
+import Log from "../utilities/logger";
+import Observable from "../utilities/observable";
+import RideType from "../objects/rideType";
 import VehicleSelector from "./selector";
+import RideVehicle from "../objects/rideVehicle";
+import MathHelper from "../utilities/mathHelper";
 
 
 // The distance of a single step for moving the vehicle.
@@ -15,7 +16,7 @@ const moveDistanceStep = 9_000;
  */
 export interface VehicleSettings
 {
-	rideIndex: number;
+	rideTypeId: number;
 	variant: number;
 	seats: number;
 	mass: number;
@@ -29,140 +30,98 @@ export interface VehicleSettings
  */
 export default class VehicleEditor
 {
-	private _rideTypes!: RideType[];
-	private _selectedVehicle: (RideVehicle | null) = null;
-	private _selectedTypeIndex: number = 0;
+	readonly rideTypeList = new Observable<RideType[]>();
+	readonly rideTypeIndex = new Observable<number>();
+
+	readonly variant = new Observable<number>();
+	readonly trackProgress = new Observable<number>();
+	readonly seats = new Observable<number>();
+	readonly mass = new Observable<number>();
+	readonly poweredAcceleration = new Observable<number>();
+	readonly poweredMaxSpeed = new Observable<number>();
+
+
+	/**
+	 * Gets the selected ride type.
+	 */
+	get rideType(): RideType
+	{
+		return this.rideTypeList.get()[this.rideTypeIndex.get()];
+	}
+
+
+	private _selector: VehicleSelector;
 
 
 	/**
 	 * Create a new vehicle editor service that can edit the selected vehicle.
-	 * 
-	 * @param window A vehicle editor window that should be updated according
-	 * to how the vehicle is edited.
+	 * @param selector The service that specifies which vehicle is currently selected.
 	 */
-	constructor(selector: VehicleSelector, readonly window: VehicleEditorWindow)
+	constructor(selector: VehicleSelector)
 	{
-		this.reloadRideTypes();
+		this._selector = selector;
 
-		window.rideTypeList.onSelect = (v => this.setRideType(v));
-		window.variantSpinner.onChange = (v => this.setVehicleVariant(v));
-		window.trackProgressSpinner.onChange = ((_, i) => this.moveVehicleRelativeDistance(i));
-		window.seatCountSpinner.onChange = (v => this.setVehicleSeatCount(v));
-		window.powAccelerationSpinner.onChange = (v => this.setVehiclePoweredAcceleration(v));
-		window.powMaxSpeedSpinner.onChange = (v => this.setVehiclePoweredMaximumSpeed(v));
-		window.massSpinner.onChange = (v => this.setVehicleMass(v));
-		window.onCopyVehicle = (() => this.getVehicleSettings());
-		window.onPasteVehicle = (s => this.applyVehicleSettings(s));
-		window.onLocateVehicle = (() => this.scrollToCar());
-
-		const selectedVehicle = selector.selectedVehicle;
-		if (selectedVehicle)
+		// Update the editor when the selector service selects a new vehicle.
+		selector.vehicle.subscribe(v =>
 		{
-			this.setVehicle(selectedVehicle);
-		}
-
-		selector.onSelect = (v => (v) ? this.setVehicle(v) : this.deselect());
-	}
-
-
-	/**
-	 * Reload the list of ride types.
-	 */
-	reloadRideTypes()
-	{
-		this._rideTypes = getAvailableRideTypes();
-		this.window.setRideTypeList(this._rideTypes);
-	}
-
-
-	/**
-	 * Deselects the current vehicle.
-	 */
-	deselect()
-	{
-		this._selectedVehicle = null;
-	}
-
-
-	/**
-	 * Sets the vehicle to edit in this editor.
-	 * 
-	 * @param vehicle The vehicle to edit.
-	 */
-	setVehicle(vehicle: RideVehicle)
-	{
-		Log.debug(`(editor) Vehicle set, entity id: ${vehicle.entityId}`);
-
-		this._selectedVehicle = vehicle;
-		const car = this.getSelectedCar();
-
-		if (car)
-		{
-			// Viewport
-			this.window.viewport.follow(vehicle.entityId);
-
-			// Ride type
-			const rideTypeId = car.rideObject;
-			const rideTypeIndex = ArrayHelper.findIndex(this._rideTypes, t => t.rideIndex === rideTypeId);
-			if (rideTypeIndex !== null)
+			if (v !== null)
 			{
-				this._selectedTypeIndex = rideTypeIndex;
-				this.window.rideTypeList.set(this._selectedTypeIndex);
+				this.setVehicle(v);
 			}
-
-			// Vehicle type properties
-			this.refreshProperties(car);
-		}
+		});
 	}
 
 
 	/**
-	 * Sets the ride type for this vehicle.
-	 * 
+	 * Sets the ride type for this vehicle. Resets all other properties
+	 * to their default values for that type.
 	 * @param rideTypeIndex The index of the ride type in the ride type list.
 	 */
 	setRideType(rideTypeIndex: number)
 	{
-		this._selectedTypeIndex = rideTypeIndex;
+		const rideTypes = this.rideTypeList.get();
+
+		rideTypeIndex = MathHelper.clamp(rideTypeIndex, 0, rideTypes.length);
+		this.rideTypeIndex.set(rideTypeIndex);
+		this.variant.set(0);
 
 		const currentCar = this.getSelectedCar();
 		if (currentCar)
 		{
-			const rideType = this.getSelectedRideType();
+			const rideType = this.rideType;
 
 			Log.debug(`(editor) Set vehicle ride type to: ${rideType.name} (index: ${rideTypeIndex})`);
-			currentCar.rideObject = rideType.rideIndex;
+			currentCar.rideObject = rideType.id;
 			currentCar.vehicleObject = 0;
 
-			this.setPropertiesToDefaultOfType(currentCar, rideType, 0);
+			this.setRideTypeDefaults(currentCar, rideType, 0);
 		}
 	}
 
 
 	/**
 	 * Sets the vehicle sprite variant. (e.g. locomotive, tender or passenger car)
-	 * 
 	 * @param variantIndex The index into the vehicle sprite list.
 	 */
-	setVehicleVariant(variantIndex: number)
+	setVariant(variantIndex: number)
 	{
 		const currentCar = this.getSelectedCar();
 		if (currentCar)
 		{
 			Log.debug(`(editor) Set vehicle variant index to: ${variantIndex}.`);
 			currentCar.vehicleObject = variantIndex;
+			this.variant.set(variantIndex);
 
-			this.setPropertiesToDefaultOfType(currentCar, this.getSelectedRideType(), variantIndex);
+			this.setRideTypeDefaults(currentCar, this.rideType, variantIndex);
 		}
 	}
 
 
 	/**
 	 * Moves the vehicle a relative distance along the track.
-	 * 
 	 * @param distance The amount of distance in steps of about 8 to 14k.
 	 */
-	moveVehicleRelativeDistance(distance: number): void
+	move(distance: number): void
 	{
 		const currentCar = this.getSelectedCar();
 		if (currentCar)
@@ -171,10 +130,7 @@ export default class VehicleEditor
 			currentCar.travelBy(distance * moveDistanceStep);
 
 			const recalculatedProgress = currentCar.trackProgress;
-			this.window.trackProgressSpinner.set(recalculatedProgress);
-
-			// If the game is paused, the viewport will not update automatically.
-			this.window.viewport.refresh();
+			this.trackProgress.set(recalculatedProgress);
 		}
 	}
 
@@ -183,13 +139,14 @@ export default class VehicleEditor
 	 * Sets the maximum number of seats for this vehicle.
 	 * @param numberOfSeats The amount of seats on this vehicle.
 	 */
-	setVehicleSeatCount(numberOfSeats: number)
+	setSeatCount(numberOfSeats: number)
 	{
 		const currentCar = this.getSelectedCar();
 		if (currentCar)
 		{
 			Log.debug(`(editor) Set vehicle max seat count to: ${numberOfSeats}.`);
 			currentCar.numSeats = numberOfSeats;
+			this.seats.set(numberOfSeats);
 		}
 	}
 
@@ -198,13 +155,14 @@ export default class VehicleEditor
 	 * Sets the powered acceleration for this vehicle.
 	 * @param power The amount of powered acceleration for this vehicle.
 	 */
-	setVehiclePoweredAcceleration(power: number)
+	setPoweredAcceleration(power: number)
 	{
 		const currentCar = this.getSelectedCar();
 		if (currentCar)
 		{
 			Log.debug(`(editor) Set vehicle powered acceleration to: ${power}.`);
 			currentCar.poweredAcceleration = power;
+			this.poweredAcceleration.set(power);
 		}
 	}
 
@@ -213,13 +171,14 @@ export default class VehicleEditor
 	 * Sets the powered maximum speed for this vehicle.
 	 * @param maximumSpeed The powered maximum speed for this vehicle.
 	 */
-	setVehiclePoweredMaximumSpeed(maximumSpeed: number)
+	setPoweredMaximumSpeed(maximumSpeed: number)
 	{
 		const currentCar = this.getSelectedCar();
 		if (currentCar)
 		{
 			Log.debug(`(editor) Set vehicle powered acceleration to: ${maximumSpeed}.`);
 			currentCar.poweredMaxSpeed = maximumSpeed;
+			this.poweredMaxSpeed.set(maximumSpeed);
 		}
 	}
 
@@ -228,40 +187,54 @@ export default class VehicleEditor
 	 * Sets the mass for this vehicle.
 	 * @param mass The amount of mass of this vehicle.
 	 */
-	setVehicleMass(mass: number)
+	setMass(mass: number)
 	{
 		const currentCar = this.getSelectedCar();
 		if (currentCar)
 		{
 			Log.debug(`(editor) Set vehicle mass to: ${mass}.`);
 			currentCar.mass = mass;
+			this.mass.set(mass);
 		}
 	}
 
-	
+
+	/**
+	 * Scroll the main viewport to the currently selected vehicle.
+	 */
+	locate()
+	{
+		const car = this.getSelectedCar();
+		if (car)
+		{
+			ui.mainViewport.scrollTo({ x: car.x, y: car.y, z: car.z });
+		}
+	}
+
+
 	/**
 	 * Gets the settings of the currently selected vehicle.
 	 */
-	getVehicleSettings(): VehicleSettings | null
+	getSettings(): VehicleSettings | null
 	{
-		const currentCar = this.getSelectedCar();
-		if (!currentCar)
+		const vehicle = this._selector.vehicle.get();
+		if (vehicle === null)
 		{
 			Log.debug(`(editor) No car selected to get settings from.`);
 			return null;
 		}
 
 		const settings: VehicleSettings = {
-			rideIndex: this.getSelectedRideType().rideIndex,
-			variant: this.window.variantSpinner.value,
-			seats: this.window.seatCountSpinner.value,
-			mass:  this.window.massSpinner.value,
+			rideTypeId: this.rideType.id,
+			variant: this.variant.get(),
+			seats: this.seats.get(),
+			mass:  this.mass.get(),
 		}
 
-		if (this.isCarPowered(currentCar))
+		if (vehicle.isPowered())
 		{
-			settings.poweredAcceleration = this.window.powAccelerationSpinner.value;
-			settings.poweredMaxSpeed = this.window.powMaxSpeedSpinner.value;
+			settings.poweredAcceleration = this.poweredAcceleration.get();
+			settings.poweredMaxSpeed = this.poweredMaxSpeed.get();
 		}
 		return settings;
 	}
@@ -269,96 +242,178 @@ export default class VehicleEditor
 
 	/**
 	 * Applies all the specified settings to the currently selected vehicle.
+	 * @param settings Object with the specified settings.
 	 */
-	applyVehicleSettings(settings: VehicleSettings): void
+	applySettings(settings: VehicleSettings): void
 	{
-		const selectedCar = this.getSelectedCar();
-		if (selectedCar === null)
+		const vehicle = this._selector.vehicle.get();
+		let car;
+
+		if (vehicle === null || !(car = vehicle.getCar()))
 		{
-			Log.debug(`No car was selected, apply settings has failed.`);
+			Log.debug(`(editor) No car was selected, apply settings has failed.`);
 			return;
 		}
 
-		const rideType = ArrayHelper.findIndex(this._rideTypes, t => t.rideIndex === settings.rideIndex);
-		if (rideType !== null)
-		{
-			this._selectedTypeIndex = rideType;
-			selectedCar.rideObject = this.getSelectedRideType().rideIndex;
-			
-			this.window.rideTypeList.set(this._selectedTypeIndex);
-		}
-
-		selectedCar.vehicleObject = settings.variant;
-		selectedCar.numSeats = settings.seats;
-		selectedCar.mass = settings.mass;
-
-		if (this.isCarPowered(selectedCar))
-		{
-			if (settings.poweredAcceleration !== undefined)
-			{
-				selectedCar.poweredAcceleration = settings.poweredAcceleration;
-			}
-			if (settings.poweredMaxSpeed !== undefined)
-			{
-				selectedCar.poweredMaxSpeed = settings.poweredMaxSpeed;
-			}
-		}
-		this.refreshProperties(selectedCar);
+		this.applySettingsToCar(car, settings, true);
 	}
 
 
 	/**
-	 * Refreshes the vehicle properties related to its type.
+	 * Applies all the specified settings to a range of vehicles on the currently selected train.
+	 * @param settings Object with the specified settings.
+	 * @param startIndex Index into the vehicle array of where to start applying. (inclusive)
+	 * @param endIndex Optional index into the vehicle array of where to stop applying. (exclusive)
+	 * If not specified, then it will apply until the end of the train.
 	 */
-	private refreshProperties(car: Car)
+	applySettingsToCurrentTrain(settings: VehicleSettings, startIndex: number, endIndex?: number): void
 	{
-		const currentType = this.getSelectedRideType();
-		const isPowered = this.isCarPowered(car);
+		const vehicles = this._selector.vehiclesOnTrain.get();
+		endIndex ??= vehicles.length;
 
-		// Variant
-		const variant = this.window.variantSpinner;
-		variant.maximum = currentType.variantCount;
-		variant.set(car.vehicleObject);
-
-		// Track progress
-		const progress = this.window.trackProgressSpinner;
-		progress.set(car.trackProgress);
-
-		// Number of seats
-		const seats = this.window.seatCountSpinner;
-		seats.set(car.numSeats);
-
-		// Mass
-		const mass = this.window.massSpinner;
-		mass.set(car.mass);
-
-		// Powered acceleration & maximum speed
-		const poweredAcceleration = this.window.powAccelerationSpinner;
-		const poweredMaxSpeed = this.window.powMaxSpeedSpinner;
-		if (isPowered)
+		for (let i = startIndex; i < endIndex; i++)
 		{
-			poweredAcceleration.set(car.poweredAcceleration);
-			poweredMaxSpeed.set(car.poweredMaxSpeed);
+			const vehicle = vehicles[i];
+			let car = vehicle.getCar();
+
+			if (!car)
+			{
+				Log.debug(`(editor) Train is missing car for vehicle index ${i}, stopping apply.`);
+				return;
+			}
+
+			this.applySettingsToCar(car, settings, false);
 		}
-		else
+	}
+
+
+	/**
+	 * Applies all the specified settings to all trains on the selected ride.
+	 * @param settings Object with the specified settings.
+	 */
+	applySettingsToAllTrains(settings: VehicleSettings): void
+	{
+		const trains = this._selector.trainsOnRide.get();
+
+		for (let i = 0; i < trains.length; i++)
 		{
-			poweredAcceleration.active(false);
-			poweredMaxSpeed.active(false);
+			if (i === this._selector.trainIndex)
+			{
+				// Fast path for currently selected train.
+				this.applySettingsToCurrentTrain(settings, 0);
+				continue;
+			}
+
+			const train = trains[i];
+			const vehicles = train.getVehicles();
+
+			for (let vehicle of vehicles)
+			{
+				this.applySettingsToCar(vehicle.getCar(), settings, false);
+			}
+		}
+	}
+
+
+	/**
+	 * Internal function that applies all vehicle settings to the specified car.
+	 */
+	private applySettingsToCar(car: Car, settings: VehicleSettings, updateObservables: boolean)
+	{
+		const rideTypes = this.rideTypeList.get();
+		const rideTypeIdx = ArrayHelper.findIndex(rideTypes, t => t.id === settings.rideTypeId);
+
+		if (rideTypeIdx !== null)
+		{
+			car.rideObject = rideTypes[rideTypeIdx].id;
+
+			if (updateObservables)
+			{
+				this.rideTypeIndex.set(rideTypeIdx);
+			}
 		}
 
-		Log.debug(`(editor) Properties refreshed; variant ${variant.value}/${variant.maximum}; seats: ${seats.value}, powered: ${isPowered}, power: ${poweredAcceleration.value}/${poweredMaxSpeed.value}`);
+		car.vehicleObject = settings.variant;
+		car.numSeats = settings.seats;
+		car.mass = settings.mass;
+
+		if (updateObservables)
+		{
+			this.variant.set(settings.variant);
+			this.seats.set(settings.seats);
+			this.mass.set(settings.mass);
+		}
+
+		if (RideVehicle.isPowered(car))
+		{
+			if (settings.poweredAcceleration !== undefined)
+			{
+				car.poweredAcceleration = settings.poweredAcceleration;
+				if (updateObservables)
+				{
+					this.poweredAcceleration.set(settings.poweredAcceleration);
+				}
+			}
+			if (settings.poweredMaxSpeed !== undefined)
+			{
+				car.poweredMaxSpeed = settings.poweredMaxSpeed;
+				if (updateObservables)
+				{
+					this.poweredMaxSpeed.set(settings.poweredMaxSpeed);
+				}
+			}
+		}
+	}
+
+
+	/**
+	 * Sets the vehicle to edit in this editor.
+	 * @param vehicle The vehicle to edit.
+	 */
+	private setVehicle(vehicle: RideVehicle)
+	{
+		let rideTypes = this.rideTypeList.get();
+		if (!rideTypes)
+		{
+			rideTypes = RideType.getAvailableTypes();
+			this.rideTypeList.set(rideTypes);
+		}
+
+		Log.debug(`(editor) Vehicle set, entity id: ${vehicle.entityId}`);
+
+		const car = this.getSelectedCar();
+		if (car)
+		{
+			// Ride type
+			const rideTypeId = car.rideObject;
+			const rideTypeIndex = ArrayHelper.findIndex(rideTypes, t => t.id === rideTypeId);
+			if (rideTypeIndex !== null)
+			{
+				this.rideTypeIndex.set(rideTypeIndex);
+			}
+
+			this.variant.set(car.vehicleObject);
+			this.trackProgress.set(car.trackProgress);
+			this.seats.set(car.numSeats);
+			this.mass.set(car.mass);
+
+			if (RideVehicle.isPowered(car))
+			{
+				this.poweredAcceleration.set(car.poweredAcceleration);
+				this.poweredMaxSpeed.set(car.poweredMaxSpeed);
+			}
+		}
 	}
 
 
 	/**
 	 * Sets the properties of the specified car to the default properties of the
 	 * specified ride type.
-	 * 
 	 * @param car The car to modify the properties of.
 	 * @param rideType The ride type.
 	 * @param variant The vehicle variant to take the properties from.
 	 */
-	private setPropertiesToDefaultOfType(car: Car, rideType: RideType, variant: number)
+	private setRideTypeDefaults(car: Car, rideType: RideType, variant: number)
 	{
 		Log.debug("(editor) All car properties have been reset to the default value.")
 
@@ -366,9 +421,16 @@ export default class VehicleEditor
 		const rideObject = rideType.getDefinition();
 		const baseVehicle = rideObject.vehicles[variant];
 
-		car.numSeats = baseVehicle.numSeats;
-		car.poweredAcceleration = baseVehicle.poweredAcceleration;
-		car.poweredMaxSpeed = baseVehicle.poweredMaxSpeed;
+		const seats = baseVehicle.numSeats;
+		const powAcceleration = baseVehicle.poweredAcceleration;
+		const powMaxSpeed = baseVehicle.poweredMaxSpeed;
+		car.numSeats = seats;
+		car.poweredAcceleration = powAcceleration;
+		car.poweredMaxSpeed = powMaxSpeed;
+		this.variant.get();
+		this.seats.set(seats)
+		this.poweredAcceleration.set(powAcceleration);
+		this.poweredMaxSpeed.set(powMaxSpeed);
 
 		// Recalculate mass with peeps.
 		let newTotalMass = baseVehicle.carMass;
@@ -377,26 +439,15 @@ export default class VehicleEditor
 			const peepId = car.peeps[i];
 			if (peepId != null)
 			{
-				const peep = map.getEntity(peepId) as Guest;
-				if (peep)
+				const guest = map.getEntity(peepId) as Guest;
+				if (guest)
 				{
-					newTotalMass += peep.mass;
+					newTotalMass += guest.mass;
 				}
 			}
 		}
 		car.mass = newTotalMass;
-
-		// Update properties
-		this.refreshProperties(car);
-	}
-
-
-	/**
-	 * Gets the selected ride type.
-	 */
-	private getSelectedRideType(): RideType
-	{
-		return this._rideTypes[this._selectedTypeIndex];
+		this.mass.set(newTotalMass);
 	}
 
 
@@ -405,7 +456,7 @@ export default class VehicleEditor
 	 */
 	private getSelectedCar(): Car | null
 	{
-		const vehicle = this._selectedVehicle;
+		const vehicle = this._selector.vehicle.get();
 
 		if (!vehicle)
 			throw new Error("(editor) There is no vehicle selected.");
@@ -414,41 +465,8 @@ export default class VehicleEditor
 		if (!car)
 		{
 			Log.debug("(editor) Selected vehicle does not exist anymore.");
-
-			this.deselect();
-			this.window.disableEditorControls();
 			return null;
 		}
 		return car;
-	}
-
-
-	/**
-	 * Returns true if this car does use powered acceleration.
-	 * Currently not all vehicle types support this property in
-	 * the openrct2 source code.
-	 *
-	 * @param car The car to check if it is powered.
-	 */
-	private isCarPowered(car: Car): boolean
-	{
-		const rideObject = context.getObject("ride", car.rideObject);
-		const vehicleObject = rideObject.vehicles[car.vehicleObject];
-
-		// 'VEHICLE_ENTRY_FLAG_POWERED' is required.
-		return ((vehicleObject.flags & (1 << 19)) != 0);
-	}
-
-
-	/**
-	 * Scroll the main viewport to the currently selected vehicle.
-	 */
-	private scrollToCar()
-	{
-		const car = this.getSelectedCar();
-		if (car)
-		{
-			ui.mainViewport.scrollTo({ x: car.x, y: car.y, z: car.z });
-		}
 	}
 }

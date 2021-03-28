@@ -1,60 +1,11 @@
-import Log from "./logger";
-
-/**
- * Gets a list of all rides in the park.
- */
-export function getRidesInPark(): ParkRide[]
-{
-	return map
-		.rides
-		.filter(r => r.classification == "ride")
-		.map(r => new ParkRide(r.id, r.name))
-		.sort((a, b) => a.name.localeCompare(b.name));
-}
+import Log from "../utilities/logger";
+import RideVehicle from "./rideVehicle";
 
 
 /**
- * Represents a ride in the park.
+ * Represents a train with one or more vehicles on a ride in the park.
  */
-export class ParkRide
-{
-	/**
-	 * @param index Gets the id of this ride in the current park.
-	 * @param name Gets the name of the ride.
-	 */
-	constructor(
-		readonly rideId: number,
-		readonly name: string
-	) { }
-
-
-	/**
-	 * Gets the associated ride data from the game.
-	 */
-	getRide(): Ride
-	{
-		return map.getRide(this.rideId);
-	}
-
-
-	/**
-	 * Get all trains on this ride.
-	 */
-	getTrains(): RideTrain[]
-	{
-		const ride = this.getRide();
-
-		return ride
-			.vehicles
-			.map((r, i) => new RideTrain(i, r));
-	}
-}
-
-
-/**
- * Represents a train on a ride in the park.
- */
-export class RideTrain
+export default class RideTrain
 {
 	/**
 	 * @param index Gets the index of the train for this ride (0-3).
@@ -83,7 +34,7 @@ export class RideTrain
 	{
 		let currentId: number | null = this.headCarId;
 		let index = 0;
-		while (currentId !== null && currentId != 0xFFFF)
+		while (currentId !== null && currentId !== 0xFFFF)
 		{
 			if (currentId === carId)
 			{
@@ -131,35 +82,15 @@ export class RideTrain
 		const entity = map.getEntity(carId);
 		if (!entity)
 		{
-			Log.error(`Entity ${carId} could not be found.`);
+			Log.error(`(train) Entity ${carId} could not be found.`);
 			return null;
 		}
 		const vehicle = entity as Car;
 		if (!vehicle)
 		{
-			Log.error(`Entity ${entity} is not a car.`);
+			Log.error(`(train) Entity ${entity} is not a car.`);
 			return null;
 		}
 		return vehicle;
-	}
-}
-
-
-export class RideVehicle
-{
-	/**
-	 * @param entityId Gets the id of the associated entity in the park.
-	 */
-	constructor(
-		readonly entityId: number
-	) { }
-
-
-	/**
-	 * Gets the associated vehicle data from the game.
-	 */
-	getCar(): Car
-	{
-		return map.getEntity(this.entityId) as Car;
 	}
 }

@@ -1,3 +1,6 @@
+/**
+ * Helpers for arrays and lists.
+ */
 module ArrayHelper
 {
 	/**
