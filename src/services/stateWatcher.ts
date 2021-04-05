@@ -1,5 +1,5 @@
-import Log from "../utilities/logger";
 import VehicleEditorWindow from "../ui/editorWindow";
+import Log from "../utilities/logger";
 import VehicleEditor from "./editor";
 import VehicleSelector from "./selector";
 

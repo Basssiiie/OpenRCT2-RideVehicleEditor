@@ -2,6 +2,7 @@
 
 import Environment from "../environment";
 
+
 /**
  * The available levels of logging.
  */
@@ -36,11 +37,11 @@ function stacktrace(): string
 	const depth = -4; // skips act(), stacktrace() and the calling method.
 	let entry: DukStackEntry, result: string = "";
 
-	for (let i = depth; (entry = Duktape.act(i)); i--) 
+	for (let i = depth; (entry = Duktape.act(i)); i--)
 	{
 		const functionName = entry.function.name;
-		const prettyName = functionName 
-			? (functionName + "()") 
+		const prettyName = functionName
+			? (functionName + "()")
 			: "<anonymous>";
 
 		result += `   -> ${prettyName}: line ${entry.lineNumber}\r\n`;
@@ -54,7 +55,7 @@ function stacktrace(): string
  */
 if (Environment.isDevelopment && isDuktapeAvailable)
 {
-	Duktape.errCreate = function onError(error) 
+	Duktape.errCreate = function onError(error)
 	{
 		error.message += ("\r\n" + stacktrace());
 		return error;

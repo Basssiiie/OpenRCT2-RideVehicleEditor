@@ -1,5 +1,6 @@
 import Log from "./logger";
 
+
 /**
  * An object that can be subscribed to and whose subscriptions will be notified
  * when the value has changed.

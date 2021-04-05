@@ -1,5 +1,5 @@
-import VehicleSelector from './services/selector';
 import VehicleEditor from './services/editor';
+import VehicleSelector from './services/selector';
 import StateWatcher from './services/stateWatcher';
 import VehicleEditorWindow from './ui/editorWindow';
 import UI from './ui/helper';
@@ -14,7 +14,7 @@ let editorInstance: VehicleEditorWindow | null;
 
 /**
  * Returns true if the game is outdated, may return false if the plugin cannot determine if the ga
- * 
+ *
  */
 function checkIsGameOutdated(): boolean
 {
@@ -60,7 +60,7 @@ function openEditorWindow()
 		editorInstance.show();
 		return;
 	}
-	
+
 	const selector = new VehicleSelector();
 	const editor = new VehicleEditor(selector);
 
@@ -72,7 +72,7 @@ function openEditorWindow()
 		watcher.dispose();
 		editorInstance = null;
 	});
-	
+
 	window.show();
 	editorInstance = window;
 }
@@ -83,7 +83,7 @@ function openEditorWindow()
  */
 function main()
 {
-	if (!UI.isAvailable) 
+	if (!UI.isAvailable)
 	{
 		console.log("UI unavailable, plugin disabled.");
 		return;
