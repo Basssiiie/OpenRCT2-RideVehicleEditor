@@ -1,10 +1,10 @@
+import RideType from "../objects/rideType";
+import RideVehicle from "../objects/rideVehicle";
 import ArrayHelper from "../utilities/arrayHelper";
 import Log from "../utilities/logger";
-import Observable from "../utilities/observable";
-import RideType from "../objects/rideType";
-import VehicleSelector from "./selector";
-import RideVehicle from "../objects/rideVehicle";
 import MathHelper from "../utilities/mathHelper";
+import Observable from "../utilities/observable";
+import VehicleSelector from "./selector";
 
 
 // The distance of a single step for moving the vehicle.
@@ -83,7 +83,6 @@ export default class VehicleEditor
 
 		rideTypeIndex = MathHelper.clamp(rideTypeIndex, 0, rideTypes.length);
 		this.rideTypeIndex.set(rideTypeIndex);
-		this.variant.set(0);
 
 		const currentCar = this.getSelectedCar();
 		if (currentCar)
@@ -92,9 +91,12 @@ export default class VehicleEditor
 
 			Log.debug(`(editor) Set vehicle ride type to: ${rideType.name} (index: ${rideTypeIndex})`);
 			currentCar.rideObject = rideType.id;
-			currentCar.vehicleObject = 0;
 
 			this.setRideTypeDefaults(currentCar, rideType, 0);
+		}
+		else
+		{
+			this.variant.set(0);
 		}
 	}
 
@@ -109,9 +111,6 @@ export default class VehicleEditor
 		if (currentCar)
 		{
 			Log.debug(`(editor) Set vehicle variant index to: ${variantIndex}.`);
-			currentCar.vehicleObject = variantIndex;
-			this.variant.set(variantIndex);
-
 			this.setRideTypeDefaults(currentCar, this.rideType, variantIndex);
 		}
 	}
@@ -419,35 +418,27 @@ export default class VehicleEditor
 
 		// Set all properties according to definition.
 		const rideObject = rideType.getDefinition();
-		const baseVehicle = rideObject.vehicles[variant];
+		const vehicleVariants = rideObject.vehicles;
 
-		const seats = baseVehicle.numSeats;
-		const powAcceleration = baseVehicle.poweredAcceleration;
-		const powMaxSpeed = baseVehicle.poweredMaxSpeed;
+		const oldVariant = vehicleVariants[this.variant.get()];
+		const newVariant = vehicleVariants[variant];
+
+		const seats = (newVariant.numSeats & 0x7F); // VEHICLE_SEAT_NUM_MASK
+		const powAcceleration = newVariant.poweredAcceleration;
+		const powMaxSpeed = newVariant.poweredMaxSpeed;
+		const mass = (newVariant.carMass + (car.mass - oldVariant.carMass));
+		Log.debug(`(editor) Vehicle '${rideObject.name}' default values:\n\tseats: ${seats}\n\tpow. acceleration: ${powAcceleration}\n\tpow. max. speed: ${powMaxSpeed}\n\tmass: ${newVariant.carMass}`);
+		Log.debug(`(editor) Vehicle mass old: ${oldVariant.carMass}, new: ${newVariant.carMass}, peeps: ${car.mass - oldVariant.carMass}`);
+		car.vehicleObject = variant;
 		car.numSeats = seats;
 		car.poweredAcceleration = powAcceleration;
 		car.poweredMaxSpeed = powMaxSpeed;
-		this.variant.get();
-		this.seats.set(seats)
+		car.mass = mass;
+		this.variant.set(variant);
+		this.seats.set(seats);
 		this.poweredAcceleration.set(powAcceleration);
 		this.poweredMaxSpeed.set(powMaxSpeed);
-
-		// Recalculate mass with peeps.
-		let newTotalMass = baseVehicle.carMass;
-		for (let i = 0; i < car.peeps.length; i++)
-		{
-			const peepId = car.peeps[i];
-			if (peepId != null)
-			{
-				const guest = map.getEntity(peepId) as Guest;
-				if (guest)
-				{
-					newTotalMass += guest.mass;
-				}
-			}
-		}
-		car.mass = newTotalMass;
-		this.mass.set(newTotalMass);
+		this.mass.set(mass);
 	}
 
 

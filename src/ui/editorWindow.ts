@@ -1,13 +1,14 @@
+import Environment from "../environment";
+import RideVehicle from "../objects/rideVehicle";
+import VehicleEditor, { VehicleSettings } from "../services/editor";
+import VehicleSelector from "../services/selector";
 import DropdownControl from "../ui/dropdown";
 import DropdownSpinnerControl from "../ui/dropdownSpinner";
 import SpinnerControl from "../ui/spinner";
 import ViewportControl from "../ui/viewport";
-import DropdownButtonControl from "./dropdownButton";
-import Log from "../utilities/logger";
-import VehicleEditor, { VehicleSettings } from "../services/editor";
-import VehicleSelector from "../services/selector";
-import Environment from "../environment";
 import ArrayHelper from "../utilities/arrayHelper";
+import Log from "../utilities/logger";
+import DropdownButtonControl from "./dropdownButton";
 
 
 // Shared coordinate constants
@@ -201,7 +202,20 @@ class VehicleEditorWindow
 					: rt.map(t => t.name);
 			this.rideTypeList.refresh();
 		});
-		editor.rideTypeIndex.subscribe(t => this.rideTypeList.set(t));
+		editor.rideTypeIndex.subscribe(t =>
+		{
+			this.rideTypeList.set(t);
+			this.variantSpinner.params.maximum = editor.rideType.variantCount;
+			this.variantSpinner.active(editor.rideType.variantCount > 1);
+
+			const car = selector.vehicle.get();
+			if (car)
+			{
+				const isPowered = car.isPowered();
+				this.powAccelerationSpinner.active(isPowered);
+				this.powMaxSpeedSpinner.active(isPowered);
+			}
+		});
 
 		// Variant sprite of the selected vehicle.
 		this.variantSpinner = new SpinnerControl({
@@ -259,7 +273,20 @@ class VehicleEditorWindow
 			y: (editorStartY + 1 + controlHeight * 4),
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
-			onChange: v => editor.setMass(v)
+			onChange: v => editor.setMass(v),
+			/* // Does not work yet because the peep array does not refresh properly..
+			format: v =>
+			{
+				const vehicle = this._selector.vehicle.get();
+				if (!vehicle)
+				{
+					return "error: unknown vehicle";
+				}
+				const peepMass = RideVehicle.massOfPeeps(vehicle.getCar());
+				Log.debug(`(window) Format mass; total: ${v}, base: ${v - peepMass}, peeps: ${peepMass}`)
+				return `${v - peepMass} (+${peepMass})`;
+			}
+			*/
 		});
 		editor.mass.subscribe(v => this.massSpinner.set(v));
 
@@ -324,44 +351,7 @@ class VehicleEditorWindow
 		});
 
 		// Generic event that happens when a vehicle is selected...
-		selector.vehicle.subscribe(v =>
-		{
-			if (v !== null)
-			{
-				const index = selector.vehicleIndex;
-				if (index !== null)
-				{
-					Log.debug(`(window) New vehicle index ${index} selected.`);
-					this.vehicleList.set(index);
-
-					// Viewport
-					this.viewport.follow(v.entityId);
-
-					// Activate controls
-					this.rideTypeList.active(true);
-					this.variantSpinner.active(true);
-					this.trackProgressSpinner.active(true);
-					this.seatCountSpinner.active(true);
-					this.massSpinner.active(true);
-
-					// Powered properties only
-					const isPowered = v.isPowered();
-					this.powAccelerationSpinner.active(isPowered);
-					this.powMaxSpeedSpinner.active(isPowered);
-					return;
-				}
-			}
-			Log.debug(`(window) Failed to select vehicle, disable controls.`);
-			this.vehicleList.active(false);
-			this.rideTypeList.active(false);
-			this.variantSpinner.active(false);
-			this.trackProgressSpinner.active(false);
-			this.seatCountSpinner.active(false);
-			this.massSpinner.active(false);
-			this.powAccelerationSpinner.active(false);
-			this.powMaxSpeedSpinner.active(false);
-			this.viewport.stop();
-		});
+		selector.vehicle.subscribe(v => this.onSelectVehicle(v));
 	}
 
 
@@ -633,6 +623,51 @@ class VehicleEditorWindow
 	close()
 	{
 		ui.closeWindows(VehicleEditorWindow.identifier);
+	}
+
+
+	/**
+	 * Event that triggers when a vehicle is selected.
+	 * @param vehicle The selected vehicle.
+	 */
+	private onSelectVehicle(vehicle: RideVehicle | null)
+	{
+		if (vehicle !== null)
+		{
+			const index = this._selector.vehicleIndex;
+			if (index !== null)
+			{
+				Log.debug(`(window) New vehicle index ${index} selected.`);
+				this.vehicleList.set(index);
+
+				// Viewport
+				this.viewport.follow(vehicle.entityId);
+
+				// Activate controls
+				this.rideTypeList.active(true);
+				this.variantSpinner.active(true);
+				this.trackProgressSpinner.active(true);
+				this.seatCountSpinner.active(true);
+				this.massSpinner.active(true);
+
+				// Powered properties only
+				const isPowered = vehicle.isPowered();
+				this.powAccelerationSpinner.active(isPowered);
+				this.powMaxSpeedSpinner.active(isPowered);
+				return;
+			}
+		}
+
+		Log.debug(`(window) Failed to select vehicle, disable controls.`);
+		this.vehicleList.active(false);
+		this.rideTypeList.active(false);
+		this.variantSpinner.active(false);
+		this.trackProgressSpinner.active(false);
+		this.seatCountSpinner.active(false);
+		this.massSpinner.active(false);
+		this.powAccelerationSpinner.active(false);
+		this.powMaxSpeedSpinner.active(false);
+		this.viewport.stop();
 	}
 
 
