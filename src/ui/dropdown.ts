@@ -63,14 +63,14 @@ export default class DropdownControl extends Control<DropdownParams>
 	 */
 	set(index: number)
 	{
-		const widget = this.getWidget<DropdownWidget>();
-		Log.debug(`(${this.params.name}) Dropdown selected index changed to ${index}.`);
-
 		if (!this._isActive)
 		{
-			this._isActive = true;
-			this.refreshWidget(widget);
+			Log.debug(`(${this.params.name}) Dropdown is inactive, selected index ${index} was not applied.`);
+			return;
 		}
+
+		const widget = this.getWidget<DropdownWidget>();
+		Log.debug(`(${this.params.name}) Dropdown selected index changed to ${index}.`);
 
 		this._silenceEvent = true;
 		widget.selectedIndex = index;

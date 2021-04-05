@@ -2,6 +2,7 @@ import Log from "../utilities/logger";
 import MathHelper from "../utilities/mathHelper";
 import Control, { ControlParams } from "./control";
 
+
 /**
  * Determines whether the spinner value wraps around or clamps to its boundaries.
  */
@@ -94,6 +95,12 @@ export default class SpinnerControl extends Control<SpinnerParams>
 	 */
 	set(value: number)
 	{
+		if (!this._isActive)
+		{
+			Log.debug(`(${this.params.name}) Spinner is inactive, value ${value} was not applied.`);
+			return;
+		}
+
 		const min = this.params.minimum;
 		const max = this.params.maximum;
 
