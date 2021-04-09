@@ -10,8 +10,11 @@ export default {
 	},
 	plugins: [
 		replace({
-			__BUILD_CONFIGURATION__: JSON.stringify("production"),
-			include: "./src/environment.ts"
+			include: "./src/environment.ts",
+			preventAssignment: true,
+			values: {
+				__BUILD_CONFIGURATION__: JSON.stringify("production")
+			}
 		}),
 		typescript(),
 		terser({
