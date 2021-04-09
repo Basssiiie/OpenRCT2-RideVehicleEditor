@@ -2,14 +2,14 @@
  * Configurable settings for a custom widget.
  */
 export interface ControlParams
- {
-	 name: string;
-	 tooltip?: string;
-	 x: number;
-	 y: number;
-	 width: number;
-	 height: number;
- }
+{
+	name: string;
+	tooltip?: string;
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+}
 
 
 /**
@@ -44,7 +44,7 @@ export default abstract class Control<TParams extends ControlParams>
 	/**
 	 * Binds the window which this control.
 	 */
-	bind(window: Window)
+	bind(window: Window): void
 	{
 		this._window = window;
 		this.refresh();
@@ -55,7 +55,7 @@ export default abstract class Control<TParams extends ControlParams>
 	 * Toggles whether the control is currently active.
 	 * @param toggle True if active, or false if disabled.
 	 */
-	active(toggle: boolean)
+	active(toggle: boolean): void
 	{
 		this._isActive = toggle;
 
@@ -69,7 +69,7 @@ export default abstract class Control<TParams extends ControlParams>
 	/**
 	 * Refreshes the widget related to this control.
 	 */
-	refresh()
+	refresh(): void
 	{
 		const widget = this.getWidget();
 		this.refreshWidget(widget);

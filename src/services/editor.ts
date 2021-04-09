@@ -1,8 +1,8 @@
 import RideType from "../objects/rideType";
 import RideVehicle from "../objects/rideVehicle";
-import ArrayHelper from "../utilities/arrayHelper";
-import Log from "../utilities/logger";
-import MathHelper from "../utilities/mathHelper";
+import * as ArrayHelper from "../utilities/arrayHelper";
+import * as Log from "../utilities/logger";
+import * as MathHelper from "../utilities/mathHelper";
 import Observable from "../utilities/observable";
 import VehicleSelector from "./selector";
 
@@ -77,7 +77,7 @@ export default class VehicleEditor
 	 * to their default values for that type.
 	 * @param rideTypeIndex The index of the ride type in the ride type list.
 	 */
-	setRideType(rideTypeIndex: number)
+	setRideType(rideTypeIndex: number): void
 	{
 		const rideTypes = this.rideTypeList.get();
 
@@ -105,7 +105,7 @@ export default class VehicleEditor
 	 * Sets the vehicle sprite variant. (e.g. locomotive, tender or passenger car)
 	 * @param variantIndex The index into the vehicle sprite list.
 	 */
-	setVariant(variantIndex: number)
+	setVariant(variantIndex: number): void
 	{
 		const currentCar = this.getSelectedCar();
 		if (currentCar)
@@ -138,7 +138,7 @@ export default class VehicleEditor
 	 * Sets the maximum number of seats for this vehicle.
 	 * @param numberOfSeats The amount of seats on this vehicle.
 	 */
-	setSeatCount(numberOfSeats: number)
+	setSeatCount(numberOfSeats: number): void
 	{
 		const currentCar = this.getSelectedCar();
 		if (currentCar)
@@ -154,7 +154,7 @@ export default class VehicleEditor
 	 * Sets the powered acceleration for this vehicle.
 	 * @param power The amount of powered acceleration for this vehicle.
 	 */
-	setPoweredAcceleration(power: number)
+	setPoweredAcceleration(power: number): void
 	{
 		const currentCar = this.getSelectedCar();
 		if (currentCar)
@@ -170,7 +170,7 @@ export default class VehicleEditor
 	 * Sets the powered maximum speed for this vehicle.
 	 * @param maximumSpeed The powered maximum speed for this vehicle.
 	 */
-	setPoweredMaximumSpeed(maximumSpeed: number)
+	setPoweredMaximumSpeed(maximumSpeed: number): void
 	{
 		const currentCar = this.getSelectedCar();
 		if (currentCar)
@@ -186,7 +186,7 @@ export default class VehicleEditor
 	 * Sets the mass for this vehicle.
 	 * @param mass The amount of mass of this vehicle.
 	 */
-	setMass(mass: number)
+	setMass(mass: number): void
 	{
 		const currentCar = this.getSelectedCar();
 		if (currentCar)
@@ -201,7 +201,7 @@ export default class VehicleEditor
 	/**
 	 * Scroll the main viewport to the currently selected vehicle.
 	 */
-	locate()
+	locate(): void
 	{
 		const car = this.getSelectedCar();
 		if (car)
@@ -228,7 +228,7 @@ export default class VehicleEditor
 			variant: this.variant.get(),
 			seats: this.seats.get(),
 			mass:  this.mass.get(),
-		}
+		};
 
 		if (vehicle.isPowered())
 		{
@@ -273,7 +273,7 @@ export default class VehicleEditor
 		for (let i = startIndex; i < endIndex; i++)
 		{
 			const vehicle = vehicles[i];
-			let car = vehicle.getCar();
+			const car = vehicle.getCar();
 
 			if (!car)
 			{
@@ -306,7 +306,7 @@ export default class VehicleEditor
 			const train = trains[i];
 			const vehicles = train.getVehicles();
 
-			for (let vehicle of vehicles)
+			for (const vehicle of vehicles)
 			{
 				this.applySettingsToCar(vehicle.getCar(), settings, false);
 			}
@@ -317,7 +317,7 @@ export default class VehicleEditor
 	/**
 	 * Internal function that applies all vehicle settings to the specified car.
 	 */
-	private applySettingsToCar(car: Car, settings: VehicleSettings, updateObservables: boolean)
+	private applySettingsToCar(car: Car, settings: VehicleSettings, updateObservables: boolean): void
 	{
 		const rideTypes = this.rideTypeList.get();
 		const rideTypeIdx = ArrayHelper.findIndex(rideTypes, t => t.id === settings.rideTypeId);
@@ -369,7 +369,7 @@ export default class VehicleEditor
 	 * Sets the vehicle to edit in this editor.
 	 * @param vehicle The vehicle to edit.
 	 */
-	private setVehicle(vehicle: RideVehicle)
+	private setVehicle(vehicle: RideVehicle): void
 	{
 		let rideTypes = this.rideTypeList.get();
 		if (!rideTypes)
@@ -412,9 +412,9 @@ export default class VehicleEditor
 	 * @param rideType The ride type.
 	 * @param variant The vehicle variant to take the properties from.
 	 */
-	private setRideTypeDefaults(car: Car, rideType: RideType, variant: number)
+	private setRideTypeDefaults(car: Car, rideType: RideType, variant: number): void
 	{
-		Log.debug("(editor) All car properties have been reset to the default value.")
+		Log.debug("(editor) All car properties have been reset to the default value.");
 
 		// Set all properties according to definition.
 		const rideObject = rideType.getDefinition();

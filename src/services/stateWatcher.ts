@@ -1,5 +1,5 @@
 import VehicleEditorWindow from "../ui/editorWindow";
-import Log from "../utilities/logger";
+import * as Log from "../utilities/logger";
 import VehicleEditor from "./editor";
 import VehicleSelector from "./selector";
 
@@ -44,7 +44,7 @@ export default class StateWatcher implements IDisposable
 
 		this._onActionHook = context.subscribe("action.execute", e => this.onActionExecuted(e));
 		this._onUpdateHook = context.subscribe("interval.tick", () => this.onGameTickUpdate());
-		window.onUpdate = () => this.onWindowUpdate();
+		window.onUpdate = (): void => this.onWindowUpdate();
 	}
 
 
@@ -60,7 +60,7 @@ export default class StateWatcher implements IDisposable
 	 * Triggers for every executed player action.
 	 * @param event The arguments describing the executed action.
 	 */
-	private onActionExecuted(event: GameActionEventArgs)
+	private onActionExecuted(event: GameActionEventArgs): void
 	{
 		if (this._isDisposed)
 			return;
@@ -71,10 +71,12 @@ export default class StateWatcher implements IDisposable
 			case "ridecreate":
 			case "ridedemolish":
 			case "ridesetname":
+			{
 				this.selector.reloadRideList();
 				break;
-
+			}
 			case "ridesetstatus": // close/reopen ride
+			{
 				const index = this.selector.rideIndex;
 				if (index !== null)
 				{
@@ -88,16 +90,17 @@ export default class StateWatcher implements IDisposable
 					}
 				}
 				break;
+			}
 		}
 
-		Log.debug(`<${action}>\n\t- type: ${event.type}\n\t- args: ${JSON.stringify(event.args)}\n\t- result: ${JSON.stringify(event.result)}`)
+		Log.debug(`<${action}>\n\t- type: ${event.type}\n\t- args: ${JSON.stringify(event.args)}\n\t- result: ${JSON.stringify(event.result)}`);
 	}
 
 
 	/**
 	 * Triggers every game tick. Does not trigger in pause mode.
 	 */
-	private onGameTickUpdate()
+	private onGameTickUpdate(): void
 	{
 		if (this._isDisposed)
 			return;
@@ -144,7 +147,7 @@ export default class StateWatcher implements IDisposable
 	/**
 	 * Triggers every tick the window UI is updated.
 	 */
-	private onWindowUpdate()
+	private onWindowUpdate(): void
 	{
 		if (this._isDisposed)
 			return;

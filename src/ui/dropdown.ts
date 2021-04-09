@@ -1,4 +1,4 @@
-import Log from "../utilities/logger";
+import * as Log from "../utilities/logger";
 import Control, { ControlParams } from "./control";
 
 
@@ -61,7 +61,7 @@ export default class DropdownControl extends Control<DropdownParams>
 	 * Sets the dropdown to the specified index.
 	 * @param index The index of the item to select.
 	 */
-	set(index: number)
+	set(index: number): void
 	{
 		if (!this._isActive)
 		{
@@ -87,7 +87,7 @@ export default class DropdownControl extends Control<DropdownParams>
 			...this.params,
 			type: "dropdown",
 			selectedIndex: 0,
-			onChange: i => this.onWidgetChange(i)
+			onChange: (i): void => this.onWidgetChange(i)
 		};
 	}
 
@@ -96,7 +96,7 @@ export default class DropdownControl extends Control<DropdownParams>
 	 * Triggered when a new item is selected in the dropdown.
 	 * @param index The number the spinner was set to.
 	 */
-	protected onWidgetChange(index: number)
+	protected onWidgetChange(index: number): void
 	{
 		if (this._silenceEvent)
 			return;
@@ -114,7 +114,7 @@ export default class DropdownControl extends Control<DropdownParams>
 
 
 	/** @inheritdoc */
-	protected refreshWidget(widget: DropdownWidget)
+	protected refreshWidget(widget: DropdownWidget): void
 	{
 		const items = this.params.items;
 		if (this._isActive && items && items.length > 0)

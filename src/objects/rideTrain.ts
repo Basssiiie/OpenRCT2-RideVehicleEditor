@@ -1,4 +1,4 @@
-import Log from "../utilities/logger";
+import * as Log from "../utilities/logger";
 import RideVehicle from "./rideVehicle";
 
 

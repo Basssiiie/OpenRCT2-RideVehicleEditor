@@ -1,4 +1,4 @@
-import Log from "../utilities/logger";
+import * as Log from "../utilities/logger";
 import Control, { ControlParams } from "./control";
 
 
@@ -18,14 +18,14 @@ export default class ViewportControl extends Control<ControlParams>
 	 * Sets the viewport to go to a specific position.
 	 * @param position The world position to go to.
 	 */
-	goTo(position: CoordsXY | CoordsXYZ)
+	goTo(position: CoordsXY | CoordsXYZ): void
 	{
 		Log.debug(`(${this.params.name}) Jump to position ${position}.`);
 		this._isActive = true;
 		this._entityId = -1;
 
 		const widget = this.getWidget<ViewportWidget>();
-		widget.viewport?.moveTo(position)
+		widget.viewport?.moveTo(position);
 
 		this.refreshWidget(widget);
 	}
@@ -35,7 +35,7 @@ export default class ViewportControl extends Control<ControlParams>
 	 * Sets the viewport to follow the specified entity.
 	 * @param entityId The id of the entity to follow.
 	 */
-	follow(entityId: number)
+	follow(entityId: number): void
 	{
 		Log.debug(`(${this.params.name}) Start following entity ${entityId}.`);
 
@@ -48,7 +48,7 @@ export default class ViewportControl extends Control<ControlParams>
 	/**
 	 * Stops the viewport where it is now, if it was following an entity.
 	 */
-	stop()
+	stop(): void
 	{
 		this._entityId = -1;
 		this.active(false);
@@ -72,7 +72,7 @@ export default class ViewportControl extends Control<ControlParams>
 
 
 	/** @inheritdoc */
-	protected refreshWidget(widget: ViewportWidget)
+	protected refreshWidget(widget: ViewportWidget): void
 	{
 		if (this._isActive && this._entityId != -1)
 		{
@@ -82,13 +82,13 @@ export default class ViewportControl extends Control<ControlParams>
 			}
 			this.update();
 		}
-		else if (this._updater) 
+		else if (this._updater)
 		{
 			Log.debug(`(${this.params.name}) Updating has stopped.`);
 			this._updater.dispose();
 			this._updater = null;
 
-			widget.viewport?.moveTo(farAway)
+			widget.viewport?.moveTo(farAway);
 		}
 	}
 
@@ -96,7 +96,7 @@ export default class ViewportControl extends Control<ControlParams>
 	/**
 	 * Update function that will run every tick if this viewport is following an entity.
 	 */
-	private update()
+	private update(): void
 	{
 		if (this._entityId == -1)
 		{

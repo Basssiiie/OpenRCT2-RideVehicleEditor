@@ -1,8 +1,8 @@
+import * as Environment from './environment';
 import VehicleEditor from './services/editor';
 import VehicleSelector from './services/selector';
 import StateWatcher from './services/stateWatcher';
 import VehicleEditorWindow from './ui/editorWindow';
-import UI from './ui/helper';
 
 
 // Stores whether the game is outdated check has been performed and what the result is.
@@ -41,12 +41,12 @@ function checkIsGameOutdated(): boolean
 /**
  * Opens the ride editor window.
  */
-function openEditorWindow()
+function openEditorWindow(): void
 {
 	// Check if game is up-to-date...
 	if (checkIsGameOutdated())
 	{
-		const title = "Please update the game!"
+		const title = "Please update the game!";
 		const message = "The version of OpenRCT2 you are currently playing is too old for this plugin.";
 
 		ui.showError(title, message);
@@ -67,11 +67,11 @@ function openEditorWindow()
 	const window = new VehicleEditorWindow(selector, editor);
 	const watcher = new StateWatcher(window, selector, editor);
 
-	window.onClose = (() =>
+	window.onClose = (): void =>
 	{
 		watcher.dispose();
 		editorInstance = null;
-	});
+	};
 
 	window.show();
 	editorInstance = window;
@@ -81,9 +81,9 @@ function openEditorWindow()
 /**
  * Entry point of the plugin.
  */
-function main()
+function main(): void
 {
-	if (!UI.isAvailable)
+	if (!Environment.isUiAvailable)
 	{
 		console.log("UI unavailable, plugin disabled.");
 		return;
@@ -99,7 +99,5 @@ function main()
 	*/
 
 	ui.registerMenuItem("Edit ride vehicles", () => openEditorWindow());
-};
-
-
+}
 export default main;

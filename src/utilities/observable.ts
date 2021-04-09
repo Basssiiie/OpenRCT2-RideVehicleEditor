@@ -1,4 +1,4 @@
-import Log from "./logger";
+import * as Log from "./logger";
 
 
 /**
@@ -8,7 +8,7 @@ import Log from "./logger";
 export default class Observable<T>
 {
 	private _value: T;
-	private _listeners?: Function[];
+	private _listeners?: ((value: T) => void)[];
 
 
 	/**
@@ -37,7 +37,7 @@ export default class Observable<T>
 	 * the value does not equal the old one.
 	 * @param value The new value.
 	 */
-	set(value: T)
+	set(value: T): void
 	{
 		if (this._value !== value)
 		{
@@ -59,7 +59,7 @@ export default class Observable<T>
 	 * @param callback The action to perfom when the value within this observable
 	 * has changed.
 	 */
-	subscribe(callback: (value: T) => void)
+	subscribe(callback: (value: T) => void): void
 	{
 		if (!this._listeners)
 		{
@@ -75,7 +75,7 @@ export default class Observable<T>
 	/**
 	 * Calls all listeners registered on this event with the specified arguments.
 	 */
-	private invoke(value: T)
+	private invoke(value: T): void
 	{
 		if (this._listeners)
 		{

@@ -50,7 +50,7 @@ export default class DropdownButtonComponent extends DropdownControl
 	{
 		const params = this.params as DropdownButtonParams;
 		const dropdown = super.createWidget();
-		dropdown.items = params.buttons?.map(b => b.text);
+		dropdown.items = params.buttons?.map((b): string => b.text);
 
 		return [
 			dropdown,
@@ -62,7 +62,7 @@ export default class DropdownButtonComponent extends DropdownControl
 				y: (params.y + 1),
 				width: (params.width - 13),
 				height: (params.height - 2),
-				onClick: () => this.onButtonClick(),
+				onClick: (): void => this.onButtonClick(),
 			}
 		];
 	}
@@ -72,7 +72,7 @@ export default class DropdownButtonComponent extends DropdownControl
 	 * Triggered when the current button is pressed.
 	 * @param index The number the spinner was set to.
 	 */
-	private onButtonClick()
+	private onButtonClick(): void
 	{
 		const params = this.params as DropdownButtonParams;
 		params.buttons[this._selectedIndex]?.onClick();
@@ -80,7 +80,7 @@ export default class DropdownButtonComponent extends DropdownControl
 
 
 	/** @inheritdoc */
-	protected onWidgetChange(index: number)
+	protected onWidgetChange(index: number): void
 	{
 		super.onWidgetChange(index);
 		this._selectedIndex = index;
@@ -99,7 +99,7 @@ export default class DropdownButtonComponent extends DropdownControl
 	/**
 	 * Refreshes just the state of the button, not the dropdown.
 	 */
-	private refreshButton()
+	private refreshButton(): void
 	{
 		const dropdown = this.getWidget<DropdownWidget>();
 		const button = this._window?.findWidget<ButtonWidget>(this.params.name + "-button");

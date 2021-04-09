@@ -39,7 +39,7 @@ export default class DropdownSpinnerControl extends DropdownControl
 			disabledMessage: "",
 			minimum: 0,
 			maximum: params.items?.length ?? 1,
-			onChange: i => this.onSpinnerChange(i)
+			onChange: (i): void => this.onSpinnerChange(i)
 		});
 	}
 
@@ -57,7 +57,7 @@ export default class DropdownSpinnerControl extends DropdownControl
 
 
 	/** @inheritdoc */
-	bind(window: Window)
+	bind(window: Window): void
 	{
 		this._spinner.bind(window);
 		super.bind(window);
@@ -68,7 +68,7 @@ export default class DropdownSpinnerControl extends DropdownControl
 	 * Triggered when the spinner selects a new item in the dropdown.
 	 * @param index The number the spinner was set to.
 	 */
-	private onSpinnerChange(index: number)
+	private onSpinnerChange(index: number): void
 	{
 		this.set(index);
 		super.onWidgetChange(index);
@@ -79,7 +79,7 @@ export default class DropdownSpinnerControl extends DropdownControl
 
 
 	/** @inheritdoc */
-	protected onWidgetChange(index: number)
+	protected onWidgetChange(index: number): void
 	{
 		this._spinner.set(index);
 		super.onWidgetChange(index);

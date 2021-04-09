@@ -1,5 +1,5 @@
-import Log from "../utilities/logger";
-import MathHelper from "../utilities/mathHelper";
+import * as Log from "../utilities/logger";
+import * as MathHelper from "../utilities/mathHelper";
 import Control, { ControlParams } from "./control";
 
 
@@ -69,7 +69,7 @@ export default class SpinnerControl extends Control<SpinnerParams>
 	/**
 	 * Gets the selected value in the spinner.
 	 */
-	get value()
+	get value(): number
 	{
 		return this._value;
 	}
@@ -93,7 +93,7 @@ export default class SpinnerControl extends Control<SpinnerParams>
 	 * Sets the spinner to the specified value.
 	 * @param value The number to set the spinner to.
 	 */
-	set(value: number)
+	set(value: number): void
 	{
 		if (!this._isActive)
 		{
@@ -114,16 +114,23 @@ export default class SpinnerControl extends Control<SpinnerParams>
 		switch (this.params.wrapMode)
 		{
 			default:
+			{
 				this._value = MathHelper.wrap(value, min, max);
-
+				break;
+			}
 			case "clamp":
+			{
 				this._value = MathHelper.clamp(value, min, max);
-
+				break;
+			}
 			case "clampThenWrap":
+			{
 				// Wrap if old value is at the limit, otherwise clamp.
 				this._value = (value < min && this._value === min) || (value >= max && this._value === (max - 1))
 					? MathHelper.wrap(value, min, max)
 					: MathHelper.clamp(value, min, max);
+				break;
+			}
 		}
 
 		//Log.debug(`(${this.params.name}) Spinner value is changed to ${this._value}. (unwrapped: ${value}, range: ${min}<->${max})`);
@@ -142,8 +149,8 @@ export default class SpinnerControl extends Control<SpinnerParams>
 			...this.params,
 			type: "spinner",
 			text: "",
-			onIncrement: () => this.onWidgetChange(this._value,  this.params.increment),
-			onDecrement: () => this.onWidgetChange(this._value, -this.params.increment)
+			onIncrement: (): void => this.onWidgetChange(this._value,  this.params.increment),
+			onDecrement: (): void => this.onWidgetChange(this._value, -this.params.increment)
 		};
 	}
 
@@ -152,7 +159,7 @@ export default class SpinnerControl extends Control<SpinnerParams>
 	 * Triggered when a value is selected in the spinner.
 	 * @param value The number the spinner was set to.
 	 */
-	private onWidgetChange(value: number, adjustment: number)
+	private onWidgetChange(value: number, adjustment: number): void
 	{
 		const widget = this.getWidget<SpinnerWidget>();
 		if (widget.isDisabled)
@@ -171,7 +178,7 @@ export default class SpinnerControl extends Control<SpinnerParams>
 
 
 	/** @inheritdoc */
-	protected refreshWidget(widget: SpinnerWidget)
+	protected refreshWidget(widget: SpinnerWidget): void
 	{
 		if (this._isActive && this.params.minimum < this.params.maximum)
 		{

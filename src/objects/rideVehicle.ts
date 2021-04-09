@@ -36,7 +36,7 @@ export default class RideVehicle
 	 * the openrct2 source code.
 	 * @param car The car for which to check the engine.
 	 */
-	static isPowered(car: Car)
+	static isPowered(car: Car): boolean
 	{
 		const rideObject = context.getObject("ride", car.rideObject);
 		const vehicleObject = rideObject.vehicles[car.vehicleObject];
@@ -51,7 +51,7 @@ export default class RideVehicle
 	 * @param car The car to calculate the guest mass of.
 	 */
 	/* // This doesn't work yet because the peep array does not get refreshed properly..
-	static massOfPeeps(car: Car)
+	static massOfPeeps(car: Car): number
 	{
 		const guests = car.peeps;
 		let totalGuestMass = 0;

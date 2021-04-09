@@ -1,7 +1,8 @@
 /// <reference path="../lib/openrct2.d.ts" />
 
-import Environment from './environment';
+import * as Environment from './environment';
 import main from './main';
+
 
 registerPlugin({
 	name: 'RideVehicleEditor',

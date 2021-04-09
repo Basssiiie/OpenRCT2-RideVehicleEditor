@@ -1,6 +1,6 @@
 /// <reference path="../../lib/duktape.d.ts" />
 
-import Environment from "../environment";
+import * as Environment from "../environment";
 
 
 /**
@@ -18,7 +18,7 @@ const isDuktapeAvailable = (typeof Duktape !== 'undefined');
 /**
  * Prints a message with the specified logging and plugin identifier.
  */
-function print(level: LogLevel, message: string)
+function print(level: LogLevel, message: string): void
 {
 	console.log(`<RVE/${level}> ${message}`);
 }
@@ -35,7 +35,7 @@ function stacktrace(): string
 	}
 
 	const depth = -4; // skips act(), stacktrace() and the calling method.
-	let entry: DukStackEntry, result: string = "";
+	let entry: DukStackEntry, result = "";
 
 	for (let i = depth; (entry = Duktape.act(i)); i--)
 	{
@@ -55,7 +55,7 @@ function stacktrace(): string
  */
 if (Environment.isDevelopment && isDuktapeAvailable)
 {
-	Duktape.errCreate = function onError(error)
+	Duktape.errCreate = function onError(error): Error
 	{
 		error.message += ("\r\n" + stacktrace());
 		return error;
@@ -64,42 +64,36 @@ if (Environment.isDevelopment && isDuktapeAvailable)
 
 
 /**
- * Exposes a few helper methods to log various messages to the console.
+ * Prints a debug message if the plugin is run in development mode.
  */
-module Log
+export function debug(message: string): void
 {
-	/**
-	 * Prints a debug message if the plugin is run in development mode.
-	 */
-	export function debug(message: string)
+	if (Environment.isDevelopment)
 	{
-		if (Environment.isDevelopment)
-		{
-			print("debug", message);
-		}
-	}
-
-
-	/**
-	 * Prints a warning message to the console.
-	 */
-	export function warning(message: string)
-	{
-		print("warning", message);
-	}
-
-
-	/**
-	 * Prints an error message to the console and an additional stacktrace
-	 * if the plugin is run in development mode.
-	 */
-	export function error(message: string)
-	{
-		if (Environment.isDevelopment)
-		{
-			message += ("\r\n" + stacktrace());
-		}
-		print("error", message);
+		print("debug", message);
 	}
 }
-export default Log;
+
+
+/**
+ * Prints a warning message to the console.
+ */
+export function warning(message: string): void
+{
+	print("warning", message);
+}
+
+
+/**
+ * Prints an error message to the console and an additional stacktrace
+ * if the plugin is run in development mode.
+ */
+
+export function error(message: string): void
+{
+	if (Environment.isDevelopment)
+	{
+		message += ("\r\n" + stacktrace());
+	}
+	print("error", message);
+}

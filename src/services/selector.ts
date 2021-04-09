@@ -1,9 +1,9 @@
-import Park, { ParkRide } from "../objects/park";
+import ParkRide from "../objects/parkRide";
 import RideTrain from "../objects/rideTrain";
 import RideVehicle from "../objects/rideVehicle";
-import ArrayHelper from "../utilities/arrayHelper";
-import Log from "../utilities/logger";
-import MathHelper from "../utilities/mathHelper";
+import * as ArrayHelper from "../utilities/arrayHelper";
+import * as Log from "../utilities/logger";
+import * as MathHelper from "../utilities/mathHelper";
 import Observable from "../utilities/observable";
 
 
@@ -68,12 +68,12 @@ export default class VehicleSelector
 	/**
 	 * Reloads the list with rides in the park.
 	 */
-	reloadRideList()
+	reloadRideList(): void
 	{
 		const lastSelectedRide = this.ride.get();
 		Log.debug(`(selector) Reloading the list of rides in the park. (last selected: '${lastSelectedRide?.name}', idx: ${this._rideIndex})`);
 
-		const rides = Park.getRides();
+		const rides = ParkRide.getAllRides();
 		this.ridesInPark.set(rides);
 
 		if (lastSelectedRide && this._rideIndex !== null)
@@ -109,7 +109,7 @@ export default class VehicleSelector
 	 * @param trainIndex The index of the train in the train list.
 	 * @param vehicleIndex The index of the vehicle in the vehicle list.
 	 */
-	selectRide(rideIndex: number, trainIndex: number = 0, vehicleIndex: number = 0)
+	selectRide(rideIndex: number, trainIndex: number = 0, vehicleIndex: number = 0): void
 	{
 		const ridesInPark = this.ridesInPark.get();
 
@@ -138,7 +138,7 @@ export default class VehicleSelector
 	 * @param trainIndex The index of the train in the train list.
 	 * @param vehicleIndex The index of the vehicle in the vehicle list.
 	 */
-	selectTrain(trainIndex: number, vehicleIndex: number = 0)
+	selectTrain(trainIndex: number, vehicleIndex: number = 0): void
 	{
 		const trains = this.trainsOnRide.get();
 
@@ -164,7 +164,7 @@ export default class VehicleSelector
 	 * Selects a vehicle from the list of vehicles of the selected train.
 	 * @param vehicleIndex The index of the vehicle in the vehicle list.
 	 */
-	selectVehicle(vehicleIndex: number)
+	selectVehicle(vehicleIndex: number): void
 	{
 		const vehicles = this.vehiclesOnTrain.get();
 
@@ -187,7 +187,7 @@ export default class VehicleSelector
 	 * Selects a vehicle from an entity id.
 	 * @param entityId The id of the entity in the game.
 	 */
-	selectEntity(entityId: number)
+	selectEntity(entityId: number): void
 	{
 		const entity = map.getEntity(entityId);
 		if (!entity || entity.type !== "car")
@@ -209,7 +209,7 @@ export default class VehicleSelector
 		this.selectRide(carRideIndex);
 
 		let trainIndex = 0, vehicleIndex: number | null = null;
-		for (let train of this.trainsOnRide.get())
+		for (const train of this.trainsOnRide.get())
 		{
 			vehicleIndex = train.getCarIndex(entityId);
 			if (vehicleIndex !== null)
@@ -225,7 +225,7 @@ export default class VehicleSelector
 	/**
 	 * Disables the editor controls and sets the selected train and vehicle to null.
 	 */
-	deselect()
+	deselect(): void
 	{
 		Log.debug(`(selector) Deselect vehicle.`);
 

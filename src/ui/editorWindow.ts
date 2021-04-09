@@ -1,4 +1,4 @@
-import Environment from "../environment";
+import * as Environment from "../environment";
 import RideVehicle from "../objects/rideVehicle";
 import VehicleEditor, { VehicleSettings } from "../services/editor";
 import VehicleSelector from "../services/selector";
@@ -6,8 +6,8 @@ import DropdownControl from "../ui/dropdown";
 import DropdownSpinnerControl from "../ui/dropdownSpinner";
 import SpinnerControl from "../ui/spinner";
 import ViewportControl from "../ui/viewport";
-import ArrayHelper from "../utilities/arrayHelper";
-import Log from "../utilities/logger";
+import * as ArrayHelper from "../utilities/arrayHelper";
+import * as Log from "../utilities/logger";
 import DropdownButtonControl from "./dropdownButton";
 
 
@@ -38,7 +38,7 @@ let lastSelectedVehicleIndex: number;
 let copiedVehicleSettings: VehicleSettings | null = null;
 
 
-class VehicleEditorWindow
+export default class VehicleEditorWindow
 {
 	/**
 	 * The universal identifier that is used for this window.
@@ -101,7 +101,7 @@ class VehicleEditorWindow
 			y: windowStart + 25,
 			width: groupboxItemWidth,
 			height: widgetLineHeight,
-			onSelect: i => selector.selectRide(i)
+			onSelect: (i): void => selector.selectRide(i)
 		});
 		selector.ridesInPark.subscribe(r =>
 		{
@@ -133,7 +133,7 @@ class VehicleEditorWindow
 			y: windowStart + 43,
 			width: (groupboxItemWidth / 2) - 2,
 			height: widgetLineHeight,
-			onSelect: i => selector.selectTrain(i)
+			onSelect: (i): void => selector.selectTrain(i)
 		});
 		selector.trainsOnRide.subscribe(t =>
 		{
@@ -163,7 +163,7 @@ class VehicleEditorWindow
 			y: windowStart + 43,
 			width: (groupboxItemWidth / 2) - 2,
 			height: widgetLineHeight,
-			onSelect: i => selector.selectVehicle(i)
+			onSelect: (i): void => selector.selectVehicle(i)
 		});
 		selector.vehiclesOnTrain.subscribe(v =>
 		{
@@ -192,7 +192,7 @@ class VehicleEditorWindow
 			y: editorStartY,
 			width: controlsSize,
 			height: widgetLineHeight,
-			onSelect: v => editor.setRideType(v)
+			onSelect: (v): void => editor.setRideType(v)
 		});
 		editor.rideTypeList.subscribe(rt =>
 		{
@@ -227,7 +227,7 @@ class VehicleEditorWindow
 			y: (editorStartY + 1 + controlHeight),
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
-			onChange: v => editor.setVariant(v)
+			onChange: (v): void => editor.setVariant(v)
 		});
 		editor.rideTypeIndex.subscribe(() => this.variantSpinner.params.maximum = editor.rideType.variantCount);
 		editor.variant.subscribe(v => this.variantSpinner.set(v));
@@ -243,7 +243,7 @@ class VehicleEditorWindow
 			y: (editorStartY + 1 + controlHeight * 2),
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
-			onChange: (_, i) => editor.move(i)
+			onChange: (_, i): void => editor.move(i)
 		});
 		editor.trackProgress.subscribe(v => this.trackProgressSpinner.set(v));
 
@@ -258,7 +258,7 @@ class VehicleEditorWindow
 			y: (editorStartY + 1 + controlHeight * 3),
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
-			onChange: v => editor.setSeatCount(v)
+			onChange: (v): void => editor.setSeatCount(v)
 		});
 		editor.seats.subscribe(v => this.seatCountSpinner.set(v));
 
@@ -273,7 +273,7 @@ class VehicleEditorWindow
 			y: (editorStartY + 1 + controlHeight * 4),
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
-			onChange: v => editor.setMass(v),
+			onChange: (v): void => editor.setMass(v),
 			/* // Does not work yet because the peep array does not refresh properly..
 			format: v =>
 			{
@@ -302,7 +302,7 @@ class VehicleEditorWindow
 			y: (editorStartY + 1 + controlHeight * 5),
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
-			onChange: v => editor.setPoweredAcceleration(v)
+			onChange: (v): void => editor.setPoweredAcceleration(v)
 		});
 		editor.poweredAcceleration.subscribe(v => this.powAccelerationSpinner.set(v));
 
@@ -318,7 +318,7 @@ class VehicleEditorWindow
 			y: (editorStartY + 1 + controlHeight * 6),
 			width: (controlsSize * (1 - controlLabelPart)),
 			height: widgetLineHeight,
-			onChange: v => editor.setPoweredMaximumSpeed(v)
+			onChange: (v): void => editor.setPoweredMaximumSpeed(v)
 		});
 		editor.poweredMaxSpeed.subscribe(v => this.powMaxSpeedSpinner.set(v));
 
@@ -327,10 +327,10 @@ class VehicleEditorWindow
 			name: "rve-apply-to-others-button",
 			tooltip: "Apply the current vehicle settings to a specific set of other vehicles on this ride",
 			buttons: [
-				{ text: "Apply this to all vehicles", onClick: () => this.applyToAllVehicles() },
-				{ text: "Apply this to following vehicles", onClick: () => 	this.applyToFollowingVehicles() },
-				{ text: "Apply this to preceding vehicles", onClick: () => this.applyToPrecedingVehicles() },
-				{ text: "Apply this to all trains", onClick: () => this.applyToAllTrains() }
+				{ text: "Apply this to all vehicles", onClick: (): void => this.applyToAllVehicles() },
+				{ text: "Apply this to following vehicles", onClick: (): void => 	this.applyToFollowingVehicles() },
+				{ text: "Apply this to preceding vehicles", onClick: (): void => this.applyToPrecedingVehicles() },
+				{ text: "Apply this to all trains", onClick: (): void => this.applyToAllTrains() }
 			],
 			x: (groupboxMargin + viewportSize + 5),
 			y: (editorStartY + controlHeight * 7) + 2,
@@ -347,7 +347,7 @@ class VehicleEditorWindow
 			y: (editorStartY + controlHeight * 7) + 2,
 			width: 45,
 			height: widgetLineHeight,
-			onSelect: i => this.updateMultiplier(i)
+			onSelect: (i): void => this.updateMultiplier(i)
 		});
 
 		// Generic event that happens when a vehicle is selected...
@@ -585,7 +585,7 @@ class VehicleEditorWindow
 	/**
 	 * Creates a new vehicle editor, or shows the currently opened one.
 	 */
-	show()
+	show(): void
 	{
 		if (this._window)
 		{
@@ -620,7 +620,7 @@ class VehicleEditorWindow
 	/**
 	 * Closes the currently opened window.
 	 */
-	close()
+	close(): void
 	{
 		ui.closeWindows(VehicleEditorWindow.identifier);
 	}
@@ -630,7 +630,7 @@ class VehicleEditorWindow
 	 * Event that triggers when a vehicle is selected.
 	 * @param vehicle The selected vehicle.
 	 */
-	private onSelectVehicle(vehicle: RideVehicle | null)
+	private onSelectVehicle(vehicle: RideVehicle | null): void
 	{
 		if (vehicle !== null)
 		{
@@ -675,10 +675,10 @@ class VehicleEditorWindow
 	 * Updates the multiplier based on which checkbox was updated.
 	 * @param selectedIndex The index of the multiplier option that was selected.
 	 */
-	private updateMultiplier(selectedIndex: number)
+	private updateMultiplier(selectedIndex: number): void
 	{
 		const increment = (10 ** selectedIndex);
-		Log.debug(`(window) Updated multiplier to ${increment}. (index: ${selectedIndex})`)
+		Log.debug(`(window) Updated multiplier to ${increment}. (index: ${selectedIndex})`);
 
 		this.setSpinnerIncrement(this.trackProgressSpinner, increment);
 		this.setSpinnerIncrement(this.seatCountSpinner, increment);
@@ -693,7 +693,7 @@ class VehicleEditorWindow
 	 * @param spinner The spinner to update.
 	 * @param increment The increment the spinner should use.
 	 */
-	private setSpinnerIncrement(spinner: SpinnerControl, increment: number)
+	private setSpinnerIncrement(spinner: SpinnerControl, increment: number): void
 	{
 		spinner.params.increment = increment;
 		spinner.refresh();
@@ -704,7 +704,7 @@ class VehicleEditorWindow
 	 * Applies the settings of the currently selected vehicle to all vehicles on the
 	 * selected train.
 	 */
-	private applyToAllVehicles()
+	private applyToAllVehicles(): void
 	{
 		const settings = this._editor.getSettings();
 		if (settings)
@@ -718,7 +718,7 @@ class VehicleEditorWindow
 	 * Applies the settings of the currently selected vehicle to all vehicles after
 	 * this vehicle on the selected train.
 	 */
-	private applyToFollowingVehicles()
+	private applyToFollowingVehicles(): void
 	{
 		const currentVehicleIndex = this._selector.vehicleIndex;
 		if (currentVehicleIndex !== null)
@@ -736,7 +736,7 @@ class VehicleEditorWindow
 	 * Applies the settings of the currently selected vehicle to all vehicles before
 	 * this vehicle on the selected train.
 	 */
-	private applyToPrecedingVehicles()
+	private applyToPrecedingVehicles(): void
 	{
 		const currentVehicleIndex = this._selector.vehicleIndex;
 		if (currentVehicleIndex !== null)
@@ -754,7 +754,7 @@ class VehicleEditorWindow
 	 * Applies the settings of the currently selected vehicle to all trains and vehicles
 	 * on the selected ride.
 	 */
-	private applyToAllTrains()
+	private applyToAllTrains(): void
 	{
 		const settings = this._editor.getSettings();
 		if (settings)
@@ -767,7 +767,7 @@ class VehicleEditorWindow
 	/**
 	 * Starts a tool that allows the user to click on a vehicle to select it.
 	 */
-	private pickVehicle()
+	private pickVehicle(): void
 	{
 		const pickerButton = this.getWidget<ButtonWidget>("rve-picker-button");
 		if (pickerButton.isPressed)
@@ -806,7 +806,7 @@ class VehicleEditorWindow
 	/**
 	 * Enables and disables the copy/paste buttons depending on the copy state.
 	 */
-	private onClickCopy()
+	private onClickCopy(): void
 	{
 		const copyWidget = this.getWidget<ButtonWidget>("rve-copy-button");
 		if (copyWidget.isPressed)
@@ -843,5 +843,3 @@ class VehicleEditorWindow
 		return widget;
 	}
 }
-
-export default VehicleEditorWindow;
