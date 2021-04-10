@@ -541,11 +541,12 @@ export default class VehicleEditorWindow
 				<LabelWidget>{
 					tooltip: "Go to this URL to check for the latest updates",
 					type: "label",
-					x: (groupboxMargin + 35),
+					x: -1,
 					y: (windowHeight - (widgetLineHeight + 3)),
-					width: 275,
+					width: windowWidth,
 					height: widgetLineHeight,
 					text: "github.com/Basssiiie/OpenRCT2-RideVehicleEditor",
+					textAlign: "centred",
 					isDisabled: true
 				},
 			],
