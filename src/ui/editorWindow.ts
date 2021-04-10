@@ -146,6 +146,7 @@ export default class VehicleEditorWindow
 			const index = this._selector.trainIndex;
 			if (index !== null)
 			{
+				this.trainList.active(true);
 				this.trainList.set(index);
 			}
 			else
@@ -170,6 +171,19 @@ export default class VehicleEditorWindow
 			this.vehicleList.params.items = v.map((_, i) => `Vehicle ${i + 1}`);
 			this.vehicleList.params.maximum = v.length;
 			this.vehicleList.refresh();
+		});
+		selector.vehicle.subscribe(() =>
+		{
+			const index = this._selector.vehicleIndex;
+			if (index !== null)
+			{
+				this.vehicleList.active(true);
+				this.vehicleList.set(index);
+			}
+			else
+			{
+				this.vehicleList.active(false);
+			}
 		});
 
 		// Viewport
@@ -415,7 +429,7 @@ export default class VehicleEditorWindow
 
 				// Track progress
 				<LabelWidget>{
-					tooltip: this.seatCountSpinner.params.tooltip,
+					tooltip: this.trackProgressSpinner.params.tooltip,
 					type: "label",
 					x: (groupboxMargin + viewportSize + 5),
 					y: (editorStartY + controlHeight * 2) + 2,
@@ -427,6 +441,7 @@ export default class VehicleEditorWindow
 
 				// Number of seats
 				<LabelWidget>{
+					tooltip: this.seatCountSpinner.params.tooltip,
 					type: "label",
 					x: (groupboxMargin + viewportSize + 5),
 					y: (editorStartY + controlHeight * 3) + 2,
