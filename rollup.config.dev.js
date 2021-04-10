@@ -27,6 +27,11 @@ export default {
 
 				beautify: true
 			},
+			mangle: {
+				properties: {
+					regex: /^_/
+				}
+			},
 
 			// Useful only for stacktraces:
 			keep_fnames: true,

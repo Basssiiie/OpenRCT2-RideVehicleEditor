@@ -23,6 +23,11 @@ export default {
 				wrap_iife: true,
 				preamble: '// Get the latest version: https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor',
 			},
+			mangle: {
+				properties: {
+					regex: /^_/
+				}
+			},
 		}),
 	],
 };

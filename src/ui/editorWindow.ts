@@ -12,6 +12,7 @@ import DropdownButtonControl from "./dropdownButton";
 
 
 // Shared coordinate constants
+const windowId = "ride-vehicle-editor";
 const windowStart = 18;
 const windowWidth = 375;
 const windowHeight = 248;
@@ -40,12 +41,6 @@ let copiedVehicleSettings: VehicleSettings | null = null;
 
 export default class VehicleEditorWindow
 {
-	/**
-	 * The universal identifier that is used for this window.
-	 */
-	static readonly identifier = "ride-vehicle-editor";
-
-
 	readonly ridesInParkList: DropdownControl;
 	readonly trainList: DropdownSpinnerControl;
 	readonly vehicleList: DropdownSpinnerControl;
@@ -382,7 +377,7 @@ export default class VehicleEditorWindow
 		}
 
 		const window = ui.openWindow({
-			classification: VehicleEditorWindow.identifier,
+			classification: windowId,
 			title: windowTitle,
 			width: windowWidth,
 			height: windowHeight,
@@ -637,7 +632,7 @@ export default class VehicleEditorWindow
 	 */
 	close(): void
 	{
-		ui.closeWindows(VehicleEditorWindow.identifier);
+		ui.closeWindows(windowId);
 	}
 
 
@@ -850,7 +845,7 @@ export default class VehicleEditorWindow
 	 */
 	private getWidget<TWidget extends Widget>(name: string): TWidget
 	{
-		const widget = ui.getWindow(VehicleEditorWindow.identifier)?.findWidget<TWidget>(name);
+		const widget = ui.getWindow(windowId)?.findWidget<TWidget>(name);
 		if (!widget)
 		{
 			throw `Cannot find widget '${name}' in editor window.`;
