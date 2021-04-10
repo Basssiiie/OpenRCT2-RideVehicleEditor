@@ -3,9 +3,9 @@
  * @param array The array to check.
  * @param index The index to check.
  */
-export function isValidIndex<T>(array: T[] | null, index: number): boolean
+export function isValidIndex<T>(array: T[] | null, index: number | null): boolean
 {
-	return (array !== null && index >= 0 && index < array.length);
+	return (array != null && index != null && index >= 0 && index < array.length);
 }
 
 
@@ -16,7 +16,7 @@ export function isValidIndex<T>(array: T[] | null, index: number): boolean
  */
 export function getAtIndex<T>(array: T[] | null, index: number | null): T | null
 {
-	return (array !== null && index !== null && index >= 0 && index < array.length) ? array[index] : null;
+	return (array != null && index != null && index >= 0 && index < array.length) ? array[index] : null;
 }
 
 
