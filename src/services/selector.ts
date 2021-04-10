@@ -98,7 +98,7 @@ export default class VehicleSelector
 			// Only need to update the dropdown, rest of UI needs no refresh.
 			Log.debug(`(selector) Last selected ride has moved: idx ${this._rideIndex} -> idx ${rideIndex}.`);
 			this._rideIndex = rideIndex;
-			this.ride.set(newlySelectedRide);
+			this.ride.set(rides[rideIndex]);
 		}
 	}
 

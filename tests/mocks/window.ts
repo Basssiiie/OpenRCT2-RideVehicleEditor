@@ -1,4 +1,4 @@
-import mock from "./mock";
+import mock from "./_mock";
 
 /**
  * A mock of a window with basic functionality.
