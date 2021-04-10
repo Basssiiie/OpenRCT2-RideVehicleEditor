@@ -328,8 +328,8 @@ export default class VehicleEditorWindow
 			tooltip: "Apply the current vehicle settings to a specific set of other vehicles on this ride",
 			buttons: [
 				{ text: "Apply this to all vehicles", onClick: (): void => this.applyToAllVehicles() },
-				{ text: "Apply this to following vehicles", onClick: (): void => 	this.applyToFollowingVehicles() },
 				{ text: "Apply this to preceding vehicles", onClick: (): void => this.applyToPrecedingVehicles() },
+				{ text: "Apply this to following vehicles", onClick: (): void => 	this.applyToFollowingVehicles() },
 				{ text: "Apply this to all trains", onClick: (): void => this.applyToAllTrains() }
 			],
 			x: (groupboxMargin + viewportSize + 5),
