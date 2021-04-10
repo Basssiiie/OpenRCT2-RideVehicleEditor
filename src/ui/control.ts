@@ -42,7 +42,7 @@ export default abstract class Control<TParams extends ControlParams>
 
 
 	/**
-	 * Binds the window which this control.
+	 * Binds a window which contains one or more widgets from this control.
 	 */
 	bind(window: Window): void
 	{

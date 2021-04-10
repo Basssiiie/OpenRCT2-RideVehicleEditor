@@ -1,4 +1,5 @@
 /// <reference path="../../lib/duktape.d.ts" />
+/* istanbul ignore file */
 
 import * as Environment from "../environment";
 
