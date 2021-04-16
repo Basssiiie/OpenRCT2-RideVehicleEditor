@@ -45,7 +45,7 @@ test("Reload ride list: updates rides in park", t =>
 });
 
 
-test("Reload ride list: reselect previous selected ride", t =>
+test("Reload ride list: reselect previous selected ride (new index)", t =>
 {
 	const selector = new VehicleSelector();
 	global.map = mock_GameMap({
@@ -70,4 +70,55 @@ test("Reload ride list: reselect previous selected ride", t =>
 
 	t.is(selector.ride.get()?.name, "looping coaster");
 	t.is(selector.rideIndex, 3);
+});
+
+
+test("Reload ride list: reselect previous selected ride (same index)", t =>
+{
+	const selector = new VehicleSelector();
+	global.map = mock_GameMap({
+		rides: [
+			mock_Ride(<Ride>{ name: "ferris wheel" }),
+			mock_Ride(<Ride>{ name: "freefall" }),
+			mock_Ride(<Ride>{ name: "twister" }),
+		]
+	});
+
+	selector.reloadRideList();
+	selector.selectRide(1);
+
+	t.is(selector.ride.get()?.name, "freefall");
+	t.is(selector.rideIndex, 1);
+
+	global.map.rides.unshift(
+		mock_Ride(<Ride>{ name: "looping coaster" }),
+		mock_Ride(<Ride>{ name: "go karts" }),
+	);
+	selector.reloadRideList();
+
+	t.is(selector.ride.get()?.name, "freefall");
+	t.is(selector.rideIndex, 1);
+});
+
+
+test("Reload ride list: previous ride has disappeared", t =>
+{
+	const selector = new VehicleSelector();
+	global.map = mock_GameMap({
+		rides: [
+			mock_Ride(<Ride>{ name: "looping coaster" }),
+		]
+	});
+
+	selector.reloadRideList();
+	selector.selectRide(0);
+
+	t.is(selector.ride.get()?.name, "looping coaster");
+	t.is(selector.rideIndex, 0);
+
+	global.map.rides.pop();
+	selector.reloadRideList();
+
+	t.is(selector.ride.get(), null);
+	t.is(selector.rideIndex, null);
 });

@@ -79,7 +79,7 @@ export default class VehicleSelector
 		if (lastSelectedRide && this._rideIndex !== null)
 		{
 			const newlySelectedRide = rides[this._rideIndex];
-			if (lastSelectedRide.rideId === newlySelectedRide.rideId)
+			if (newlySelectedRide && newlySelectedRide.rideId === lastSelectedRide.rideId)
 			{
 				// Position is still the same in the new list.
 				return;
@@ -90,7 +90,7 @@ export default class VehicleSelector
 			if (rideIndex === null)
 			{
 				// Not found, reset to ride at index 0.
-				Log.debug(`(selector) Last selected ride not found, reset first in list.`);
+				Log.debug(`(selector) Last selected ride not found, reset to first in list.`);
 				this.selectRide(0);
 				return;
 			}
