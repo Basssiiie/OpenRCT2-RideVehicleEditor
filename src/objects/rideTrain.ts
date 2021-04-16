@@ -8,7 +8,7 @@ import RideVehicle from "./rideVehicle";
 export default class RideTrain
 {
 	/**
-	 * @param index Gets the index of the train for this ride (0-3).
+	 * @param index Gets the index of the train for this ride.
 	 * @param headCarId Gets the entity id for the first car of this train.
 	 */
 	constructor(
