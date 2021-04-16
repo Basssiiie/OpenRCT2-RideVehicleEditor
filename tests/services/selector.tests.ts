@@ -1,18 +1,20 @@
 /// <reference path="../../lib/openrct2.d.ts" />
 
 import test from 'ava';
+import RideVehicle from "../../src/objects/rideVehicle";
 import VehicleSelector from "../../src/services/selector";
 import mock_GameMap from "../mocks/gameMap";
 import mock_Ride from "../mocks/ride";
+import mock from "../mocks/_mock";
 
 
 test("Constructor defaults", t =>
 {
 	const selector = new VehicleSelector();
 
-	t.falsy(selector.ridesInPark.get());
-	t.falsy(selector.trainsOnRide.get());
-	t.falsy(selector.vehiclesOnTrain.get());
+	t.deepEqual(selector.ridesInPark.get(), []);
+	t.deepEqual(selector.trainsOnRide.get(), []);
+	t.deepEqual(selector.vehiclesOnTrain.get(), []);
 	t.is(selector.ride.get(), null);
 	t.is(selector.train.get(), null);
 	t.is(selector.vehicle.get(), null);
@@ -121,4 +123,52 @@ test("Reload ride list: previous ride has disappeared", t =>
 
 	t.is(selector.ride.get(), null);
 	t.is(selector.rideIndex, null);
+});
+
+
+test("Select vehicle: select correct vehicle", t =>
+{
+	const selector = new VehicleSelector();
+	selector.vehiclesOnTrain.set([
+		mock(new RideVehicle(10)),
+		mock(new RideVehicle(20)),
+		mock(new RideVehicle(30))
+	]);
+	t.is(selector.vehicle.get(), null);
+	t.is(selector.vehicleIndex, null);
+
+	selector.selectVehicle(2);
+	t.is(selector.vehicle.get()?.entityId, 30);
+	t.is(selector.vehicleIndex, 2);
+
+	selector.selectVehicle(1);
+	t.is(selector.vehicle.get()?.entityId, 20);
+	t.is(selector.vehicleIndex, 1);
+
+	selector.selectVehicle(0);
+	t.is(selector.vehicle.get()?.entityId, 10);
+	t.is(selector.vehicleIndex, 0);
+
+	selector.selectVehicle(-1);
+	t.is(selector.vehicle.get()?.entityId, 10);
+	t.is(selector.vehicleIndex, 0);
+
+	selector.selectVehicle(3);
+	t.is(selector.vehicle.get()?.entityId, 30);
+	t.is(selector.vehicleIndex, 2);
+});
+
+
+test("Select vehicle: no vehicles available", t =>
+{
+	const selector = new VehicleSelector();
+	t.is(selector.vehicle.get(), null);
+
+	selector.selectVehicle(0);
+	t.is(selector.vehicle.get(), null);
+	t.is(selector.vehicleIndex, null);
+
+	selector.selectVehicle(1);
+	t.is(selector.vehicle.get(), null);
+	t.is(selector.vehicleIndex, null);
 });

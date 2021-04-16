@@ -12,9 +12,9 @@ import Observable from "../utilities/observable";
  */
 export default class VehicleSelector
 {
-	readonly ridesInPark = new Observable<ParkRide[]>();
-	readonly trainsOnRide = new Observable<RideTrain[]>();
-	readonly vehiclesOnTrain = new Observable<RideVehicle[]>();
+	readonly ridesInPark = new Observable<ParkRide[]>([]);
+	readonly trainsOnRide = new Observable<RideTrain[]>([]);
+	readonly vehiclesOnTrain = new Observable<RideVehicle[]>([]);
 
 
 	/**
