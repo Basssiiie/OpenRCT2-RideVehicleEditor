@@ -643,6 +643,8 @@ export default class VehicleEditorWindow
 	 */
 	private onSelectVehicle(vehicle: RideVehicle | null): void
 	{
+		const copyButton = this._window?.findWidget<ButtonWidget>("rve-copy-button");
+
 		if (vehicle !== null)
 		{
 			const index = this._selector.vehicleIndex;
@@ -651,8 +653,9 @@ export default class VehicleEditorWindow
 				Log.debug(`(window) New vehicle index ${index} selected.`);
 				this.vehicleList.set(index);
 
-				// Viewport
+				// Viewport & apply-button
 				this.viewport.follow(vehicle.entityId);
+				this.applyToOthersButton.active(true);
 
 				// Activate controls
 				this.rideTypeList.active(true);
@@ -665,6 +668,12 @@ export default class VehicleEditorWindow
 				const isPowered = vehicle.isPowered();
 				this.powAccelerationSpinner.active(isPowered);
 				this.powMaxSpeedSpinner.active(isPowered);
+
+				// Copy button
+				if (copyButton)
+				{
+					copyButton.isDisabled = false;
+				}
 				return;
 			}
 		}
@@ -678,7 +687,14 @@ export default class VehicleEditorWindow
 		this.massSpinner.active(false);
 		this.powAccelerationSpinner.active(false);
 		this.powMaxSpeedSpinner.active(false);
+		this.applyToOthersButton.active(false);
 		this.viewport.stop();
+
+		// Copy button
+		if (copyButton)
+		{
+			copyButton.isDisabled = true;
+		}
 	}
 
 
