@@ -27,7 +27,6 @@ test("Constructor defaults", t =>
 
 test("Reload ride list: updates rides in park", t =>
 {
-	const selector = new VehicleSelector();
 	global.map = mock_GameMap({
 		rides: [
 			mock_Ride(<Ride>{ name: "twister" }),
@@ -35,7 +34,7 @@ test("Reload ride list: updates rides in park", t =>
 			mock_Ride(<Ride>{ name: "looping coaster" }),
 		]
 	});
-
+	const selector = new VehicleSelector();
 	selector.reloadRideList();
 
 	const rides = selector.ridesInPark.get();
@@ -50,7 +49,6 @@ test("Reload ride list: updates rides in park", t =>
 
 test("Reload ride list: reselect previous selected ride (new index)", t =>
 {
-	const selector = new VehicleSelector();
 	global.map = mock_GameMap({
 		rides: [
 			mock_Ride(<Ride>{ name: "ferris wheel" }),
@@ -58,7 +56,7 @@ test("Reload ride list: reselect previous selected ride (new index)", t =>
 			mock_Ride(<Ride>{ name: "twister" }),
 		]
 	});
-
+	const selector = new VehicleSelector();
 	selector.reloadRideList();
 	selector.selectRide(1);
 
@@ -78,7 +76,6 @@ test("Reload ride list: reselect previous selected ride (new index)", t =>
 
 test("Reload ride list: reselect previous selected ride (same index)", t =>
 {
-	const selector = new VehicleSelector();
 	global.map = mock_GameMap({
 		rides: [
 			mock_Ride(<Ride>{ name: "ferris wheel" }),
@@ -86,7 +83,7 @@ test("Reload ride list: reselect previous selected ride (same index)", t =>
 			mock_Ride(<Ride>{ name: "twister" }),
 		]
 	});
-
+	const selector = new VehicleSelector();
 	selector.reloadRideList();
 	selector.selectRide(1);
 
@@ -106,13 +103,12 @@ test("Reload ride list: reselect previous selected ride (same index)", t =>
 
 test("Reload ride list: previous ride has disappeared", t =>
 {
-	const selector = new VehicleSelector();
 	global.map = mock_GameMap({
 		rides: [
 			mock_Ride(<Ride>{ name: "looping coaster" }),
 		]
 	});
-
+	const selector = new VehicleSelector();
 	selector.reloadRideList();
 	selector.selectRide(0);
 

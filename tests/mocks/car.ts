@@ -7,9 +7,27 @@ import mock from "./_mock";
  */
 export default function mock_Car(template?: Partial<Car>): Car
 {
-	return mock<Car>({
+	const car = mock<Car>({
 		type: "car",
+		vehicleObject: 0,
+		get trackProgress()
+		{
+			return (this.id ?? 1) * 10;
+		},
 
 		...(mock_Entity(template) as Partial<Entity>),
 	});
+	// Init car based on object if any is specified
+	if (car.rideObject !== undefined && car.vehicleObject !== undefined)
+	{
+		const obj = context.getObject("ride", car.rideObject).vehicles[car.vehicleObject];
+		if (obj)
+		{
+			car.numSeats = obj.numSeats ?? 0;
+			car.mass = obj.carMass ?? 0;
+			car.poweredAcceleration = obj.poweredAcceleration ?? 0;
+			car.poweredMaxSpeed = obj.poweredMaxSpeed ?? 0;
+		}
+	}
+	return car;
 }

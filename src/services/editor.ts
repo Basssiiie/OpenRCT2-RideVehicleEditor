@@ -401,6 +401,11 @@ export default class VehicleEditor
 				this.poweredAcceleration.set(car.poweredAcceleration);
 				this.poweredMaxSpeed.set(car.poweredMaxSpeed);
 			}
+			else
+			{
+				this.poweredAcceleration.set(0);
+				this.poweredMaxSpeed.set(0);
+			}
 		}
 	}
 

@@ -6,9 +6,10 @@ import mock from "./_mock";
 /**
  * Mock that adds additional configurations to the game map.
  */
-type GameMapMock = GameMap & {
+interface GameMapMock extends GameMap
+{
 	entities?: Entity[]
-};
+}
 
 
 /**
