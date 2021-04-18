@@ -1,6 +1,6 @@
 import mock_Object, { RCTObject } from "./object";
 import mock_RideObjectVehicle from "./rideObjectVehicle";
-import mock from "./_mock";
+import mock from "./core/mock";
 
 
 /**

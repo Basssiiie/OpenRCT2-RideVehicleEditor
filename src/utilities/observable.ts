@@ -42,13 +42,13 @@ export default class Observable<T>
 		if (this._value !== value)
 		{
 			this._value = value;
-			Log.debug(`(observable) Value updated for ${this._listeners?.length ?? 0} listeners: ${JSON.stringify(value).slice(0, 50)}`);
+			Log.debug(`(observable) Value updated for ${this._listeners?.length ?? 0} listeners: ${JSON.stringify(value)?.slice(0, 50)}`);
 
 			this.invoke(value);
 		}
 		else
 		{
-			Log.debug(`(observable) Value is already set to: ${JSON.stringify(value).slice(0, 50)}`);
+			Log.debug(`(observable) Value is already set to: ${JSON.stringify(value)?.slice(0, 50)}`);
 		}
 	}
 

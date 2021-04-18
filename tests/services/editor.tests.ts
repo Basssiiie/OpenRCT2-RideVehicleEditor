@@ -32,10 +32,10 @@ function setupPark(): void
 	global.map = mock_GameMap({
 		entities: [
 			// steam trains
-			mock_Car(<Car>{ id: 20, nextCarOnTrain: 21, ride: 7, rideObject: 2, vehicleObject: 0 }),
-			mock_Car(<Car>{ id: 21, nextCarOnTrain: 22, ride: 7, rideObject: 2, vehicleObject: 1 }),
-			mock_Car(<Car>{ id: 22, nextCarOnTrain: 23, ride: 7, rideObject: 2, vehicleObject: 2 }),
-			mock_Car(<Car>{ id: 23, nextCarOnTrain: null, ride: 7, rideObject: 2, vehicleObject: 2 }),
+			mock_Car(<Car>{ id: 20, nextCarOnTrain: 21, ride: 7, rideObject: 2, vehicleObject: 0, trackProgress: 10 }),
+			mock_Car(<Car>{ id: 21, nextCarOnTrain: 22, ride: 7, rideObject: 2, vehicleObject: 1, trackProgress: 15 }),
+			mock_Car(<Car>{ id: 22, nextCarOnTrain: 23, ride: 7, rideObject: 2, vehicleObject: 2, trackProgress: 20 }),
+			mock_Car(<Car>{ id: 23, nextCarOnTrain: null, ride: 7, rideObject: 2, vehicleObject: 2, trackProgress: 25 }),
 		],
 		rides: [
 			mock_Ride(<Ride>{ id: 7, name: "steam trains 1", vehicles: [ 20 ] }),
@@ -59,7 +59,7 @@ test("Set vehicle: locomotive", t =>
 	t.is(editor.seats.get(), 1);
 	t.is(editor.poweredAcceleration.get(), 45);
 	t.is(editor.poweredMaxSpeed.get(), 35);
-	t.true(editor.trackProgress.get() > 0);
+	t.is(editor.trackProgress.get(), 10);
 });
 
 
@@ -78,7 +78,7 @@ test("Set vehicle: tender", t =>
 	t.is(editor.seats.get(), 2);
 	t.is(editor.poweredAcceleration.get(), 0);
 	t.is(editor.poweredMaxSpeed.get(), 0);
-	t.true(editor.trackProgress.get() > 0);
+	t.is(editor.trackProgress.get(), 15);
 });
 
 
@@ -97,5 +97,5 @@ test("Set vehicle: passenger car", t =>
 	t.is(editor.seats.get(), 4);
 	t.is(editor.poweredAcceleration.get(), 0);
 	t.is(editor.poweredMaxSpeed.get(), 0);
-	t.true(editor.trackProgress.get() > 0);
+	t.is(editor.trackProgress.get(), 20);
 });

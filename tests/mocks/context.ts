@@ -1,5 +1,17 @@
 import mock_Object, { RCTObject } from "./object";
-import mock from "./_mock";
+import mock from "./core/mock";
+
+
+/**
+ * Mock that adds additional configurations to the game map.
+ */
+interface Subscription
+{
+	hook: string;
+	callback: (e: unknown) => void;
+	disposable: IDisposable;
+	isDisposed: boolean;
+}
 
 
 /**
@@ -7,7 +19,8 @@ import mock from "./_mock";
  */
 interface ContextMock extends Context
 {
-	objects?: RCTObject[]
+	objects?: RCTObject[];
+	subscriptions?: Subscription[];
 }
 
 
@@ -17,6 +30,7 @@ interface ContextMock extends Context
 export default function mock_Context(template?: Partial<ContextMock>): ContextMock
 {
 	return mock<ContextMock>({
+		subscriptions: [],
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		getObject(type: ObjectType, index: number): any
 		{
@@ -30,6 +44,22 @@ export default function mock_Context(template?: Partial<ContextMock>): ContextMo
 		getAllObjects(type: ObjectType): any[]
 		{
 			return this.objects?.filter(o => o.type === type) ?? [];
+		},
+		// eslint-disable-next-line @typescript-eslint/ban-types
+		subscribe(hook: string, callback: Function): IDisposable
+		{
+			const subscription: Subscription =
+			{
+				hook: hook,
+				callback: callback as (e: unknown) => void,
+				isDisposed: false,
+				disposable:
+				{
+					dispose(): void	{ subscription.isDisposed = true; }
+				}
+			};
+			this.subscriptions?.push(subscription);
+			return subscription.disposable;
 		},
 
 		...template,

@@ -1,5 +1,5 @@
 import mock_Entity from "./entity";
-import mock from "./_mock";
+import mock from "./core/mock";
 
 
 /**
@@ -10,10 +10,6 @@ export default function mock_Car(template?: Partial<Car>): Car
 	const car = mock<Car>({
 		type: "car",
 		vehicleObject: 0,
-		get trackProgress()
-		{
-			return (this.id ?? 1) * 10;
-		},
 
 		...(mock_Entity(template) as Partial<Entity>),
 	});

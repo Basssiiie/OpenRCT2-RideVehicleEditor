@@ -1,12 +1,12 @@
 import mock_Entity from "./entity";
 import mock_Ride from "./ride";
-import mock from "./_mock";
+import mock from "./core/mock";
 
 
 /**
  * Mock that adds additional configurations to the game map.
  */
-interface GameMapMock extends GameMap
+export interface GameMapMock extends GameMap
 {
 	entities?: Entity[]
 }

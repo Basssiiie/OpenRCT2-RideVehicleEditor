@@ -1,4 +1,4 @@
-import mock from "./_mock";
+import mock from "./core/mock";
 
 
 let entityId = 0;
