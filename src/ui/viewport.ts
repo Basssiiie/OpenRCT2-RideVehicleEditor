@@ -20,8 +20,8 @@ export default class ViewportControl extends Control<ControlParams>
 	 */
 	goTo(position: CoordsXY | CoordsXYZ): void
 	{
-		Log.debug(`(${this.params.name}) Jump to position ${position}.`);
-		this._isActive = true;
+		Log.debug(`(${this._params.name}) Jump to position ${position}.`);
+		this._params.isActive = true;
 		this._entityId = -1;
 
 		const widget = this.getWidget<ViewportWidget>();
@@ -37,9 +37,9 @@ export default class ViewportControl extends Control<ControlParams>
 	 */
 	follow(entityId: number): void
 	{
-		Log.debug(`(${this.params.name}) Start following entity ${entityId}.`);
+		Log.debug(`(${this._params.name}) Start following entity ${entityId}.`);
 
-		this._isActive = true;
+		this._params.isActive = true;
 		this._entityId = entityId;
 		this.refresh();
 	}
@@ -61,7 +61,7 @@ export default class ViewportControl extends Control<ControlParams>
 	createWidget(): ViewportWidget
 	{
 		return {
-			...this.params,
+			...this._params,
 			type: "viewport",
 			viewport: <Viewport>{
 				left: farAway.x,
@@ -74,7 +74,7 @@ export default class ViewportControl extends Control<ControlParams>
 	/** @inheritdoc */
 	protected refreshWidget(widget: ViewportWidget): void
 	{
-		if (this._isActive && this._entityId != -1)
+		if (this._params.isActive && this._entityId != -1)
 		{
 			if (!this._updater)
 			{
@@ -84,7 +84,7 @@ export default class ViewportControl extends Control<ControlParams>
 		}
 		else if (this._updater)
 		{
-			Log.debug(`(${this.params.name}) Updating has stopped.`);
+			Log.debug(`(${this._params.name}) Updating has stopped.`);
 			this._updater.dispose();
 			this._updater = null;
 
@@ -101,7 +101,7 @@ export default class ViewportControl extends Control<ControlParams>
 		if (this._entityId == -1)
 		{
 			this.stop();
-			Log.error(`(${this.params.name}) Viewport tick update called while there is no entity to follow.`);
+			Log.error(`(${this._params.name}) Viewport tick update called while there is no entity to follow.`);
 			return;
 		}
 

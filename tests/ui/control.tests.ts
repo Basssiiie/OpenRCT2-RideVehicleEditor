@@ -32,6 +32,7 @@ test("Widget parameters are set", t =>
 	t.is(control.params.height, 40);
 	t.is(control.params.name, "test-name");
 	t.is(control.params.tooltip, "test a tip");
+	t.is(control.params.isActive, true); // default value
 });
 
 

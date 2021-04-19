@@ -319,6 +319,17 @@ export default class VehicleEditor
 	 */
 	private applySettingsToCar(car: Car, settings: VehicleSettings, updateObservables: boolean): void
 	{
+		car.vehicleObject = settings.variant;
+		car.numSeats = settings.seats;
+		car.mass = settings.mass;
+
+		if (updateObservables)
+		{
+			this.variant.set(settings.variant);
+			this.seats.set(settings.seats);
+			this.mass.set(settings.mass);
+		}
+
 		const rideTypes = this.rideTypeList.get();
 		const rideTypeIdx = ArrayHelper.findIndex(rideTypes, t => t.id === settings.rideTypeId);
 
@@ -332,34 +343,21 @@ export default class VehicleEditor
 			}
 		}
 
-		car.vehicleObject = settings.variant;
-		car.numSeats = settings.seats;
-		car.mass = settings.mass;
-
-		if (updateObservables)
+		// Only apply if the original vehicle had them set.
+		if (settings.poweredAcceleration !== undefined)
 		{
-			this.variant.set(settings.variant);
-			this.seats.set(settings.seats);
-			this.mass.set(settings.mass);
-		}
-
-		if (RideVehicle.isPowered(car))
-		{
-			if (settings.poweredAcceleration !== undefined)
+			car.poweredAcceleration = settings.poweredAcceleration;
+			if (updateObservables)
 			{
-				car.poweredAcceleration = settings.poweredAcceleration;
-				if (updateObservables)
-				{
-					this.poweredAcceleration.set(settings.poweredAcceleration);
-				}
+				this.poweredAcceleration.set(settings.poweredAcceleration);
 			}
-			if (settings.poweredMaxSpeed !== undefined)
+		}
+		if (settings.poweredMaxSpeed !== undefined)
+		{
+			car.poweredMaxSpeed = settings.poweredMaxSpeed;
+			if (updateObservables)
 			{
-				car.poweredMaxSpeed = settings.poweredMaxSpeed;
-				if (updateObservables)
-				{
-					this.poweredMaxSpeed.set(settings.poweredMaxSpeed);
-				}
+				this.poweredMaxSpeed.set(settings.poweredMaxSpeed);
 			}
 		}
 	}

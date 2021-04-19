@@ -8,6 +8,8 @@ import SpinnerControl from "../ui/spinner";
 import ViewportControl from "../ui/viewport";
 import * as ArrayHelper from "../utilities/arrayHelper";
 import * as Log from "../utilities/logger";
+import ButtonControl, { PressType } from "./button";
+import Control, { BindableControl } from "./control";
 import DropdownButtonControl from "./dropdownButton";
 
 
@@ -54,6 +56,10 @@ export default class VehicleEditorWindow
 	readonly powMaxSpeedSpinner: SpinnerControl;
 	readonly massSpinner: SpinnerControl;
 
+	readonly locateButton: ButtonControl;
+	readonly pickerButton: ButtonControl;
+	readonly copyButton: ButtonControl;
+	readonly pasteButton: ButtonControl;
 	readonly applyToOthersButton: DropdownButtonControl;
 	readonly multiplierDropdown: DropdownControl;
 
@@ -215,7 +221,7 @@ export default class VehicleEditorWindow
 		{
 			this.rideTypeList.set(t);
 			this.variantSpinner.params.maximum = editor.rideType.variantCount;
-			this.variantSpinner.active(editor.rideType.variantCount > 1);
+			this.variantSpinner.refresh();
 
 			const car = selector.vehicle.get();
 			if (car)
@@ -303,7 +309,7 @@ export default class VehicleEditorWindow
 		this.powAccelerationSpinner = new SpinnerControl({
 			name: "rve-powered-acceleration-spinner",
 			tooltip: "Cranks up the engines to accelerate faster, self-powered vehicles only",
-			disabledMessage: "Only on powered vehicles.",
+			disabledMessage: "Only on powered vehicles",
 			wrapMode: "clampThenWrap",
 			minimum: 0,
 			maximum: 256,
@@ -319,7 +325,7 @@ export default class VehicleEditorWindow
 		this.powMaxSpeedSpinner = new SpinnerControl({
 			name: "rve-powered-max-speed-spinner",
 			tooltip: "The (il)legal speed limit for your vehicle, self-powered vehicles only",
-			disabledMessage: "Only on powered vehicles.",
+			disabledMessage: "Only on powered vehicles",
 			wrapMode: "clampThenWrap",
 			minimum: 0,
 			maximum: 256,
@@ -331,7 +337,63 @@ export default class VehicleEditorWindow
 		});
 		editor.poweredMaxSpeed.subscribe(v => this.powMaxSpeedSpinner.set(v));
 
-		// Dropdown button to apply current settings to other vehicles
+		// Button to locate the vehicle in the main viewport.
+		this.locateButton = new ButtonControl({
+			name: "rve-locate-button",
+			tooltip: "Locate your vehicle when you've lost it (again)",
+			image: 5167, // SPR_LOCATE
+			x: (groupboxMargin + 1),
+			y: (editorStartY + viewportSize + 8),
+			width: buttonSize,
+			height: buttonSize,
+			onClick: (): void => this._editor.locate()
+		});
+
+		this.pickerButton = new ButtonControl({
+			name: "rve-picker-button",
+			tooltip: "Use the picker to select a vehicle by clicking it",
+			image: 29467, // SPR_G2_EYEDROPPER
+			mode: "toggle",
+			x: (groupboxMargin + buttonSize + 2),
+			y: (editorStartY + viewportSize + 8),
+			width: buttonSize,
+			height: buttonSize,
+			onClick: (type: PressType): void => this.pickVehicle(type)
+		});
+
+		this.copyButton = new ButtonControl({
+			name: "rve-copy-button",
+			tooltip: "Copies the current vehicle settings to your clipboard",
+			mode: "toggle",
+			image: 29434, // SPR_G2_COPY
+			isPressed: (copiedVehicleSettings !== null),
+			x: (groupboxMargin + (buttonSize + 1) * 2) + 1,
+			y: (editorStartY + viewportSize + 8),
+			width: buttonSize,
+			height: buttonSize,
+			onClick: (type: PressType): void => this.onClickCopy(type)
+		});
+
+		this.pasteButton = new ButtonControl({
+			name: "rve-paste-button",
+			tooltip: "Pastes the previously copied vehicle settings over the currently selected vehicle",
+			isActive: (copiedVehicleSettings !== null),
+			image: 29435, // SPR_G2_PASTE
+			x: (groupboxMargin + (buttonSize + 1) * 3) + 1,
+			y: (editorStartY + viewportSize + 8),
+			width: buttonSize,
+			height: buttonSize,
+			onClick: (): void =>
+			{
+				if (copiedVehicleSettings !== null)
+				{
+					Log.debug(`(window) Paste settings: ${JSON.stringify(copiedVehicleSettings)}`);
+					this._editor.applySettings(copiedVehicleSettings);
+				}
+			}
+		});
+
+		// Dropdown button to apply current settings to other vehicles.
 		this.applyToOthersButton = new DropdownButtonControl({
 			name: "rve-apply-to-others-button",
 			tooltip: "Apply the current vehicle settings to a specific set of other vehicles on this ride",
@@ -483,61 +545,13 @@ export default class VehicleEditorWindow
 				this.powMaxSpeedSpinner.createWidget(),
 
 				// Toolbar
+				this.locateButton.createWidget(),
+				this.pickerButton.createWidget(),
+				this.copyButton.createWidget(),
+				this.pasteButton.createWidget(),
 				...this.applyToOthersButton.createWidgets(),
 				this.multiplierDropdown.createWidget(),
 
-				<ButtonWidget>{
-					tooltip: "Locate your vehicle when you've lost it (again)",
-					type: "button",
-					x: (groupboxMargin + 1),
-					y: (editorStartY + viewportSize + 8),
-					width: buttonSize,
-					height: buttonSize,
-					image: 5167, // SPR_LOCATE
-					onClick: () => this._editor.locate()
-				},
-				<ButtonWidget>{
-					tooltip: "Use the picker to select a vehicle by clicking it",
-					name: "rve-picker-button",
-					type: "button",
-					x: (groupboxMargin + buttonSize + 2),
-					y: (editorStartY + viewportSize + 8),
-					width: buttonSize,
-					height: buttonSize,
-					image: 29467, // SPR_G2_EYEDROPPER
-					onClick: () => this.pickVehicle()
-				},
-				<ButtonWidget>{
-					tooltip: "Copies the current vehicle settings to your clipboard",
-					name: "rve-copy-button",
-					type: "button",
-					x: (groupboxMargin + (buttonSize + 1) * 2) + 1,
-					y: (editorStartY + viewportSize + 8),
-					width: buttonSize,
-					height: buttonSize,
-					isPressed: (copiedVehicleSettings !== null),
-					image: 29434, // SPR_G2_COPY
-					onClick: () => this.onClickCopy()
-				},
-				<ButtonWidget>{
-					tooltip: "Pastes the previously copied vehicle settings over the currently selected vehicle",
-					name: "rve-paste-button",
-					type: "button",
-					x: (groupboxMargin + (buttonSize + 1) * 3) + 1,
-					y: (editorStartY + viewportSize + 8),
-					width: buttonSize,
-					height: buttonSize,
-					isDisabled: (copiedVehicleSettings === null),
-					image: 29435, // SPR_G2_PASTE
-					onClick: () =>
-					{
-						if (copiedVehicleSettings !== null)
-						{
-							Log.debug(`(window) Paste settings: ${JSON.stringify(copiedVehicleSettings)}`);
-							this._editor.applySettings(copiedVehicleSettings);
-						}
-					}
-				},
 				<LabelWidget>{
 					tooltip: "Go to this URL to check for the latest updates",
 					type: "label",
@@ -572,21 +586,15 @@ export default class VehicleEditorWindow
 			}
 		});
 
-		this.ridesInParkList.bind(window);
-		this.trainList.bind(window);
-		this.vehicleList.bind(window);
-
-		this.rideTypeList.bind(window);
-		this.variantSpinner.bind(window);
-		this.trackProgressSpinner.bind(window);
-		this.seatCountSpinner.bind(window);
-		this.massSpinner.bind(window);
-		this.powAccelerationSpinner.bind(window);
-		this.powMaxSpeedSpinner.bind(window);
-
-		this.viewport.bind(window);
-		this.applyToOthersButton.bind(window);
-		this.multiplierDropdown.bind(window);
+		// Bind all controls to this window...
+		for (const field in this)
+		{
+			const value = this[field];
+			if (value instanceof Control)
+			{
+				(value as BindableControl).bind(window);
+			}
+		}
 
 		Log.debug("(window) Window creation complete.");
 		return window;
@@ -624,6 +632,12 @@ export default class VehicleEditorWindow
 			// Not found, select first available ride.
 			Log.debug("(window) Restore selection failed: ride not found.");
 			this._selector.selectRide(0);
+
+			// If none is selectable, ensure controls are disabled..
+			if (this._selector.vehicle.get() === null)
+			{
+				this.onSelectVehicle(null);
+			}
 		}
 	}
 
@@ -643,7 +657,20 @@ export default class VehicleEditorWindow
 	 */
 	private onSelectVehicle(vehicle: RideVehicle | null): void
 	{
-		const copyButton = this._window?.findWidget<ButtonWidget>("rve-copy-button");
+		// Toggle base controls
+		const toggle = (toggle: boolean): void =>
+		{
+			this.rideTypeList.active(toggle);
+			this.variantSpinner.active(toggle);
+			this.trackProgressSpinner.active(toggle);
+			this.seatCountSpinner.active(toggle);
+			this.massSpinner.active(toggle);
+
+			// Buttons
+			this.applyToOthersButton.active(toggle);
+			this.locateButton.active(toggle);
+			this.copyButton.active(toggle);
+		};
 
 		if (vehicle !== null)
 		{
@@ -653,48 +680,23 @@ export default class VehicleEditorWindow
 				Log.debug(`(window) New vehicle index ${index} selected.`);
 				this.vehicleList.set(index);
 
-				// Viewport & apply-button
+				toggle(true);
 				this.viewport.follow(vehicle.entityId);
-				this.applyToOthersButton.active(true);
-
-				// Activate controls
-				this.rideTypeList.active(true);
-				this.variantSpinner.active(true);
-				this.trackProgressSpinner.active(true);
-				this.seatCountSpinner.active(true);
-				this.massSpinner.active(true);
 
 				// Powered properties only
 				const isPowered = vehicle.isPowered();
 				this.powAccelerationSpinner.active(isPowered);
 				this.powMaxSpeedSpinner.active(isPowered);
-
-				// Copy button
-				if (copyButton)
-				{
-					copyButton.isDisabled = false;
-				}
 				return;
 			}
 		}
 
 		Log.debug(`(window) Failed to select vehicle, disable controls.`);
+		toggle(false);
 		this.vehicleList.active(false);
-		this.rideTypeList.active(false);
-		this.variantSpinner.active(false);
-		this.trackProgressSpinner.active(false);
-		this.seatCountSpinner.active(false);
-		this.massSpinner.active(false);
 		this.powAccelerationSpinner.active(false);
 		this.powMaxSpeedSpinner.active(false);
-		this.applyToOthersButton.active(false);
 		this.viewport.stop();
-
-		// Copy button
-		if (copyButton)
-		{
-			copyButton.isDisabled = true;
-		}
 	}
 
 
@@ -794,17 +796,15 @@ export default class VehicleEditorWindow
 	/**
 	 * Starts a tool that allows the user to click on a vehicle to select it.
 	 */
-	private pickVehicle(): void
+	private pickVehicle(type: PressType): void
 	{
-		const pickerButton = this.getWidget<ButtonWidget>("rve-picker-button");
-		if (pickerButton.isPressed)
+		if (type === "up")
 		{
 			const tool = ui.tool;
 			if (tool && tool.id === "rve-pick-vehicle")
 			{
 				tool.cancel();
 			}
-			pickerButton.isPressed = false;
 		}
 		else
 		{
@@ -821,11 +821,9 @@ export default class VehicleEditorWindow
 				},
 				onFinish: () =>
 				{
-					const pickerButton = this.getWidget<ButtonWidget>("rve-picker-button");
-					pickerButton.isPressed = false;
+					this.pickerButton.set("up");
 				}
 			});
-			pickerButton.isPressed = true;
 		}
 	}
 
@@ -833,40 +831,34 @@ export default class VehicleEditorWindow
 	/**
 	 * Enables and disables the copy/paste buttons depending on the copy state.
 	 */
-	private onClickCopy(): void
+	private onClickCopy(type: PressType): void
 	{
-		const copyWidget = this.getWidget<ButtonWidget>("rve-copy-button");
-		if (copyWidget.isPressed)
+		const isDown = (type === "down");
+		if (isDown)
 		{
-			copyWidget.isPressed = false;
-			copiedVehicleSettings = null;
+			copiedVehicleSettings = this._editor.getSettings();
+			if (copiedVehicleSettings === null)
+			{
+				this.copyButton.set("up");
+			}
 		}
 		else
 		{
-			copiedVehicleSettings = this._editor.getSettings();
-			if (copiedVehicleSettings !== null)
-			{
-				copyWidget.isPressed = true;
-			}
+			copiedVehicleSettings = null;
 		}
-		Log.debug(`(window) Copied: ${copyWidget.isPressed}`);
-
-		const pasteWidget = this.getWidget<ButtonWidget>("rve-paste-button");
-		pasteWidget.isDisabled = !copyWidget.isPressed;
+		Log.debug(`(window) Copied: ${isDown}`);
+		this.pasteButton.active(isDown);
 	}
 
 
 	/**
-	 * Returns the widget with the specified name, if the window is active.
-	 * @param name The name of the widget.
+	 * Resets all window globals for unit tests.
 	 */
-	private getWidget<TWidget extends Widget>(name: string): TWidget
+	static resetGlobals(): void
 	{
-		const widget = ui.getWindow(windowId)?.findWidget<TWidget>(name);
-		if (!widget)
-		{
-			throw `Cannot find widget '${name}' in editor window.`;
-		}
-		return widget;
+		lastSelectedRideId = null;
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		lastSelectedTrainIndex = lastSelectedVehicleIndex = undefined!;
+		copiedVehicleSettings = null;
 	}
 }

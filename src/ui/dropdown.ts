@@ -63,14 +63,14 @@ export default class DropdownControl extends Control<DropdownParams>
 	 */
 	set(index: number): void
 	{
-		if (!this._isActive)
+		if (!this._params.isActive)
 		{
-			Log.debug(`(${this.params.name}) Dropdown is inactive, selected index ${index} was not applied.`);
+			Log.debug(`(${this._params.name}) Dropdown is inactive, selected index ${index} was not applied.`);
 			return;
 		}
 
 		const widget = this.getWidget<DropdownWidget>();
-		Log.debug(`(${this.params.name}) Dropdown selected index changed to ${index}.`);
+		Log.debug(`(${this._params.name}) Dropdown selected index changed to ${index}.`);
 
 		this._silenceEvent = true;
 		widget.selectedIndex = index;
@@ -84,7 +84,7 @@ export default class DropdownControl extends Control<DropdownParams>
 	createWidget(): DropdownWidget
 	{
 		return {
-			...this.params,
+			...this._params,
 			type: "dropdown",
 			selectedIndex: 0,
 			onChange: (i): void => this.onWidgetChange(i)
@@ -104,20 +104,19 @@ export default class DropdownControl extends Control<DropdownParams>
 		const widget = this.getWidget<DropdownWidget>();
 		if (widget.isDisabled)
 		{
-			Log.debug(`(${this.params.name}) Widget is disabled, no change event triggered.`);
+			Log.debug(`(${this._params.name}) Widget is disabled, no change event triggered.`);
 			return;
 		}
 
-		if (this.params.onSelect)
-			this.params.onSelect(index);
+		this._params.onSelect?.(index);
 	}
 
 
 	/** @inheritdoc */
 	protected refreshWidget(widget: DropdownWidget): void
 	{
-		const items = this.params.items;
-		if (this._isActive && items && items.length > 0)
+		const items = this._params.items;
+		if (this._params.isActive && items && items.length > 0)
 		{
 			widget.items = items;
 			widget.isDisabled = (this._params.disableSingleItem && items.length == 1);

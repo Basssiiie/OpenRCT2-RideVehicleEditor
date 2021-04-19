@@ -89,7 +89,7 @@ export default class DropdownSpinnerControl extends DropdownControl
 	/** @inheritdoc */
 	protected refreshWidget(widget: DropdownWidget): void
 	{
-		this._spinner.params.maximum = this.params.items.length;
+		this._spinner.params.maximum = this._params.items.length;
 		this._spinner.refresh();
 
 		super.refreshWidget(widget);

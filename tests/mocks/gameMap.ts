@@ -8,7 +8,8 @@ import mock from "./core/mock";
  */
 export interface GameMapMock extends GameMap
 {
-	entities?: Entity[]
+	entities: Entity[];
+	rides: Ride[];
 }
 
 

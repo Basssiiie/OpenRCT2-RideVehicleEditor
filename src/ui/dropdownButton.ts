@@ -48,7 +48,7 @@ export default class DropdownButtonComponent extends DropdownControl
 	 */
 	createWidgets(): Widget[]
 	{
-		const params = this.params as DropdownButtonParams;
+		const params = this._params as DropdownButtonParams;
 		const dropdown = super.createWidget();
 		dropdown.items = params.buttons?.map((b): string => b.text);
 
@@ -74,7 +74,7 @@ export default class DropdownButtonComponent extends DropdownControl
 	 */
 	private onButtonClick(): void
 	{
-		const params = this.params as DropdownButtonParams;
+		const params = this._params as DropdownButtonParams;
 		params.buttons[this._selectedIndex]?.onClick();
 	}
 
@@ -102,12 +102,12 @@ export default class DropdownButtonComponent extends DropdownControl
 	private refreshButton(): void
 	{
 		const dropdown = this.getWidget<DropdownWidget>();
-		const button = this._window?.findWidget<ButtonWidget>(this.params.name + "-button");
+		const button = this._window?.findWidget<ButtonWidget>(this._params.name + "-button");
 		if (button)
 		{
 			button.isDisabled = dropdown.isDisabled;
 
-			const params = this.params as DropdownButtonParams;
+			const params = this._params as DropdownButtonParams;
 			button.text = params.buttons[this._selectedIndex].text;
 		}
 	}

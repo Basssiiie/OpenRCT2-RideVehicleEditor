@@ -95,23 +95,23 @@ export default class SpinnerControl extends Control<SpinnerParams>
 	 */
 	set(value: number): void
 	{
-		if (!this._isActive)
+		/*if (!this._params.isActive)
 		{
 			Log.debug(`(${this.params.name}) Spinner is inactive, value ${value} was not applied.`);
 			return;
-		}
+		}*/
 
-		const min = this.params.minimum;
-		const max = this.params.maximum;
+		const min = this._params.minimum;
+		const max = this._params.maximum;
 
 		if (min >= max)
 		{
-			Log.debug(`(${this.params.name}) Minimum ${min} is equal to or larger than maximum ${max}, value ${value} was not applied.`);
+			Log.debug(`(${this._params.name}) Minimum ${min} is equal to or larger than maximum ${max}, value ${value} was not applied.`);
 			return;
 		}
 
-		this._isActive = true;
-		switch (this.params.wrapMode)
+		this._params.isActive = true;
+		switch (this._params.wrapMode)
 		{
 			default:
 			{
@@ -146,11 +146,11 @@ export default class SpinnerControl extends Control<SpinnerParams>
 	createWidget(): SpinnerWidget
 	{
 		return {
-			...this.params,
+			...this._params,
 			type: "spinner",
 			text: "",
-			onIncrement: (): void => this.onWidgetChange(this._value,  this.params.increment),
-			onDecrement: (): void => this.onWidgetChange(this._value, -this.params.increment)
+			onIncrement: (): void => this.onWidgetChange(this._value,  this._params.increment),
+			onDecrement: (): void => this.onWidgetChange(this._value, -this._params.increment)
 		};
 	}
 
@@ -164,33 +164,30 @@ export default class SpinnerControl extends Control<SpinnerParams>
 		const widget = this.getWidget<SpinnerWidget>();
 		if (widget.isDisabled)
 		{
-			Log.debug(`(${this.params.name}) Widget is disabled, no change event triggered.`);
+			Log.debug(`(${this._params.name}) Widget is disabled, no change event triggered.`);
 			return;
 		}
 		value += adjustment;
 		this.set(value);
 
-		if (this.params.onChange)
-		{
-			this.params.onChange(this._value, adjustment);
-		}
+		this._params.onChange?.(this._value, adjustment);
 	}
 
 
 	/** @inheritdoc */
 	protected refreshWidget(widget: SpinnerWidget): void
 	{
-		if (this._isActive && this.params.minimum < this.params.maximum)
+		if (this._params.isActive && this._params.minimum < this._params.maximum)
 		{
-			widget.text = (this.params.format)
-				? this.params.format(this.value)
+			widget.text = (this._params.format)
+				? this._params.format(this.value)
 				: this._value.toString();
 
-			widget.isDisabled = (this.params.minimum >= (this.params.maximum - 1));
+			widget.isDisabled = (this._params.minimum >= (this._params.maximum - 1));
 		}
 		else
 		{
-			widget.text = this.params.disabledMessage;
+			widget.text = this._params.disabledMessage;
 			widget.isDisabled = true;
 		}
 	}

@@ -3,8 +3,24 @@
  */
 export interface ControlParams
 {
+	/**
+	 * Internal identifying name of the control.
+	 */
 	name: string;
+
+	/**
+	 * An optional tooltip to show by this control, by hovering over it.
+	 * @default undefined
+	 */
 	tooltip?: string;
+
+
+	/**
+	 * Whether or not the control starts active.
+	 * @default true
+	 */
+	isActive?: boolean;
+
 	x: number;
 	y: number;
 	width: number;
@@ -13,9 +29,22 @@ export interface ControlParams
 
 
 /**
+ * Allows a window to be bound to this control. Any related widgets in this
+ * window will be updated when the control is updated.
+ */
+export interface BindableControl
+{
+	/**
+	 * Binds a window which contains one or more widgets from this control.
+	 */
+	bind(window: Window): void;
+}
+
+
+/**
  * Base class for managing and binding a widget controller to a window.
  */
-export default abstract class Control<TParams extends ControlParams>
+export default abstract class Control<TParams extends ControlParams> implements BindableControl
 {
 	/**
 	 * Gets the parameters for this control.
@@ -27,7 +56,6 @@ export default abstract class Control<TParams extends ControlParams>
 
 
 	protected _window: (Window | null) = null;
-	protected _isActive: boolean = true;
 	protected _params: Required<TParams>;
 
 
@@ -37,6 +65,7 @@ export default abstract class Control<TParams extends ControlParams>
 	 */
 	constructor(params: TParams)
 	{
+		params.isActive ??= true;
 		this._params = params as Required<TParams>;
 	}
 
@@ -57,7 +86,7 @@ export default abstract class Control<TParams extends ControlParams>
 	 */
 	active(toggle: boolean): void
 	{
-		this._isActive = toggle;
+		this._params.isActive = toggle;
 
 		const widget = this.getWidget();
 		widget.isDisabled = !toggle;
