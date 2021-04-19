@@ -24,7 +24,7 @@ test("Widget parameters are set", t =>
 test("Default widget parameters are set", t =>
 {
 	const dropdown = new DropdownControl({
-		x: 1, y: 2, width: 3, height: 4
+		name: "test", x: 1, y: 2, width: 3, height: 4
 	});
 	t.deepEqual(dropdown.params.items, []);
 	t.is(dropdown.params.disabledMessage, "Not available");
@@ -35,7 +35,7 @@ test("Default widget parameters are set", t =>
 test("Configured widget parameters are not overwritten", t =>
 {
 	const dropdown = new DropdownControl({
-		x: 1, y: 2, width: 3, height: 4,
+		name: "test", x: 1, y: 2, width: 3, height: 4,
 		items: [ "test" ],
 		disabledMessage: "test disabled",
 		disableSingleItem: false,
@@ -49,7 +49,7 @@ test("Configured widget parameters are not overwritten", t =>
 test("Created widget is complete", t =>
 {
 	const control = new DropdownControl({
-		x: 1, y: 2, width: 3, height: 4,
+		name: "test", x: 1, y: 2, width: 3, height: 4,
 		items: [ "one", "two" ]
 	});
 	const widget = control.createWidget();
@@ -68,7 +68,7 @@ test("Created widget is complete", t =>
 test("set() updates selected index", t =>
 {
 	const control = new DropdownControl({
-		x: 1, y: 2, width: 3, height: 4,
+		name: "test", x: 1, y: 2, width: 3, height: 4,
 		items: [ "one", "two", "three" ],
 		onSelect: (): void => t.fail("Event should be silenced when using 'set'")
 	});
@@ -87,7 +87,7 @@ test("set() updates selected index", t =>
 test("set() does nothing when control inactive", t =>
 {
 	const control = new DropdownControl({
-		x: 1, y: 2, width: 3, height: 4,
+		name: "test", x: 1, y: 2, width: 3, height: 4,
 		items: [ "one", "two", "three" ],
 		onSelect: (): void => t.fail("Event should be silenced when using 'set'")
 	});
@@ -110,7 +110,7 @@ test("Widget onChange updates control", t =>
 	t.plan(2);
 
 	const control = new DropdownControl({
-		x: 1, y: 2, width: 3, height: 4,
+		name: "test", x: 1, y: 2, width: 3, height: 4,
 		items: [ "one", "two", "three" ],
 		onSelect: (idx): void => t.is(idx, 1)
 	});
@@ -130,7 +130,7 @@ test("selectedIndex triggering onChange does not trigger onSelect", t =>
 {
 	const tokens: string[] = [];
 	const control = new DropdownControl({
-		x: 1, y: 2, width: 3, height: 4,
+		name: "test", x: 1, y: 2, width: 3, height: 4,
 		items: [ "one", "two", "three" ],
 		onSelect: (): void => t.fail("Should not trigger")
 	});

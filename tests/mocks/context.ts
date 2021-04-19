@@ -1,4 +1,4 @@
-import mock_Object, { RCTObject } from "./object";
+import mock_LoadedObject from "./loadedObject";
 import mock from "./core/mock";
 
 
@@ -19,7 +19,7 @@ interface Subscription
  */
 interface ContextMock extends Context
 {
-	objects: RCTObject[];
+	objects: LoadedObject[];
 	subscriptions: Subscription[];
 }
 
@@ -36,7 +36,7 @@ export default function mock_Context(template?: Partial<ContextMock>): ContextMo
 		{
 			const result = this.objects?.find(o => o.index === index && o.type === type);
 			if (!result)
-				return mock_Object(<RCTObject>{ name: "not-found" });
+				return mock_LoadedObject(<LoadedObject>{ name: "not-found" });
 
 			return result;
 		},

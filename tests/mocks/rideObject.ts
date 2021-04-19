@@ -1,4 +1,4 @@
-import mock_Object, { RCTObject } from "./object";
+import mock_LoadedObject from "./loadedObject";
 import mock_RideObjectVehicle from "./rideObjectVehicle";
 import mock from "./core/mock";
 
@@ -15,6 +15,6 @@ export default function mock_RideObject(template?: Partial<RideObject>): RideObj
 			mock_RideObjectVehicle()
 		],
 
-		...(mock_Object(template) as Partial<RCTObject>),
+		...(mock_LoadedObject(template) as Partial<LoadedObject>),
 	});
 }

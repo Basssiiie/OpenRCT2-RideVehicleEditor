@@ -31,7 +31,7 @@ export default function mock_GameMap(template?: Partial<GameMapMock>): GameMapMo
 		{
 			const result = this.entities?.find(r => r.id === id);
 			if (!result)
-				return mock_Entity(<Entity>{ name: "not-found" });
+				return mock_Entity(<Entity>(<unknown>{ name: "not-found" }));
 
 			return result;
 		},
