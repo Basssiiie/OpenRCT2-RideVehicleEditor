@@ -19,8 +19,8 @@ interface Subscription
  */
 interface ContextMock extends Context
 {
-	objects?: RCTObject[];
-	subscriptions?: Subscription[];
+	objects: RCTObject[];
+	subscriptions: Subscription[];
 }
 
 

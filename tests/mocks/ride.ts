@@ -9,9 +9,8 @@ let rideId = 0;
  */
 interface RideMock extends Ride
 {
-	objectId?: number
+	objectId: number
 }
-
 
 
 /**

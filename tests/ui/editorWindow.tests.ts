@@ -336,6 +336,25 @@ test("Edit: ride type", t =>
 });
 
 
+test("Edit: ride type, account for peep mass", t =>
+{
+	const params = setupWindow();
+	const window = params.window;
+	((map as GameMapMock).entities[0] as Car).mass += 129; // extra peep mass
+
+	window.show();
+
+	const widgets = getWidgets();
+	widgets.rideTypeList?.onChange?.(1); // to non-powered mine train
+
+	t.is(widgets.mass?.text, "189");
+
+	widgets.rideTypeList?.onChange?.(2); // to powered monorail
+
+	t.is(widgets.mass?.text, "209");
+});
+
+
 test("Edit: variant increment", t =>
 {
 	const params = setupWindow();
@@ -379,6 +398,193 @@ test("Edit: variant decrement", t =>
 	t.is(widgets.poweredMaxSpeed?.text, "Only on powered vehicles");
 	t.true(widgets.poweredAcceleration?.isDisabled);
 	t.true(widgets.poweredMaxSpeed?.isDisabled);
+});
+
+
+test("Edit: track progress", t =>
+{
+	const params = setupWindow();
+	const window = params.window;
+
+	window.show();
+
+	const widgets = getWidgets();
+	widgets.trackProgress?.onIncrement?.();
+	t.is(widgets.trackProgress?.text, "11");
+
+	widgets.trackProgress?.onIncrement?.();
+	t.is(widgets.trackProgress?.text, "12");
+
+	widgets.trackProgress?.onDecrement?.();
+	t.is(widgets.trackProgress?.text, "11");
+
+	widgets.trackProgress?.onDecrement?.();
+	t.is(widgets.trackProgress?.text, "10");
+
+	widgets.trackProgress?.onDecrement?.();
+	t.is(widgets.trackProgress?.text, "9");
+});
+
+
+test("Edit: mass", t =>
+{
+	const params = setupWindow();
+	const window = params.window;
+
+	window.show();
+
+	const widgets = getWidgets();
+	widgets.mass?.onIncrement?.();
+	t.is(widgets.mass?.text, "31");
+
+	widgets.mass?.onDecrement?.();
+	t.is(widgets.mass?.text, "30");
+});
+
+
+test("Edit: seats", t =>
+{
+	const params = setupWindow();
+	const window = params.window;
+
+	window.show();
+
+	const widgets = getWidgets();
+	widgets.seats?.onIncrement?.();
+	t.is(widgets.seats?.text, "4");
+
+	widgets.seats?.onDecrement?.();
+	t.is(widgets.seats?.text, "3");
+});
+
+
+test("Edit: powered acceleration", t =>
+{
+	const params = setupWindow();
+	const window = params.window;
+
+	window.show();
+
+	const widgets = getWidgets();
+	widgets.poweredAcceleration?.onIncrement?.();
+	t.is(widgets.poweredAcceleration?.text, "6");
+
+	widgets.poweredAcceleration?.onDecrement?.();
+	t.is(widgets.poweredAcceleration?.text, "5");
+});
+
+
+test("Edit: powered max speed", t =>
+{
+	const params = setupWindow();
+	const window = params.window;
+
+	window.show();
+
+	const widgets = getWidgets();
+	widgets.poweredMaxSpeed?.onIncrement?.();
+	t.is(widgets.poweredMaxSpeed?.text, "16");
+
+	widgets.poweredMaxSpeed?.onDecrement?.();
+	t.is(widgets.poweredMaxSpeed?.text, "15");
+});
+
+
+test("Edit: multiplier x 10 increment", t =>
+{
+	const params = setupWindow();
+	const window = params.window;
+
+	window.show();
+
+	const widgets = getWidgets();
+	widgets.multiplier?.onChange?.(1); // set to x10
+
+	widgets.trackProgress?.onIncrement?.();
+	widgets.mass?.onIncrement?.();
+	widgets.seats?.onIncrement?.();
+	widgets.poweredAcceleration?.onIncrement?.();
+	widgets.poweredMaxSpeed?.onIncrement?.();
+
+	t.is(widgets.trackProgress?.text, "20");
+	t.is(widgets.mass?.text, "40");
+	t.is(widgets.seats?.text, "13");
+	t.is(widgets.poweredAcceleration?.text, "15");
+	t.is(widgets.poweredMaxSpeed?.text, "25");
+});
+
+
+test("Edit: multiplier x 10 decrement", t =>
+{
+	const params = setupWindow();
+	const window = params.window;
+
+	window.show();
+
+	const widgets = getWidgets();
+	widgets.multiplier?.onChange?.(1); // set to x10
+
+	widgets.trackProgress?.onDecrement?.();
+	widgets.mass?.onDecrement?.();
+	widgets.seats?.onDecrement?.();
+	widgets.poweredAcceleration?.onDecrement?.();
+	widgets.poweredMaxSpeed?.onDecrement?.();
+
+	t.is(widgets.trackProgress?.text, "0");
+	t.is(widgets.mass?.text, "20");
+	t.is(widgets.seats?.text, "0"); // bottom limit
+	t.is(widgets.poweredAcceleration?.text, "0"); // bottom limit
+	t.is(widgets.poweredMaxSpeed?.text, "5");
+});
+
+
+test("Edit: multiplier x 100 increment", t =>
+{
+	const params = setupWindow();
+	const window = params.window;
+
+	window.show();
+
+	const widgets = getWidgets();
+	widgets.multiplier?.onChange?.(2); // set to x100
+
+	widgets.trackProgress?.onIncrement?.();
+	widgets.mass?.onIncrement?.();
+	widgets.seats?.onIncrement?.();
+	widgets.poweredAcceleration?.onIncrement?.();
+	widgets.poweredMaxSpeed?.onIncrement?.();
+
+	t.is(widgets.trackProgress?.text, "110");
+	t.is(widgets.mass?.text, "130");
+	t.is(widgets.seats?.text, "32"); // maxed out
+	t.is(widgets.poweredAcceleration?.text, "105");
+	t.is(widgets.poweredMaxSpeed?.text, "115");
+});
+
+
+test("Edit: multiplier x 100 decrement", t =>
+{
+	const params = setupWindow();
+	const window = params.window;
+
+	window.show();
+
+	const widgets = getWidgets();
+	widgets.multiplier?.onChange?.(2); // set to x100
+
+	widgets.trackProgress?.onDecrement?.();
+	widgets.mass?.onDecrement?.();
+	widgets.seats?.onDecrement?.();
+	widgets.poweredAcceleration?.onDecrement?.();
+	widgets.poweredMaxSpeed?.onDecrement?.();
+
+	// can go negative, but game will move it to another track piece
+	t.is(widgets.trackProgress?.text, "-90");
+	// all go to bottom limit
+	t.is(widgets.mass?.text, "0");
+	t.is(widgets.seats?.text, "0");
+	t.is(widgets.poweredAcceleration?.text, "0");
+	t.is(widgets.poweredMaxSpeed?.text, "0");
 });
 
 

@@ -7,7 +7,7 @@ import mock from "./core/mock";
  */
 export interface UiMock extends Ui
 {
-	createdWindows?: WindowMock[]
+	createdWindows: WindowMock[]
 }
 
 

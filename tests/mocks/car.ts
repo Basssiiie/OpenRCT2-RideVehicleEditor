@@ -4,16 +4,29 @@ import RideVehicle from "../../src/objects/rideVehicle";
 
 
 /**
+ * Mock that adds additional configurations to the car.
+ */
+interface CarMock extends Car
+{
+	trackProgress: number
+}
+
+
+/**
  * A mock of a car entity.
  */
-export default function mock_Car(template?: Partial<Car>): Car
+export default function mock_Car(template?: Partial<CarMock>): CarMock
 {
-	const car = mock<Car>({
+	const car = mock<CarMock>({
 		type: "car",
 		vehicleObject: 0,
 		// These fallback to 0 if they do are not powered.
 		poweredAcceleration: 0,
 		poweredMaxSpeed: 0,
+		travelBy(distance: number): void
+		{
+			this.trackProgress = (this.trackProgress ?? 0) + (distance / 9000);
+		},
 
 		...(mock_Entity(template) as Partial<Entity>),
 	});
