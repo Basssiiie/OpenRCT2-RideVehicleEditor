@@ -19,14 +19,11 @@ export default class RideVehicle
 
 
 	/**
-	 * Returns true if this car does use powered acceleration.
-	 * Currently not all vehicle types support this property in
-	 * the openrct2 source code.
+	 * Returns the object definition fpr this car.
 	 */
-	isPowered(): boolean
+	getDefinition(): RideObjectVehicle
 	{
-		const car = this.getCar();
-		return RideVehicle.isPowered(car);
+		return RideVehicle.getDefinition(this.getCar());
 	}
 
 
@@ -34,15 +31,33 @@ export default class RideVehicle
 	 * Returns true if this car does use powered acceleration.
 	 * Currently not all vehicle types support this property in
 	 * the openrct2 source code.
-	 * @param car The car for which to check the engine.
 	 */
-	static isPowered(car: Car): boolean
+	isPowered(): boolean
+	{
+		return RideVehicle.isPowered(this.getDefinition());
+	}
+
+
+	/**
+	 * Returns the object definition for this car.
+	 */
+	static getDefinition(car: Car): RideObjectVehicle
 	{
 		const rideObject = context.getObject("ride", car.rideObject);
-		const vehicleObject = rideObject.vehicles[car.vehicleObject];
+		return rideObject.vehicles[car.vehicleObject];
+	}
 
+
+	/**
+	 * Returns true if this vehicle does use powered acceleration.
+	 * Currently not all vehicle types support this property in
+	 * the openrct2 source code.
+	 * @param vehicle The vehicle definition for which to check the engine.
+	 */
+	static isPowered(vehicle: RideObjectVehicle): boolean
+	{
 		// 'VEHICLE_ENTRY_FLAG_POWERED' is required.
-		return ((vehicleObject.flags & (1 << 19)) !== 0);
+		return ((vehicle.flags & (1 << 19)) !== 0);
 	}
 
 

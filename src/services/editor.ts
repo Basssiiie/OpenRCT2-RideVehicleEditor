@@ -37,6 +37,7 @@ export default class VehicleEditor
 	readonly trackProgress = new Observable<number>();
 	readonly seats = new Observable<number>();
 	readonly mass = new Observable<number>();
+	readonly isPowered = new Observable<boolean>();
 	readonly poweredAcceleration = new Observable<number>();
 	readonly poweredMaxSpeed = new Observable<number>();
 
@@ -80,6 +81,7 @@ export default class VehicleEditor
 	setRideType(rideTypeIndex: number): void
 	{
 		const rideTypes = this.rideTypeList.get();
+		const oldVehicleObject = this.getVehicleObject();
 
 		rideTypeIndex = MathHelper.clamp(rideTypeIndex, 0, rideTypes.length);
 		this.rideTypeIndex.set(rideTypeIndex);
@@ -87,12 +89,10 @@ export default class VehicleEditor
 		const currentCar = this.getSelectedCar();
 		if (currentCar)
 		{
-			const rideType = this.rideType;
+			Log.debug(`(editor) Set vehicle ride type to: ${this.rideType.name} (index: ${rideTypeIndex})`);
+			currentCar.rideObject = this.rideType.id;
 
-			Log.debug(`(editor) Set vehicle ride type to: ${rideType.name} (index: ${rideTypeIndex})`);
-			currentCar.rideObject = rideType.id;
-
-			this.setRideTypeDefaults(currentCar, rideType, 0);
+			this.setRideTypeDefaults(currentCar, 0, oldVehicleObject.carMass);
 		}
 		else
 		{
@@ -111,7 +111,8 @@ export default class VehicleEditor
 		if (currentCar)
 		{
 			Log.debug(`(editor) Set vehicle variant index to: ${variantIndex}.`);
-			this.setRideTypeDefaults(currentCar, this.rideType, variantIndex);
+			const vehicleObject = this.getVehicleObject();
+			this.setRideTypeDefaults(currentCar, variantIndex, vehicleObject.carMass);
 		}
 	}
 
@@ -328,6 +329,8 @@ export default class VehicleEditor
 			this.variant.set(settings.variant);
 			this.seats.set(settings.seats);
 			this.mass.set(settings.mass);
+
+
 		}
 
 		const rideTypes = this.rideTypeList.get();
@@ -347,18 +350,18 @@ export default class VehicleEditor
 		if (settings.poweredAcceleration !== undefined)
 		{
 			car.poweredAcceleration = settings.poweredAcceleration;
-			if (updateObservables)
-			{
-				this.poweredAcceleration.set(settings.poweredAcceleration);
-			}
 		}
 		if (settings.poweredMaxSpeed !== undefined)
 		{
 			car.poweredMaxSpeed = settings.poweredMaxSpeed;
-			if (updateObservables)
-			{
-				this.poweredMaxSpeed.set(settings.poweredMaxSpeed);
-			}
+		}
+		if (updateObservables)
+		{
+			this.poweredAcceleration.set(settings.poweredAcceleration ?? 0);
+			this.poweredMaxSpeed.set(settings.poweredMaxSpeed ?? 0);
+
+			const definition = RideVehicle.getDefinition(car);
+			this.isPowered.set(RideVehicle.isPowered(definition));
 		}
 	}
 
@@ -394,7 +397,11 @@ export default class VehicleEditor
 			this.seats.set(car.numSeats);
 			this.mass.set(car.mass);
 
-			if (RideVehicle.isPowered(car))
+			const definition = RideVehicle.getDefinition(car);
+			const isPowered = RideVehicle.isPowered(definition);
+			this.isPowered.set(isPowered);
+
+			if (isPowered)
 			{
 				this.poweredAcceleration.set(car.poweredAcceleration);
 				this.poweredMaxSpeed.set(car.poweredMaxSpeed);
@@ -412,36 +419,31 @@ export default class VehicleEditor
 	 * Sets the properties of the specified car to the default properties of the
 	 * specified ride type.
 	 * @param car The car to modify the properties of.
-	 * @param rideType The ride type.
 	 * @param variant The vehicle variant to take the properties from.
+	 * @param oldMass The mass from the previous variant and ride type.
 	 */
-	private setRideTypeDefaults(car: Car, rideType: RideType, variant: number): void
+	private setRideTypeDefaults(car: Car, variant: number, oldMass: number): void
 	{
 		Log.debug("(editor) All car properties have been reset to the default value.");
 
 		// Set all properties according to definition.
-		const rideObject = rideType.getDefinition();
-		const vehicleVariants = rideObject.vehicles;
+		const vehicleObj = this.getVehicleObject(variant);
 
-		const oldVariant = vehicleVariants[this.variant.get()];
-		const newVariant = vehicleVariants[variant];
-
-		const seats = (newVariant.numSeats & 0x7F); // VEHICLE_SEAT_NUM_MASK
-		const powAcceleration = newVariant.poweredAcceleration;
-		const powMaxSpeed = newVariant.poweredMaxSpeed;
-		const mass = (newVariant.carMass + (car.mass - oldVariant.carMass));
-		Log.debug(`(editor) Vehicle '${rideObject.name}' default values:\n\tseats: ${seats}\n\tpow. acceleration: ${powAcceleration}\n\tpow. max. speed: ${powMaxSpeed}\n\tmass: ${newVariant.carMass}`);
-		Log.debug(`(editor) Vehicle mass old: ${oldVariant.carMass}, new: ${newVariant.carMass}, peeps: ${car.mass - oldVariant.carMass}`);
+		const seats = (vehicleObj.numSeats & 0x7F); // VEHICLE_SEAT_NUM_MASK
+		const powAcceleration = vehicleObj.poweredAcceleration;
+		const powMaxSpeed = vehicleObj.poweredMaxSpeed;
+		const mass = (vehicleObj.carMass + (car.mass - oldMass));
 		car.vehicleObject = variant;
 		car.numSeats = seats;
+		car.mass = mass;
 		car.poweredAcceleration = powAcceleration;
 		car.poweredMaxSpeed = powMaxSpeed;
-		car.mass = mass;
 		this.variant.set(variant);
 		this.seats.set(seats);
+		this.mass.set(mass);
+		this.isPowered.set(RideVehicle.isPowered(vehicleObj));
 		this.poweredAcceleration.set(powAcceleration);
 		this.poweredMaxSpeed.set(powMaxSpeed);
-		this.mass.set(mass);
 	}
 
 
@@ -462,5 +464,15 @@ export default class VehicleEditor
 			return null;
 		}
 		return car;
+	}
+
+
+	/**
+	 * Returns the currently picked vehicle object.
+	 */
+	private getVehicleObject(variant?: number): RideObjectVehicle
+	{
+		const rideObj = this.rideType.getDefinition();
+		return rideObj.vehicles[variant ?? this.variant.get()];
 	}
 }

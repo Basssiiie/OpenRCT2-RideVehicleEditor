@@ -110,7 +110,6 @@ export default class SpinnerControl extends Control<SpinnerParams>
 			return;
 		}
 
-		this._params.isActive = true;
 		switch (this._params.wrapMode)
 		{
 			default:

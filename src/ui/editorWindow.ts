@@ -222,14 +222,6 @@ export default class VehicleEditorWindow
 			this.rideTypeList.set(t);
 			this.variantSpinner.params.maximum = editor.rideType.variantCount;
 			this.variantSpinner.refresh();
-
-			const car = selector.vehicle.get();
-			if (car)
-			{
-				const isPowered = car.isPowered();
-				this.powAccelerationSpinner.active(isPowered);
-				this.powMaxSpeedSpinner.active(isPowered);
-			}
 		});
 
 		// Variant sprite of the selected vehicle.
@@ -244,7 +236,6 @@ export default class VehicleEditorWindow
 			height: widgetLineHeight,
 			onChange: (v): void => editor.setVariant(v)
 		});
-		editor.rideTypeIndex.subscribe(() => this.variantSpinner.params.maximum = editor.rideType.variantCount);
 		editor.variant.subscribe(v => this.variantSpinner.set(v));
 
 		// Sets the track progress of the current vehicle
@@ -336,6 +327,13 @@ export default class VehicleEditorWindow
 			onChange: (v): void => editor.setPoweredMaximumSpeed(v)
 		});
 		editor.poweredMaxSpeed.subscribe(v => this.powMaxSpeedSpinner.set(v));
+
+		// Enable/disable the powered spinners if the vehicle is powered.
+		editor.isPowered.subscribe(v =>
+		{
+			this.powAccelerationSpinner.active(v);
+			this.powMaxSpeedSpinner.active(v);
+		});
 
 		// Button to locate the vehicle in the main viewport.
 		this.locateButton = new ButtonControl({

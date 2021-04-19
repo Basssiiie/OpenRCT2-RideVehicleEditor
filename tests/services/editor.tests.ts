@@ -55,11 +55,12 @@ test("Set vehicle: locomotive", t =>
 
 	t.is(editor.rideTypeIndex.get(), 0);
 	t.is(editor.variant.get(), 0);
+	t.is(editor.trackProgress.get(), 10);
 	t.is(editor.mass.get(), 100);
 	t.is(editor.seats.get(), 1);
 	t.is(editor.poweredAcceleration.get(), 45);
 	t.is(editor.poweredMaxSpeed.get(), 35);
-	t.is(editor.trackProgress.get(), 10);
+	t.true(editor.isPowered.get());
 });
 
 
@@ -74,11 +75,12 @@ test("Set vehicle: tender", t =>
 
 	t.is(editor.rideTypeIndex.get(), 0);
 	t.is(editor.variant.get(), 1);
+	t.is(editor.trackProgress.get(), 15);
 	t.is(editor.mass.get(), 50);
 	t.is(editor.seats.get(), 2);
 	t.is(editor.poweredAcceleration.get(), 0);
 	t.is(editor.poweredMaxSpeed.get(), 0);
-	t.is(editor.trackProgress.get(), 15);
+	t.false(editor.isPowered.get());
 });
 
 
@@ -93,9 +95,10 @@ test("Set vehicle: passenger car", t =>
 
 	t.is(editor.rideTypeIndex.get(), 0);
 	t.is(editor.variant.get(), 2);
+	t.is(editor.trackProgress.get(), 20);
 	t.is(editor.mass.get(), 200);
 	t.is(editor.seats.get(), 4);
 	t.is(editor.poweredAcceleration.get(), 0);
 	t.is(editor.poweredMaxSpeed.get(), 0);
-	t.is(editor.trackProgress.get(), 20);
+	t.false(editor.isPowered.get());
 });
