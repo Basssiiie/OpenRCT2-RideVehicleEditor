@@ -55,7 +55,9 @@ function setupPark(): void
 			// mine train
 			mock_Car(<Car>{ id: 30, nextCarOnTrain: 31, ride: 7, rideObject: 3, vehicleObject: 0, trackProgress: 15 }),
 			mock_Car(<Car>{ id: 31, nextCarOnTrain: 32, ride: 7, rideObject: 3, vehicleObject: 1, trackProgress: 25 }),
-			mock_Car(<Car>{ id: 32, nextCarOnTrain: null, ride: 7, rideObject: 3, vehicleObject: 1, trackProgress: 35 }),
+			mock_Car(<Car>{ id: 32, nextCarOnTrain: 33, ride: 7, rideObject: 3, vehicleObject: 1, trackProgress: 35 }),
+			mock_Car(<Car>{ id: 33, nextCarOnTrain: 34, ride: 7, rideObject: 3, vehicleObject: 1, trackProgress: 45 }),
+			mock_Car(<Car>{ id: 34, nextCarOnTrain: null, ride: 7, rideObject: 3, vehicleObject: 1, trackProgress: 55 }),
 		],
 		rides: [
 			mock_Ride(<Ride>{ id: 6, name: "chairlift 1", vehicles: [ 20, 21 ] }),
@@ -740,6 +742,29 @@ test("Copy/paste: press double = nothing copied", t =>
 });
 
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+function actual()
+{
+	const widgets = getWidgets();
+	return {
+		rideType: widgets.rideTypeList?.selectedIndex,
+		variant: widgets.variant?.text,
+		mass: widgets.mass?.text,
+		seats: widgets.seats?.text,
+		poweredAcceleration: widgets.poweredAcceleration?.text,
+		poweredMaxSpeed: widgets.poweredMaxSpeed?.text
+	};
+}
+const expected = {
+	rideType: 2,
+	variant: "0",
+	mass: "80",
+	seats: "6",
+	poweredAcceleration: "12",
+	poweredMaxSpeed: "42"
+};
+
+
 test("Apply: to all vehicles", t =>
 {
 	const params = setupWindow();
@@ -756,22 +781,6 @@ test("Apply: to all vehicles", t =>
 	const tracker = trackCars();
 	widgets.applyToOthersButton?.onClick?.();
 
-	const actual = (): unknown => ({
-		rideType: widgets.rideTypeList?.selectedIndex,
-		variant: widgets.variant?.text,
-		mass: widgets.mass?.text,
-		seats: widgets.seats?.text,
-		poweredAcceleration: widgets.poweredAcceleration?.text,
-		poweredMaxSpeed: widgets.poweredMaxSpeed?.text
-	});
-	const expected = {
-		rideType: 2,
-		variant: "0",
-		mass: "80",
-		seats: "6",
-		poweredAcceleration: "12",
-		poweredMaxSpeed: "42"
-	};
 	t.deepEqual(actual(), expected);
 	t.is(widgets.trackProgress?.text, "25");
 
@@ -783,8 +792,166 @@ test("Apply: to all vehicles", t =>
 	t.deepEqual(actual(), expected);
 	t.is(widgets.trackProgress?.text, "35");
 
+	params.selector.selectEntity(33);
+	t.deepEqual(actual(), expected);
+	t.is(widgets.trackProgress?.text, "45");
+
+	params.selector.selectEntity(34);
+	t.deepEqual(actual(), expected);
+	t.is(widgets.trackProgress?.text, "55");
+
 	t.is(tracker.find(t => t.id === 30)?._sets.total(), 6);
 	t.is(tracker.find(t => t.id === 31)?._sets.total(), 6);
 	t.is(tracker.find(t => t.id === 32)?._sets.total(), 6);
-	t.is(tracker._sets.total(), 18);
+	t.is(tracker.find(t => t.id === 33)?._sets.total(), 6);
+	t.is(tracker.find(t => t.id === 34)?._sets.total(), 6);
+	t.is(tracker._sets.total(), 5 * 6);
+});
+
+
+test("Apply: to preceding vehicles", t =>
+{
+	const params = setupWindow();
+	const window = params.window;
+
+	window.show();
+
+	const widgets = getWidgets();
+	params.selector.selectEntity(32);
+	widgets.applyToOthersDropdown?.onChange?.(1);
+	t.is(widgets.applyToOthersButton?.text, "Apply this to preceding vehicles");
+	widgets.rideTypeList?.onChange?.(2);
+
+	const tracker = trackCars();
+	widgets.applyToOthersButton?.onClick?.();
+
+	t.deepEqual(actual(), expected);
+
+	params.selector.selectEntity(30);
+	t.deepEqual(actual(), expected);
+
+	params.selector.selectEntity(31);
+	t.deepEqual(actual(), expected);
+
+	// anything else is not affected
+	params.selector.selectEntity(33);
+	t.notDeepEqual(actual(), expected);
+
+	params.selector.selectEntity(34);
+	t.notDeepEqual(actual(), expected);
+
+	t.is(tracker.find(t => t.id === 30)?._sets.total(), 6);
+	t.is(tracker.find(t => t.id === 31)?._sets.total(), 6);
+	t.is(tracker.find(t => t.id === 32)?._sets.total(), 0); // selected car is not affected
+	t.is(tracker.find(t => t.id === 33)?._sets.total(), 0);
+	t.is(tracker.find(t => t.id === 34)?._sets.total(), 0);
+	t.is(tracker._sets.total(), 12);
+});
+
+
+test("Apply: to preceding vehicles - nothing on first car", t =>
+{
+	const params = setupWindow();
+	const window = params.window;
+
+	window.show();
+
+	const widgets = getWidgets();
+	params.selector.selectEntity(30);
+	widgets.applyToOthersDropdown?.onChange?.(1);
+	t.is(widgets.applyToOthersButton?.text, "Apply this to preceding vehicles");
+	widgets.rideTypeList?.onChange?.(2);
+
+	const tracker = trackCars();
+	widgets.applyToOthersButton?.onClick?.();
+
+	t.is(tracker._sets.total(), 0);
+});
+
+
+test("Apply: to following vehicles", t =>
+{
+	const params = setupWindow();
+	const window = params.window;
+
+	window.show();
+
+	const widgets = getWidgets();
+	params.selector.selectEntity(32);
+	widgets.applyToOthersDropdown?.onChange?.(2);
+	t.is(widgets.applyToOthersButton?.text, "Apply this to following vehicles");
+	widgets.rideTypeList?.onChange?.(2);
+
+	const tracker = trackCars();
+	widgets.applyToOthersButton?.onClick?.();
+
+	t.deepEqual(actual(), expected);
+
+	// first 2 cars are not affected
+	params.selector.selectEntity(30);
+	t.notDeepEqual(actual(), expected);
+
+	params.selector.selectEntity(31);
+	t.notDeepEqual(actual(), expected);
+
+	params.selector.selectEntity(33);
+	t.deepEqual(actual(), expected);
+
+	params.selector.selectEntity(34);
+	t.deepEqual(actual(), expected);
+
+	t.is(tracker.find(t => t.id === 30)?._sets.total(), 0);
+	t.is(tracker.find(t => t.id === 31)?._sets.total(), 0);
+	t.is(tracker.find(t => t.id === 32)?._sets.total(), 0); // selected car is not affected
+	t.is(tracker.find(t => t.id === 33)?._sets.total(), 6);
+	t.is(tracker.find(t => t.id === 34)?._sets.total(), 6);
+	t.is(tracker._sets.total(), 12);
+});
+
+
+test("Apply: to following vehicles - nothing on last car", t =>
+{
+	const params = setupWindow();
+	const window = params.window;
+
+	window.show();
+
+	const widgets = getWidgets();
+	params.selector.selectEntity(34);
+	widgets.applyToOthersDropdown?.onChange?.(2);
+	t.is(widgets.applyToOthersButton?.text, "Apply this to following vehicles");
+	widgets.rideTypeList?.onChange?.(2);
+
+	const tracker = trackCars();
+	widgets.applyToOthersButton?.onClick?.();
+
+	t.is(tracker._sets.total(), 0);
+});
+
+
+test("Apply: to all trains", t =>
+{
+	const params = setupWindow();
+	const window = params.window;
+
+	window.show();
+
+	const widgets = getWidgets();
+	params.selector.selectEntity(21);
+	widgets.applyToOthersDropdown?.onChange?.(3);
+	t.is(widgets.applyToOthersButton?.text, "Apply this to all trains");
+	widgets.rideTypeList?.onChange?.(2);
+
+	const tracker = trackCars();
+	widgets.applyToOthersButton?.onClick?.();
+
+	t.deepEqual(actual(), expected);
+
+	// the other train is also affected
+	params.selector.selectEntity(20);
+	t.deepEqual(actual(), expected);
+
+	t.is(tracker.find(t => t.id === 20)?._sets.total(), 6);
+	t.is(tracker.find(t => t.id === 21)?._sets.total(), 6);
+	t.is(tracker._sets.total(), 12);
 });

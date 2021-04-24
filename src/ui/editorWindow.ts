@@ -753,7 +753,7 @@ export default class VehicleEditorWindow
 			const settings = this._editor.getSettings();
 			if (settings)
 			{
-				this._editor.applySettingsToCurrentTrain(settings, currentVehicleIndex);
+				this._editor.applySettingsToCurrentTrain(settings, currentVehicleIndex + 1);
 			}
 		}
 	}
