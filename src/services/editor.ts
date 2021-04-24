@@ -329,8 +329,6 @@ export default class VehicleEditor
 			this.variant.set(settings.variant);
 			this.seats.set(settings.seats);
 			this.mass.set(settings.mass);
-
-
 		}
 
 		const rideTypes = this.rideTypeList.get();

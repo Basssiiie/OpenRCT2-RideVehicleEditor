@@ -6,6 +6,7 @@ import VehicleSelector from "../../src/services/selector";
 import VehicleEditorWindow from "../../src/ui/editorWindow";
 import mock_Car from "../mocks/car";
 import mock_Context from "../mocks/context";
+import track, { Trackable } from "../mocks/core/trackable";
 import mock_GameMap, { GameMapMock } from "../mocks/gameMap";
 import mock_Ride from "../mocks/ride";
 import mock_RideObject from "../mocks/rideObject";
@@ -109,6 +110,12 @@ function getWidgets()
 		copy: get<ButtonWidget>("rve-copy-button"),
 		paste: get<ButtonWidget>("rve-paste-button"),
 	};
+}
+
+
+function trackCars(): Trackable<Trackable<Car>[]>
+{
+	return track((global.map as GameMapMock).entities as Car[]);
 }
 
 
@@ -302,10 +309,23 @@ test("Show window: no rides and vehicles", t =>
 });
 
 
+test("Show window: no vehicle is not modified", t =>
+{
+	const params = setupWindow();
+	const window = params.window;
+	const tracker = trackCars();
+
+	window.show();
+
+	t.is(tracker._sets.total(), 0);
+});
+
+
 test("Edit: ride type", t =>
 {
 	const params = setupWindow();
 	const window = params.window;
+	const tracker = trackCars();
 
 	window.show();
 
@@ -321,6 +341,14 @@ test("Edit: ride type", t =>
 	t.is(widgets.poweredMaxSpeed?.text, "Only on powered vehicles");
 	t.true(widgets.poweredAcceleration?.isDisabled);
 	t.true(widgets.poweredMaxSpeed?.isDisabled);
+	t.is(tracker[0]._sets.rideObject, 1);
+	// set to type's default
+	t.is(tracker[0]._sets.vehicleObject, 1);
+	t.is(tracker[0]._sets.numSeats, 1);
+	t.is(tracker[0]._sets.mass, 1);
+	t.is(tracker[0]._sets.poweredAcceleration, 1);
+	t.is(tracker[0]._sets.poweredMaxSpeed, 1);
+	t.is(tracker._sets.total(), 6);
 
 	widgets.rideTypeList?.onChange?.(2); // to powered monorail
 
@@ -333,6 +361,14 @@ test("Edit: ride type", t =>
 	t.is(widgets.poweredMaxSpeed?.text, "42");
 	t.false(widgets.poweredAcceleration?.isDisabled);
 	t.false(widgets.poweredMaxSpeed?.isDisabled);
+	t.is(tracker[0]._sets.rideObject, 2);
+	// set to type's default
+	t.is(tracker[0]._sets.vehicleObject, 2);
+	t.is(tracker[0]._sets.numSeats, 2);
+	t.is(tracker[0]._sets.mass, 2);
+	t.is(tracker[0]._sets.poweredAcceleration, 2);
+	t.is(tracker[0]._sets.poweredMaxSpeed, 2);
+	t.is(tracker._sets.total(), 12);
 });
 
 
@@ -340,7 +376,7 @@ test("Edit: ride type, account for peep mass", t =>
 {
 	const params = setupWindow();
 	const window = params.window;
-	((map as GameMapMock).entities[0] as Car).mass += 129; // extra peep mass
+	((global.map as GameMapMock).entities[0] as Car).mass += 129; // extra peep mass
 
 	window.show();
 
@@ -359,6 +395,7 @@ test("Edit: variant increment", t =>
 {
 	const params = setupWindow();
 	const window = params.window;
+	const tracker = trackCars();
 
 	window.show();
 
@@ -375,6 +412,15 @@ test("Edit: variant increment", t =>
 	t.is(widgets.poweredMaxSpeed?.text, "44");
 	t.false(widgets.poweredAcceleration?.isDisabled);
 	t.false(widgets.poweredMaxSpeed?.isDisabled);
+
+	t.is(tracker[0]._sets.rideObject, 1);
+	t.is(tracker[0]._sets.vehicleObject, 2);
+	// set to variants's default
+	t.is(tracker[0]._sets.numSeats, 2);
+	t.is(tracker[0]._sets.mass, 2);
+	t.is(tracker[0]._sets.poweredAcceleration, 2);
+	t.is(tracker[0]._sets.poweredMaxSpeed, 2);
+	t.is(tracker._sets.total(), 11);
 });
 
 
@@ -382,6 +428,7 @@ test("Edit: variant decrement", t =>
 {
 	const params = setupWindow();
 	const window = params.window;
+	const tracker = trackCars();
 
 	window.show();
 
@@ -398,6 +445,15 @@ test("Edit: variant decrement", t =>
 	t.is(widgets.poweredMaxSpeed?.text, "Only on powered vehicles");
 	t.true(widgets.poweredAcceleration?.isDisabled);
 	t.true(widgets.poweredMaxSpeed?.isDisabled);
+
+	t.is(tracker[0]._sets.rideObject, 1);
+	t.is(tracker[0]._sets.vehicleObject, 2);
+	// set to variants's default
+	t.is(tracker[0]._sets.numSeats, 2);
+	t.is(tracker[0]._sets.mass, 2);
+	t.is(tracker[0]._sets.poweredAcceleration, 2);
+	t.is(tracker[0]._sets.poweredMaxSpeed, 2);
+	t.is(tracker._sets.total(), 11);
 });
 
 
@@ -405,6 +461,7 @@ test("Edit: track progress", t =>
 {
 	const params = setupWindow();
 	const window = params.window;
+	const tracker = trackCars();
 
 	window.show();
 
@@ -423,6 +480,9 @@ test("Edit: track progress", t =>
 
 	widgets.trackProgress?.onDecrement?.();
 	t.is(widgets.trackProgress?.text, "9");
+
+	t.is(tracker[0]._sets.trackProgress, 5);
+	t.is(tracker._sets.total(), 5);
 });
 
 
@@ -430,6 +490,7 @@ test("Edit: mass", t =>
 {
 	const params = setupWindow();
 	const window = params.window;
+	const tracker = trackCars();
 
 	window.show();
 
@@ -439,6 +500,9 @@ test("Edit: mass", t =>
 
 	widgets.mass?.onDecrement?.();
 	t.is(widgets.mass?.text, "30");
+
+	t.is(tracker[0]._sets.mass, 2);
+	t.is(tracker._sets.total(), 2);
 });
 
 
@@ -446,6 +510,7 @@ test("Edit: seats", t =>
 {
 	const params = setupWindow();
 	const window = params.window;
+	const tracker = trackCars();
 
 	window.show();
 
@@ -455,6 +520,9 @@ test("Edit: seats", t =>
 
 	widgets.seats?.onDecrement?.();
 	t.is(widgets.seats?.text, "3");
+
+	t.is(tracker[0]._sets.numSeats, 2);
+	t.is(tracker._sets.total(), 2);
 });
 
 
@@ -462,6 +530,7 @@ test("Edit: powered acceleration", t =>
 {
 	const params = setupWindow();
 	const window = params.window;
+	const tracker = trackCars();
 
 	window.show();
 
@@ -471,6 +540,9 @@ test("Edit: powered acceleration", t =>
 
 	widgets.poweredAcceleration?.onDecrement?.();
 	t.is(widgets.poweredAcceleration?.text, "5");
+
+	t.is(tracker[0]._sets.poweredAcceleration, 2);
+	t.is(tracker._sets.total(), 2);
 });
 
 
@@ -478,6 +550,7 @@ test("Edit: powered max speed", t =>
 {
 	const params = setupWindow();
 	const window = params.window;
+	const tracker = trackCars();
 
 	window.show();
 
@@ -487,6 +560,9 @@ test("Edit: powered max speed", t =>
 
 	widgets.poweredMaxSpeed?.onDecrement?.();
 	t.is(widgets.poweredMaxSpeed?.text, "15");
+
+	t.is(tracker[0]._sets.poweredMaxSpeed, 2);
+	t.is(tracker._sets.total(), 2);
 });
 
 
@@ -494,6 +570,7 @@ test("Edit: multiplier x 10 increment", t =>
 {
 	const params = setupWindow();
 	const window = params.window;
+	const tracker = trackCars();
 
 	window.show();
 
@@ -511,6 +588,8 @@ test("Edit: multiplier x 10 increment", t =>
 	t.is(widgets.seats?.text, "13");
 	t.is(widgets.poweredAcceleration?.text, "15");
 	t.is(widgets.poweredMaxSpeed?.text, "25");
+
+	t.is(tracker._sets.total(), 5);
 });
 
 
@@ -518,6 +597,7 @@ test("Edit: multiplier x 10 decrement", t =>
 {
 	const params = setupWindow();
 	const window = params.window;
+	const tracker = trackCars();
 
 	window.show();
 
@@ -535,6 +615,8 @@ test("Edit: multiplier x 10 decrement", t =>
 	t.is(widgets.seats?.text, "0"); // bottom limit
 	t.is(widgets.poweredAcceleration?.text, "0"); // bottom limit
 	t.is(widgets.poweredMaxSpeed?.text, "5");
+
+	t.is(tracker._sets.total(), 5);
 });
 
 
@@ -542,6 +624,7 @@ test("Edit: multiplier x 100 increment", t =>
 {
 	const params = setupWindow();
 	const window = params.window;
+	const tracker = trackCars();
 
 	window.show();
 
@@ -559,6 +642,8 @@ test("Edit: multiplier x 100 increment", t =>
 	t.is(widgets.seats?.text, "32"); // maxed out
 	t.is(widgets.poweredAcceleration?.text, "105");
 	t.is(widgets.poweredMaxSpeed?.text, "115");
+
+	t.is(tracker._sets.total(), 5);
 });
 
 
@@ -566,6 +651,7 @@ test("Edit: multiplier x 100 decrement", t =>
 {
 	const params = setupWindow();
 	const window = params.window;
+	const tracker = trackCars();
 
 	window.show();
 
@@ -585,6 +671,8 @@ test("Edit: multiplier x 100 decrement", t =>
 	t.is(widgets.seats?.text, "0");
 	t.is(widgets.poweredAcceleration?.text, "0");
 	t.is(widgets.poweredMaxSpeed?.text, "0");
+
+	t.is(tracker._sets.total(), 5);
 });
 
 
@@ -592,6 +680,7 @@ test("Copy/paste: chairlift settings on mine train car", t =>
 {
 	const params = setupWindow();
 	const window = params.window;
+	const tracker = trackCars();
 
 	window.show();
 
@@ -601,8 +690,11 @@ test("Copy/paste: chairlift settings on mine train car", t =>
 	t.false(widgets.paste?.isDisabled);
 
 	params.selector.selectEntity(32); // select mine train
+	t.is(widgets.rideTypeList?.selectedIndex, 1);
+
 	widgets.paste?.onClick?.(); // paste chairlift
 
+	t.is(widgets.rideTypeList?.selectedIndex, 0);
 	t.is(widgets.variant?.text, "0");
 	t.is(widgets.trackProgress?.text, "35"); // Does not get updated
 	t.is(widgets.seats?.text, "3");
@@ -611,6 +703,16 @@ test("Copy/paste: chairlift settings on mine train car", t =>
 	t.is(widgets.poweredMaxSpeed?.text, "15");
 	t.false(widgets.poweredAcceleration?.isDisabled);
 	t.false(widgets.poweredMaxSpeed?.isDisabled);
+
+	const minetrain = tracker.find(t => t.id === 32);
+	t.is(minetrain?._sets.rideObject, 1);
+	t.is(minetrain?._sets.vehicleObject, 1);
+	t.is(minetrain?._sets.trackProgress, 0);
+	t.is(minetrain?._sets.numSeats, 1);
+	t.is(minetrain?._sets.mass, 1);
+	t.is(minetrain?._sets.poweredAcceleration, 1);
+	t.is(minetrain?._sets.poweredMaxSpeed, 1);
+	t.is(tracker._sets.total(), 6);
 });
 
 
@@ -618,6 +720,7 @@ test("Copy/paste: press double = nothing copied", t =>
 {
 	const params = setupWindow();
 	const window = params.window;
+	const tracker = trackCars();
 
 	window.show();
 
@@ -632,6 +735,8 @@ test("Copy/paste: press double = nothing copied", t =>
 	widgets.copy?.onClick?.();
 	t.false(widgets.copy?.isPressed);
 	t.true(widgets.paste?.isDisabled);
+
+	t.is(tracker._sets.total(), 0);
 });
 
 
@@ -647,6 +752,8 @@ test("Apply: to all vehicles", t =>
 	//widgets.applyToOthersDropdown?.onChange?.(0);
 	t.is(widgets.applyToOthersButton?.text, "Apply this to all vehicles");
 	widgets.rideTypeList?.onChange?.(2);
+
+	const tracker = trackCars();
 	widgets.applyToOthersButton?.onClick?.();
 
 	const actual = (): unknown => ({
@@ -675,4 +782,9 @@ test("Apply: to all vehicles", t =>
 	params.selector.selectEntity(32);
 	t.deepEqual(actual(), expected);
 	t.is(widgets.trackProgress?.text, "35");
+
+	t.is(tracker.find(t => t.id === 30)?._sets.total(), 6);
+	t.is(tracker.find(t => t.id === 31)?._sets.total(), 6);
+	t.is(tracker.find(t => t.id === 32)?._sets.total(), 6);
+	t.is(tracker._sets.total(), 18);
 });
