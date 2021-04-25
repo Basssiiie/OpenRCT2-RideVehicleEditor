@@ -26,7 +26,7 @@ A few people made some great videos showcasing how to use the plugin.
 
 ## Installation
 
-1. This plugin requires release version v0.3.3 or any of the newest develop versions.
+1. This plugin requires at least OpenRCT2 version v0.3.3 (release) or the newest develop version.
 2. Download the latest version of the plugin from the [Releases page](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/releases).
 3. To install it, put the downloaded `*.js` file into your `/OpenRCT2/plugin` folder.
     - Easiest way to find the OpenRCT2-folder is by launching the OpenRCT2 game, click and hold on the red toolbox in the main menu, and select "Open custom content folder".
