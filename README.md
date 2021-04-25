@@ -2,31 +2,33 @@
 
 This plugin lets you edit vehicles on any ride in your park on the fly.
 
-![(Image of train with edited vehicles)](img/train.png)
+![(Image of train with edited vehicles)](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/master/img/chaos.png)
 
 ### Current features
-- Select and switch through all ride vehicles in your park.
+- Select and switch through all ride vehicles in your park, or use the picker to click on the vehicle directly.
 - Change the vehicle type for each vehicle independently.
 - Switch through different variants of the same ride type. (E.g. locomotive, tender or passenger car.)
 - Modify properties like mass, number of seats, (powered) acceleration of each vehicle.
 - Modify spacing between different vehicles on the same train.
+- Copy and paste the settings of a vehicle over other completely unrelated vehicles.
+- Easily apply your changes to all vehicles on the train or the ride.
 
 ### Planned features
-- Buttons to apply changes to all vehicles or all trains.
+- Please submit any ideas under [Issues](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/issues).
 
 ## See it in action
 
 A few people made some great videos showcasing how to use the plugin.
 
+- **[Mini Vehicle Hacking Contest - The Results](https://youtu.be/ThXNZdzY3Ys)**, by Deurklink and his DKMP community (using v1.0)
 - **[Git Gud at OpenRCT2 #93: Vehicle hacking with the Ride Vehicle Editor Plugin!](https://youtu.be/xSzyTD7xFss)**, by Deurklink (using v1.0)
 - **[The Joy of Hacking OpenRCT2: Vehicle Hacking 101](https://youtu.be/gqQHDqQQRDw)**, by Zarathustra (using v0.3)
 
 ## Installation
 
-1. This plugin requires a OpenRCT2 develop version newer than the 29th of December, or release version v0.3.3 or higher when it is available. 
-    - Update OpenRCT2 if you are still playing an older version of the game, otherwise the plugin will not load.
+1. This plugin requires release version v0.3.3 or any of the newest develop versions.
 2. Download the latest version of the plugin from the [Releases page](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/releases).
-3. To install it, put the downloaded `*.js` file into your `/OpenRCT2/plugin` folder. 
+3. To install it, put the downloaded `*.js` file into your `/OpenRCT2/plugin` folder.
     - Easiest way to find the OpenRCT2-folder is by launching the OpenRCT2 game, click and hold on the red toolbox in the main menu, and select "Open custom content folder".
     - Otherwise this folder is commonly found in `C:/Users/<YOUR NAME>/Documents/OpenRCT2/plugin` on Windows.
     - If you already had this plugin installed before, you can safely overwrite the old file.
@@ -41,7 +43,7 @@ A few people made some great videos showcasing how to use the plugin.
 **Answer:** yes, all changes to vehicles will still work if the player does not have the plugin installed. The plugin is only required to make any new changes.
 
 ### I want to add 100 to a vehicle's property without clicking a 100 times, how?
-**Answer:** in the bottom right corner of the editor window, there's a dropdown with the value `x1`. Change it to `x10` or `x100` to add or subtract by tens or hundreds respectively.
+**Answer:** in the bottom right corner of the editor window, there's a dropdown with the value `x1`. Change it to `x10` or `x100` to add or subtract by tens or hundreds respectively. You can also hold down the [+] and [-] buttons.
 
 ### Can I reset the changes I made to a ride?
 **Answer:** yes, you can reset the ride by closing it twice (to remove the vehicles) and reopening it again. All vehicles will respawn with the original values.
@@ -74,7 +76,7 @@ This project is based on [wisnia74's Typescript modding template](https://github
 This project supports the [OpenRCT2 hot reload feature](https://github.com/OpenRCT2/OpenRCT2/blob/master/distribution/scripting.md#writing-scripts) for development.
 
 1. Make sure you've enabled it by setting `enable_hot_reloading = true` in your `/OpenRCT2/config.ini`.
-2. Open `rollup.config.dev.js` and change the output file path to your plugin folder. 
+2. Open `rollup.config.dev.js` and change the output file path to your plugin folder.
     - Example: `C:/Users/<YOUR NAME>/Documents/OpenRCT2/plugin/RideVehicleEditor.js`.
     - Make sure this path uses `/` instead of `\` slashes!
 3. Open command prompt and use `cd` to change your current directory to the root folder of this project.
@@ -84,7 +86,5 @@ This project supports the [OpenRCT2 hot reload feature](https://github.com/OpenR
 7. OpenRCT2 will notice file changes and it will reload the plugin.
 
 ## Notes
-
-Don't touch `app.js`, even though it's just an empty file. Its existence makes Nodemon happy, and Nodemon is what watches your files for changes & fires off new dev builds for hot reloading.
 
 Thanks to [wisnia74](https://github.com/wisnia74/openrct2-typescript-mod-template) for providing the template for this mod and readme.
