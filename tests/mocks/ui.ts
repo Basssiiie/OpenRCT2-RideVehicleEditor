@@ -1,5 +1,6 @@
 import mock_Window, { WindowMock } from "./window";
 import mock from "./core/mock";
+import mock_Viewport from "./viewport";
 
 
 /**
@@ -17,20 +18,32 @@ export interface UiMock extends Ui
 export default function mock_Ui(template?: Partial<UiMock>): UiMock
 {
 	return mock<UiMock>({
+		mainViewport: mock_Viewport(),
 		createdWindows: [],
 		openWindow(desc: WindowDesc): Window
 		{
 			const window = mock_Window(desc);
+			window.isOpen = true;
 			this.createdWindows?.unshift(window);
 			return window;
 		},
+		closeWindows(classification: string, id?: number): void
+		{
+			this.createdWindows
+				?.filter(w => w.classificationName === classification
+					&& (id === undefined || id === w.number))
+				.forEach(w =>
+				{
+					w.onClose?.();
+					w.isOpen = false;
+				});
+		},
 		getWindow(id: string | number): Window
 		{
-			let window = this.createdWindows?.find(w => w.classificationName === id || w.classification === id);
+			const window = this.createdWindows?.find(w => w.classificationName === id || w.classification === id);
 			if (!window)
-			{
-				window = { title: "not-found" } as WindowMock;
-			}
+				return <Window><unknown>null;
+
 			return window as Window;
 		},
 

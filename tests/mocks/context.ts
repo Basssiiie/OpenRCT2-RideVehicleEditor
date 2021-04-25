@@ -1,4 +1,3 @@
-import mock_LoadedObject from "./loadedObject";
 import mock from "./core/mock";
 
 
@@ -17,7 +16,7 @@ interface Subscription
 /**
  * Mock that adds additional configurations to the game map.
  */
-interface ContextMock extends Context
+export interface ContextMock extends Context
 {
 	objects: LoadedObject[];
 	subscriptions: Subscription[];
@@ -36,7 +35,7 @@ export default function mock_Context(template?: Partial<ContextMock>): ContextMo
 		{
 			const result = this.objects?.find(o => o.index === index && o.type === type);
 			if (!result)
-				return mock_LoadedObject(<LoadedObject>{ name: "not-found" });
+				return <LoadedObject><unknown>null;
 
 			return result;
 		},
@@ -60,6 +59,18 @@ export default function mock_Context(template?: Partial<ContextMock>): ContextMo
 			};
 			this.subscriptions?.push(subscription);
 			return subscription.disposable;
+		},
+		executeAction(action: ActionType, args: Record<string, unknown>, callback: (result: GameActionResult) => void): void
+		{
+			const result: GameActionResult = { cost: 1 };
+			this.subscriptions
+				?.filter((s: Subscription) => s.hook === "action.execute" && !s.isDisposed)
+				.forEach(s => s.callback(<GameActionEventArgs>{
+					action: action,
+					args: args,
+					result: result
+				}));
+			callback(result);
 		},
 
 		...template,

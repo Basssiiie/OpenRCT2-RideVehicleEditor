@@ -1,5 +1,3 @@
-import mock_Entity from "./entity";
-import mock_Ride from "./ride";
 import mock from "./core/mock";
 
 
@@ -23,7 +21,7 @@ export default function mock_GameMap(template?: Partial<GameMapMock>): GameMapMo
 		{
 			const result = this.rides?.find(r => r.id === id);
 			if (!result)
-				return mock_Ride(<Ride>{ name: "not-found" });
+				return <Ride><unknown>null;
 
 			return result;
 		},
@@ -31,7 +29,7 @@ export default function mock_GameMap(template?: Partial<GameMapMock>): GameMapMo
 		{
 			const result = this.entities?.find(r => r.id === id);
 			if (!result)
-				return mock_Entity(<Entity>(<unknown>{ name: "not-found" }));
+				return <Entity><unknown>null;
 
 			return result;
 		},

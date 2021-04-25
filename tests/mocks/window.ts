@@ -7,6 +7,11 @@ import mock from "./core/mock";
 export interface WindowMock extends Window
 {
 	classificationName: string;
+	isOpen: boolean;
+
+	onClose?: () => void;
+	onUpdate?: () => void;
+	onTabChange?: () => void;
 }
 
 
