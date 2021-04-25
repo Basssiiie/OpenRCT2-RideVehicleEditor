@@ -5,14 +5,14 @@ import VehicleEditor from "../../src/services/editor";
 import VehicleSelector from "../../src/services/selector";
 import StateWatcher, { RideSetStatusArgs } from "../../src/services/stateWatcher";
 import VehicleEditorWindow from "../../src/ui/editorWindow";
-import mock_Car from "../mocks/car";
-import mock_Context, { ContextMock } from "../mocks/context";
+import mock_Car from "../mocks/car.mock";
+import mock_Context, { ContextMock } from "../mocks/context.mock";
 import track from "../mocks/core/trackable";
-import mock_GameMap, { GameMapMock } from "../mocks/gameMap";
-import mock_Ride from "../mocks/ride";
-import mock_RideObject from "../mocks/rideObject";
-import mock_RideObjectVehicle from "../mocks/rideObjectVehicle";
-import mock_Ui, { UiMock } from "../mocks/ui";
+import mock_GameMap, { GameMapMock } from "../mocks/gameMap.mock";
+import mock_Ride from "../mocks/ride.mock";
+import mock_RideObject from "../mocks/rideObject.mock";
+import mock_RideObjectVehicle from "../mocks/rideObjectVehicle.mock";
+import mock_Ui, { UiMock } from "../mocks/ui.mock";
 
 
 function setupPark(): void

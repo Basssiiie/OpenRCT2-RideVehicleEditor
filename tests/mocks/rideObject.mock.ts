@@ -1,5 +1,5 @@
-import mock_LoadedObject from "./loadedObject";
-import mock_RideObjectVehicle from "./rideObjectVehicle";
+import mock_LoadedObject from "./loadedObject.mock";
+import mock_RideObjectVehicle from "./rideObjectVehicle.mock";
 import mock from "./core/mock";
 
 

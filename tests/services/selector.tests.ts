@@ -3,10 +3,10 @@
 import test, { ExecutionContext } from 'ava';
 import RideTrain from "../../src/objects/rideTrain";
 import VehicleSelector from "../../src/services/selector";
-import mock_Car from "../mocks/car";
-import mock_Entity from "../mocks/entity";
-import mock_GameMap from "../mocks/gameMap";
-import mock_Ride from "../mocks/ride";
+import mock_Car from "../mocks/car.mock";
+import mock_Entity from "../mocks/entity.mock";
+import mock_GameMap from "../mocks/gameMap.mock";
+import mock_Ride from "../mocks/ride.mock";
 
 
 test("Constructor defaults", t =>

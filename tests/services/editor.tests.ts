@@ -3,12 +3,12 @@
 import test from 'ava';
 import VehicleEditor from "../../src/services/editor";
 import VehicleSelector from "../../src/services/selector";
-import mock_Car from "../mocks/car";
-import mock_Context from "../mocks/context";
-import mock_GameMap from "../mocks/gameMap";
-import mock_Ride from "../mocks/ride";
-import mock_RideObject from "../mocks/rideObject";
-import mock_RideObjectVehicle from "../mocks/rideObjectVehicle";
+import mock_Car from "../mocks/car.mock";
+import mock_Context from "../mocks/context.mock";
+import mock_GameMap from "../mocks/gameMap.mock";
+import mock_Ride from "../mocks/ride.mock";
+import mock_RideObject from "../mocks/rideObject.mock";
+import mock_RideObjectVehicle from "../mocks/rideObjectVehicle.mock";
 
 
 function setupPark(): void

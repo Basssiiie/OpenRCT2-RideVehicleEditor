@@ -2,7 +2,7 @@
 
 import test from 'ava';
 import Control, { ControlParams } from "../../src/ui/control";
-import mock_Window from "../mocks/window";
+import mock_Window from "../mocks/window.mock";
 
 
 class ControlMock extends Control<ControlParams>

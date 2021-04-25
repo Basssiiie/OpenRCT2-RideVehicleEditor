@@ -1,6 +1,6 @@
-import mock_Window, { WindowMock } from "./window";
+import mock_Window, { WindowMock } from "./window.mock";
 import mock from "./core/mock";
-import mock_Viewport from "./viewport";
+import mock_Viewport from "./viewport.mock";
 
 
 /**

@@ -2,7 +2,7 @@
 
 import test from 'ava';
 import DropdownControl from "../../src/ui/dropdown";
-import mock_Window from "../mocks/window";
+import mock_Window from "../mocks/window.mock";
 
 
 test("Widget parameters are set", t =>

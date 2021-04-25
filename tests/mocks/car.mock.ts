@@ -1,4 +1,4 @@
-import mock_Entity from "./entity";
+import mock_Entity from "./entity.mock";
 import mock from "./core/mock";
 import RideVehicle from "../../src/objects/rideVehicle";
 
