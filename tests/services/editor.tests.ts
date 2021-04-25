@@ -102,3 +102,24 @@ test("Set vehicle: passenger car", t =>
 	t.is(editor.poweredMaxSpeed.get(), 0);
 	t.false(editor.isPowered.get());
 });
+
+
+test.skip("Deselect: reset all values", t =>
+{
+	setupPark();
+	const selector = new VehicleSelector();
+	const editor = new VehicleEditor(selector);
+	selector.reloadRideList();
+
+	selector.selectEntity(20);
+	selector.deselect();
+
+	t.is(editor.rideTypeIndex.get(), 0);
+	t.is(editor.variant.get(), 0);
+	t.is(editor.trackProgress.get(), 0);
+	t.is(editor.mass.get(), 0);
+	t.is(editor.seats.get(), 0);
+	t.is(editor.poweredAcceleration.get(), 0);
+	t.is(editor.poweredMaxSpeed.get(), 0);
+	t.false(editor.isPowered.get());
+});

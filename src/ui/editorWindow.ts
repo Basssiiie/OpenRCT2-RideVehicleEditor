@@ -173,19 +173,7 @@ export default class VehicleEditorWindow
 			this.vehicleList.params.maximum = v.length;
 			this.vehicleList.refresh();
 		});
-		selector.vehicle.subscribe(() =>
-		{
-			const index = this._selector.vehicleIndex;
-			if (index !== null)
-			{
-				this.vehicleList.active(true);
-				this.vehicleList.set(index);
-			}
-			else
-			{
-				this.vehicleList.active(false);
-			}
-		});
+		selector.vehicle.subscribe(v => this.onSelectVehicle(v));
 
 		// Viewport
 		this.viewport = new ViewportControl({
@@ -418,9 +406,6 @@ export default class VehicleEditorWindow
 			height: widgetLineHeight,
 			onSelect: (i): void => this.updateMultiplier(i)
 		});
-
-		// Generic event that happens when a vehicle is selected...
-		selector.vehicle.subscribe(v => this.onSelectVehicle(v));
 	}
 
 
@@ -658,6 +643,7 @@ export default class VehicleEditorWindow
 		// Toggle base controls
 		const toggle = (toggle: boolean): void =>
 		{
+			this.vehicleList.active(toggle);
 			this.rideTypeList.active(toggle);
 			this.variantSpinner.active(toggle);
 			this.trackProgressSpinner.active(toggle);
@@ -676,9 +662,8 @@ export default class VehicleEditorWindow
 			if (index !== null)
 			{
 				Log.debug(`(window) New vehicle index ${index} selected.`);
-				this.vehicleList.set(index);
-
 				toggle(true);
+				this.vehicleList.set(index);
 				this.viewport.follow(vehicle.entityId);
 
 				// Powered properties only
@@ -691,7 +676,6 @@ export default class VehicleEditorWindow
 
 		Log.debug(`(window) Failed to select vehicle, disable controls.`);
 		toggle(false);
-		this.vehicleList.active(false);
 		this.powAccelerationSpinner.active(false);
 		this.powMaxSpeedSpinner.active(false);
 		this.viewport.stop();

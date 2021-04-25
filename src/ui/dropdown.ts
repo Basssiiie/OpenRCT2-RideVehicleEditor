@@ -13,6 +13,11 @@ export interface DropdownParams extends ControlParams
 	 */
 	items?: string[];
 
+	/**
+	 * sets the default selected item, indexed into the items array.
+	 * @default 0
+	 */
+	selectedIndex?: number;
 
 	/**
 	 * Sets the message that will show when the dropdown is not available.
@@ -20,13 +25,11 @@ export interface DropdownParams extends ControlParams
 	 */
 	disabledMessage?: string;
 
-
 	/**
 	 * Automatically disables the dropdown if it has a single item.
 	 * @default true
 	 */
 	disableSingleItem?: boolean;
-
 
 	/**
 	 * Triggers when the selected dropdown item changes.
@@ -52,6 +55,7 @@ export default class DropdownControl extends Control<DropdownParams>
 	{
 		super(params);
 		params.items ??= [];
+		params.selectedIndex ??= 0;
 		params.disabledMessage ??= "Not available";
 		params.disableSingleItem ??= true;
 	}
@@ -63,16 +67,11 @@ export default class DropdownControl extends Control<DropdownParams>
 	 */
 	set(index: number): void
 	{
-		if (!this._params.isActive)
-		{
-			Log.debug(`(${this._params.name}) Dropdown is inactive, selected index ${index} was not applied.`);
-			return;
-		}
-
 		const widget = this.getWidget<DropdownWidget>();
-		Log.debug(`(${this._params.name}) Dropdown selected index changed to ${index}.`);
+		Log.debug(`(${this._params.name}) Dropdown selected index changed to ${index} (${this._params.items[index]}).`);
 
 		this._silenceEvent = true;
+		this._params.selectedIndex = index;
 		widget.selectedIndex = index;
 		this._silenceEvent = false;
 	}
@@ -86,7 +85,6 @@ export default class DropdownControl extends Control<DropdownParams>
 		return {
 			...this._params,
 			type: "dropdown",
-			selectedIndex: 0,
 			onChange: (i): void => this.onWidgetChange(i)
 		};
 	}
@@ -108,6 +106,7 @@ export default class DropdownControl extends Control<DropdownParams>
 			return;
 		}
 
+		this._params.selectedIndex = index;
 		this._params.onSelect?.(index);
 	}
 
@@ -120,6 +119,14 @@ export default class DropdownControl extends Control<DropdownParams>
 		{
 			widget.items = items;
 			widget.isDisabled = (this._params.disableSingleItem && items.length == 1);
+
+			const index = this._params.selectedIndex;
+			if (index > 0)
+			{
+				this._silenceEvent = true;
+				widget.selectedIndex = (index < items.length) ? index : 0;
+				this._silenceEvent = false;
+			}
 		}
 		else
 		{

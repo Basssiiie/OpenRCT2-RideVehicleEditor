@@ -69,6 +69,11 @@ export default class VehicleEditor
 			{
 				this.setVehicle(v);
 			}
+			else
+			{
+				// The dropdown index does not reset automatically..
+				this.rideTypeIndex.set(0);
+			}
 		});
 	}
 

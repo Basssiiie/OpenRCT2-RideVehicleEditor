@@ -95,12 +95,6 @@ export default class SpinnerControl extends Control<SpinnerParams>
 	 */
 	set(value: number): void
 	{
-		/*if (!this._params.isActive)
-		{
-			Log.debug(`(${this.params.name}) Spinner is inactive, value ${value} was not applied.`);
-			return;
-		}*/
-
 		const min = this._params.minimum;
 		const max = this._params.maximum;
 

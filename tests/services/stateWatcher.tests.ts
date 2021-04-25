@@ -147,15 +147,19 @@ test("Ride open: reloads editor", t =>
 	const window = (global.ui as UiMock).createdWindows?.[0];
 	const trainList = window.findWidget<DropdownWidget>("rve-train-list");
 	const vehicleList = window.findWidget<DropdownWidget>("rve-vehicle-list");
+	const rideType = window.findWidget<DropdownWidget>("rve-ride-type-list");
 	const seats = window.findWidget<SpinnerWidget>("rve-seats-spinner");
 
 	t.true(trainList.isDisabled);
 	t.true(vehicleList.isDisabled);
+	t.true(rideType.isDisabled);
 	t.true(seats.isDisabled);
 	t.deepEqual(trainList.items, ["No trains available"]);
 	t.deepEqual(vehicleList.items, ["No vehicles available"]);
+	t.deepEqual(rideType.items, ["No ride types available"]);
 	t.is(trainList.selectedIndex, 0);
 	t.is(vehicleList.selectedIndex, 0);
+	t.is(rideType.selectedIndex, 0);
 	t.is(seats.text, "Not available");
 
 	map.entities.unshift(
@@ -170,11 +174,14 @@ test("Ride open: reloads editor", t =>
 
 	t.false(trainList.isDisabled);
 	t.false(vehicleList.isDisabled);
+	t.false(rideType.isDisabled);
 	t.false(seats.isDisabled);
 	t.deepEqual(trainList.items, ["Train 1", "Train 2"]);
 	t.deepEqual(vehicleList.items, ["Vehicle 1", "Vehicle 2"]);
+	t.deepEqual(rideType.items, ["chairlift", "wooden coaster"]);
 	t.is(trainList.selectedIndex, 0);
 	t.is(vehicleList.selectedIndex, 0);
+	t.is(rideType.selectedIndex, 1);
 	t.is(seats.text, "4");
 
 	t.is(tracker._sets.total(), 0);
@@ -254,7 +261,6 @@ test("Ride close but keep cars: nothing changes", t =>
 
 	t.is(tracker._sets.total(), 0);
 });
-
 
 
 test("Hidden window: do nothing", t =>
