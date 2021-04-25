@@ -4,7 +4,8 @@
 export type Tracker<T> = Record<keyof T, number> &
 {
 	/**
-	 * Gets the total amount of all the counts.
+	 * Gets the total amount of times any of the properties on
+	 * the object have been accessed.
 	 */
 	total(): number;
 };

@@ -21,7 +21,7 @@ export default function mock_Ride(template?: Partial<RideMock>): RideMock
 	return mock<RideMock>({
 		id: (++rideId),
 		classification: "ride",
-		vehicles: [ 0 ],
+		vehicles: [],
 		get object()
 		{
 			return context.getObject("ride", this.objectId ?? -1);

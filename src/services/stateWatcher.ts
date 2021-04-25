@@ -7,7 +7,7 @@ import VehicleSelector from "./selector";
 /**
  * Returned arguments for the 'ridesetstatus' action.
  */
-interface RideSetStatusArgs
+export interface RideSetStatusArgs
 {
 	/**
 	 * The id of the ride that was changed.
@@ -86,7 +86,7 @@ export default class StateWatcher implements IDisposable
 					if (ride !== null && ride.rideId === statusUpdate.ride)
 					{
 						Log.debug("(watcher) Ride status changed.");
-						this.selector.selectRide(index);
+						this.selector.selectRide(index, this.selector.trainIndex ?? 0, this.selector.vehicleIndex ?? 0);
 					}
 				}
 				break;

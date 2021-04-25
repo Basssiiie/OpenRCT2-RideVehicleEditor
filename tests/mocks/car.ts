@@ -23,6 +23,7 @@ export default function mock_Car(template?: Partial<CarMock>): CarMock
 		// These fallback to 0 if they do are not powered.
 		poweredAcceleration: 0,
 		poweredMaxSpeed: 0,
+		nextCarOnTrain: null,
 		travelBy(distance: number): void
 		{
 			this.trackProgress = (this.trackProgress ?? 0) + (distance / 9000);
