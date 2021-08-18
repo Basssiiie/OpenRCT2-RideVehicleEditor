@@ -1,8 +1,8 @@
-import * as Environment from './environment';
-import VehicleEditor from './services/editor';
-import VehicleSelector from './services/selector';
-import StateWatcher from './services/stateWatcher';
-import VehicleEditorWindow from './ui/editorWindow';
+import * as Environment from "./environment";
+import VehicleEditor from "./services/editor";
+import VehicleSelector from "./services/selector";
+import StateWatcher from "./services/stateWatcher";
+import VehicleEditorWindow from "./ui/editorWindow";
 
 
 // Stores whether the game is outdated check has been performed and what the result is.
@@ -33,7 +33,7 @@ function checkIsGameOutdated(): boolean
 	const car = (entities[0] as Car);
 
 	// The game is up-to-date if the 'trackProgress' property is present.
-	isGameOutdated = (car && typeof car.trackProgress === 'undefined');
+	isGameOutdated = (car && typeof car.trackProgress === "undefined");
 	return isGameOutdated;
 }
 

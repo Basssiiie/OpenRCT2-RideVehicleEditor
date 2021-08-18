@@ -6,7 +6,7 @@ labels: 'bug'
 ---
 
 **Describe the bug**
-Please describe clearly and concisely  what the bug is.
+Please describe clearly and concisely what the bug is.
 
 **To reproduce**
 Steps to reproduce the behavior:
