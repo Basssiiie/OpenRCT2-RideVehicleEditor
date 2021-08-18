@@ -1,12 +1,12 @@
-import replace from '@rollup/plugin-replace';
-import typescript from '@rollup/plugin-typescript';
-import { terser } from 'rollup-plugin-terser';
+import replace from "@rollup/plugin-replace";
+import typescript from "@rollup/plugin-typescript";
+import { terser } from "rollup-plugin-terser";
 
 export default {
-	input: './src/registerPlugin.ts',
+	input: "./src/registerPlugin.ts",
 	output: {
-		file: './dist/RideVehicleEditor.js',
-		format: 'iife',
+		file: "./dist/RideVehicleEditor.js",
+		format: "iife",
 	},
 	plugins: [
 		replace({
@@ -21,7 +21,7 @@ export default {
 			format: {
 				quote_style: 1,
 				wrap_iife: true,
-				preamble: '// Get the latest version: https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor',
+				preamble: "// Get the latest version: https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor",
 			},
 			mangle: {
 				properties: {
