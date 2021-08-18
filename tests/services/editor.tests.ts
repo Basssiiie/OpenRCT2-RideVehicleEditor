@@ -1,44 +1,39 @@
 /// <reference path="../../lib/openrct2.d.ts" />
 
-import test from 'ava';
+import test from "ava";
+import Mock from "openrct2-mocks";
 import VehicleEditor from "../../src/services/editor";
 import VehicleSelector from "../../src/services/selector";
-import mock_Car from "../mocks/car.mock";
-import mock_Context from "../mocks/context.mock";
-import mock_GameMap from "../mocks/gameMap.mock";
-import mock_Ride from "../mocks/ride.mock";
-import mock_RideObject from "../mocks/rideObject.mock";
-import mock_RideObjectVehicle from "../mocks/rideObjectVehicle.mock";
 
 
 function setupPark(): void
 {
-	global.context = mock_Context({
+	global.context = Mock.context({
 		objects: [
-			mock_RideObject(<RideObject>{ index: 2, name: "steam trains", vehicles:
+			Mock.rideObject(<RideObject>{ index: 2, name: "steam trains", vehicles:
 			[
-				mock_RideObjectVehicle({
+				Mock.rideObjectVehicle({
 					carMass: 100, numSeats: 1, poweredAcceleration: 45, poweredMaxSpeed: 35, flags: ~0
 				}),
-				mock_RideObjectVehicle({
+				Mock.rideObjectVehicle({
 					carMass: 50, numSeats: 2
 				}),
-				mock_RideObjectVehicle({
+				Mock.rideObjectVehicle({
 					carMass: 200, numSeats: 4
 				})
 			]}),
 		]
 	});
-	global.map = mock_GameMap({
+	global.map = Mock.map({
 		entities: [
 			// steam trains
-			mock_Car(<Car>{ id: 20, nextCarOnTrain: 21, ride: 7, rideObject: 2, vehicleObject: 0, trackProgress: 10 }),
-			mock_Car(<Car>{ id: 21, nextCarOnTrain: 22, ride: 7, rideObject: 2, vehicleObject: 1, trackProgress: 15 }),
-			mock_Car(<Car>{ id: 22, nextCarOnTrain: 23, ride: 7, rideObject: 2, vehicleObject: 2, trackProgress: 20 }),
-			mock_Car(<Car>{ id: 23, nextCarOnTrain: null, ride: 7, rideObject: 2, vehicleObject: 2, trackProgress: 25 }),
+			Mock.car(<Car>{ id: 20, nextCarOnTrain: 21, ride: 7, rideObject: 2, vehicleObject: 0, trackProgress: 10 }),
+			Mock.car(<Car>{ id: 21, nextCarOnTrain: 22, ride: 7, rideObject: 2, vehicleObject: 1, trackProgress: 15 }),
+			Mock.car(<Car>{ id: 22, nextCarOnTrain: 23, ride: 7, rideObject: 2, vehicleObject: 2, trackProgress: 20 }),
+			Mock.car(<Car>{ id: 23, nextCarOnTrain: null, ride: 7, rideObject: 2, vehicleObject: 2, trackProgress: 25 }),
 		],
 		rides: [
-			mock_Ride(<Ride>{ id: 7, name: "steam trains 1", vehicles: [ 20 ] }),
+			Mock.ride(<Ride>{ id: 7, name: "steam trains 1", vehicles: [ 20 ] }),
 		]
 	});
 }

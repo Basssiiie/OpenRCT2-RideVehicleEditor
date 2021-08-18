@@ -1,6 +1,4 @@
-/// <reference path="../../../lib/openrct2.d.ts" />
-
-import test from 'ava';
+import test from "ava";
 import track from "./trackable";
 
 

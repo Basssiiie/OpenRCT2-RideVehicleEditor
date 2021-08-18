@@ -1,8 +1,8 @@
 /// <reference path="../../lib/openrct2.d.ts" />
 
-import test from 'ava';
+import test from "ava";
+import Mock from "openrct2-mocks";
 import Control, { ControlParams } from "../../src/ui/control";
-import mock_Window from "../mocks/window.mock";
 
 
 class ControlMock extends Control<ControlParams>
@@ -44,7 +44,7 @@ test.cb("Refresh triggers refresh of widget", t =>
 		x: 10, y: 20, width: 30, height: 40,
 		name: "test-widget", type: "groupbox"
 	};
-	const window = mock_Window({
+	const window = Mock.window({
 		widgets: [ widget as Widget ]
 	});
 	const control = new ControlMock(widget as ControlParams);

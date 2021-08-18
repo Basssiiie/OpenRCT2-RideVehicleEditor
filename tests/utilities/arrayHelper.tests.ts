@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-/// <reference path="../../lib/openrct2.d.ts" />
-
-import test from 'ava';
-import * as ArrayHelper from '../../src/utilities/arrayHelper';
+import test from "ava";
+import * as ArrayHelper from "../../src/utilities/arrayHelper";
 
 
 test("isValidIndex()", t =>

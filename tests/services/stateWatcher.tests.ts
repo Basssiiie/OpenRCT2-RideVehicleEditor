@@ -1,50 +1,44 @@
 /// <reference path="../../lib/openrct2.d.ts" />
 
-import test from 'ava';
+import test from "ava";
+import Mock, { ContextMock, GameMapMock, UiMock } from "openrct2-mocks";
 import VehicleEditor from "../../src/services/editor";
 import VehicleSelector from "../../src/services/selector";
 import StateWatcher, { RideSetStatusArgs } from "../../src/services/stateWatcher";
 import VehicleEditorWindow from "../../src/ui/editorWindow";
-import mock_Car from "../mocks/car.mock";
-import mock_Context, { ContextMock } from "../mocks/context.mock";
-import track from "../mocks/core/trackable";
-import mock_GameMap, { GameMapMock } from "../mocks/gameMap.mock";
-import mock_Ride from "../mocks/ride.mock";
-import mock_RideObject from "../mocks/rideObject.mock";
-import mock_RideObjectVehicle from "../mocks/rideObjectVehicle.mock";
-import mock_Ui, { UiMock } from "../mocks/ui.mock";
+import track from "../.trackable/trackable";
 
 
 function setupPark(): void
 {
-	global.context = mock_Context({
+	global.context = Mock.context({
 		objects: [
-			mock_RideObject(<RideObject>{ index: 2, name: "chairlift", vehicles:
+			Mock.rideObject(<RideObject>{ index: 2, name: "chairlift", vehicles:
 			[
-				mock_RideObjectVehicle({
+				Mock.rideObjectVehicle({
 					carMass: 30, numSeats: 2, poweredAcceleration: 5, poweredMaxSpeed: 15, flags: ~0
 				}),
 			]}),
-			mock_RideObject(<RideObject>{ index: 3, name: "wooden coaster", vehicles:
+			Mock.rideObject(<RideObject>{ index: 3, name: "wooden coaster", vehicles:
 			[
-				mock_RideObjectVehicle({
+				Mock.rideObjectVehicle({
 					carMass: 60, numSeats: 4
 				}),
 			]}),
 		]
 	});
-	global.map = mock_GameMap({
+	global.map = Mock.map({
 		entities: [
 			// charlift
-			mock_Car(<Car>{ id: 20, ride: 6, rideObject: 2, vehicleObject: 0, trackProgress: 10 }),
-			mock_Car(<Car>{ id: 21, ride: 6, rideObject: 2, vehicleObject: 0, trackProgress: 20 }),
+			Mock.car(<Car>{ id: 20, ride: 6, rideObject: 2, vehicleObject: 0, trackProgress: 10 }),
+			Mock.car(<Car>{ id: 21, ride: 6, rideObject: 2, vehicleObject: 0, trackProgress: 20 }),
 		],
 		rides: [
-			mock_Ride(<Ride>{ id: 6, name: "chairlift 1", vehicles: [ 20, 21 ] }),
-			mock_Ride(<Ride>{ id: 7, name: "wooden coaster 1" }),
+			Mock.ride(<Ride>{ id: 6, name: "chairlift 1", vehicles: [ 20, 21 ] }),
+			Mock.ride(<Ride>{ id: 7, name: "wooden coaster 1" }),
 		]
 	});
-	global.ui = mock_Ui();
+	global.ui = Mock.ui();
 }
 
 
@@ -91,7 +85,7 @@ test("Ride create: reloads ride list", t =>
 
 	t.deepEqual(rideList.items, ["chairlift 1", "wooden coaster 1"]);
 
-	map.rides.push(mock_Ride({ name: "freefall 1" }));
+	map.rides.push(Mock.ride({ name: "freefall 1" }));
 	context.executeAction("ridecreate", {}, () => t.pass());
 
 	t.deepEqual(rideList.items, ["chairlift 1", "freefall 1", "wooden coaster 1"]);
@@ -163,10 +157,10 @@ test("Ride open: reloads editor", t =>
 	t.is(seats.text, "Not available");
 
 	map.entities.unshift(
-		mock_Car({ id: 31, ride: 7, rideObject: 3, trackProgress: 110, nextCarOnTrain: 32}),
-		mock_Car({ id: 32, ride: 7, rideObject: 3, trackProgress: 120 }),
-		mock_Car({ id: 33, ride: 7, rideObject: 3, trackProgress: 210, nextCarOnTrain: 34 }),
-		mock_Car({ id: 34, ride: 7, rideObject: 3, trackProgress: 220 }),
+		Mock.car({ id: 31, ride: 7, rideObject: 3, trackProgress: 110, nextCarOnTrain: 32}),
+		Mock.car({ id: 32, ride: 7, rideObject: 3, trackProgress: 120 }),
+		Mock.car({ id: 33, ride: 7, rideObject: 3, trackProgress: 210, nextCarOnTrain: 34 }),
+		Mock.car({ id: 34, ride: 7, rideObject: 3, trackProgress: 220 }),
 	);
 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 	map.rides.find(r => r.id === 7)!.vehicles.push(31, 33);

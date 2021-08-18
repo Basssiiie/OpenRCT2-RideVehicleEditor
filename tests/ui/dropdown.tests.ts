@@ -1,8 +1,8 @@
 /// <reference path="../../lib/openrct2.d.ts" />
 
-import test from 'ava';
+import test from "ava";
+import Mock from "openrct2-mocks";
 import DropdownControl from "../../src/ui/dropdown";
-import mock_Window from "../mocks/window.mock";
 
 
 test("Widget parameters are set", t =>
@@ -73,7 +73,7 @@ test("set() updates selected index", t =>
 		onSelect: (): void => t.fail("Event should be silenced when using 'set'")
 	});
 	const widget = control.createWidget();
-	const window = mock_Window({
+	const window = Mock.window({
 		widgets: [ widget ]
 	});
 	control.bind(window);
@@ -92,7 +92,7 @@ test.skip("set() does nothing when control inactive", t =>
 		onSelect: (): void => t.fail("Event should be silenced when using 'set'")
 	});
 	const widget = control.createWidget();
-	const window = mock_Window({
+	const window = Mock.window({
 		widgets: [ widget ]
 	});
 	control.bind(window);
@@ -115,7 +115,7 @@ test("Widget onChange updates control", t =>
 		onSelect: (idx): void => t.is(idx, 1)
 	});
 	const widget = control.createWidget();
-	const window = mock_Window({
+	const window = Mock.window({
 		widgets: [ widget ]
 	});
 	control.bind(window);
@@ -155,7 +155,7 @@ test("selectedIndex triggering onChange does not trigger onSelect", t =>
 			}
 		}
 	});
-	const window = mock_Window({
+	const window = Mock.window({
 		widgets: [ widget ]
 	});
 	control.bind(window);

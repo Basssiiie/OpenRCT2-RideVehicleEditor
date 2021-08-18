@@ -1,70 +1,64 @@
 /// <reference path="../../lib/openrct2.d.ts" />
 
-import test from 'ava';
+import test from "ava";
+import Mock, { GameMapMock, UiMock } from "openrct2-mocks";
 import VehicleEditor from "../../src/services/editor";
 import VehicleSelector from "../../src/services/selector";
 import VehicleEditorWindow from "../../src/ui/editorWindow";
-import mock_Car from "../mocks/car.mock";
-import mock_Context from "../mocks/context.mock";
-import track, { Trackable } from "../mocks/core/trackable";
-import mock_GameMap, { GameMapMock } from "../mocks/gameMap.mock";
-import mock_Ride from "../mocks/ride.mock";
-import mock_RideObject from "../mocks/rideObject.mock";
-import mock_RideObjectVehicle from "../mocks/rideObjectVehicle.mock";
-import mock_Ui, { UiMock } from "../mocks/ui.mock";
+import track, { Trackable } from "../.trackable/trackable";
 
 
 function setupPark(): void
 {
-	global.context = mock_Context({
+	global.context = Mock.context({
 		objects: [
-			mock_RideObject(<RideObject>{ index: 2, name: "chairlift", vehicles:
+			Mock.rideObject(<RideObject>{ index: 2, name: "chairlift", vehicles:
 			[
-				mock_RideObjectVehicle({
+				Mock.rideObjectVehicle({
 					carMass: 30, numSeats: 3, poweredAcceleration: 5, poweredMaxSpeed: 15, flags: ~0
 				}),
 			]}),
-			mock_RideObject(<RideObject>{ index: 3, name: "mine train coaster", vehicles:
+			Mock.rideObject(<RideObject>{ index: 3, name: "mine train coaster", vehicles:
 			[
-				mock_RideObjectVehicle({
+				Mock.rideObjectVehicle({
 					carMass: 60, numSeats: 2
 				}),
-				mock_RideObjectVehicle({
+				Mock.rideObjectVehicle({
 					carMass: 50, numSeats: 4
 				}),
 			]}),
-			mock_RideObject(<RideObject>{ index: 4, name: "monorail", vehicles:
+			Mock.rideObject(<RideObject>{ index: 4, name: "monorail", vehicles:
 			[
-				mock_RideObjectVehicle({
+				Mock.rideObjectVehicle({
 					carMass: 80, numSeats: 6, poweredAcceleration: 12, poweredMaxSpeed: 42, flags: ~0
 				}),
-				mock_RideObjectVehicle({
+				Mock.rideObjectVehicle({
 					carMass: 100, numSeats: 8, poweredAcceleration: 14, poweredMaxSpeed: 44, flags: ~0
 				}),
-				mock_RideObjectVehicle({
+				Mock.rideObjectVehicle({
 					carMass: 120, numSeats: 10
 				}),
 			]}),
 		]
 	});
-	global.map = mock_GameMap({
+	global.map = Mock.map({
 		entities: [
 			// charlift
-			mock_Car(<Car>{ id: 20, nextCarOnTrain: null, ride: 6, rideObject: 2, vehicleObject: 0, trackProgress: 10 }),
-			mock_Car(<Car>{ id: 21, nextCarOnTrain: null, ride: 6, rideObject: 2, vehicleObject: 0, trackProgress: 20 }),
+			Mock.car(<Car>{ id: 20, nextCarOnTrain: null, ride: 6, rideObject: 2, vehicleObject: 0, trackProgress: 10 }),
+			Mock.car(<Car>{ id: 21, nextCarOnTrain: null, ride: 6, rideObject: 2, vehicleObject: 0, trackProgress: 20 }),
 			// mine train
-			mock_Car(<Car>{ id: 30, nextCarOnTrain: 31, ride: 7, rideObject: 3, vehicleObject: 0, trackProgress: 15 }),
-			mock_Car(<Car>{ id: 31, nextCarOnTrain: 32, ride: 7, rideObject: 3, vehicleObject: 1, trackProgress: 25 }),
-			mock_Car(<Car>{ id: 32, nextCarOnTrain: 33, ride: 7, rideObject: 3, vehicleObject: 1, trackProgress: 35 }),
-			mock_Car(<Car>{ id: 33, nextCarOnTrain: 34, ride: 7, rideObject: 3, vehicleObject: 1, trackProgress: 45 }),
-			mock_Car(<Car>{ id: 34, nextCarOnTrain: null, ride: 7, rideObject: 3, vehicleObject: 1, trackProgress: 55 }),
+			Mock.car(<Car>{ id: 30, nextCarOnTrain: 31, ride: 7, rideObject: 3, vehicleObject: 0, trackProgress: 15 }),
+			Mock.car(<Car>{ id: 31, nextCarOnTrain: 32, ride: 7, rideObject: 3, vehicleObject: 1, trackProgress: 25 }),
+			Mock.car(<Car>{ id: 32, nextCarOnTrain: 33, ride: 7, rideObject: 3, vehicleObject: 1, trackProgress: 35 }),
+			Mock.car(<Car>{ id: 33, nextCarOnTrain: 34, ride: 7, rideObject: 3, vehicleObject: 1, trackProgress: 45 }),
+			Mock.car(<Car>{ id: 34, nextCarOnTrain: null, ride: 7, rideObject: 3, vehicleObject: 1, trackProgress: 55 }),
 		],
 		rides: [
-			mock_Ride(<Ride>{ id: 6, name: "chairlift 1", vehicles: [ 20, 21 ] }),
-			mock_Ride(<Ride>{ id: 7, name: "mine train 1", vehicles: [ 30 ] }),
+			Mock.ride(<Ride>{ id: 6, name: "chairlift 1", vehicles: [ 20, 21 ] }),
+			Mock.ride(<Ride>{ id: 7, name: "mine train 1", vehicles: [ 30 ] }),
 		]
 	});
-	global.ui = mock_Ui();
+	global.ui = Mock.ui();
 }
 
 

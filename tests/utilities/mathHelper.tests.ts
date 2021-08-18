@@ -1,7 +1,5 @@
-/// <reference path="../../lib/openrct2.d.ts" />
-
-import test from 'ava';
-import * as MathHelper from '../../src/utilities/mathHelper';
+import test from "ava";
+import * as MathHelper from "../../src/utilities/mathHelper";
 
 
 test("clamp(): only max", t =>

@@ -1,12 +1,9 @@
 /// <reference path="../../lib/openrct2.d.ts" />
 
-import test, { ExecutionContext } from 'ava';
+import test, { ExecutionContext } from "ava";
+import Mock from "openrct2-mocks";
 import RideTrain from "../../src/objects/rideTrain";
 import VehicleSelector from "../../src/services/selector";
-import mock_Car from "../mocks/car.mock";
-import mock_Entity from "../mocks/entity.mock";
-import mock_GameMap from "../mocks/gameMap.mock";
-import mock_Ride from "../mocks/ride.mock";
 
 
 test("Constructor defaults", t =>
@@ -27,11 +24,11 @@ test("Constructor defaults", t =>
 
 test("Reload ride list: updates rides in park", t =>
 {
-	global.map = mock_GameMap({
+	global.map = Mock.map({
 		rides: [
-			mock_Ride(<Ride>{ name: "twister" }),
-			mock_Ride(<Ride>{ name: "ferris wheel" }),
-			mock_Ride(<Ride>{ name: "looping coaster" }),
+			Mock.ride(<Ride>{ name: "twister" }),
+			Mock.ride(<Ride>{ name: "ferris wheel" }),
+			Mock.ride(<Ride>{ name: "looping coaster" }),
 		]
 	});
 	const selector = new VehicleSelector();
@@ -49,11 +46,11 @@ test("Reload ride list: updates rides in park", t =>
 
 test("Reload ride list: reselect previous selected ride (new index)", t =>
 {
-	global.map = mock_GameMap({
+	global.map = Mock.map({
 		rides: [
-			mock_Ride(<Ride>{ name: "ferris wheel" }),
-			mock_Ride(<Ride>{ name: "looping coaster" }),
-			mock_Ride(<Ride>{ name: "twister" }),
+			Mock.ride(<Ride>{ name: "ferris wheel" }),
+			Mock.ride(<Ride>{ name: "looping coaster" }),
+			Mock.ride(<Ride>{ name: "twister" }),
 		]
 	});
 	const selector = new VehicleSelector();
@@ -64,8 +61,8 @@ test("Reload ride list: reselect previous selected ride (new index)", t =>
 	t.is(selector.rideIndex, 1);
 
 	global.map.rides.unshift(
-		mock_Ride(<Ride>{ name: "freefall" }),
-		mock_Ride(<Ride>{ name: "go karts" }),
+		Mock.ride(<Ride>{ name: "freefall" }),
+		Mock.ride(<Ride>{ name: "go karts" }),
 	);
 	selector.reloadRideList();
 
@@ -76,11 +73,11 @@ test("Reload ride list: reselect previous selected ride (new index)", t =>
 
 test("Reload ride list: reselect previous selected ride (same index)", t =>
 {
-	global.map = mock_GameMap({
+	global.map = Mock.map({
 		rides: [
-			mock_Ride(<Ride>{ name: "ferris wheel" }),
-			mock_Ride(<Ride>{ name: "freefall" }),
-			mock_Ride(<Ride>{ name: "twister" }),
+			Mock.ride(<Ride>{ name: "ferris wheel" }),
+			Mock.ride(<Ride>{ name: "freefall" }),
+			Mock.ride(<Ride>{ name: "twister" }),
 		]
 	});
 	const selector = new VehicleSelector();
@@ -91,8 +88,8 @@ test("Reload ride list: reselect previous selected ride (same index)", t =>
 	t.is(selector.rideIndex, 1);
 
 	global.map.rides.unshift(
-		mock_Ride(<Ride>{ name: "looping coaster" }),
-		mock_Ride(<Ride>{ name: "go karts" }),
+		Mock.ride(<Ride>{ name: "looping coaster" }),
+		Mock.ride(<Ride>{ name: "go karts" }),
 	);
 	selector.reloadRideList();
 
@@ -103,9 +100,9 @@ test("Reload ride list: reselect previous selected ride (same index)", t =>
 
 test("Reload ride list: previous ride has disappeared", t =>
 {
-	global.map = mock_GameMap({
+	global.map = Mock.map({
 		rides: [
-			mock_Ride(<Ride>{ name: "looping coaster" }),
+			Mock.ride(<Ride>{ name: "looping coaster" }),
 		]
 	});
 	const selector = new VehicleSelector();
@@ -125,24 +122,24 @@ test("Reload ride list: previous ride has disappeared", t =>
 
 function setupPark(): void
 {
-	global.map = mock_GameMap({
+	global.map = Mock.map({
 		entities: [
 			// looping train 1
-			mock_Car(<Car>{ id: 11, ride: 3, nextCarOnTrain: 12 }),
-			mock_Car(<Car>{ id: 12, ride: 3, nextCarOnTrain: 13 }),
-			mock_Car(<Car>{ id: 13, ride: 3, nextCarOnTrain: null }),
+			Mock.car(<Car>{ id: 11, ride: 3, nextCarOnTrain: 12 }),
+			Mock.car(<Car>{ id: 12, ride: 3, nextCarOnTrain: 13 }),
+			Mock.car(<Car>{ id: 13, ride: 3, nextCarOnTrain: null }),
 			// looping train 2
-			mock_Car(<Car>{ id: 21, ride: 3, nextCarOnTrain: 22 }),
-			mock_Car(<Car>{ id: 22, ride: 3, nextCarOnTrain: 23 }),
-			mock_Car(<Car>{ id: 23, ride: 3, nextCarOnTrain: null }),
+			Mock.car(<Car>{ id: 21, ride: 3, nextCarOnTrain: 22 }),
+			Mock.car(<Car>{ id: 22, ride: 3, nextCarOnTrain: 23 }),
+			Mock.car(<Car>{ id: 23, ride: 3, nextCarOnTrain: null }),
 			// go karts cars
-			mock_Car(<Car>{ id: 31, ride: 2, nextCarOnTrain: null }),
-			mock_Car(<Car>{ id: 32, ride: 2, nextCarOnTrain: null }),
-			mock_Car(<Car>{ id: 33, ride: 2, nextCarOnTrain: null }),
+			Mock.car(<Car>{ id: 31, ride: 2, nextCarOnTrain: null }),
+			Mock.car(<Car>{ id: 32, ride: 2, nextCarOnTrain: null }),
+			Mock.car(<Car>{ id: 33, ride: 2, nextCarOnTrain: null }),
 		],
 		rides: [
-			mock_Ride(<Ride>{ id: 2, name: "go karts", vehicles: [ 31, 32, 33 ] }),
-			mock_Ride(<Ride>{ id: 3, name: "looping coaster", vehicles: [ 11, 21 ] }),
+			Mock.ride(<Ride>{ id: 2, name: "go karts", vehicles: [ 31, 32, 33 ] }),
+			Mock.ride(<Ride>{ id: 3, name: "looping coaster", vehicles: [ 11, 21 ] }),
 		]
 	});
 }
@@ -312,12 +309,12 @@ test("Select entity: go karts train 2", selectEntityMacro, 33, 0, 2, 0, "go kart
 
 test("Select entity: entity is not a car", t =>
 {
-	global.map = mock_GameMap({
+	global.map = Mock.map({
 		entities: [
-			mock_Entity(<Peep>{ id: 15, type: "peep"})
+			Mock.entity(<Peep>{ id: 15, type: "peep"})
 		],
 		rides: [
-			mock_Ride(<Ride>{ id: 1, name: "log flume" }),
+			Mock.ride(<Ride>{ id: 1, name: "log flume" }),
 		]
 	});
 	const selector = new VehicleSelector();
@@ -336,12 +333,12 @@ test("Select entity: entity is not a car", t =>
 
 test("Select entity: car ride does not exist", t =>
 {
-	global.map = mock_GameMap({
+	global.map = Mock.map({
 		entities: [
-			mock_Car(<Car>{ id: 15, ride: 2 })
+			Mock.car(<Car>{ id: 15, ride: 2 })
 		],
 		rides: [
-			mock_Ride(<Ride>{ id: 1, name: "log flume" }),
+			Mock.ride(<Ride>{ id: 1, name: "log flume" }),
 		]
 	});
 	const selector = new VehicleSelector();
