@@ -14,7 +14,7 @@ export type DropdownSpinnerParams = DropdownParams & Partial<SpinnerParams>;
 export default class DropdownSpinnerControl extends DropdownControl
 {
 	/** @inheritdoc */
-	get params(): Required<DropdownSpinnerParams>
+	override get params(): Required<DropdownSpinnerParams>
 	{
 		return this._params as Required<DropdownSpinnerParams>;
 	}
@@ -57,7 +57,7 @@ export default class DropdownSpinnerControl extends DropdownControl
 
 
 	/** @inheritdoc */
-	bind(window: Window): void
+	override bind(window: Window): void
 	{
 		this._spinner.bind(window);
 		super.bind(window);
@@ -79,7 +79,7 @@ export default class DropdownSpinnerControl extends DropdownControl
 
 
 	/** @inheritdoc */
-	protected onWidgetChange(index: number): void
+	protected override onWidgetChange(index: number): void
 	{
 		this._spinner.set(index);
 		super.onWidgetChange(index);
@@ -87,7 +87,7 @@ export default class DropdownSpinnerControl extends DropdownControl
 
 
 	/** @inheritdoc */
-	protected refreshWidget(widget: DropdownWidget): void
+	protected override refreshWidget(widget: DropdownWidget): void
 	{
 		this._spinner.params.maximum = this._params.items.length;
 		this._spinner.refresh();

@@ -80,7 +80,7 @@ export default class DropdownButtonComponent extends DropdownControl
 
 
 	/** @inheritdoc */
-	protected onWidgetChange(index: number): void
+	protected override onWidgetChange(index: number): void
 	{
 		super.onWidgetChange(index);
 		this._selectedIndex = index;
@@ -89,7 +89,7 @@ export default class DropdownButtonComponent extends DropdownControl
 
 
 	/** @inheritdoc */
-	protected refreshWidget(widget: DropdownWidget): void
+	protected override refreshWidget(widget: DropdownWidget): void
 	{
 		super.refreshWidget(widget);
 		this.refreshButton();
