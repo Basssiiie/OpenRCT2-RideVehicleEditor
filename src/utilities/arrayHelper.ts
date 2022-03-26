@@ -36,3 +36,25 @@ export function findIndex<T>(array: T[], predicate: (item: T) => boolean): numbe
 	}
 	return null;
 }
+
+
+/**
+ * Gets the first matching item. Returns null if no items match the predicate.
+ * @param array The array to check.
+ * @param predicate The function to match the items against.
+ */
+export function find<T>(array: T[], predicate: (item: T) => boolean): T | null
+{
+	const idx = findIndex(array, predicate);
+	return (idx === null) ? null : array[idx];
+}
+
+
+/**
+ * Gets the first item of the array, or null if it has no items.
+ * @param array The array to check.
+ */
+export function firstOrNull<T>(array: T[]): T | null
+{
+	return (array.length > 0) ? array[0] : null;
+}

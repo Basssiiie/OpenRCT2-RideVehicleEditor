@@ -1,6 +1,6 @@
-import ParkRide from "../objects/parkRide";
-import RideTrain from "../objects/rideTrain";
-import RideVehicle from "../objects/rideVehicle";
+import { ParkRide } from "../objects/parkRide";
+import { RideTrain } from "../objects/rideTrain";
+import { RideVehicle } from "../objects/rideVehicle";
 import * as ArrayHelper from "../utilities/arrayHelper";
 import * as Log from "../utilities/logger";
 import * as MathHelper from "../utilities/mathHelper";
@@ -71,7 +71,7 @@ export default class VehicleSelector
 	reloadRideList(): void
 	{
 		const lastSelectedRide = this.ride.get();
-		Log.debug(`(selector) Reloading the list of rides in the park. (last selected: '${lastSelectedRide?.name}', idx: ${this._rideIndex})`);
+		Log.debug(`(selector) Reloading the list of rides in the park. (last selected: '${lastSelectedRide?.ride().name}', idx: ${this._rideIndex})`);
 
 		const rides = ParkRide.getAllRides();
 		this.ridesInPark.set(rides);
@@ -79,14 +79,14 @@ export default class VehicleSelector
 		if (lastSelectedRide && this._rideIndex !== null)
 		{
 			const newlySelectedRide = rides[this._rideIndex];
-			if (newlySelectedRide && newlySelectedRide.rideId === lastSelectedRide.rideId)
+			if (newlySelectedRide && newlySelectedRide.id === lastSelectedRide.id)
 			{
 				// Position is still the same in the new list.
 				return;
 			}
 
 			// Ride index has changed; find the new index.
-			const rideIndex = ArrayHelper.findIndex(rides, r => r.rideId === lastSelectedRide.rideId);
+			const rideIndex = ArrayHelper.findIndex(rides, r => r.id === lastSelectedRide.id);
 			if (rideIndex === null)
 			{
 				// Not found, reset to ride at index 0.
@@ -125,10 +125,10 @@ export default class VehicleSelector
 		this._rideIndex = rideIndex = MathHelper.clamp(rideIndex, 0, ridesInPark.length);
 
 		const ride = this.ridesInPark.get()[rideIndex];
-		Log.debug(`(selector) Selected ride '${ride.name}' (index: ${rideIndex}, range: 0<->${ridesInPark.length}))`);
+		Log.debug(`(selector) Selected ride '${ride.ride().name}' (index: ${rideIndex}, range: 0<->${ridesInPark.length}))`);
 		this.ride.set(ride);
 
-		this.trainsOnRide.set(ride.getTrains());
+		this.trainsOnRide.set(ride.trains());
 		this.selectTrain(trainIndex, vehicleIndex);
 	}
 
@@ -155,7 +155,7 @@ export default class VehicleSelector
 		Log.debug(`(selector) Selected train at index ${trainIndex} (range: 0<->${trains.length}).`);
 		this.train.set(train);
 
-		this.vehiclesOnTrain.set(train.getVehicles());
+		this.vehiclesOnTrain.set(train.vehicles());
 		this.selectVehicle(vehicleIndex);
 	}
 
@@ -199,7 +199,7 @@ export default class VehicleSelector
 		const car = entity as Car;
 		const rideId = car.ride;
 
-		const carRideIndex = ArrayHelper.findIndex(this.ridesInPark.get(), r => r.rideId === rideId);
+		const carRideIndex = ArrayHelper.findIndex(this.ridesInPark.get(), r => r.id === rideId);
 		if (carRideIndex === null)
 		{
 			Log.debug(`(selector) Could not find ride id ${carRideIndex} for selected entity id ${entityId}.`);

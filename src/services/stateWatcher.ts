@@ -1,6 +1,6 @@
 import VehicleEditorWindow from "../ui/editorWindow";
 import * as Log from "../utilities/logger";
-import VehicleEditor from "./editor";
+//import VehicleEditor from "./editor";
 import VehicleSelector from "./selector";
 
 
@@ -83,7 +83,7 @@ export default class StateWatcher implements IDisposable
 					const ride = this.selector.ride.get();
 					const statusUpdate = (event.args as RideSetStatusArgs);
 
-					if (ride !== null && ride.rideId === statusUpdate.ride)
+					if (ride !== null && ride.id === statusUpdate.ride)
 					{
 						Log.debug("(watcher) Ride status changed.");
 						this.selector.selectRide(index, this.selector.trainIndex ?? 0, this.selector.vehicleIndex ?? 0);
@@ -109,7 +109,7 @@ export default class StateWatcher implements IDisposable
 		const vehicle = this.selector.vehicle.get();
 		if (vehicle)
 		{
-			const car = vehicle.getCar();
+			const car = vehicle.car();
 			if (!car)
 			{
 				this.selector.deselect();

@@ -1,8 +1,7 @@
 import * as Environment from "./environment";
-import VehicleEditor from "./services/editor";
-import VehicleSelector from "./services/selector";
-import StateWatcher from "./services/stateWatcher";
+import { init } from "./services/actions";
 import VehicleEditorWindow from "./ui/editorWindow";
+import { editorWindow } from "./ui/window";
 
 
 // Stores whether the game is outdated check has been performed and what the result is.
@@ -43,6 +42,10 @@ function checkIsGameOutdated(): boolean
  */
 function openEditorWindow(): void
 {
+	init();
+	editorWindow.open();
+
+
 	// Check if game is up-to-date...
 	if (checkIsGameOutdated())
 	{
@@ -60,7 +63,7 @@ function openEditorWindow(): void
 		editorInstance.show();
 		return;
 	}
-
+	/*
 	const selector = new VehicleSelector();
 	const editor = new VehicleEditor(selector);
 
@@ -74,14 +77,14 @@ function openEditorWindow(): void
 	};
 
 	window.show();
-	editorInstance = window;
+	editorInstance = window;*/
 }
 
 
 /**
  * Entry point of the plugin.
  */
-function main(): void
+export function main(): void
 {
 	if (!Environment.isUiAvailable)
 	{
@@ -100,4 +103,3 @@ function main(): void
 
 	ui.registerMenuItem("Edit ride vehicles", () => openEditorWindow());
 }
-export default main;

@@ -2,7 +2,7 @@
 
 import test, { ExecutionContext } from "ava";
 import Mock from "openrct2-mocks";
-import RideTrain from "../../src/objects/rideTrain";
+import { RideTrain } from "../../src/objects/rideTrain";
 import VehicleSelector from "../../src/services/selector";
 
 

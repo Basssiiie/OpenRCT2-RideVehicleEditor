@@ -98,3 +98,30 @@ export function error(message: string): void
 	}
 	print("error", message);
 }
+
+
+/**
+ * Prints an error message to the console and an additional stacktrace
+ * if the assert fails and the plugin is run in development mode.
+ */
+export function assert(condition: boolean, message: string): void
+{
+	if (Environment.isDevelopment && !condition)
+	{
+		throw new AssertError(message);
+	}
+	return <never>0;
+}
+
+
+/**
+ * Throwable error for asserts.
+ */
+class AssertError extends Error
+{
+	constructor(message: string)
+	{
+		super(message);
+		this.name = "AssertError";
+	}
+}

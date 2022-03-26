@@ -1,5 +1,5 @@
 import * as Environment from "../environment";
-import RideVehicle from "../objects/rideVehicle";
+import { RideVehicle } from "../objects/rideVehicle";
 import VehicleEditor, { VehicleSettings } from "../services/editor";
 import VehicleSelector from "../services/selector";
 import DropdownControl from "../ui/dropdown";

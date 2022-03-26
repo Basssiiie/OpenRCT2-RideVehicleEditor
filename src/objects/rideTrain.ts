@@ -1,96 +1,65 @@
 import * as Log from "../utilities/logger";
-import RideVehicle from "./rideVehicle";
+import { RideVehicle } from "./rideVehicle";
 
 
 /**
  * Represents a train with one or more vehicles on a ride in the park.
  */
-export default class RideTrain
+export class RideTrain
 {
-	/**
-	 * @param index Gets the index of the train for this ride.
-	 * @param headCarId Gets the entity id for the first car of this train.
-	 */
-	constructor(
-		readonly index: number,
-		readonly headCarId: number
-	) { }
+	readonly carId: number;
+	private _vehicles?: RideVehicle[] | null;
+	private _onMissing: () => void;
 
 
 	/**
-	 * Gets the first car of this train.
+	 * Creates a new train for a ride.
+	 * @param carId Gets the entity id for the first car of this train.
+	 * @param onMissing Callback that should get triggered when the entity has disappeared.
 	 */
-	getHeadCar(): Car
+	constructor(carId: number, onMissing: () => void)
 	{
-		return map.getEntity(this.headCarId) as Car;
+		this.carId = carId;
+		this._onMissing = onMissing;
+		this.refresh();
 	}
 
 
-	/**
-	 * Gets the index at which the specified car is located within the train.
-	 * Returns 'null' if the specified car is not part of this train.
-	 */
-	getCarIndex(carId: number): number | null
+	refresh(): void
 	{
-		let currentId: number | null = this.headCarId;
-		let index = 0;
-		while (currentId !== null && currentId !== 0xFFFF)
-		{
-			if (currentId === carId)
-			{
-				return index;
-			}
+		const vehicleList: RideVehicle[] = [];
+		const missingCar = (): void => this.refresh();
 
-			const car = this.getCarEntity(currentId);
-			if (car === null)
-			{
-				break;
-			}
+		let currentId: (number | null) = this.carId;
+		let car: Car | null = null;
+
+		while (currentId != null
+			&& currentId != 0xFFFF // = invalid vehicle
+			&& (car = <Car>map.getEntity(currentId))
+			&& car.type === "car")
+		{
+			vehicleList.push(new RideVehicle(car, missingCar));
 			currentId = car.nextCarOnTrain;
-			index++;
 		}
-		return null;
+
+		if (vehicleList.length > 0)
+		{
+			this._vehicles = vehicleList;
+		}
+		else
+		{
+			this._vehicles = null;
+			this._onMissing();
+		}
 	}
 
 
 	/**
 	 * Gets a list of all cars in this train, from front to back.
 	 */
-	getVehicles(): RideVehicle[]
+	vehicles(): RideVehicle[]
 	{
-		const vehicles: RideVehicle[] = [];
-		let currentId: (number | null) = this.headCarId;
-
-		while (currentId != null && currentId != 0xFFFF)
-		{
-			const vehicle = this.getCarEntity(currentId);
-			if (!vehicle)
-			{
-				break;
-			}
-
-			vehicles.push(new RideVehicle(currentId));
-			currentId = vehicle.nextCarOnTrain;
-		}
-		return vehicles;
-	}
-
-
-	// Get the entity for this car id, or print an error if it is not found.
-	private getCarEntity(carId: number): (Car | null)
-	{
-		const entity = map.getEntity(carId);
-		if (!entity)
-		{
-			Log.error(`(train) Entity ${carId} could not be found.`);
-			return null;
-		}
-		const vehicle = entity as Car;
-		if (!vehicle)
-		{
-			Log.error(`(train) Entity ${entity} is not a car.`);
-			return null;
-		}
-		return vehicle;
+		Log.assert(!!this._vehicles, `Selected train with car id '${this.carId}' is missing.`);
+		return <RideVehicle[]>this._vehicles;
 	}
 }

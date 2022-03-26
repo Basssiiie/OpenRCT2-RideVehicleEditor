@@ -1,44 +1,85 @@
+import * as Log from "../utilities/logger";
+
+
+/**
+ * Gets all available ride types that are currently loaded.
+ */
+export function getAllRideTypes(): RideType[]
+{
+	return context
+		.getAllObjects("ride")
+		.filter(r => r.carsPerFlatRide !== 0) // tracked rides == 255, flatrides >= 1, shops == 0
+		.sort((a, b) => a.name.localeCompare(b.name))
+		.map(r => new RideType(r));
+}
+
+
 /**
  * Represents a ride type currently available to be build.
  */
-export default class RideType
+export class RideType
 {
+	readonly id: number;
+	private _object?: RideObject | null;
+	private _variants: number = -1;
+
+
 	/**
-	 * @param id The index of the loaded ride definition object.
-	 * @param name The name of the ride type.
-	 * @param variantCount The amount of different variants (vehicle sprites) this ride has.
+	 * Creates a new ride type object.
 	 */
-	constructor(
-		readonly id: number,
-		readonly name: string,
-		readonly variantCount: number
-	) { }
+	constructor(object: RideObject);
+	constructor(id: number);
+	constructor(param: RideObject | number)
+	{
+		if (typeof param === "number")
+		{
+			this.id = param;
+			this.refresh();
+		}
+		else
+		{
+			this.id = param.index;
+			this._object = param;
+		}
+	}
+
+
+	refresh(): void
+	{
+		const obj = context.getObject("ride", this.id);
+		if (obj)
+		{
+			this._object = obj;
+		}
+		else
+		{
+			this._object = null;
+		}
+	}
 
 
 	/*
-	 * Gets the associated ride defintion from the game.
+	 * Gets the associated ride definition from the game.
 	 */
-	getDefinition(): RideObject
+	object(): RideObject
 	{
-		return context.getObject("ride", this.id);
+		Log.assert(!!this._object, `Selected ride object with id '${this.id}' is missing.`);
+		return <RideObject>this._object;
 	}
 
 
 	/**
-	 * Gets all available ride types that are currently loaded.
+	 * The amount of different variants (vehicle sprites) this ride has.
 	 */
-	static getAvailableTypes(): RideType[]
+	variants(): number
 	{
-		return context
-			.getAllObjects("ride")
-			.filter(r => r.carsPerFlatRide !== 0) // tracked rides == 255, flatrides >= 1, shops == 0
-			.map(r => new RideType(
-				r.index,
-				r.name,
-				r.vehicles
-					.filter(v => v.baseImageId > 0)
-					.length
-			))
-			.sort((a, b) => a.name.localeCompare(b.name));
+		if (this._variants === -1)
+		{
+			this._variants = this.object()
+				.vehicles
+				.filter(v => v.baseImageId > 0)
+				.length;
+		}
+		return this._variants;
 	}
 }

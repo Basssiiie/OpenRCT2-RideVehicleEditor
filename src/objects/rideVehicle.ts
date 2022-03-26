@@ -1,29 +1,76 @@
+import * as Log from "../utilities/logger";
+
+
 /**
  * A single vehicle on a train currently in the park.
  */
-export default class RideVehicle
+export class RideVehicle
 {
+	readonly id: number;
+	private _entity?: Car | null;
+	private _type?: RideObjectVehicle | null;
+	private _onMissing: () => void;
+
+
 	/**
-	 * @param entityId Gets the id of the associated entity in the park.
+	 * Creates a new ride vehicle to wrap a car.
 	 */
-	constructor(readonly entityId: number) { }
+	constructor(car: Car, onMissing: () => void);
+	constructor(id: number, onMissing: () => void);
+	constructor(param: Car | number, onMissing: () => void)
+	{
+		this._onMissing = onMissing;
+
+		if (typeof param === "number")
+		{
+			this.id = param;
+			this.refresh();
+		}
+		else
+		{
+			this.id = param.id;
+			this._entity = param;
+		}
+	}
+
+	refresh(): void
+	{
+		const car = map.getEntity(this.id);
+		if (car && car.type === "car")
+		{
+			this._entity = <Car>car;
+		}
+		else
+		{
+			this._entity = null;
+			this._onMissing();
+		}
+	}
 
 
 	/**
 	 * Gets the associated vehicle data from the game.
 	 */
-	getCar(): Car
+	car(): Car
 	{
-		return map.getEntity(this.entityId) as Car;
+		Log.assert(!!this._entity, `Selected car with id '${this.id}' is missing.`);
+		Log.assert(this._entity?.type === "car", `Selected car with id '${this.id}' is not of type 'car', but of type '${this._entity?.type}'.`);
+		return <Car>this._entity;
 	}
 
 
 	/**
-	 * Returns the object definition fpr this car.
+	 * Returns the object definition for this car.
 	 */
-	getDefinition(): RideObjectVehicle
+	type(): RideObjectVehicle
 	{
-		return RideVehicle.getDefinition(this.getCar());
+		if (!this._type)
+		{
+			const entity = this.car();
+			const rideObject = context.getObject("ride", entity.rideObject);
+			this._type = rideObject.vehicles[entity.vehicleObject];
+		}
+		return this._type;
 	}
 
 
@@ -34,30 +81,8 @@ export default class RideVehicle
 	 */
 	isPowered(): boolean
 	{
-		return RideVehicle.isPowered(this.getDefinition());
-	}
-
-
-	/**
-	 * Returns the object definition for this car.
-	 */
-	static getDefinition(car: Car): RideObjectVehicle
-	{
-		const rideObject = context.getObject("ride", car.rideObject);
-		return rideObject.vehicles[car.vehicleObject];
-	}
-
-
-	/**
-	 * Returns true if this vehicle does use powered acceleration.
-	 * Currently not all vehicle types support this property in
-	 * the openrct2 source code.
-	 * @param vehicle The vehicle definition for which to check the engine.
-	 */
-	static isPowered(vehicle: RideObjectVehicle): boolean
-	{
 		// 'VEHICLE_ENTRY_FLAG_POWERED' is required.
-		return ((vehicle.flags & (1 << 19)) !== 0);
+		return !!(this.type().flags & (1 << 19));
 	}
 
 
