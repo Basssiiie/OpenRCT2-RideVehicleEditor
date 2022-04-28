@@ -2,7 +2,7 @@
 
 import test from "ava";
 import Mock, { GameMapMock, UiMock } from "openrct2-mocks";
-import VehicleEditor from "../../src/services/editor";
+import VehicleEditor from "../../src/services/vehicleEditor";
 import VehicleSelector from "../../src/services/selector";
 import VehicleEditorWindow from "../../src/ui/editorWindow";
 import track, { Trackable } from "../.trackable/trackable";

@@ -1,17 +1,19 @@
+import { Colour } from "openrct2-flexui";
 import { RideType } from "../objects/rideType";
 import { RideVehicle } from "../objects/rideVehicle";
 import * as Log from "../utilities/logger";
 import { hasPermissions, register } from "./actions";
 
 
-const execute = register<UpdateVehicleSettingArgs>("rve-updatesetting", updateVehicleSetting);
+const execute = register<UpdateVehicleSettingArgs>("rve-update-car", updateVehicleSetting);
 
 // The distance of a single step for moving the vehicle.
 const moveDistanceStep = 9_000;
 
 
 type VehicleUpdateKeys = "rideObject" | "vehicleObject" | "trackProgress"
-	| "numSeats" | "mass" | "poweredAcceleration" | "poweredMaxSpeed";
+	| "numSeats" | "mass" | "poweredAcceleration" | "poweredMaxSpeed"
+	| "x" | "y" | "z" | "body" | "trim" | "tertiary";
 
 const
 	rideTypeKey = "rideObject",
@@ -20,7 +22,13 @@ const
 	seatsKey = "numSeats",
 	massKey = "mass",
 	poweredAccelerationKey = "poweredAcceleration",
-	poweredMaxSpeedKey = "poweredMaxSpeed";
+	poweredMaxSpeedKey = "poweredMaxSpeed",
+	xPosition = "x",
+	yPosition = "y",
+	zPosition = "z",
+	primaryColour = "body",
+	secondaryColour = "trim",
+	tertiaryColour = "tertiary";
 
 
 /**
@@ -88,6 +96,34 @@ export function setPoweredMaximumSpeed(vehicle: RideVehicle, maximumSpeed: numbe
 
 
 /**
+ * Sets the primary colour for this vehicle.
+ */
+export function setPrimaryColour(vehicle: RideVehicle, colour: Colour): void
+{
+	updateValue(vehicle.id, primaryColour, colour);
+}
+
+
+/**
+ * Sets the secondary colour for this vehicle.
+ */
+export function setSecondaryColour(vehicle: RideVehicle, colour: Colour): void
+{
+	updateValue(vehicle.id, secondaryColour, colour);
+}
+
+
+/**
+ * Sets the tertiary colour for this vehicle.
+ */
+export function setTertiaryColour(vehicle: RideVehicle, colour: Colour): void
+{
+	updateValue(vehicle.id, tertiaryColour, colour);
+}
+
+
+
+/**
  * Arguments for updating a single key in a vehicle object.
  */
 interface UpdateVehicleSettingArgs
@@ -131,6 +167,9 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs, playerId: number):
 		case massKey:
 		case poweredAccelerationKey:
 		case poweredMaxSpeedKey:
+		case xPosition:
+		case yPosition:
+		case zPosition:
 		{
 			(<Car>car)[key] = value;
 			break;
@@ -138,6 +177,15 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs, playerId: number):
 		case trackProgressKey:
 		{
 			(<Car>car).travelBy(value);
+			break;
+		}
+		case primaryColour:
+		case secondaryColour:
+		case tertiaryColour:
+		{
+			const colours = (<Car>car).colours;
+			colours[key] = value;
+			(<Car>car).colours = colours; // reassignment is required for update
 			break;
 		}
 		default:

@@ -4,7 +4,7 @@ import * as Log from "../utilities/logger";
 import { hasPermissions, register } from "./actions";
 
 
-const execute = register<PasteVehicleSettingsArgs>("rve-pastesettings", pasteVehicleSettings);
+const execute = register<PasteVehicleSettingsArgs>("rve-paste-car", pasteVehicleSettings);
 
 
 export function applyToTrain(train: RideTrain): void

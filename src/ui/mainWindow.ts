@@ -1,24 +1,35 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-import { box, button, compute, dropdown, dropdownButton, dropdownSpinner, FlexibleLayoutContainer, FlexiblePosition, horizontal, isStore, label, LabelParams, spinner, SpinnerParams, toggle, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
+import { box, button, colourPicker, compute, dropdown, dropdownSpinner, FlexiblePosition, horizontal, isStore, label, LabelParams, SpinnerParams, toggle, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
 import { isDevelopment, pluginVersion } from "../environment";
 import { RideVehicle } from "../objects/rideVehicle";
-import { ViewModel } from "../objects/viewModel";
-import { changeTrackProgress, setMass, setPoweredAcceleration, setPoweredMaximumSpeed, setRideType, setSeatCount, setVariant } from "../services/editor";
+import { changeTrackProgress, setMass, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
 import * as Log from "../utilities/logger";
+import { VehicleViewModel } from "../viewmodels/vehicleViewModel";
+import { applyWindow } from "./applyWindow";
+import { model as rideModel, rideWindow } from "./rideWindow";
+import { combinedLabelSpinner } from "./utilityControls";
 
 
-const model = new ViewModel();
+const model = new VehicleViewModel();
+model.selectedRide.subscribe(r => rideModel.ride.set((r) ? r[0] : null));
+
 for (const key in model)
 {
 	const store = model[<keyof typeof model>key];
 	if (isStore(store) && ["mass","trackProgress","variant"].indexOf(key) === -1)
 	{
-		store.subscribe(v => console.log(`> '${key}' updated to: ${JSON.stringify(v)}`));
+		store.subscribe(v =>
+		{
+			const json = JSON.stringify(v);
+			console.log(`> '${key}' updated to ${(json.length < 15) ? json : (`${json.substring(0, 10)}...`)}`)
+		});
 	}
 }
 
 
 const buttonSize = 24;
+const controlsWidth = 260;
+const controlsLabelWidth = controlsWidth * 0.35;
+const controlsSpinnerWidth = controlsWidth - (controlsLabelWidth + 4); // include spacing
 
 let title = `Ride vehicle editor (v${pluginVersion})`;
 if (isDevelopment)
@@ -27,19 +38,33 @@ if (isDevelopment)
 }
 
 
-export const editorWindow = window({
+export const mainWindow = window({
 	title,
-	width: 375, minWidth: 375, maxWidth: 500,
-	height: 245, minHeight: 245, maxHeight: 280,
+	width: 375, maxWidth: 500,
+	height: 264, maxHeight: 293,
 	spacing: 5,
 	onOpen: () => model.reload(),
 	onUpdate: () => model.update(),
+	onClose: () =>
+	{
+		applyWindow.close();
+		rideWindow.close();
+	},
 	content: [
 		box(
 			vertical([ // selection top bar
-				label({
-					text: "Pick a ride:"
-				}),
+				horizontal([
+					label({
+						text: "Pick a ride:"
+					}),
+					button({
+						text: "Edit ride...",
+						tooltip: "Changes properties of the ride, that are not related to its vehicles.",
+						width: 100,
+						height: 14,
+						onClick: () => rideWindow.open()
+					})
+				]),
 				dropdown({ // ride list
 					items: compute(model.rides, c => c.map(r => r.ride().name)),
 					tooltip: "List of rides in the park",
@@ -106,7 +131,7 @@ export const editorWindow = window({
 			}),
 			vertical({
 				// control part
-				width: 260,
+				width: controlsWidth,
 				spacing: 3,
 				content: [
 					dropdown({ // vehicle type editor
@@ -118,7 +143,7 @@ export const editorWindow = window({
 						selectedIndex: compute(model.type, t => (t) ? t[1] : 0),
 						onChange: idx => modifyVehicle(setRideType, model.rideTypes.get()[idx])
 					}),
-					labelledSpinner({
+					labelSpinner({
 						text: "Variant:",
 						tooltip: "Sprite variant to use from the selected ride type",
 						maximum: compute(model.type, c => (c) ? c[0].variants() : 4),
@@ -127,7 +152,7 @@ export const editorWindow = window({
 						value: model.variant,
 						onChange: value => modifyVehicle(setVariant, value)
 					}),
-					labelledSpinner({
+					labelSpinner({
 						text: "Seats:",
 						tooltip: "Total amount of passengers that can cuddle up in this vehicle",
 						maximum: 33, // vehicles refuse more than 32 guests, leaving them stuck just before entering.
@@ -136,7 +161,7 @@ export const editorWindow = window({
 						value: model.seats,
 						onChange: value => modifyVehicle(setSeatCount, value)
 					}),
-					labelledSpinner({
+					labelSpinner({
 						text: "Mass:",
 						tooltip: "Total amount of mass (weight) of this vehicle, including all its passengers and your mom",
 						maximum: 65_536,
@@ -145,7 +170,7 @@ export const editorWindow = window({
 						value: model.mass,
 						onChange: value => modifyVehicle(setMass, value)
 					}),
-					labelledSpinner({
+					labelSpinner({
 						text: "Acceleration:",
 						tooltip: "Cranks up the engines to accelerate faster, self-powered vehicles only",
 						disabledMessage: "Only on powered vehicles",
@@ -155,7 +180,7 @@ export const editorWindow = window({
 						value: model.poweredAcceleration,
 						onChange: value => modifyVehicle(setPoweredAcceleration, value)
 					}),
-					labelledSpinner({
+					labelSpinner({
 						text: "Max. speed:",
 						tooltip: "The (il)legal speed limit for your vehicle, self-powered vehicles only",
 						disabledMessage: "Only on powered vehicles",
@@ -165,7 +190,7 @@ export const editorWindow = window({
 						value: model.poweredMaxSpeed,
 						onChange: value => modifyVehicle(setPoweredMaximumSpeed, value)
 					}),
-					labelledSpinner({
+					labelSpinner({
 						text: "Track progress:",
 						tooltip: "Distance in steps of how far the vehicle has progressed along the current track piece",
 						maximum: 1,
@@ -175,25 +200,41 @@ export const editorWindow = window({
 						onChange: (_, incr) => modifyVehicle(changeTrackProgress, incr)
 					}),
 					horizontal([
-						dropdownButton({
-							buttons: [
-								{ text: "Apply to all vehicles", onClick: (): void => {} },
-								{ text: "Apply to preceding vehicles", onClick: (): void => {} },
-								{ text: "Apply to following vehicles", onClick: (): void => {} },
-								{ text: "Apply to all vehicles on all trains", onClick: (): void => {} },
-								{ text: "Apply to preceding vehicles on all trains", onClick: (): void => {} },
-								{ text: "Apply to following vehicles on all trains", onClick: (): void => {} },
-								{ text: "Apply to same vehicle on all trains", onClick: (): void => {} }
-							],
-							tooltip: "Apply the current vehicle settings to a specific set of other vehicles on this ride",
+						label({
+							text: "Colours:",
+							tooltip: "The three important boxes that make the car pretty on demand.",
+							width: controlsLabelWidth,
+							disabled: model.isEditDisabled,
+						}),
+						colourPicker({
+							tooltip: "The primary (body) colour of the vehicle.",
+							colour: model.primaryColour,
+							onChange: value => modifyVehicle(setPrimaryColour, value)
+						}),
+						colourPicker({
+							tooltip: "The secondary (trim) colour of the vehicle.",
+							colour: model.secondaryColour,
+							onChange: value => modifyVehicle(setSecondaryColour, value)
+						}),
+						colourPicker({
+							tooltip: "The tertiary (detail) colour of the vehicle.",
+							colour: model.tertiaryColour,
+							onChange: value => modifyVehicle(setTertiaryColour, value)
 						}),
 						dropdown({
 							width: 45,
+							padding: { left: "1w" },
 							items: ["x1", "x10", "x100"],
 							tooltip: "Multiplies all spinner controls by the specified amount",
 							onChange: idx => model.multiplier.set(10 ** idx),
 						})
-					])
+					]),
+					button({
+						text: "Apply to other vehicles...",
+						tooltip: "Apply the current vehicle settings to a specific set of other vehicles on this ride",
+						height: 14,
+						onClick: () => applyWindow.open()
+					})
 				]
 			})
 		]),
@@ -208,21 +249,9 @@ export const editorWindow = window({
 });
 
 
-function labelledSpinner(params: LabelParams & SpinnerParams): WidgetCreator<FlexibleLayoutContainer & FlexiblePosition>
+function labelSpinner(params: LabelParams & SpinnerParams): WidgetCreator<FlexiblePosition>
 {
-	(<FlexiblePosition>params).width = "65%";
-	params.disabledMessage ||= "Not available";
-	params.wrapMode ||= "clampThenWrap";
-
-	return horizontal([
-		label({
-			width: "35%",
-			disabled: params.disabled,
-			text: params.text,
-			tooltip: params.tooltip
-		}),
-		spinner(params)
-	]);
+	return combinedLabelSpinner(controlsLabelWidth, controlsSpinnerWidth, params);
 }
 
 

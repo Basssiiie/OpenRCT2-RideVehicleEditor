@@ -2,7 +2,7 @@
 
 import test from "ava";
 import Mock, { ContextMock, GameMapMock, UiMock } from "openrct2-mocks";
-import VehicleEditor from "../../src/services/editor";
+import VehicleEditor from "../../src/services/vehicleEditor";
 import VehicleSelector from "../../src/services/selector";
 import StateWatcher, { RideSetStatusArgs } from "../../src/services/stateWatcher";
 import VehicleEditorWindow from "../../src/ui/editorWindow";

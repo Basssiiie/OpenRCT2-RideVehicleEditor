@@ -1,14 +1,10 @@
 import * as Environment from "./environment";
-import { init } from "./services/actions";
-import VehicleEditorWindow from "./ui/editorWindow";
-import { editorWindow } from "./ui/window";
+import { initActions } from "./services/actions";
+import { mainWindow } from "./ui/mainWindow";
 
 
 // Stores whether the game is outdated check has been performed and what the result is.
 let isGameOutdated: boolean | null = null;
-
-// Currently only one instance of the editor window allowed.
-let editorInstance: VehicleEditorWindow | null;
 
 
 /**
@@ -42,10 +38,6 @@ function checkIsGameOutdated(): boolean
  */
 function openEditorWindow(): void
 {
-	init();
-	editorWindow.open();
-
-
 	// Check if game is up-to-date...
 	if (checkIsGameOutdated())
 	{
@@ -58,26 +50,7 @@ function openEditorWindow(): void
 	}
 
 	// Show the current instance if one is active.
-	if (editorInstance)
-	{
-		editorInstance.show();
-		return;
-	}
-	/*
-	const selector = new VehicleSelector();
-	const editor = new VehicleEditor(selector);
-
-	const window = new VehicleEditorWindow(selector, editor);
-	const watcher = new StateWatcher(window, selector, editor);
-
-	window.onClose = (): void =>
-	{
-		watcher.dispose();
-		editorInstance = null;
-	};
-
-	window.show();
-	editorInstance = window;*/
+	mainWindow.open();
 }
 
 
@@ -101,5 +74,6 @@ export function main(): void
 	}
 	*/
 
+	initActions();
 	ui.registerMenuItem("Edit ride vehicles", () => openEditorWindow());
 }

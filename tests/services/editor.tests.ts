@@ -2,7 +2,7 @@
 
 import test from "ava";
 import Mock from "openrct2-mocks";
-import VehicleEditor from "../../src/services/editor";
+import VehicleEditor from "../../src/services/vehicleEditor";
 import VehicleSelector from "../../src/services/selector";
 
 

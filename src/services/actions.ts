@@ -31,7 +31,7 @@ export function register<T>(name: string, action: Action<T>): ExecuteAction<T>
 /**
  * Register all actions by registering them with the OpenRCT2 context.
  */
-export function init(): void
+export function initActions(): void
 {
 	for (const action in registeredActions)
 	{

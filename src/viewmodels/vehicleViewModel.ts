@@ -1,13 +1,13 @@
-import { compute, Store, store } from "openrct2-flexui";
-import { getAllRides, ParkRide } from "./parkRide";
-import { RideTrain } from "./rideTrain";
-import { getAllRideTypes, RideType } from "./rideType";
-import { RideVehicle } from "./rideVehicle";
+import { Colour, compute, Store, store } from "openrct2-flexui";
+import { getAllRides, ParkRide } from "../objects/parkRide";
+import { RideTrain } from "../objects/rideTrain";
+import { getAllRideTypes, RideType } from "../objects/rideType";
+import { RideVehicle } from "../objects/rideVehicle";
 import { findIndex } from "../utilities/arrayHelper";
 
 
 
-export class ViewModel
+export class VehicleViewModel
 {
 	readonly selectedRide = store<[ParkRide, number] | null>(null);
 	readonly selectedTrain = store<[RideTrain, number] | null>(null);
@@ -30,6 +30,10 @@ export class ViewModel
 	readonly poweredAcceleration = store<number>(0);
 	readonly poweredMaxSpeed = store<number>(0);
 
+	readonly primaryColour = store<Colour>(0);
+	readonly secondaryColour = store<Colour>(0);
+	readonly tertiaryColour = store<Colour>(0);
+
 	constructor()
 	{
 		this.rides.subscribe(r => updateSelectionOrNull(this.selectedRide, r));
@@ -42,11 +46,15 @@ export class ViewModel
 			{
 				const vehicle = v[0], car = vehicle.car(), types = this.rideTypes.get();
 				const typeIdx = findIndex(types, t => t.id === car.rideObject);
+				const colours = car.colours;
 
 				this.type.set((typeIdx === null) ? null : [ types[typeIdx], typeIdx ]);
 				this.seats.set(car.numSeats);
 				this.poweredAcceleration.set(car.poweredAcceleration);
 				this.poweredMaxSpeed.set(car.poweredMaxSpeed);
+				this.primaryColour.set(colours.body);
+				this.secondaryColour.set(colours.trim);
+				this.tertiaryColour.set(colours.tertiary);
 				updateFromCar(this, car);
 			}
 		});
@@ -84,7 +92,7 @@ function updateSelectionOrNull<T>(store: Store<[T, number] | null>, items: T[]):
 }
 
 
-function updateFromCar(model: ViewModel, car: Car): void
+function updateFromCar(model: VehicleViewModel, car: Car): void
 {
 	model.variant.set(car.vehicleObject);
 	model.trackProgress.set(car.trackProgress);
