@@ -28,9 +28,11 @@ export class RideVehicle
 		}
 		else
 		{
-			this.id = param.id;
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			this.id = param.id!;
 			this._entity = param;
 		}
+		Log.assert(typeof this.id === "number", "Ride vehicle entity is invalid.");
 	}
 
 	refresh(): void

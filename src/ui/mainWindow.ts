@@ -4,13 +4,21 @@ import { RideVehicle } from "../objects/rideVehicle";
 import { changeTrackProgress, setMass, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
 import * as Log from "../utilities/logger";
 import { VehicleViewModel } from "../viewmodels/vehicleViewModel";
-import { applyWindow } from "./applyWindow";
+import { model as applyModel, applyWindow } from "./applyWindow";
 import { model as rideModel, rideWindow } from "./rideWindow";
 import { combinedLabelSpinner } from "./utilityControls";
 
 
 const model = new VehicleViewModel();
 model.selectedRide.subscribe(r => rideModel.ride.set((r) ? r[0] : null));
+model.selectedVehicle.subscribe(() =>
+{
+	const source = applyModel.source;
+	if (source !== null)
+	{
+		updateApplyWindow();
+	}
+});
 
 for (const key in model)
 {
@@ -20,7 +28,7 @@ for (const key in model)
 		store.subscribe(v =>
 		{
 			const json = JSON.stringify(v);
-			console.log(`> '${key}' updated to ${(json.length < 15) ? json : (`${json.substring(0, 10)}...`)}`)
+			console.log(`> '${key}' updated to ${(json.length < 15) ? json : (`${json.substring(0, 10)}...`)}`);
 		});
 	}
 }
@@ -233,7 +241,7 @@ export const mainWindow = window({
 						text: "Apply to other vehicles...",
 						tooltip: "Apply the current vehicle settings to a specific set of other vehicles on this ride",
 						height: 14,
-						onClick: () => applyWindow.open()
+						onClick: () => (updateApplyWindow() && applyWindow.open())
 					})
 				]
 			})
@@ -266,4 +274,20 @@ function modifyVehicle<T>(action: (vehicle: RideVehicle, value: T) => void, valu
 	{
 		Log.debug(`Failed to modify vehicle with '${action}' to '${value}'; none is selected.`);
 	}
+}
+
+
+function updateApplyWindow(): boolean
+{
+	const
+		ride = model.selectedRide.get(),
+		train = model.selectedTrain.get(),
+		vehicle = model.selectedVehicle.get(),
+		valid = !!(ride && train && vehicle);
+
+	if (valid)
+	{
+		applyModel.source = { ride, train, vehicle };
+	}
+	return valid;
 }

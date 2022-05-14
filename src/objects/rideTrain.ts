@@ -62,4 +62,15 @@ export class RideTrain
 		Log.assert(!!this._vehicles, `Selected train with car id '${this.carId}' is missing.`);
 		return <RideVehicle[]>this._vehicles;
 	}
+
+
+	/**
+	 * Gets the vehicle at the specific index.
+	 */
+	at(index: number): RideVehicle
+	{
+		const vehicles = this.vehicles();
+		Log.assert(0 <= index && index < vehicles.length, `Vehicle index ${index} out of range for train of length ${vehicles.length}`);
+		return vehicles[index];
+	}
 }
