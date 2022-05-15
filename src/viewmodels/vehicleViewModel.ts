@@ -4,6 +4,7 @@ import { RideTrain } from "../objects/rideTrain";
 import { getAllRideTypes, RideType } from "../objects/rideType";
 import { RideVehicle } from "../objects/rideVehicle";
 import { findIndex } from "../utilities/arrayHelper";
+import * as Log from "../utilities/logger";
 
 
 
@@ -18,6 +19,7 @@ export class VehicleViewModel
 	readonly trains = compute(this.selectedRide, r => (r) ? r[0].trains() : []);
 	readonly vehicles = compute(this.selectedTrain, t => (t) ? t[0].vehicles() : []);
 
+	readonly isPicking = store<boolean>(false);
 	readonly isEditDisabled = compute(this.selectedVehicle, v => !v);
 	readonly isUnpowered = compute(this.selectedVehicle, v => !v || !v[0].isPowered());
 	readonly multiplier = store<number>(1);
@@ -60,18 +62,75 @@ export class VehicleViewModel
 		});
 	}
 
+	/**
+	 * Reload available rides and ride types.
+	 */
 	reload(): void
 	{
 		this.rideTypes.set(getAllRideTypes());
 		this.rides.set(getAllRides());
 	}
 
+	/**
+	 * Synchronise the data of the model with the car.
+	 */
 	update(): void
 	{
 		const vehicle = this.selectedVehicle.get();
 		if (vehicle)
 		{
 			updateFromCar(this, vehicle[0].car());
+		}
+	}
+
+	/**
+	 * Select a specific car entity.
+	 */
+	select(car: Car): void
+	{
+		const
+			rides = this.rides.get(),
+			carId = car.id,
+			rideId = car.ride,
+			carRideIndex = findIndex(rides, r => r.id === rideId);
+
+		if (carRideIndex === null)
+		{
+			Log.debug(`Could not find ride id ${rideId} for selected entity id ${carId}.`);
+			return;
+		}
+
+		this.selectedRide.set([ rides[carRideIndex], carRideIndex ]);
+
+		const trains = this.trains.get();
+		for (let t = 0; t < trains.length; t++)
+		{
+			const vehicles = trains[t].vehicles();
+			for (let v = 0; v < vehicles.length; v++)
+			{
+				if (vehicles[v].id === carId)
+				{
+					this.selectedTrain.set([ trains[t], t ]);
+					this.selectedVehicle.set([ vehicles[v], v ]);
+					return;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Attempt to modify the vehicle with the specified action, if a vehicle is selected.
+	 */
+	modifyVehicle<T>(action: (vehicle: RideVehicle, value: T) => void, value: T): void
+	{
+		const vehicle = this.selectedVehicle.get();
+		if (vehicle)
+		{
+			action(vehicle[0], value);
+		}
+		else
+		{
+			Log.debug(`Failed to modify vehicle with '${action}' to '${value}'; none is selected.`);
 		}
 	}
 }

@@ -1,8 +1,7 @@
 import { box, button, colourPicker, compute, dropdown, dropdownSpinner, FlexiblePosition, horizontal, isStore, label, LabelParams, SpinnerParams, toggle, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
 import { isDevelopment, pluginVersion } from "../environment";
-import { RideVehicle } from "../objects/rideVehicle";
 import { changeTrackProgress, setMass, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
-import * as Log from "../utilities/logger";
+import { toggleVehiclePicker } from "../services/vehiclePicker";
 import { VehicleViewModel } from "../viewmodels/vehicleViewModel";
 import { model as applyModel, applyWindow } from "./applyWindow";
 import { model as rideModel, rideWindow } from "./rideWindow";
@@ -78,6 +77,7 @@ export const mainWindow = window({
 					tooltip: "List of rides in the park",
 					disabledMessage: "No rides in this park",
 					autoDisable: "empty",
+					selectedIndex: compute(model.selectedRide, r => r ? r[1] : 0),
 					onChange: i => model.selectedRide.set([model.rides.get()[i], i]),
 				}),
 				horizontal([
@@ -86,6 +86,7 @@ export const mainWindow = window({
 						tooltip: "List of trains on the currently selected ride",
 						disabledMessage: "No trains available",
 						autoDisable: "single",
+						selectedIndex: compute(model.selectedTrain, t => t ? t[1] : 0),
 						onChange: i => model.selectedTrain.set([model.trains.get()[i], i]),
 					}),
 					dropdownSpinner({ // vehicle list
@@ -93,6 +94,7 @@ export const mainWindow = window({
 						tooltip: "List of vehicles on the currently selected train",
 						disabledMessage: "No vehicles available",
 						autoDisable: "single",
+						selectedIndex: compute(model.selectedVehicle, v => v ? v[1] : 0),
 						onChange: i => model.selectedVehicle.set([model.vehicles.get()[i], i]),
 					})
 				])
@@ -116,10 +118,12 @@ export const mainWindow = window({
 								image: 5167, // SPR_LOCATE,
 								disabled: model.isEditDisabled,
 							}),
-							button({
+							toggle({
 								width: buttonSize, height: buttonSize,
 								tooltip: "Use the picker to select a vehicle by clicking it",
 								image: 29467, // SPR_G2_EYEDROPPER
+								isPressed: model.isPicking,
+								onChange: p => toggleVehiclePicker(p, c => model.select(c), () => model.isPicking.set(false))
 							}),
 							toggle({
 								width: buttonSize, height: buttonSize,
@@ -149,7 +153,7 @@ export const mainWindow = window({
 						disabled: model.isEditDisabled,
 						autoDisable: "empty",
 						selectedIndex: compute(model.type, t => (t) ? t[1] : 0),
-						onChange: idx => modifyVehicle(setRideType, model.rideTypes.get()[idx])
+						onChange: idx => model.modifyVehicle(setRideType, model.rideTypes.get()[idx])
 					}),
 					labelSpinner({
 						text: "Variant:",
@@ -158,7 +162,7 @@ export const mainWindow = window({
 						wrapMode: "wrap",
 						disabled: model.isEditDisabled,
 						value: model.variant,
-						onChange: value => modifyVehicle(setVariant, value)
+						onChange: value => model.modifyVehicle(setVariant, value)
 					}),
 					labelSpinner({
 						text: "Seats:",
@@ -167,7 +171,7 @@ export const mainWindow = window({
 						disabled: model.isEditDisabled,
 						step: model.multiplier,
 						value: model.seats,
-						onChange: value => modifyVehicle(setSeatCount, value)
+						onChange: value => model.modifyVehicle(setSeatCount, value)
 					}),
 					labelSpinner({
 						text: "Mass:",
@@ -176,7 +180,7 @@ export const mainWindow = window({
 						disabled: model.isEditDisabled,
 						step: model.multiplier,
 						value: model.mass,
-						onChange: value => modifyVehicle(setMass, value)
+						onChange: value => model.modifyVehicle(setMass, value)
 					}),
 					labelSpinner({
 						text: "Acceleration:",
@@ -186,7 +190,7 @@ export const mainWindow = window({
 						disabled: model.isUnpowered,
 						step: model.multiplier,
 						value: model.poweredAcceleration,
-						onChange: value => modifyVehicle(setPoweredAcceleration, value)
+						onChange: value => model.modifyVehicle(setPoweredAcceleration, value)
 					}),
 					labelSpinner({
 						text: "Max. speed:",
@@ -196,7 +200,7 @@ export const mainWindow = window({
 						disabled: model.isUnpowered,
 						step: model.multiplier,
 						value: model.poweredMaxSpeed,
-						onChange: value => modifyVehicle(setPoweredMaximumSpeed, value)
+						onChange: value => model.modifyVehicle(setPoweredMaximumSpeed, value)
 					}),
 					labelSpinner({
 						text: "Track progress:",
@@ -205,7 +209,7 @@ export const mainWindow = window({
 						disabled: model.isEditDisabled,
 						step: model.multiplier,
 						value: model.trackProgress,
-						onChange: (_, incr) => modifyVehicle(changeTrackProgress, incr)
+						onChange: (_, incr) => model.modifyVehicle(changeTrackProgress, incr)
 					}),
 					horizontal([
 						label({
@@ -217,17 +221,17 @@ export const mainWindow = window({
 						colourPicker({
 							tooltip: "The primary (body) colour of the vehicle.",
 							colour: model.primaryColour,
-							onChange: value => modifyVehicle(setPrimaryColour, value)
+							onChange: value => model.modifyVehicle(setPrimaryColour, value)
 						}),
 						colourPicker({
 							tooltip: "The secondary (trim) colour of the vehicle.",
 							colour: model.secondaryColour,
-							onChange: value => modifyVehicle(setSecondaryColour, value)
+							onChange: value => model.modifyVehicle(setSecondaryColour, value)
 						}),
 						colourPicker({
 							tooltip: "The tertiary (detail) colour of the vehicle.",
 							colour: model.tertiaryColour,
-							onChange: value => modifyVehicle(setTertiaryColour, value)
+							onChange: value => model.modifyVehicle(setTertiaryColour, value)
 						}),
 						dropdown({
 							width: 45,
@@ -260,20 +264,6 @@ export const mainWindow = window({
 function labelSpinner(params: LabelParams & SpinnerParams): WidgetCreator<FlexiblePosition>
 {
 	return combinedLabelSpinner(controlsLabelWidth, controlsSpinnerWidth, params);
-}
-
-
-function modifyVehicle<T>(action: (vehicle: RideVehicle, value: T) => void, value: T): void
-{
-	const vehicle = model.selectedVehicle.get();
-	if (vehicle)
-	{
-		action(vehicle[0], value);
-	}
-	else
-	{
-		Log.debug(`Failed to modify vehicle with '${action}' to '${value}'; none is selected.`);
-	}
 }
 
 
