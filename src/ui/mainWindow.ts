@@ -1,6 +1,7 @@
 import { box, button, colourPicker, compute, dropdown, dropdownSpinner, FlexiblePosition, horizontal, isStore, label, LabelParams, SpinnerParams, toggle, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
 import { isDevelopment, pluginVersion } from "../environment";
 import { changeTrackProgress, setMass, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
+import { locate } from "../services/vehicleLocater";
 import { toggleVehiclePicker } from "../services/vehiclePicker";
 import { VehicleViewModel } from "../viewmodels/vehicleViewModel";
 import { model as applyModel, applyWindow } from "./applyWindow";
@@ -117,6 +118,14 @@ export const mainWindow = window({
 								tooltip: "Locate your vehicle when you've lost it (again)",
 								image: 5167, // SPR_LOCATE,
 								disabled: model.isEditDisabled,
+								onClick: () =>
+								{
+									const vehicle = model.selectedVehicle.get();
+									if (vehicle)
+									{
+										locate(vehicle[0]);
+									}
+								}
 							}),
 							toggle({
 								width: buttonSize, height: buttonSize,
