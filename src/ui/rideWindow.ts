@@ -14,6 +14,7 @@ export const model = new RideViewModel();
 
 export const rideWindow = window({
 	title: model.title,
+	position: "center",
 	width: 220,
 	height: 195,
 	colours: [ 24, 24 ],

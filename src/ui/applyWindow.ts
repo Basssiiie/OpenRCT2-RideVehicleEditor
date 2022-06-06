@@ -8,6 +8,7 @@ export const model = new ApplyViewModel();
 
 export const applyWindow = window({
 	title: "Apply to other vehicles",
+	position: "center",
 	width: 200,
 	height: 226,
 	colours: [ 12, 12 ],
