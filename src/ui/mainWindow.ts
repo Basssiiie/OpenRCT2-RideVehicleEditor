@@ -1,4 +1,4 @@
-import { box, button, colourPicker, compute, dropdown, dropdownSpinner, FlexiblePosition, horizontal, isStore, label, LabelParams, SpinnerParams, toggle, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
+import { button, colourPicker, compute, dropdown, dropdownSpinner, FlexiblePosition, groupbox, horizontal, isStore, label, LabelParams, SpinnerParams, toggle, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
 import { isDevelopment, pluginVersion } from "../environment";
 import { changeTrackProgress, setMass, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
 import { locate } from "../services/vehicleLocater";
@@ -59,48 +59,46 @@ export const mainWindow = window({
 		rideWindow.close();
 	},
 	content: [
-		box(
-			vertical([ // selection top bar
-				horizontal([
-					label({
-						text: "Pick a ride:"
-					}),
-					button({
-						text: "Edit ride...",
-						tooltip: "Changes properties of the ride, that are not related to its vehicles.",
-						width: 100,
-						height: 14,
-						onClick: () => rideWindow.open()
-					})
-				]),
-				dropdown({ // ride list
-					items: compute(model.rides, c => c.map(r => r.ride().name)),
-					tooltip: "List of rides in the park",
-					disabledMessage: "No rides in this park",
-					autoDisable: "empty",
-					selectedIndex: compute(model.selectedRide, r => r ? r[1] : 0),
-					onChange: i => model.selectedRide.set([model.rides.get()[i], i]),
+		groupbox([ // selection top bar
+			horizontal([
+				label({
+					text: "Pick a ride:"
 				}),
-				horizontal([
-					dropdownSpinner({ // train list
-						items: compute(model.trains, c => c.map((_, i) => `Train ${i + 1}`)),
-						tooltip: "List of trains on the currently selected ride",
-						disabledMessage: "No trains available",
-						autoDisable: "single",
-						selectedIndex: compute(model.selectedTrain, t => t ? t[1] : 0),
-						onChange: i => model.selectedTrain.set([model.trains.get()[i], i]),
-					}),
-					dropdownSpinner({ // vehicle list
-						items: compute(model.vehicles, c => c.map((_, i) => `Vehicle ${i + 1}`)),
-						tooltip: "List of vehicles on the currently selected train",
-						disabledMessage: "No vehicles available",
-						autoDisable: "single",
-						selectedIndex: compute(model.selectedVehicle, v => v ? v[1] : 0),
-						onChange: i => model.selectedVehicle.set([model.vehicles.get()[i], i]),
-					})
-				])
+				button({
+					text: "Edit ride...",
+					tooltip: "Changes properties of the ride, that are not related to its vehicles.",
+					width: 100,
+					height: 14,
+					onClick: () => rideWindow.open()
+				})
+			]),
+			dropdown({ // ride list
+				items: compute(model.rides, c => c.map(r => r.ride().name)),
+				tooltip: "List of rides in the park",
+				disabledMessage: "No rides in this park",
+				autoDisable: "empty",
+				selectedIndex: compute(model.selectedRide, r => r ? r[1] : 0),
+				onChange: i => model.selectedRide.set([model.rides.get()[i], i]),
+			}),
+			horizontal([
+				dropdownSpinner({ // train list
+					items: compute(model.trains, c => c.map((_, i) => `Train ${i + 1}`)),
+					tooltip: "List of trains on the currently selected ride",
+					disabledMessage: "No trains available",
+					autoDisable: "single",
+					selectedIndex: compute(model.selectedTrain, t => t ? t[1] : 0),
+					onChange: i => model.selectedTrain.set([model.trains.get()[i], i]),
+				}),
+				dropdownSpinner({ // vehicle list
+					items: compute(model.vehicles, c => c.map((_, i) => `Vehicle ${i + 1}`)),
+					tooltip: "List of vehicles on the currently selected train",
+					disabledMessage: "No vehicles available",
+					autoDisable: "single",
+					selectedIndex: compute(model.selectedVehicle, v => v ? v[1] : 0),
+					onChange: i => model.selectedVehicle.set([model.vehicles.get()[i], i]),
+				})
 			])
-		),
+		]),
 		horizontal([
 			vertical({
 				spacing: 8,
