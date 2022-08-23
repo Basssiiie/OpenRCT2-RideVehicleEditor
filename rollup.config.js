@@ -21,9 +21,18 @@ const extensions = [ ".js", ".ts" ];
  * > git update-index --no-skip-worktree rollup.config.js
  * ```
  */
-const output = (isDev)
-	? `${getPath("documents")}/OpenRCT2/plugin/RideVehicleEditor.js`
-	: "./dist/RideVehicleEditor.js";
+function getOutput()
+{
+	if (!isDev)
+		return "./dist/RideVehicleEditor.js";
+
+	const pluginPath = "OpenRCT2/plugin/RideVehicleEditor.js";
+	switch (process.platform)
+	{
+		case "win32": return `${getPath("documents")}/${pluginPath}`;
+		default: return `${getPath("userData")}/${pluginPath}`; // for both Mac and Linux
+	}
+}
 
 
 /**
@@ -32,7 +41,7 @@ const output = (isDev)
 const config = {
 	input: "./src/registerPlugin.ts",
 	output: {
-		file: output,
+		file: getOutput(),
 		format: "iife",
 	},
 	plugins: [

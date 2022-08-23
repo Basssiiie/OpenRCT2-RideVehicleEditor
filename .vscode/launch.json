@@ -8,8 +8,8 @@
 			"type": "node",
 			"request": "launch",
 			"name": "Debug AVA test file",
-			"runtimeExecutable": "${workspaceFolder}/node_modules/.bin/ava",
-			"runtimeArgs": [
+			"program": "${workspaceFolder}/node_modules/ava/entrypoints/cli.mjs",
+			"args": [
 				"${file}"
 			],
 			"outputCapture": "std",
