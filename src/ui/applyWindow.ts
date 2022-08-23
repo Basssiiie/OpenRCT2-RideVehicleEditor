@@ -32,7 +32,6 @@ export const applyWindow = window({
 			text: "Only",
 			tooltip: "Select which of these settings should be applied.",
 			padding: { top: 8 },
-			gap: [14, 10, 10, 10],
 			content: [
 				checkbox({
 					text: "Type & variant",
@@ -63,6 +62,12 @@ export const applyWindow = window({
 					tooltip: "Copy the selected maximum powered speed to other vehicles.",
 					isChecked: compute(model.filters, f => !!(f & CopyFilter.PoweredMaxSpeed)),
 					onChange: c => model.setFilter(CopyFilter.PoweredMaxSpeed, c)
+				}),
+				checkbox({
+					text: "Spacing",
+					tooltip: "Copy the selected spacing to other vehicles.",
+					isChecked: compute(model.filters, f => !!(f & CopyFilter.Spacing)),
+					onChange: c => model.setFilter(CopyFilter.Spacing, c)
 				}),
 				checkbox({
 					text: "Colours",

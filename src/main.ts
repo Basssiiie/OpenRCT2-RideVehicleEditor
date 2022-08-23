@@ -3,44 +3,15 @@ import { initActions } from "./services/actions";
 import { mainWindow } from "./ui/mainWindow";
 
 
-// Stores whether the game is outdated check has been performed and what the result is.
-let isGameOutdated: boolean | null = null;
-
-
-/**
- * Returns true if the game is outdated, may return false if the plugin cannot determine if the ga
- *
- */
-function checkIsGameOutdated(): boolean
-{
-	if (isGameOutdated !== null)
-	{
-		return isGameOutdated;
-	}
-
-	const entities = map.getAllEntities("car");
-	if (entities.length === 0)
-	{
-		// We cannot check if the game is up to date, assume up to date for now...
-		return false;
-	}
-
-	const car = (entities[0] as Car);
-
-	// The game is up-to-date if the 'trackProgress' property is present.
-	isGameOutdated = (car && typeof car.trackProgress === "undefined");
-	return isGameOutdated;
-}
-
-
 /**
  * Opens the ride editor window.
  */
 function openEditorWindow(): void
 {
 	// Check if game is up-to-date...
-	if (checkIsGameOutdated())
+	if (context.apiVersion < 54)
 	{
+		// 54 => https://github.com/OpenRCT2/OpenRCT2/pull/16975
 		const title = "Please update the game!";
 		const message = "The version of OpenRCT2 you are currently playing is too old for this plugin.";
 
@@ -64,15 +35,6 @@ export function main(): void
 		console.log("UI unavailable, plugin disabled.");
 		return;
 	}
-
-	/* // This can crash the plugin system...
-	const window = ui.getWindow(VehicleEditorWindow.identifier);
-	if (window)
-	{
-		log("Editor window was already open; reopen because of reload.");
-		window.close();
-	}
-	*/
 
 	initActions();
 	ui.registerMenuItem("Edit ride vehicles", () => openEditorWindow());

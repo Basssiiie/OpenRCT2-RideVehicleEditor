@@ -27,7 +27,6 @@ export function combinedLabelSpinner(labelWidth: Scale, spinnerWidth: Scale, par
  */
 export function combinedLabelCheckbox(labelWidth: Scale, params: LabelParams & CheckboxParams): WidgetCreator<FlexiblePosition>
 {
-	//(<FlexiblePosition>params).width = 9;
 	const text = params.text;
 	params.text = "";
 	return horizontal([

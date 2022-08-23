@@ -1,12 +1,10 @@
-import { checkbox, CheckboxParams, dropdown, FlexiblePosition, groupbox, horizontal, LabelParams, SpinnerParams, WidgetCreator, window } from "openrct2-flexui";
+import { checkbox, CheckboxParams, compute, dropdown, FlexiblePosition, groupbox, horizontal, LabelParams, SpinnerParams, WidgetCreator, window } from "openrct2-flexui";
 import { ParkRide } from "../objects/parkRide";
 import { setBuildMonth, setCustomDesign, setExcitementRating, setFrozenRatings, setIndestructable, setIntensityRating, setNauseaRating } from "../services/rideEditor";
+import { formatMonthAndYear, formatRelativeDate } from "../utilities/date";
 import * as Log from "../utilities/logger";
 import { RideViewModel } from "../viewmodels/rideVehicleModel";
 import { combinedLabelCheckbox, combinedLabelSpinner } from "./utilityControls";
-
-
-const months = [ "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug.", "Sep.", "Oct." ];
 
 
 export const model = new RideViewModel();
@@ -23,7 +21,6 @@ export const rideWindow = window({
 			text: "Ratings",
 			tooltip: "Edit the ratings of the ride",
 			padding: { top: 4 },
-			gap: [12, 8, 8, 8],
 			content: [
 				labelSpinner({
 					text: "Excitement",
@@ -73,16 +70,24 @@ export const rideWindow = window({
 			text: "Construction",
 			tooltip: "Edit properties related to the construction of the ride",
 			padding: { top: 4 },
-			gap: [12, 8, 8, 8],
 			content: [
 				labelSpinner({
 					text: "Build month",
-					tooltip: "The month in which this ride was built.",
+					tooltip: "The month in which this ride was built. Somehow never in the winter months.",
 					value: model.buildMonth,
 					minimum: -32_768,
 					maximum: 32_767,
-					format: formatBuildMonth,
+					format: formatMonthAndYear,
 					onChange: v => modifyRide(setBuildMonth, v)
+				}),
+				labelSpinner({
+					text: "Construction",
+					tooltip: "The amount of time ago the ride was built, in months and years. Rides get older as well, just like you.",
+					value: compute(model.buildMonth, v => (v + date.monthsElapsed)),
+					minimum: -32_768,
+					maximum: 32_767,
+					format: formatRelativeDate,
+					onChange: v => modifyRide(setBuildMonth, v - date.monthsElapsed)
 				}),
 				labelCheckbox({
 					text: "Custom design",
@@ -92,7 +97,7 @@ export const rideWindow = window({
 				}),
 				labelCheckbox({
 					text: "Indestructable",
-					tooltip: "Indestructable rides cannot be demolished.",
+					tooltip: "Indestructable rides cannot be demolished, even if you ask them nicely.",
 					isChecked: model.indestructable,
 					onChange: v => modifyRide(setIndestructable, v)
 				}),
@@ -116,17 +121,6 @@ function formatRating(value: number): string
 {
 	return (value / 100).toFixed(2);
 }
-
-
-function formatBuildMonth(value: number): string
-{
-	const amountOfMonths = months.length;
-	const month = (((value % amountOfMonths) + amountOfMonths) % amountOfMonths);
-	const year = Math.floor(value / amountOfMonths);
-
-	return `${months[month]}, Year ${year}`;
-}
-
 
 function modifyRide<T>(action: (ride: ParkRide, value: T) => void, value: T): void
 {

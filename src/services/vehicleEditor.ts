@@ -3,12 +3,10 @@ import { RideType } from "../objects/rideType";
 import { RideVehicle } from "../objects/rideVehicle";
 import * as Log from "../utilities/logger";
 import { hasPermissions, register } from "./actions";
+import { getDistanceFromProgress } from "./spacingEditor";
 
 
 const execute = register<UpdateVehicleSettingArgs>("rve-update-car", updateVehicleSetting);
-
-// The distance of a single step for moving the vehicle.
-const moveDistanceStep = 9_000;
 
 
 type VehicleUpdateKeys = "rideObject" | "vehicleObject" | "trackProgress"
@@ -46,7 +44,7 @@ export function setRideType(vehicle: RideVehicle, type: RideType): void
  */
 export function changeTrackProgress(vehicle: RideVehicle, trackProgress: number): void
 {
-	updateValue(vehicle.id, trackProgressKey, trackProgress * moveDistanceStep);
+	updateValue(vehicle.id, trackProgressKey, getDistanceFromProgress(vehicle.car(), trackProgress));
 }
 
 

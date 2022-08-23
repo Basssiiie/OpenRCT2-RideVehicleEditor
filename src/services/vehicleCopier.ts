@@ -15,7 +15,8 @@ export const enum CopyFilter
 	Mass =                (1 << 2),
 	PoweredAcceleration = (1 << 3),
 	PoweredMaxSpeed =     (1 << 4),
-	Colours =             (1 << 5),
+	Spacing =             (1 << 5),
+	Colours =             (1 << 6),
 	All = -1
 }
 

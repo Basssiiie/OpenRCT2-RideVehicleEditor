@@ -3,6 +3,7 @@ import { getAllRides, ParkRide } from "../objects/parkRide";
 import { RideTrain } from "../objects/rideTrain";
 import { getAllRideTypes, RideType } from "../objects/rideType";
 import { RideVehicle } from "../objects/rideVehicle";
+import { getSpacingToPrecedingVehicle } from "../services/spacingEditor";
 import { findIndex } from "../utilities/arrayHelper";
 import * as Log from "../utilities/logger";
 
@@ -19,18 +20,24 @@ export class VehicleViewModel
 	readonly trains = compute(this.selectedRide, r => (r) ? r[0].trains() : []);
 	readonly vehicles = compute(this.selectedTrain, t => (t) ? t[0].vehicles() : []);
 
+	readonly status = store<VehicleStatus | null>(null);
 	readonly isPicking = store<boolean>(false);
 	readonly isEditDisabled = compute(this.selectedVehicle, v => !v);
 	readonly isUnpowered = compute(this.selectedVehicle, v => !v || !v[0].isPowered());
+	readonly isPositionDisabled = compute(this.status, this.isEditDisabled, (s, e) => e || !s || isMoving(s));
 	readonly multiplier = store<number>(1);
 
 	readonly type = store<[RideType, number] | null>(null);
 	readonly variant = store<number>(0);
-	readonly trackProgress = store<number>(0);
 	readonly seats = store<number>(0);
 	readonly mass = store<number>(0);
 	readonly poweredAcceleration = store<number>(0);
 	readonly poweredMaxSpeed = store<number>(0);
+	readonly trackProgress = store<number>(0);
+	readonly spacing = store<number | null>(0);
+	readonly x = store<number>(0);
+	readonly y = store<number>(0);
+	readonly z = store<number>(0);
 
 	readonly primaryColour = store<Colour>(0);
 	readonly secondaryColour = store<Colour>(0);
@@ -57,7 +64,7 @@ export class VehicleViewModel
 				this.primaryColour.set(colours.body);
 				this.secondaryColour.set(colours.trim);
 				this.tertiaryColour.set(colours.tertiary);
-				updateFromCar(this, car);
+				updateFromCar(this, car, v[1]);
 			}
 		});
 	}
@@ -79,7 +86,7 @@ export class VehicleViewModel
 		const vehicle = this.selectedVehicle.get();
 		if (vehicle)
 		{
-			updateFromCar(this, vehicle[0].car());
+			updateFromCar(this, vehicle[0].car(), vehicle[1]);
 		}
 	}
 
@@ -138,22 +145,50 @@ export class VehicleViewModel
 
 
 
-function updateSelectionOrNull<T>(store: Store<[T, number] | null>, items: T[]): void
+function updateSelectionOrNull<T>(value: Store<[T, number] | null>, items: T[]): void
 {
 	let selection: [T, number] | null = null;
 	if (items.length > 0)
 	{
-		const previous = store.get();
+		const previous = value.get();
 		const selectedIdx = (previous && previous[1] < items.length) ? previous[1] : 0;
 		selection = [ items[selectedIdx], selectedIdx ];
 	}
-	store.set(selection);
+	value.set(selection);
 }
 
 
-function updateFromCar(model: VehicleViewModel, car: Car): void
+function isMoving(status: VehicleStatus): boolean
 {
+	switch (status)
+	{
+		case "arriving":
+		case "crashing":
+		case "departing":
+		case "moving_to_end_of_station":
+		case "travelling_boat":
+		case "travelling_cable_lift":
+		case "travelling_dodgems":
+		case "travelling":
+			return true;
+	}
+	return false;
+}
+
+
+function updateFromCar(model: VehicleViewModel, car: Car, index: number): void
+{
+	model.status.set(car.status);
 	model.variant.set(car.vehicleObject);
-	model.trackProgress.set(car.trackProgress);
 	model.mass.set(car.mass);
+	model.trackProgress.set(car.trackProgress);
+	model.x.set(car.x);
+	model.y.set(car.y);
+	model.z.set(car.z);
+
+	const train = model.selectedTrain.get();
+	if (train)
+	{
+		model.spacing.set(getSpacingToPrecedingVehicle(train[0], car, index));
+	}
 }

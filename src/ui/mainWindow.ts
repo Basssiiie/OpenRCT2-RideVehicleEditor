@@ -1,4 +1,4 @@
-import { button, colourPicker, compute, dropdown, dropdownSpinner, FlexiblePosition, groupbox, horizontal, isStore, label, LabelParams, SpinnerParams, toggle, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
+import { button, colourPicker, compute, dropdown, dropdownSpinner, FlexiblePosition, groupbox, horizontal, isStore, label, LabelParams, spinner, SpinnerParams, SpinnerWrapMode, toggle, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
 import { isDevelopment, pluginVersion } from "../environment";
 import { changeTrackProgress, setMass, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
 import { locate } from "../services/vehicleLocater";
@@ -23,12 +23,12 @@ model.selectedVehicle.subscribe(() =>
 for (const key in model)
 {
 	const store = model[<keyof typeof model>key];
-	if (isStore(store) && ["mass","trackProgress","variant"].indexOf(key) === -1)
+	if (isStore(store) && ["mass","trackProgress","variant","x","y","z"].indexOf(key) === -1)
 	{
 		store.subscribe(v =>
 		{
 			const json = JSON.stringify(v);
-			console.log(`> '${key}' updated to ${(json.length < 15) ? json : (`${json.substring(0, 10)}...`)}`);
+			console.log(`> '${key}' updated to ${(json.length < 95) ? json : (`${json.substring(0, 100)}...`)}`);
 		});
 	}
 }
@@ -38,6 +38,7 @@ const buttonSize = 24;
 const controlsWidth = 260;
 const controlsLabelWidth = controlsWidth * 0.35;
 const controlsSpinnerWidth = controlsWidth - (controlsLabelWidth + 4); // include spacing
+const clampThenWrapMode: SpinnerWrapMode = "clampThenWrap";
 
 let title = `Ride vehicle editor (v${pluginVersion})`;
 if (isDevelopment)
@@ -49,7 +50,7 @@ if (isDevelopment)
 export const mainWindow = window({
 	title,
 	width: 375, maxWidth: 500,
-	height: 264, maxHeight: 293,
+	height: 298, maxHeight: 327,
 	spacing: 5,
 	onOpen: () => model.reload(),
 	onUpdate: () => model.update(),
@@ -165,6 +166,7 @@ export const mainWindow = window({
 					labelSpinner({
 						text: "Variant:",
 						tooltip: "Sprite variant to use from the selected ride type",
+						minimum: 0,
 						maximum: compute(model.type, c => (c) ? c[0].variants() : 4),
 						wrapMode: "wrap",
 						disabled: model.isEditDisabled,
@@ -174,7 +176,9 @@ export const mainWindow = window({
 					labelSpinner({
 						text: "Seats:",
 						tooltip: "Total amount of passengers that can cuddle up in this vehicle",
+						minimum: 0,
 						maximum: 33, // vehicles refuse more than 32 guests, leaving them stuck just before entering.
+						wrapMode: clampThenWrapMode,
 						disabled: model.isEditDisabled,
 						step: model.multiplier,
 						value: model.seats,
@@ -183,7 +187,9 @@ export const mainWindow = window({
 					labelSpinner({
 						text: "Mass:",
 						tooltip: "Total amount of mass (weight) of this vehicle, including all its passengers and your mom",
+						minimum: 0,
 						maximum: 65_536,
+						wrapMode: clampThenWrapMode,
 						disabled: model.isEditDisabled,
 						step: model.multiplier,
 						value: model.mass,
@@ -193,7 +199,9 @@ export const mainWindow = window({
 						text: "Acceleration:",
 						tooltip: "Cranks up the engines to accelerate faster, self-powered vehicles only",
 						disabledMessage: "Only on powered vehicles",
+						minimum: 0,
 						maximum: 256,
+						wrapMode: clampThenWrapMode,
 						disabled: model.isUnpowered,
 						step: model.multiplier,
 						value: model.poweredAcceleration,
@@ -203,7 +211,9 @@ export const mainWindow = window({
 						text: "Max. speed:",
 						tooltip: "The (il)legal speed limit for your vehicle, self-powered vehicles only",
 						disabledMessage: "Only on powered vehicles",
+						minimum: 0,
 						maximum: 256,
+						wrapMode: clampThenWrapMode,
 						disabled: model.isUnpowered,
 						step: model.multiplier,
 						value: model.poweredMaxSpeed,
@@ -212,16 +222,51 @@ export const mainWindow = window({
 					labelSpinner({
 						text: "Track progress:",
 						tooltip: "Distance in steps of how far the vehicle has progressed along the current track piece",
-						maximum: 1,
+						minimum: 0,
 						disabled: model.isEditDisabled,
 						step: model.multiplier,
 						value: model.trackProgress,
 						onChange: (_, incr) => model.modifyVehicle(changeTrackProgress, incr)
 					}),
+					labelSpinner({
+						text: "Spacing:",
+						tooltip: "Choose whether either tailgating or social distancing is the best for your vehicle",
+						minimum: 0,
+						disabled: compute(model.isEditDisabled, model.selectedVehicle, (noEdit, vehicle) => (noEdit || !vehicle || vehicle[1] === 0)),
+						step: model.multiplier,
+						value: compute(model.spacing, v => v || 0),
+						format: v => (v) ? v.toString() : "Too far away",
+					}),
+					horizontal([
+						label({
+							text: "Position:",
+							tooltip: "The fantastic map location of your vehicle and where to find it. Only works when the vehicle is not moving.",
+							width: controlsLabelWidth,
+							disabled: model.isPositionDisabled,
+						}),
+						spinner({
+							minimum: 0,
+							disabled: model.isPositionDisabled,
+							step: model.multiplier,
+							value: model.x,
+						}),
+						spinner({
+							minimum: 0,
+							disabled: model.isPositionDisabled,
+							step: model.multiplier,
+							value: model.y,
+						}),
+						spinner({
+							minimum: 0,
+							disabled: model.isPositionDisabled,
+							step: model.multiplier,
+							value: model.z,
+						})
+					]),
 					horizontal([
 						label({
 							text: "Colours:",
-							tooltip: "The three important boxes that make the car pretty on demand.",
+							tooltip: "The three important boxes that make the vehicle pretty on demand.",
 							width: controlsLabelWidth,
 							disabled: model.isEditDisabled,
 						}),
