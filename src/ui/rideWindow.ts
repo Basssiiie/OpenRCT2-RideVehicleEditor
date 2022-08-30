@@ -7,14 +7,17 @@ import { RideViewModel } from "../viewmodels/rideVehicleModel";
 import { combinedLabelCheckbox, combinedLabelSpinner } from "./utilityControls";
 
 
+const int16max = 32_767, int16min = -32_768;
+
+
 export const model = new RideViewModel();
 
 
 export const rideWindow = window({
 	title: model.title,
 	position: "center",
-	width: 220,
-	height: 195,
+	width: 255, minWidth: 225, maxWidth: 275,
+	height: 216,
 	colours: [ 24, 24 ],
 	content: [
 		groupbox({
@@ -27,7 +30,8 @@ export const rideWindow = window({
 					tooltip: "Happy guests make for a happy life.",
 					value: model.excitement,
 					step: model.multiplier,
-					maximum: 800,
+					minimum: int16min,
+					maximum: int16max,
 					format: formatRating,
 					onChange: v => modifyRide(setExcitementRating, v)
 				}),
@@ -36,7 +40,8 @@ export const rideWindow = window({
 					tooltip: "Guests will prefer rides that match their intensity preference.",
 					value: model.intensity,
 					step: model.multiplier,
-					maximum: 800,
+					minimum: int16min,
+					maximum: int16max,
 					format: formatRating,
 					onChange: v => modifyRide(setIntensityRating, v)
 				}),
@@ -45,7 +50,8 @@ export const rideWindow = window({
 					tooltip: "The higher the value, the more yellow your paths will be.",
 					value: model.nausea,
 					step: model.multiplier,
-					maximum: 800,
+					minimum: int16min,
+					maximum: int16max,
 					format: formatRating,
 					onChange: v => modifyRide(setNauseaRating, v)
 				}),
@@ -75,8 +81,8 @@ export const rideWindow = window({
 					text: "Build month",
 					tooltip: "The month in which this ride was built. Somehow never in the winter months.",
 					value: model.buildMonth,
-					minimum: -32_768,
-					maximum: 32_767,
+					minimum: int16min,
+					maximum: int16max,
 					format: formatMonthAndYear,
 					onChange: v => modifyRide(setBuildMonth, v)
 				}),
@@ -84,8 +90,8 @@ export const rideWindow = window({
 					text: "Construction",
 					tooltip: "The amount of time ago the ride was built, in months and years. Rides get older as well, just like you.",
 					value: compute(model.buildMonth, v => (v + date.monthsElapsed)),
-					minimum: -32_768,
-					maximum: 32_767,
+					minimum: int16min,
+					maximum: int16max,
 					format: formatRelativeDate,
 					onChange: v => modifyRide(setBuildMonth, v - date.monthsElapsed)
 				}),
@@ -109,12 +115,12 @@ export const rideWindow = window({
 
 function labelSpinner(params: LabelParams & SpinnerParams): WidgetCreator<FlexiblePosition>
 {
-	return combinedLabelSpinner("45%", "55%", params);
+	return combinedLabelSpinner(85, "1w", params);
 }
 
 function labelCheckbox(params: LabelParams & CheckboxParams): WidgetCreator<FlexiblePosition>
 {
-	return combinedLabelCheckbox("45%", params);
+	return combinedLabelCheckbox(85, params);
 }
 
 function formatRating(value: number): string

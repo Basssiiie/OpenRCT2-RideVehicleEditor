@@ -120,6 +120,33 @@ export function setTertiaryColour(vehicle: RideVehicle, colour: Colour): void
 }
 
 
+/**
+ * Sets the primary colour for this vehicle.
+ */
+export function setPositionX(vehicle: RideVehicle, x: number): void
+{
+	updateValue(vehicle.id, xPosition, x);
+}
+
+
+/**
+ * Sets the secondary colour for this vehicle.
+ */
+export function setPositionY(vehicle: RideVehicle, y: number): void
+{
+	updateValue(vehicle.id, yPosition, y);
+}
+
+
+/**
+ * Sets the tertiary colour for this vehicle.
+ */
+export function setPositionZ(vehicle: RideVehicle, z: number): void
+{
+	updateValue(vehicle.id, zPosition, z);
+}
+
+
 
 /**
  * Arguments for updating a single key in a vehicle object.

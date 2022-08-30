@@ -4,6 +4,7 @@ import { RideTrain } from "../objects/rideTrain";
 import { getAllRideTypes, RideType } from "../objects/rideType";
 import { RideVehicle } from "../objects/rideVehicle";
 import { getSpacingToPrecedingVehicle } from "../services/spacingEditor";
+import { CopyFilter, getTargets } from "../services/vehicleCopier";
 import { findIndex } from "../utilities/arrayHelper";
 import * as Log from "../utilities/logger";
 
@@ -42,6 +43,10 @@ export class VehicleViewModel
 	readonly primaryColour = store<Colour>(0);
 	readonly secondaryColour = store<Colour>(0);
 	readonly tertiaryColour = store<Colour>(0);
+
+	readonly copyFilters = store<CopyFilter>(0);
+	readonly copyTargetOption = store<number>(0);
+	readonly copyTargets = compute(this.copyTargetOption, this.selectedVehicle, (o, v) => getTargets(o, this.selectedRide.get(), this.selectedTrain.get(), v));
 
 	constructor()
 	{
@@ -139,6 +144,19 @@ export class VehicleViewModel
 		{
 			Log.debug(`Failed to modify vehicle with '${action}' to '${value}'; none is selected.`);
 		}
+	}
+
+	/**
+	 * Toggle a filter on or off.
+	 */
+	setFilter(filter: CopyFilter, toggle: boolean): void
+	{
+		const enabledFilters = this.copyFilters.get();
+
+		this.copyFilters.set((toggle)
+			? (enabledFilters | filter)
+			: (enabledFilters & ~filter)
+		);
 	}
 }
 

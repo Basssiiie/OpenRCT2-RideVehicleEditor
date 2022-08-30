@@ -1,25 +1,17 @@
-import { button, colourPicker, compute, dropdown, dropdownSpinner, FlexiblePosition, groupbox, horizontal, isStore, label, LabelParams, spinner, SpinnerParams, SpinnerWrapMode, toggle, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
+import { button, checkbox, colourPicker, compute, dropdown, dropdownSpinner, FlexiblePosition, groupbox, horizontal, label, LabelParams, SpinnerParams, SpinnerWrapMode, toggle, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
 import { isDevelopment, pluginVersion } from "../environment";
-import { changeTrackProgress, setMass, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
+import { CopyFilter } from "../services/vehicleCopier";
+import { changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
 import { locate } from "../services/vehicleLocater";
 import { toggleVehiclePicker } from "../services/vehiclePicker";
 import { VehicleViewModel } from "../viewmodels/vehicleViewModel";
-import { model as applyModel, applyWindow } from "./applyWindow";
 import { model as rideModel, rideWindow } from "./rideWindow";
 import { combinedLabelSpinner } from "./utilityControls";
 
 
 const model = new VehicleViewModel();
 model.selectedRide.subscribe(r => rideModel.ride.set((r) ? r[0] : null));
-model.selectedVehicle.subscribe(() =>
-{
-	const source = applyModel.source;
-	if (source !== null)
-	{
-		updateApplyWindow();
-	}
-});
-
+/*
 for (const key in model)
 {
 	const store = model[<keyof typeof model>key];
@@ -32,12 +24,12 @@ for (const key in model)
 		});
 	}
 }
-
+*/
 
 const buttonSize = 24;
-const controlsWidth = 260;
-const controlsLabelWidth = controlsWidth * 0.35;
-const controlsSpinnerWidth = controlsWidth - (controlsLabelWidth + 4); // include spacing
+const controlsWidth = 244;
+const controlsLabelWidth = 82;
+const controlsSpinnerWidth = 146; // controlsWidth - (controlsLabelWidth + 4 + 12); // include spacing
 const clampThenWrapMode: SpinnerWrapMode = "clampThenWrap";
 
 let title = `Ride vehicle editor (v${pluginVersion})`;
@@ -49,16 +41,12 @@ if (isDevelopment)
 
 export const mainWindow = window({
 	title,
-	width: 375, maxWidth: 500,
-	height: 298, maxHeight: 327,
+	width: 500, minWidth: 465, maxWidth: 560,
+	height: 404,
 	spacing: 5,
 	onOpen: () => model.reload(),
 	onUpdate: () => model.update(),
-	onClose: () =>
-	{
-		applyWindow.close();
-		rideWindow.close();
-	},
+	onClose: () => rideWindow.close(),
 	content: [
 		groupbox([ // selection top bar
 			horizontal([
@@ -104,47 +92,133 @@ export const mainWindow = window({
 			vertical({
 				spacing: 8,
 				content: [ // toolbar
-					viewport({
-						target: compute(model.selectedVehicle, c => (c) ? c[0].id : null),
-						disabled: model.isEditDisabled,
-					}),
-					horizontal({
-						padding: [ 0, "1w" ],
-						spacing: 1,
-						content: [ // buttons
-							button({
-								width: buttonSize, height: buttonSize,
-								tooltip: "Locate your vehicle when you've lost it (again)",
-								image: 5167, // SPR_LOCATE,
-								disabled: model.isEditDisabled,
-								onClick: () =>
-								{
-									const vehicle = model.selectedVehicle.get();
-									if (vehicle)
+					horizontal([
+						vertical({
+							padding: [ "1w", 0 ],
+							spacing: 8,
+							content: [ // buttons
+								toggle({
+									width: buttonSize, height: buttonSize,
+									tooltip: "Use the picker to select a vehicle by clicking it",
+									image: 29467, // SPR_G2_EYEDROPPER
+									isPressed: model.isPicking,
+									onChange: p => toggleVehiclePicker(p, c => model.select(c), () => model.isPicking.set(false))
+								}),
+								toggle({
+									width: buttonSize, height: buttonSize,
+									tooltip: "Copies the current vehicle settings to your clipboard, so you can use it on another ride",
+									image: 29434, // SPR_G2_COPY,
+									disabled: model.isEditDisabled,
+								}),
+								button({
+									width: buttonSize, height: buttonSize,
+									tooltip: "Pastes the previously copied vehicle settings over the currently selected vehicle",
+									image: 29435, // SPR_G2_PASTE,
+									disabled: model.isEditDisabled,
+								}),
+								button({
+									width: buttonSize, height: buttonSize,
+									tooltip: "Locate your vehicle when you've lost it (again)",
+									image: 5167, // SPR_LOCATE,
+									disabled: model.isEditDisabled,
+									onClick: () =>
 									{
-										locate(vehicle[0]);
+										const vehicle = model.selectedVehicle.get();
+										if (vehicle)
+										{
+											locate(vehicle[0]);
+										}
 									}
-								}
+								}),
+							]
+						}),
+						viewport({
+							target: compute(model.selectedVehicle, c => (c) ? c[0].id : null),
+							disabled: model.isEditDisabled,
+						}),
+					]),
+					groupbox({
+						text: "Apply & synchronize",
+						content: [
+							horizontal([
+								vertical([
+									checkbox({
+										text: "Type & variant",
+										tooltip: "Copy the selected ride type and variant to other vehicles.",
+										isChecked: compute(model.copyFilters, f => !!(f & CopyFilter.TypeAndVariant)),
+										onChange: c => model.setFilter(CopyFilter.TypeAndVariant, c)
+									}),
+									checkbox({
+										text: "Colours",
+										tooltip: "Copy the selected vehicle colours to other vehicles.",
+										isChecked: compute(model.copyFilters, f => !!(f & CopyFilter.Colours)),
+										onChange: c => model.setFilter(CopyFilter.Colours, c)
+									}),
+									checkbox({
+										text: "Track progress",
+										tooltip: "Copy the selected track progress to other vehicles.",
+										isChecked: compute(model.copyFilters, f => !!(f & CopyFilter.TrackProgress)),
+										onChange: c => model.setFilter(CopyFilter.TrackProgress, c)
+									}),
+									checkbox({
+										text: "Spacing",
+										tooltip: "Copy the selected spacing to other vehicles.",
+										isChecked: compute(model.copyFilters, f => !!(f & CopyFilter.Spacing)),
+										onChange: c => model.setFilter(CopyFilter.Spacing, c)
+									}),
+								]),
+								vertical([
+									checkbox({
+										text: "Seats",
+										tooltip: "Copy the selected seat count to other vehicles.",
+										isChecked: compute(model.copyFilters, f => !!(f & CopyFilter.Seats)),
+										onChange: c => model.setFilter(CopyFilter.Seats, c)
+									}),
+									checkbox({
+										text: "Mass",
+										tooltip: "Copy the selected mass (weight) to other vehicles.",
+										isChecked: compute(model.copyFilters, f => !!(f & CopyFilter.Mass)),
+										onChange: c => model.setFilter(CopyFilter.Mass, c)
+									}),
+									checkbox({
+										text: "Acceleration",
+										tooltip: "Copy the selected powered acceleration to other vehicles.",
+										isChecked: compute(model.copyFilters, f => !!(f & CopyFilter.PoweredAcceleration)),
+										onChange: c => model.setFilter(CopyFilter.PoweredAcceleration, c)
+									}),
+									checkbox({
+										text: "Max. speed",
+										tooltip: "Copy the selected maximum powered speed to other vehicles.",
+										isChecked: compute(model.copyFilters, f => !!(f & CopyFilter.PoweredMaxSpeed)),
+										onChange: c => model.setFilter(CopyFilter.PoweredMaxSpeed, c)
+									}),
+								])
+							]),
+							dropdown({
+								items: [
+									"All vehicles on this train",
+									"Preceding vehicles on this train",
+									"Following vehicles on this train",
+									"All vehicles on all trains",
+									"Preceding vehicles on all trains",
+									"Following vehicles on all trains",
+									"Same vehicle number on all trains",
+								],
+								tooltip: "Apply the selected vehicle settings to a specific set of other vehicles on this ride.",
+								//padding: [0, 1],
+								selectedIndex: model.copyTargetOption,
+								onChange: idx => model.copyTargetOption.set(idx)
 							}),
-							toggle({
-								width: buttonSize, height: buttonSize,
-								tooltip: "Use the picker to select a vehicle by clicking it",
-								image: 29467, // SPR_G2_EYEDROPPER
-								isPressed: model.isPicking,
-								onChange: p => toggleVehiclePicker(p, c => model.select(c), () => model.isPicking.set(false))
-							}),
-							toggle({
-								width: buttonSize, height: buttonSize,
-								tooltip: "Copies the current vehicle settings to your clipboard",
-								image: 29434, // SPR_G2_COPY,
-								disabled: model.isEditDisabled,
-							}),
-							button({
-								width: buttonSize, height: buttonSize,
-								tooltip: "Pastes the previously copied vehicle settings over the currently selected vehicle",
-								image: 29435, // SPR_G2_PASTE,
-								disabled: model.isEditDisabled,
-							}),
+							horizontal([
+								button({
+									text: "Apply",
+									height: buttonSize
+								}),
+								toggle({
+									text: "Synchronize",
+									height: buttonSize
+								})
+							])
 						]
 					})
 				]
@@ -152,158 +226,178 @@ export const mainWindow = window({
 			vertical({
 				// control part
 				width: controlsWidth,
-				spacing: 3,
+				spacing: 8,
 				content: [
-					dropdown({ // vehicle type editor
-						items: compute(model.rideTypes, c => c.map(t => t.object().name)),
-						tooltip: "All ride types currently available in the park",
-						disabledMessage: "No ride types available",
-						disabled: model.isEditDisabled,
-						autoDisable: "empty",
-						selectedIndex: compute(model.type, t => (t) ? t[1] : 0),
-						onChange: idx => model.modifyVehicle(setRideType, model.rideTypes.get()[idx])
+					groupbox({
+						text: "Visuals",
+						//spacing: 3,
+						content: [
+							dropdown({ // vehicle type editor
+								items: compute(model.rideTypes, c => c.map(t => t.object().name)),
+								tooltip: "All ride types currently available in the park",
+								disabledMessage: "No ride types available",
+								disabled: model.isEditDisabled,
+								autoDisable: "empty",
+								selectedIndex: compute(model.type, t => (t) ? t[1] : 0),
+								onChange: idx => model.modifyVehicle(setRideType, model.rideTypes.get()[idx])
+							}),
+							labelSpinner({
+								text: "Variant:",
+								tooltip: "Sprite variant to use from the selected ride type",
+								minimum: 0,
+								maximum: compute(model.type, c => (c) ? c[0].variants() : 4),
+								wrapMode: "wrap",
+								disabled: model.isEditDisabled,
+								value: model.variant,
+								onChange: value => model.modifyVehicle(setVariant, value)
+							}),
+							horizontal([
+								label({
+									text: "Colours:",
+									tooltip: "The three important boxes that make the vehicle pretty on demand.",
+									width: controlsLabelWidth,
+									disabled: model.isEditDisabled,
+								}),
+								colourPicker({
+									tooltip: "The primary (body) colour of the vehicle.",
+									colour: model.primaryColour,
+									onChange: value => model.modifyVehicle(setPrimaryColour, value)
+								}),
+								colourPicker({
+									tooltip: "The secondary (trim) colour of the vehicle.",
+									colour: model.secondaryColour,
+									onChange: value => model.modifyVehicle(setSecondaryColour, value)
+								}),
+								colourPicker({
+									tooltip: "The tertiary (detail) colour of the vehicle.",
+									colour: model.tertiaryColour,
+									onChange: value => model.modifyVehicle(setTertiaryColour, value)
+								})
+							]),
+						]
 					}),
-					labelSpinner({
-						text: "Variant:",
-						tooltip: "Sprite variant to use from the selected ride type",
-						minimum: 0,
-						maximum: compute(model.type, c => (c) ? c[0].variants() : 4),
-						wrapMode: "wrap",
-						disabled: model.isEditDisabled,
-						value: model.variant,
-						onChange: value => model.modifyVehicle(setVariant, value)
+					groupbox({
+						text: "Positioning",
+						spacing: 3,
+						content: [
+							labelSpinner({
+								text: "Track progress:",
+								tooltip: "Distance in steps of how far the vehicle has progressed along the current track piece",
+								minimum: 0,
+								disabled: model.isEditDisabled,
+								step: model.multiplier,
+								value: model.trackProgress,
+								onChange: (_, incr) => model.modifyVehicle(changeTrackProgress, incr)
+							}),
+							labelSpinner({
+								text: "Spacing:",
+								tooltip: "Choose whether either tailgating or social distancing is the best for your vehicle",
+								minimum: 0,
+								disabled: compute(model.isEditDisabled, model.selectedVehicle, (noEdit, vehicle) => (noEdit || !vehicle || vehicle[1] === 0)),
+								step: model.multiplier,
+								value: compute(model.spacing, v => v || 0),
+								format: v => (v) ? v.toString() : "Too far away",
+							}),
+							labelSpinner({
+								text: "X position:",
+								tooltip: "The fantastic map location of your vehicle and where to find it. Only works when the vehicle is not moving.",
+								minimum: 0,
+								disabled: model.isPositionDisabled,
+								step: model.multiplier,
+								value: model.x,
+								onChange: value => model.modifyVehicle(setPositionX, value)
+							}, true),
+							labelSpinner({
+								text: "Y position:",
+								tooltip: "The fantastic map location of your vehicle and where to find it. Only works when the vehicle is not moving.",
+								minimum: 0,
+								disabled: model.isPositionDisabled,
+								step: model.multiplier,
+								value: model.y,
+								onChange: value => model.modifyVehicle(setPositionY, value)
+							}, true),
+							labelSpinner({
+								text: "Z position:",
+								tooltip: "The fantastic map location of your vehicle and where to find it. Only works when the vehicle is not moving.",
+								minimum: 0,
+								disabled: model.isPositionDisabled,
+								step: model.multiplier,
+								value: model.z,
+								onChange: value => model.modifyVehicle(setPositionZ, value)
+							}, true)
+						]
 					}),
-					labelSpinner({
-						text: "Seats:",
-						tooltip: "Total amount of passengers that can cuddle up in this vehicle",
-						minimum: 0,
-						maximum: 33, // vehicles refuse more than 32 guests, leaving them stuck just before entering.
-						wrapMode: clampThenWrapMode,
-						disabled: model.isEditDisabled,
-						step: model.multiplier,
-						value: model.seats,
-						onChange: value => model.modifyVehicle(setSeatCount, value)
-					}),
-					labelSpinner({
-						text: "Mass:",
-						tooltip: "Total amount of mass (weight) of this vehicle, including all its passengers and your mom",
-						minimum: 0,
-						maximum: 65_536,
-						wrapMode: clampThenWrapMode,
-						disabled: model.isEditDisabled,
-						step: model.multiplier,
-						value: model.mass,
-						onChange: value => model.modifyVehicle(setMass, value)
-					}),
-					labelSpinner({
-						text: "Acceleration:",
-						tooltip: "Cranks up the engines to accelerate faster, self-powered vehicles only",
-						disabledMessage: "Only on powered vehicles",
-						minimum: 0,
-						maximum: 256,
-						wrapMode: clampThenWrapMode,
-						disabled: model.isUnpowered,
-						step: model.multiplier,
-						value: model.poweredAcceleration,
-						onChange: value => model.modifyVehicle(setPoweredAcceleration, value)
-					}),
-					labelSpinner({
-						text: "Max. speed:",
-						tooltip: "The (il)legal speed limit for your vehicle, self-powered vehicles only",
-						disabledMessage: "Only on powered vehicles",
-						minimum: 0,
-						maximum: 256,
-						wrapMode: clampThenWrapMode,
-						disabled: model.isUnpowered,
-						step: model.multiplier,
-						value: model.poweredMaxSpeed,
-						onChange: value => model.modifyVehicle(setPoweredMaximumSpeed, value)
-					}),
-					labelSpinner({
-						text: "Track progress:",
-						tooltip: "Distance in steps of how far the vehicle has progressed along the current track piece",
-						minimum: 0,
-						disabled: model.isEditDisabled,
-						step: model.multiplier,
-						value: model.trackProgress,
-						onChange: (_, incr) => model.modifyVehicle(changeTrackProgress, incr)
-					}),
-					labelSpinner({
-						text: "Spacing:",
-						tooltip: "Choose whether either tailgating or social distancing is the best for your vehicle",
-						minimum: 0,
-						disabled: compute(model.isEditDisabled, model.selectedVehicle, (noEdit, vehicle) => (noEdit || !vehicle || vehicle[1] === 0)),
-						step: model.multiplier,
-						value: compute(model.spacing, v => v || 0),
-						format: v => (v) ? v.toString() : "Too far away",
+					groupbox({
+						text: "Properties",
+						spacing: 3,
+						content: [
+							labelSpinner({
+								text: "Seats:",
+								tooltip: "Total amount of passengers that can cuddle up in this vehicle",
+								minimum: 0,
+								maximum: 33, // vehicles refuse more than 32 guests, leaving them stuck just before entering.
+								wrapMode: clampThenWrapMode,
+								disabled: model.isEditDisabled,
+								step: model.multiplier,
+								value: model.seats,
+								onChange: value => model.modifyVehicle(setSeatCount, value)
+							}),
+							labelSpinner({
+								text: "Mass:",
+								tooltip: "Total amount of mass (weight) of this vehicle, including all its passengers and your mom",
+								minimum: 0,
+								maximum: 65_536,
+								wrapMode: clampThenWrapMode,
+								disabled: model.isEditDisabled,
+								step: model.multiplier,
+								value: model.mass,
+								onChange: value => model.modifyVehicle(setMass, value)
+							}),
+							labelSpinner({
+								text: "Acceleration:",
+								tooltip: "Cranks up the engines to accelerate faster, self-powered vehicles only",
+								disabledMessage: "Powered vehicles only",
+								minimum: 0,
+								maximum: 256,
+								wrapMode: clampThenWrapMode,
+								disabled: model.isUnpowered,
+								step: model.multiplier,
+								value: model.poweredAcceleration,
+								onChange: value => model.modifyVehicle(setPoweredAcceleration, value)
+							}),
+							labelSpinner({
+								text: "Max. speed:",
+								tooltip: "The (il)legal speed limit for your vehicle, self-powered vehicles only",
+								disabledMessage: "Powered vehicles only",
+								minimum: 0,
+								maximum: 256,
+								wrapMode: clampThenWrapMode,
+								disabled: model.isUnpowered,
+								step: model.multiplier,
+								value: model.poweredMaxSpeed,
+								onChange: value => model.modifyVehicle(setPoweredMaximumSpeed, value)
+							})
+						]
 					}),
 					horizontal([
 						label({
-							text: "Position:",
-							tooltip: "The fantastic map location of your vehicle and where to find it. Only works when the vehicle is not moving.",
-							width: controlsLabelWidth,
-							disabled: model.isPositionDisabled,
-						}),
-						spinner({
-							minimum: 0,
-							disabled: model.isPositionDisabled,
-							step: model.multiplier,
-							value: model.x,
-						}),
-						spinner({
-							minimum: 0,
-							disabled: model.isPositionDisabled,
-							step: model.multiplier,
-							value: model.y,
-						}),
-						spinner({
-							minimum: 0,
-							disabled: model.isPositionDisabled,
-							step: model.multiplier,
-							value: model.z,
-						})
-					]),
-					horizontal([
-						label({
-							text: "Colours:",
-							tooltip: "The three important boxes that make the vehicle pretty on demand.",
-							width: controlsLabelWidth,
-							disabled: model.isEditDisabled,
-						}),
-						colourPicker({
-							tooltip: "The primary (body) colour of the vehicle.",
-							colour: model.primaryColour,
-							onChange: value => model.modifyVehicle(setPrimaryColour, value)
-						}),
-						colourPicker({
-							tooltip: "The secondary (trim) colour of the vehicle.",
-							colour: model.secondaryColour,
-							onChange: value => model.modifyVehicle(setSecondaryColour, value)
-						}),
-						colourPicker({
-							tooltip: "The tertiary (detail) colour of the vehicle.",
-							colour: model.tertiaryColour,
-							onChange: value => model.modifyVehicle(setTertiaryColour, value)
+							text: "Multiplier:",
+							width: 60,
+							padding: { left: "1w" }
 						}),
 						dropdown({
 							width: 45,
-							padding: { left: "1w" },
+							padding: { top: -2, right: 6 },
 							items: ["x1", "x10", "x100"],
 							tooltip: "Multiplies all spinner controls by the specified amount",
 							onChange: idx => model.multiplier.set(10 ** idx),
 						})
-					]),
-					button({
-						text: "Apply to other vehicles...",
-						tooltip: "Apply the current vehicle settings to a specific set of other vehicles on this ride",
-						height: 14,
-						onClick: () => (updateApplyWindow() && applyWindow.open())
-					})
+					])
 				]
 			})
 		]),
 		label({ // credits
-			padding: [ 0, 15 ], // do not cover the resize corner
+			padding: [ 0, 20 ], // do not cover the resize corner
 			text: "github.com/Basssiiie/OpenRCT2-RideVehicleEditor",
 			tooltip: "Go to this URL to check for the latest updates",
 			alignment: "centred",
@@ -313,23 +407,7 @@ export const mainWindow = window({
 });
 
 
-function labelSpinner(params: LabelParams & SpinnerParams): WidgetCreator<FlexiblePosition>
+function labelSpinner(params: LabelParams & SpinnerParams, noDisabledMessage?: boolean): WidgetCreator<FlexiblePosition>
 {
-	return combinedLabelSpinner(controlsLabelWidth, controlsSpinnerWidth, params);
-}
-
-
-function updateApplyWindow(): boolean
-{
-	const
-		ride = model.selectedRide.get(),
-		train = model.selectedTrain.get(),
-		vehicle = model.selectedVehicle.get(),
-		valid = !!(ride && train && vehicle);
-
-	if (valid)
-	{
-		applyModel.source = { ride, train, vehicle };
-	}
-	return valid;
+	return combinedLabelSpinner(controlsLabelWidth, controlsSpinnerWidth, params, noDisabledMessage);
 }

@@ -1,8 +1,26 @@
+import { ParkRide } from "../objects/parkRide";
+import { RideTrain } from "../objects/rideTrain";
 import { RideVehicle } from "../objects/rideVehicle";
 import { hasPermissions, register } from "./actions";
+import * as Log from "../utilities/logger";
 
 
 const execute = register<PasteVehicleSettingsArgs>("rve-paste-car", pasteVehicleSettings);
+
+
+/**
+ * The available copy options.
+ */
+export const copyOptions =
+[
+	"All vehicles on this train",
+	"Preceding vehicles on this train",
+	"Following vehicles on this train",
+	"All vehicles on all trains",
+	"Preceding vehicles on all trains",
+	"Following vehicles on all trains",
+	"Same vehicle number on all trains",
+] as const;
 
 
 /**
@@ -11,13 +29,62 @@ const execute = register<PasteVehicleSettingsArgs>("rve-paste-car", pasteVehicle
 export const enum CopyFilter
 {
 	TypeAndVariant =      (1 << 0),
-	Seats =               (1 << 1),
-	Mass =                (1 << 2),
-	PoweredAcceleration = (1 << 3),
-	PoweredMaxSpeed =     (1 << 4),
-	Spacing =             (1 << 5),
-	Colours =             (1 << 6),
+	Colours =             (1 << 1),
+	TrackProgress =       (1 << 2),
+	Spacing =             (1 << 3),
+	Seats =               (1 << 4),
+	Mass =                (1 << 5),
+	PoweredAcceleration = (1 << 6),
+	PoweredMaxSpeed =     (1 << 7),
 	All = -1
+}
+
+
+/**
+ * Gets the targeted vehicles based on the selected copy option, in the following
+ * format; [[ car id, amount of following cars ], ...].
+ */
+export function getTargets(copyOption: number, ride: [ParkRide, number] | null, train: [RideTrain, number] | null, vehicle: [RideVehicle, number] | null):  [number, number | null][]
+{
+	if (ride && train && vehicle)
+	{
+		switch(copyOption)
+		{
+			case 0: // "All vehicles on this train"
+			{
+				return [[ train[0].carId, null ]];
+			}
+			case 1: // "Preceding vehicles on this train"
+			{
+				return [[ train[0].carId, vehicle[1] ]];
+			}
+			case 2: // "Following vehicles on this train"
+			{
+				return [[ vehicle[0].id, null ]];
+			}
+			case 3: // "All vehicles on all trains"
+			{
+				return getTargetsOnAllTrains(ride, t => [ t.carId, null ]);
+			}
+			case 4: // "Preceding vehicles on all trains"
+			{
+				const amountOfVehicles = (vehicle[1] + 1);
+				return getTargetsOnAllTrains(ride, t => [ t.carId, amountOfVehicles ]);
+			}
+			case 5: // "Following vehicles on all trains"
+			{
+				const index = vehicle[1];
+				return getTargetsOnAllTrains(ride, t => [ t.at(index).id, null ]);
+			}
+			case 6: // "Same vehicle on all trains"
+			{
+				const index = vehicle[1];
+				return getTargetsOnAllTrains(ride, t => [ t.at(index).id, 1 ]);
+			}
+		}
+	}
+	Log.assert(true, `getTargets(), selected copy option out of range: ${copyOption}, or vehicle not selected: ${vehicle}`);
+	return [];
 }
 
 
@@ -150,4 +217,13 @@ function applyVehicleSettings(car: Car, settings: VehicleSettings): void
 	{
 		car.colours = { body: colours[0], trim: colours[1], tertiary: colours[2] };
 	}
+}
+
+
+/**
+ * Finds the matching targets on all trains of the specified ride.
+ */
+function getTargetsOnAllTrains(ride: [ParkRide, number], callback: (train: RideTrain) => [number, number | null]): [number, number | null][]
+{
+	return ride[0].trains().map(callback);
 }
