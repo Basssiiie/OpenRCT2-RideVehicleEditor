@@ -2,6 +2,12 @@ import * as Log from "../utilities/logger";
 
 
 /**
+ * Required permission for editing anything with this plugin.
+ */
+export const requiredEditPermission: PermissionType = "ride_properties";
+
+
+/**
  * Callback for executing the specific action.
  */
 export type Action<T> = (args: T, player: number) => void;
@@ -61,7 +67,7 @@ export function hasPermissions(playerId: number, permission: PermissionType): bo
 		const group = network.getGroup(player.group);
 		if (group.permissions.indexOf(permission) < 0)
 		{
-			Log.debug(`Cannot apply update from player ${playerId}: lacking 'ride_properties' permission.`);
+			Log.debug(`Cannot apply update from player ${playerId}: lacking '${permission}' permission.`);
 			return false;
 		}
 	}

@@ -1,5 +1,5 @@
 import { RideLifeCycleFlags } from "../objects/rideLifeCycleFlags";
-import { hasPermissions, register } from "./actions";
+import { hasPermissions, register, requiredEditPermission } from "./actions";
 import * as Log from "../utilities/logger";
 import { ParkRide } from "../objects/parkRide";
 
@@ -104,7 +104,7 @@ function updateValue(rideId: number, key: RideUpdateKeys, value: number | boolea
  */
 function updateRideSetting(args: UpdateRideSettingArgs, playerId: number): void
 {
-	if (!hasPermissions(playerId, "ride_properties"))
+	if (!hasPermissions(playerId, requiredEditPermission))
 		return;
 
 	const ride = map.getRide(args.id);

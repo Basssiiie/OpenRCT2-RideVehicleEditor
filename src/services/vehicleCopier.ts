@@ -1,7 +1,7 @@
 import { ParkRide } from "../objects/parkRide";
 import { RideTrain } from "../objects/rideTrain";
 import { RideVehicle } from "../objects/rideVehicle";
-import { hasPermissions, register } from "./actions";
+import { hasPermissions, register, requiredEditPermission } from "./actions";
 import * as Log from "../utilities/logger";
 
 
@@ -164,7 +164,7 @@ interface VehicleSettings
  */
 function pasteVehicleSettings(args: PasteVehicleSettingsArgs, playerId: number): void
 {
-	if (!hasPermissions(playerId, "ride_properties"))
+	if (!hasPermissions(playerId, requiredEditPermission))
 		return;
 
 	for (const target of args.targets)

@@ -2,7 +2,7 @@ import { Colour } from "openrct2-flexui";
 import { RideType } from "../objects/rideType";
 import { RideVehicle } from "../objects/rideVehicle";
 import * as Log from "../utilities/logger";
-import { hasPermissions, register } from "./actions";
+import { hasPermissions, register, requiredEditPermission } from "./actions";
 import { getDistanceFromProgress } from "./spacingEditor";
 
 
@@ -173,7 +173,7 @@ function updateValue(vehicleId: number, key: VehicleUpdateKeys, value: number): 
  */
 function updateVehicleSetting(args: UpdateVehicleSettingArgs, playerId: number): void
 {
-	if (!hasPermissions(playerId, "ride_properties"))
+	if (!hasPermissions(playerId, requiredEditPermission))
 		return;
 
 	const car = map.getEntity(args.id);

@@ -205,7 +205,6 @@ export const mainWindow = window({
 									"Same vehicle number on all trains",
 								],
 								tooltip: "Apply the selected vehicle settings to a specific set of other vehicles on this ride.",
-								//padding: [0, 1],
 								selectedIndex: model.copyTargetOption,
 								onChange: idx => model.copyTargetOption.set(idx)
 							}),
