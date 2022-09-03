@@ -3,6 +3,7 @@ import { RideTrain } from "../objects/rideTrain";
 import { RideVehicle } from "../objects/rideVehicle";
 import { hasPermissions, register, requiredEditPermission } from "./actions";
 import * as Log from "../utilities/logger";
+import { forEachVehicle, VehicleSpan } from "./vehicleSpan";
 
 
 const execute = register<PasteVehicleSettingsArgs>("rve-paste-car", pasteVehicleSettings);
@@ -140,7 +141,7 @@ export function applyToTargets(source: RideVehicle, filters: CopyFilter, targets
 interface PasteVehicleSettingsArgs
 {
 	settings: VehicleSettings;
-	targets: [number, number | null][];
+	targets: VehicleSpan[];
 }
 
 
@@ -167,28 +168,7 @@ function pasteVehicleSettings(args: PasteVehicleSettingsArgs, playerId: number):
 	if (!hasPermissions(playerId, requiredEditPermission))
 		return;
 
-	for (const target of args.targets)
-	{
-		const maximum = target[1];
-		let currentId = target[0];
-		let count = 0;
-
-		while (maximum === null || count < maximum)
-		{
-			const car = <Car>map.getEntity(currentId);
-			if (!car || car.type !== "car")
-				break;
-
-			applyVehicleSettings(car, args.settings);
-
-			const nextId = car.nextCarOnTrain;
-			if (nextId === null)
-				break;
-
-			currentId = nextId;
-			count++;
-		}
-	}
+	forEachVehicle(args.targets, car => applyVehicleSettings(car, args.settings));
 }
 
 

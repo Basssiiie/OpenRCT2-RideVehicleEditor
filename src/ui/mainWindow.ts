@@ -42,7 +42,7 @@ if (isDevelopment)
 export const mainWindow = window({
 	title,
 	width: 500, minWidth: 465, maxWidth: 560,
-	height: 404,
+	height: 401,
 	spacing: 5,
 	onOpen: () => model.reload(),
 	onUpdate: () => model.update(),
@@ -215,7 +215,9 @@ export const mainWindow = window({
 								}),
 								toggle({
 									text: "Synchronize",
-									height: buttonSize
+									height: buttonSize,
+									isPressed: model.synchronizeTargets,
+									onChange: enabled => model.synchronizeTargets.set(enabled)
 								})
 							])
 						]
@@ -244,9 +246,9 @@ export const mainWindow = window({
 								text: "Variant:",
 								tooltip: "Sprite variant to use from the selected ride type",
 								minimum: 0,
-								maximum: compute(model.type, c => (c) ? c[0].variants() : 4),
+								maximum: model.maximumVariants,
 								wrapMode: "wrap",
-								disabled: model.isEditDisabled,
+								disabled: compute(model.isEditDisabled, model.maximumVariants, (noEdit, max) => (noEdit || !max)),
 								value: model.variant,
 								onChange: value => model.modifyVehicle(setVariant, value)
 							}),
@@ -396,6 +398,7 @@ export const mainWindow = window({
 			})
 		]),
 		label({ // credits
+			height: 11,
 			padding: [ 0, 20 ], // do not cover the resize corner
 			text: "github.com/Basssiiie/OpenRCT2-RideVehicleEditor",
 			tooltip: "Go to this URL to check for the latest updates",

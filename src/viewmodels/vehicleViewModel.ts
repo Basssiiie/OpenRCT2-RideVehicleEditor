@@ -5,6 +5,7 @@ import { getAllRideTypes, RideType } from "../objects/rideType";
 import { RideVehicle } from "../objects/rideVehicle";
 import { getSpacingToPrecedingVehicle } from "../services/spacingEditor";
 import { CopyFilter, getTargets } from "../services/vehicleCopier";
+import { VehicleSpan } from "../services/vehicleSpan";
 import { findIndex } from "../utilities/arrayHelper";
 import * as Log from "../utilities/logger";
 
@@ -29,6 +30,7 @@ export class VehicleViewModel
 	readonly multiplier = store<number>(1);
 
 	readonly type = store<[RideType, number] | null>(null);
+	readonly maximumVariants = compute(this.type, t => (t) ? t[0].variants() : 4);
 	readonly variant = store<number>(0);
 	readonly seats = store<number>(0);
 	readonly mass = store<number>(0);
@@ -47,6 +49,7 @@ export class VehicleViewModel
 	readonly copyFilters = store<CopyFilter>(0);
 	readonly copyTargetOption = store<number>(0);
 	readonly copyTargets = compute(this.copyTargetOption, this.selectedVehicle, (o, v) => getTargets(o, this.selectedRide.get(), this.selectedTrain.get(), v));
+	readonly synchronizeTargets = store<boolean>(false);
 
 	constructor()
 	{
@@ -133,12 +136,19 @@ export class VehicleViewModel
 	/**
 	 * Attempt to modify the vehicle with the specified action, if a vehicle is selected.
 	 */
-	modifyVehicle<T>(action: (vehicle: RideVehicle, value: T) => void, value: T): void
+	modifyVehicle<T>(action: (vehicles: VehicleSpan[], value: T) => void, value: T): void
 	{
 		const vehicle = this.selectedVehicle.get();
 		if (vehicle)
 		{
-			action(vehicle[0], value);
+			if (this.synchronizeTargets.get())
+			{
+				action(this.copyTargets.get(), value);
+			}
+			else
+			{
+				action([[ vehicle[0].id, 1 ]], value);
+			}
 		}
 		else
 		{

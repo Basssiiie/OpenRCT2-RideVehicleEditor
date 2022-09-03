@@ -1,9 +1,9 @@
 import { Colour } from "openrct2-flexui";
 import { RideType } from "../objects/rideType";
-import { RideVehicle } from "../objects/rideVehicle";
 import * as Log from "../utilities/logger";
 import { hasPermissions, register, requiredEditPermission } from "./actions";
 import { getDistanceFromProgress } from "./spacingEditor";
+import { forEachVehicle, VehicleSpan } from "./vehicleSpan";
 
 
 const execute = register<UpdateVehicleSettingArgs>("rve-update-car", updateVehicleSetting);
@@ -33,117 +33,117 @@ const
  * Sets the ride type for this vehicle. Resets all other properties
  * to their default values for that type.
  */
-export function setRideType(vehicle: RideVehicle, type: RideType): void
+export function setRideType(vehicles: VehicleSpan[], type: RideType): void
 {
-	updateValue(vehicle.id, rideTypeKey, type.id);
+	updateValue(vehicles, rideTypeKey, type.id);
 }
 
 
 /**
  * Moves the vehicle a relative distance along the track.
  */
-export function changeTrackProgress(vehicle: RideVehicle, trackProgress: number): void
+export function changeTrackProgress(vehicles: VehicleSpan[], trackProgress: number): void
 {
-	updateValue(vehicle.id, trackProgressKey, getDistanceFromProgress(vehicle.car(), trackProgress));
+	updateValue(vehicles, trackProgressKey, trackProgress);
 }
 
 
 /**
  * Sets the vehicle sprite variant. (e.g. locomotive, tender or passenger car)
  */
-export function setVariant(vehicle: RideVehicle, variant: number): void
+export function setVariant(vehicles: VehicleSpan[], variant: number): void
 {
-	updateValue(vehicle.id, variantKey, variant);
+	updateValue(vehicles, variantKey, variant);
 }
 
 
 /**
  * Sets the maximum number of seats for this vehicle.
  */
-export function setSeatCount(vehicle: RideVehicle, seats: number): void
+export function setSeatCount(vehicles: VehicleSpan[], seats: number): void
 {
-	updateValue(vehicle.id, seatsKey, seats);
+	updateValue(vehicles, seatsKey, seats);
 }
 
 
 /**
  * Sets the mass for this vehicle.
  */
-export function setMass(vehicle: RideVehicle, mass: number): void
+export function setMass(vehicles: VehicleSpan[], mass: number): void
 {
-	updateValue(vehicle.id, massKey, mass);
+	updateValue(vehicles, massKey, mass);
 }
 
 
 /**
  * Sets the powered acceleration for this vehicle.
  */
-export function setPoweredAcceleration(vehicle: RideVehicle, power: number): void
+export function setPoweredAcceleration(vehicles: VehicleSpan[], power: number): void
 {
-	updateValue(vehicle.id, poweredAccelerationKey, power);
+	updateValue(vehicles, poweredAccelerationKey, power);
 }
 
 
 /**
  * Sets the powered acceleration for this vehicle.
  */
-export function setPoweredMaximumSpeed(vehicle: RideVehicle, maximumSpeed: number): void
+export function setPoweredMaximumSpeed(vehicles: VehicleSpan[], maximumSpeed: number): void
 {
-	updateValue(vehicle.id, poweredMaxSpeedKey, maximumSpeed);
+	updateValue(vehicles, poweredMaxSpeedKey, maximumSpeed);
 }
 
 
 /**
  * Sets the primary colour for this vehicle.
  */
-export function setPrimaryColour(vehicle: RideVehicle, colour: Colour): void
+export function setPrimaryColour(vehicles: VehicleSpan[], colour: Colour): void
 {
-	updateValue(vehicle.id, primaryColour, colour);
+	updateValue(vehicles, primaryColour, colour);
 }
 
 
 /**
  * Sets the secondary colour for this vehicle.
  */
-export function setSecondaryColour(vehicle: RideVehicle, colour: Colour): void
+export function setSecondaryColour(vehicles: VehicleSpan[], colour: Colour): void
 {
-	updateValue(vehicle.id, secondaryColour, colour);
+	updateValue(vehicles, secondaryColour, colour);
 }
 
 
 /**
  * Sets the tertiary colour for this vehicle.
  */
-export function setTertiaryColour(vehicle: RideVehicle, colour: Colour): void
+export function setTertiaryColour(vehicles: VehicleSpan[], colour: Colour): void
 {
-	updateValue(vehicle.id, tertiaryColour, colour);
+	updateValue(vehicles, tertiaryColour, colour);
 }
 
 
 /**
  * Sets the primary colour for this vehicle.
  */
-export function setPositionX(vehicle: RideVehicle, x: number): void
+export function setPositionX(vehicles: VehicleSpan[], x: number): void
 {
-	updateValue(vehicle.id, xPosition, x);
+	updateValue(vehicles, xPosition, x);
 }
 
 
 /**
  * Sets the secondary colour for this vehicle.
  */
-export function setPositionY(vehicle: RideVehicle, y: number): void
+export function setPositionY(vehicles: VehicleSpan[], y: number): void
 {
-	updateValue(vehicle.id, yPosition, y);
+	updateValue(vehicles, yPosition, y);
 }
 
 
 /**
  * Sets the tertiary colour for this vehicle.
  */
-export function setPositionZ(vehicle: RideVehicle, z: number): void
+export function setPositionZ(vehicles: VehicleSpan[], z: number): void
 {
-	updateValue(vehicle.id, zPosition, z);
+	updateValue(vehicles, zPosition, z);
 }
 
 
@@ -153,7 +153,7 @@ export function setPositionZ(vehicle: RideVehicle, z: number): void
  */
 interface UpdateVehicleSettingArgs
 {
-	id: number;
+	targets: VehicleSpan[];
 	key: VehicleUpdateKeys;
 	value: number;
 }
@@ -162,9 +162,9 @@ interface UpdateVehicleSettingArgs
 /**
  * Dispatches an update game action to other clients to update the specified key.
  */
-function updateValue(vehicleId: number, key: VehicleUpdateKeys, value: number): void
+function updateValue(vehicles: VehicleSpan[], key: VehicleUpdateKeys, value: number): void
 {
-	execute({ id: vehicleId, key, value });
+	execute({ targets: vehicles, key, value });
 }
 
 
@@ -176,14 +176,7 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs, playerId: number):
 	if (!hasPermissions(playerId, requiredEditPermission))
 		return;
 
-	const car = map.getEntity(args.id);
-	if (!car || car.type !== "car")
-	{
-		Log.debug(`Car ${args.id} not found.`);
-		return;
-	}
-
-	const { key, value } = args;
+	const { targets, key, value } = args;
 	switch (key) // Restrict key to permitted set.
 	{
 		case rideTypeKey:
@@ -196,21 +189,28 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs, playerId: number):
 		case yPosition:
 		case zPosition:
 		{
-			(<Car>car)[key] = value;
+			forEachVehicle(targets, car => car[key] = value);
 			break;
 		}
 		case trackProgressKey:
 		{
-			(<Car>car).travelBy(value);
+			forEachVehicle(targets, car =>
+			{
+				const distance = getDistanceFromProgress(car, value);
+				car.travelBy(distance);
+			});
 			break;
 		}
 		case primaryColour:
 		case secondaryColour:
 		case tertiaryColour:
 		{
-			const colours = (<Car>car).colours;
-			colours[key] = value;
-			(<Car>car).colours = colours; // reassignment is required for update
+			forEachVehicle(targets, car =>
+			{
+				const colours = car.colours;
+				colours[key] = value;
+				car.colours = colours; // reassignment is required for update
+			});
 			break;
 		}
 		default:
