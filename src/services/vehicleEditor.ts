@@ -9,14 +9,15 @@ import { forEachVehicle, VehicleSpan } from "./vehicleSpan";
 const execute = register<UpdateVehicleSettingArgs>("rve-update-car", updateVehicleSetting);
 
 
-type VehicleUpdateKeys = "rideObject" | "vehicleObject" | "trackProgress"
-	| "numSeats" | "mass" | "poweredAcceleration" | "poweredMaxSpeed"
-	| "x" | "y" | "z" | "body" | "trim" | "tertiary";
+type VehicleUpdateKeys = "rideObject" | "vehicleObject" | "trackProgress" | "spacing"
+	| "numSeats" | "mass" | "poweredAcceleration" | "poweredMaxSpeed" | "x" | "y" | "z"
+	| "body" | "trim" | "tertiary";
 
 const
 	rideTypeKey = "rideObject",
 	variantKey = "vehicleObject",
 	trackProgressKey = "trackProgress",
+	spacingKey = "spacing",
 	seatsKey = "numSeats",
 	massKey = "mass",
 	poweredAccelerationKey = "poweredAcceleration",
@@ -45,6 +46,15 @@ export function setRideType(vehicles: VehicleSpan[], type: RideType): void
 export function changeTrackProgress(vehicles: VehicleSpan[], trackProgress: number): void
 {
 	updateValue(vehicles, trackProgressKey, trackProgress);
+}
+
+
+/**
+ * Moves the vehicle a relative distance away from the vehicle before it.
+ */
+export function changeSpacing(vehicles: VehicleSpan[], trackProgress: number): void
+{
+	updateValue(vehicles, spacingKey, trackProgress);
 }
 
 
@@ -177,6 +187,7 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs, playerId: number):
 		return;
 
 	const { targets, key, value } = args;
+	let callback: (car: Car, index: number) => void;
 	switch (key) // Restrict key to permitted set.
 	{
 		case rideTypeKey:
@@ -189,34 +200,48 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs, playerId: number):
 		case yPosition:
 		case zPosition:
 		{
-			forEachVehicle(targets, car => car[key] = value);
+			callback = (car): void =>
+			{
+				car[key] = value;
+			};
 			break;
 		}
 		case trackProgressKey:
 		{
-			forEachVehicle(targets, car =>
+			callback = (car): void =>
 			{
 				const distance = getDistanceFromProgress(car, value);
 				car.travelBy(distance);
-			});
+			};
+			break;
+		}
+		case spacingKey:
+		{
+			callback = (car, index): void =>
+			{
+				const distance = getDistanceFromProgress(car, value * (index + 1));
+				car.travelBy(distance);
+			};
 			break;
 		}
 		case primaryColour:
 		case secondaryColour:
 		case tertiaryColour:
 		{
-			forEachVehicle(targets, car =>
+			callback = (car): void =>
 			{
 				const colours = car.colours;
 				colours[key] = value;
 				car.colours = colours; // reassignment is required for update
-			});
+			};
 			break;
 		}
 		default:
 		{
 			Log.debug(`Setting '${key}' not valid. Value: ${value}`);
-			break;
+			return;
 		}
 	}
+
+	forEachVehicle(targets, callback);
 }

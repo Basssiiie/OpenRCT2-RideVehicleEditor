@@ -1,4 +1,3 @@
-
 const monthNames = [ "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug.", "Sep.", "Oct." ];
 
 
@@ -9,7 +8,7 @@ export function formatMonthAndYear(months: number): string
 {
 	const amountOfMonths = monthNames.length;
 	const month = (((months % amountOfMonths) + amountOfMonths) % amountOfMonths);
-	const year = Math.floor(months / amountOfMonths);
+	const year = (Math.floor(months / amountOfMonths) + 1);
 
 	return `${monthNames[month]}, year ${year}`;
 }
@@ -30,7 +29,7 @@ export function formatRelativeDate(relativeDate: number): string
 		yearString = combineAndPluralise(year, "year");
 
 	const combined = (monthString && yearString)
-		? (`${monthString}, ${yearString}`)
+		? (`${yearString}, ${monthString}`)
 		: (monthString || yearString || "This month");
 
 	if ((relativeDate < 0))

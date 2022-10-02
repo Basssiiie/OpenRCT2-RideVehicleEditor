@@ -42,7 +42,7 @@ function stacktrace(): string
 	{
 		const functionName = entry.function.name;
 		const prettyName = functionName
-			? (functionName + "()")
+			? (`${functionName}()`)
 			: "<anonymous>";
 
 		result += `   -> ${prettyName}: line ${entry.lineNumber}\r\n`;
@@ -58,7 +58,7 @@ if (Environment.isDevelopment && isDuktapeAvailable)
 {
 	Duktape.errCreate = function onError(error): Error
 	{
-		error.message += ("\r\n" + stacktrace());
+		error.message += (`\r\n${stacktrace()}`);
 		return error;
 	};
 }
@@ -89,12 +89,11 @@ export function warning(message: string): void
  * Prints an error message to the console and an additional stacktrace
  * if the plugin is run in development mode.
  */
-
 export function error(message: string): void
 {
 	if (Environment.isDevelopment)
 	{
-		message += ("\r\n" + stacktrace());
+		message += (`\r\n${stacktrace()}`);
 	}
 	print("error", message);
 }
@@ -108,20 +107,7 @@ export function assert(condition: boolean, message: string): void
 {
 	if (Environment.isDevelopment && !condition)
 	{
-		throw new AssertError(message);
+		throw Error(`Assertion failed! ${message}`);
 	}
 	return <never>0;
-}
-
-
-/**
- * Throwable error for asserts.
- */
-class AssertError extends Error
-{
-	constructor(message: string)
-	{
-		super(message);
-		this.name = "AssertError";
-	}
 }

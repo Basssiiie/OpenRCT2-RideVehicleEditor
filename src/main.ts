@@ -9,9 +9,9 @@ import { mainWindow } from "./ui/mainWindow";
 function openEditorWindow(): void
 {
 	// Check if game is up-to-date...
-	if (context.apiVersion < 54)
+	if (context.apiVersion < 59)
 	{
-		// 54 => https://github.com/OpenRCT2/OpenRCT2/pull/16975
+		// 59 => https://github.com/OpenRCT2/OpenRCT2/pull/17821
 		const title = "Please update the game!";
 		const message = "The version of OpenRCT2 you are currently playing is too old for this plugin.";
 

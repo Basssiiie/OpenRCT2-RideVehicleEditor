@@ -89,7 +89,7 @@ export const rideWindow = window({
 				labelSpinner({
 					text: "Construction",
 					tooltip: "The amount of time ago the ride was built, in months and years. Rides get older as well, just like you.",
-					value: compute(model.buildMonth, v => (v + date.monthsElapsed)),
+					value: compute(model.buildMonth, v => (v - date.monthsElapsed)),
 					minimum: int16min,
 					maximum: int16max,
 					format: formatRelativeDate,

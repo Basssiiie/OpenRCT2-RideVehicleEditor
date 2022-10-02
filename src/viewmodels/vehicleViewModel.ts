@@ -22,11 +22,12 @@ export class VehicleViewModel
 	readonly trains = compute(this.selectedRide, r => (r) ? r[0].trains() : []);
 	readonly vehicles = compute(this.selectedTrain, t => (t) ? t[0].vehicles() : []);
 
-	readonly status = store<VehicleStatus | null>(null);
+	readonly isMoving = store(false);
+	readonly isUnpowered = compute(this.selectedVehicle, v => !v || !v[0].isPowered());
 	readonly isPicking = store<boolean>(false);
 	readonly isEditDisabled = compute(this.selectedVehicle, v => !v);
-	readonly isUnpowered = compute(this.selectedVehicle, v => !v || !v[0].isPowered());
-	readonly isPositionDisabled = compute(this.status, this.isEditDisabled, (s, e) => e || !s || isMoving(s));
+	readonly isPositionDisabled = compute(this.isMoving, this.isEditDisabled, (m, e) => m || e);
+	readonly formatPosition = (pos: number): string => (this.isEditDisabled.get() ? "Not available" : pos.toString());
 	readonly multiplier = store<number>(1);
 
 	readonly type = store<[RideType, number] | null>(null);
@@ -50,6 +51,8 @@ export class VehicleViewModel
 	readonly copyTargetOption = store<number>(0);
 	readonly copyTargets = compute(this.copyTargetOption, this.selectedVehicle, (o, v) => getTargets(o, this.selectedRide.get(), this.selectedTrain.get(), v));
 	readonly synchronizeTargets = store<boolean>(false);
+
+	private _onPlayerAction?: IDisposable;
 
 	constructor()
 	{
@@ -78,12 +81,26 @@ export class VehicleViewModel
 	}
 
 	/**
-	 * Reload available rides and ride types.
+	 * Reload available rides and ride types when the window opens.
 	 */
-	reload(): void
+	open(): void
 	{
 		this.rideTypes.set(getAllRideTypes());
 		this.rides.set(getAllRides());
+
+		this._onPlayerAction ||= context.subscribe("action.execute", e => this._onPlayerActionExecuted(e));
+	}
+
+	/**
+	 * Disposes events that were being listened for.
+	 */
+	close(): void
+	{
+		if (this._onPlayerAction)
+		{
+			this._onPlayerAction.dispose();
+		}
+		this._onPlayerAction = undefined;
 	}
 
 	/**
@@ -168,6 +185,44 @@ export class VehicleViewModel
 			: (enabledFilters & ~filter)
 		);
 	}
+
+
+	/**
+	 * Triggers for every executed player action.
+	 * @param event The arguments describing the executed action.
+	 */
+	private _onPlayerActionExecuted(event: GameActionEventArgs): void
+	{
+		const action = event.action as ActionType;
+		switch (action)
+		{
+			case "ridecreate":
+			case "ridedemolish":
+			case "ridesetname":
+			{
+				this.rides.set(getAllRides());
+				break;
+			}
+			/* case "ridesetstatus": // close/reopen ride
+			{
+				const index = this.selector.rideIndex;
+				if (index !== null)
+				{
+					const ride = this.selector.ride.get();
+					const statusUpdate = (event.args as RideSetStatusArgs);
+
+					if (ride !== null && ride.rideId === statusUpdate.ride)
+					{
+						Log.debug("(watcher) Ride status changed.");
+						this.selector.selectRide(index, this.selector.trainIndex ?? 0, this.selector.vehicleIndex ?? 0);
+					}
+				}
+				break;
+			} */
+		}
+
+		Log.debug(`<${action}>\n\t- type: ${event.type}\n\t- args: ${JSON.stringify(event.args)}\n\t- result: ${JSON.stringify(event.result)}`);
+	}
 }
 
 
@@ -186,6 +241,25 @@ function updateSelectionOrNull<T>(value: Store<[T, number] | null>, items: T[]):
 }
 
 
+function updateFromCar(model: VehicleViewModel, car: Car, index: number): void
+{
+	model.variant.set(car.vehicleObject);
+	model.mass.set(car.mass);
+	model.trackProgress.set(car.trackProgress);
+	model.x.set(car.x);
+	model.y.set(car.y);
+	model.z.set(car.z);
+
+	const train = model.selectedTrain.get();
+	if (train)
+	{
+		const status = train[0].at(0).car().status;
+		model.isMoving.set(isMoving(status));
+		model.spacing.set(getSpacingToPrecedingVehicle(train[0], car, index));
+	}
+}
+
+
 function isMoving(status: VehicleStatus): boolean
 {
 	switch (status)
@@ -201,22 +275,4 @@ function isMoving(status: VehicleStatus): boolean
 			return true;
 	}
 	return false;
-}
-
-
-function updateFromCar(model: VehicleViewModel, car: Car, index: number): void
-{
-	model.status.set(car.status);
-	model.variant.set(car.vehicleObject);
-	model.mass.set(car.mass);
-	model.trackProgress.set(car.trackProgress);
-	model.x.set(car.x);
-	model.y.set(car.y);
-	model.z.set(car.z);
-
-	const train = model.selectedTrain.get();
-	if (train)
-	{
-		model.spacing.set(getSpacingToPrecedingVehicle(train[0], car, index));
-	}
 }

@@ -59,7 +59,7 @@ function createCacheKey(trackType: number, subposition: number, direction: Direc
 /**
  * The positional data for a specific track element.
  */
-class TrackDistances
+export class TrackDistances
 {
 	_startX: number;
 	_startY: number;
@@ -68,7 +68,7 @@ class TrackDistances
 	_endY: number;
 	_endZ: number;
 	_distances: Uint16Array;
-	_length: number;
+	_progressLength: number;
 	_totalDistance: number;
 
 	constructor(subpositions: TrackSubposition[])
@@ -90,7 +90,7 @@ class TrackDistances
 			const distance = getSubpositionTranslationDistance(x, y, z, next.x, next.y, next.z);
 
 			totalDistance += distance;
-			distances[idx] = distance;
+			distances[idx - 1] = distance;
 
 			x = next.x;
 			y = next.y;
@@ -100,7 +100,7 @@ class TrackDistances
 		this._endY = y;
 		this._endZ = z;
 		this._distances = distances;
-		this._length = (distances.length + 1);
+		this._progressLength = distances.length;
 		this._totalDistance = totalDistance;
 	}
 }

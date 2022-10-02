@@ -4,11 +4,11 @@ import { checkbox, CheckboxParams, FlexiblePosition, horizontal, label, LabelPar
 /**
  * A spinner with a label on the left side.
  */
-export function combinedLabelSpinner(labelWidth: Scale, spinnerWidth: Scale, params: LabelParams & SpinnerParams, noDisabledMessage?: boolean): WidgetCreator<FlexiblePosition>
+export function combinedLabelSpinner(labelWidth: Scale, spinnerWidth: Scale, params: LabelParams & SpinnerParams, fallbackDisabledMessage: boolean = true): WidgetCreator<FlexiblePosition>
 {
 	(<FlexiblePosition>params).width = spinnerWidth;
 	params.wrapMode ||= "clampThenWrap";
-	if (noDisabledMessage)
+	if (fallbackDisabledMessage)
 	{
 		params.disabledMessage ||= "Not available";
 	}
