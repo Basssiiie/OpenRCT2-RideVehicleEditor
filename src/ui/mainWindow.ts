@@ -1,6 +1,6 @@
 import { button, checkbox, colourPicker, compute, dropdown, dropdownSpinner, FlexiblePosition, groupbox, horizontal, label, LabelParams, SpinnerParams, SpinnerWrapMode, toggle, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
 import { isDevelopment, pluginVersion } from "../environment";
-import { CopyFilter } from "../services/vehicleCopier";
+import { applyToTargets, CopyFilter, getTargets, getVehicleSettings } from "../services/vehicleCopier";
 import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
 import { locate } from "../services/vehicleLocater";
 import { toggleVehiclePicker } from "../services/vehiclePicker";
@@ -26,6 +26,8 @@ for (const key in model)
 }
 */
 
+model.selectedVehicle.subscribe(v => console.log(`new vehicle: ${v}`));
+
 const buttonSize = 24;
 const controlsWidth = 244;
 const controlsLabelWidth = 82;
@@ -33,7 +35,7 @@ const controlsSpinnerWidth = 146; // controlsWidth - (controlsLabelWidth + 4 + 1
 const clampThenWrapMode: SpinnerWrapMode = "clampThenWrap";
 
 // Tips that are used multiple times
-const applyOptionsTip = "Apply the selected vehicle settings to a specific set of other vehicles on this ride.";
+const applyOptionsTip = "Copy the selected vehicle settings to a specific set of other vehicles on this ride.";
 const multiplierTip = "Multiplies all spinner controls by the specified amount";
 
 let title = `Ride vehicle editor (v${pluginVersion})`;
@@ -107,20 +109,33 @@ export const mainWindow = window({
 									tooltip: "Use the picker to select a vehicle by clicking it",
 									image: 29467, // SPR_G2_EYEDROPPER
 									isPressed: model.isPicking,
-									disabled: model.isEditDisabled,
-									onChange: p => toggleVehiclePicker(p, c => model.select(c), () => model.isPicking.set(false))
+									onChange: pressed => toggleVehiclePicker(pressed, c => model.select(c), () => model.isPicking.set(false))
 								}),
 								toggle({
 									width: buttonSize, height: buttonSize,
 									tooltip: "Copies the current vehicle settings to your clipboard, so you can use it on another ride",
 									image: 29434, // SPR_G2_COPY,
 									disabled: model.isEditDisabled,
+									isPressed: compute(model.clipboard, clip => !!clip),
+									onChange: pressed =>
+									{
+										const vehicle = model.selectedVehicle.get();
+										model.clipboard.set((pressed && vehicle) ? getVehicleSettings(vehicle[0], CopyFilter.All) : null);
+									}
 								}),
 								button({
 									width: buttonSize, height: buttonSize,
 									tooltip: "Pastes the previously copied vehicle settings over the currently selected vehicle",
 									image: 29435, // SPR_G2_PASTE,
-									disabled: model.isEditDisabled,
+									disabled: compute(model.isEditDisabled, model.clipboard, (edit, clip) => edit || !clip),
+									onClick: () =>
+									{
+										const vehicle = model.selectedVehicle.get(), settings = model.clipboard.get();
+										if (vehicle && settings)
+										{
+											applyToTargets(settings, [[ vehicle[0].id, 1 ]]);
+										}
+									}
 								}),
 								button({
 									width: buttonSize, height: buttonSize,
@@ -219,12 +234,15 @@ export const mainWindow = window({
 								button({
 									text: "Apply",
 									tooltip: applyOptionsTip,
-									height: buttonSize
+									height: buttonSize,
+									disabled: model.isEditDisabled,
+									onClick: () => applySelectedSettingsToRide()
 								}),
 								toggle({
 									text: "Synchronize",
-									tooltip: "Enable this and every change you make, will be made to the other vehicles as well. It's like synchronized swimming.",
+									tooltip: "Enable this and every change you make, will be made to the other vehicles as well. It's like synchronized swimming!",
 									height: buttonSize,
+									disabled: model.isEditDisabled,
 									isPressed: model.synchronizeTargets,
 									onChange: enabled => model.synchronizeTargets.set(enabled)
 								})
@@ -248,7 +266,7 @@ export const mainWindow = window({
 								disabled: model.isEditDisabled,
 								autoDisable: "empty",
 								selectedIndex: compute(model.type, t => (t) ? t[1] : 0),
-								onChange: idx => model.modifyVehicle(setRideType, model.rideTypes.get()[idx])
+								onChange: idx => updateVehicleType(idx)
 							}),
 							labelSpinner({
 								text: "Variant:",
@@ -421,6 +439,25 @@ export const mainWindow = window({
 	]
 });
 
+
+function updateVehicleType(typeIdx: number): void
+{
+	const type = model.rideTypes.get()[typeIdx];
+	model.modifyVehicle(setRideType, type);
+	model.maximumVariants.set(type.variants());
+}
+
+function applySelectedSettingsToRide(): void
+{
+	const vehicle = model.selectedVehicle.get();
+	if (vehicle)
+	{
+		applyToTargets(
+			getVehicleSettings(vehicle[0], model.copyFilters.get()),
+			getTargets(model.copyTargetOption.get(), model.selectedRide.get(), model.selectedTrain.get(), vehicle)
+		);
+	}
+}
 
 function labelSpinner(params: LabelParams & SpinnerParams): WidgetCreator<FlexiblePosition>
 {

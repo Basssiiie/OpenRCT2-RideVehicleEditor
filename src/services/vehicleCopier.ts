@@ -90,9 +90,9 @@ export function getTargets(copyOption: number, ride: [ParkRide, number] | null, 
 
 
 /**
- * Copy the source vehicle to the specified targets.
+ * Gets information about all the settings of the specified vehicle.
  */
-export function applyToTargets(source: RideVehicle, filters: CopyFilter, targets: [number, number | null][]): void
+export function getVehicleSettings(source: RideVehicle, filters: CopyFilter): VehicleSettings
 {
 	const
 		car = source.car(),
@@ -125,8 +125,31 @@ export function applyToTargets(source: RideVehicle, filters: CopyFilter, targets
 		const cols = car.colours;
 		settings.colours = [ cols.body, cols.trim, cols.tertiary ];
 	}
+	return settings;
+}
 
+
+/**
+ * Applies the set of vehicle settings to the specified targets.
+ */
+export function applyToTargets(settings: VehicleSettings, targets: [number, number | null][]): void
+{
 	execute({ settings, targets });
+}
+
+
+/**
+ * A set of settings for a specific vehicle.
+ */
+export interface VehicleSettings
+{
+	rideTypeId?: number;
+	variant?: number;
+	seats?: number;
+	mass?: number;
+	poweredAcceleration?: number;
+	poweredMaxSpeed?: number;
+	colours?: number[];
 }
 
 
@@ -142,21 +165,6 @@ interface PasteVehicleSettingsArgs
 {
 	settings: VehicleSettings;
 	targets: VehicleSpan[];
-}
-
-
-/**
- * A set of settings for a specific vehicle.
- */
-interface VehicleSettings
-{
-	rideTypeId?: number;
-	variant?: number;
-	seats?: number;
-	mass?: number;
-	poweredAcceleration?: number;
-	poweredMaxSpeed?: number;
-	colours?: number[];
 }
 
 
@@ -193,7 +201,7 @@ function applyVehicleSettings(car: Car, settings: VehicleSettings): void
 	apply("poweredMaxSpeed", settings.poweredMaxSpeed);
 
 	const colours = settings.colours;
-	if (colours !== undefined)
+	if (colours)
 	{
 		car.colours = { body: colours[0], trim: colours[1], tertiary: colours[2] };
 	}

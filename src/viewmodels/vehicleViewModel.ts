@@ -4,7 +4,7 @@ import { RideTrain } from "../objects/rideTrain";
 import { getAllRideTypes, RideType } from "../objects/rideType";
 import { RideVehicle } from "../objects/rideVehicle";
 import { getSpacingToPrecedingVehicle } from "../services/spacingEditor";
-import { CopyFilter, getTargets } from "../services/vehicleCopier";
+import { CopyFilter, getTargets, VehicleSettings } from "../services/vehicleCopier";
 import { VehicleSpan } from "../services/vehicleSpan";
 import { findIndex } from "../utilities/arrayHelper";
 import * as Log from "../utilities/logger";
@@ -51,6 +51,7 @@ export class VehicleViewModel
 	readonly copyTargetOption = store<number>(0);
 	readonly copyTargets = compute(this.copyTargetOption, this.selectedVehicle, (o, v) => getTargets(o, this.selectedRide.get(), this.selectedTrain.get(), v));
 	readonly synchronizeTargets = store<boolean>(false);
+	readonly clipboard = store<VehicleSettings | null>(null);
 
 	private _onPlayerAction?: IDisposable;
 
