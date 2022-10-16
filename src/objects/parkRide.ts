@@ -47,16 +47,8 @@ export class ParkRide
 
 	refresh(): void
 	{
-		const obj = map.getRide(this.id);
-		if (obj)
-		{
-			this._ride = obj;
-			this._trains = null;
-		}
-		else
-		{
-			this._ride = null;
-		}
+		this._trains = null;
+		this._ride = map.getRide(this.id) || null;
 	}
 
 
@@ -78,7 +70,12 @@ export class ParkRide
 		if (!this._trains)
 		{
 			const missingTrain = (): void => this.refresh();
-			this._trains = this.ride().vehicles.map(r => new RideTrain(r, missingTrain));
+			const trainIds = this.ride().vehicles;
+			if (trainIds.indexOf(0xFFFF) >= 0)
+			{
+				return [];
+			}
+			this._trains = trainIds.map(r => new RideTrain(r, missingTrain));
 		}
 		return this._trains;
 	}

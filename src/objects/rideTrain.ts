@@ -19,6 +19,7 @@ export class RideTrain
 	 */
 	constructor(carId: number, onMissing: () => void)
 	{
+		Log.assert(carId !== 0xFFFF, "Invalid car id");
 		this.carId = carId;
 		this._onMissing = onMissing;
 		this.refresh();

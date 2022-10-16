@@ -46,15 +46,7 @@ export class RideType
 
 	refresh(): void
 	{
-		const obj = context.getObject("ride", this.id);
-		if (obj)
-		{
-			this._object = obj;
-		}
-		else
-		{
-			this._object = null;
-		}
+		this._object = context.getObject("ride", this.id) || null;
 	}
 
 
@@ -75,10 +67,17 @@ export class RideType
 	{
 		if (this._variants === -1)
 		{
-			this._variants = this.object()
-				.vehicles
-				.filter(v => v.baseImageId > 0)
-				.length;
+			// Find last vehicle with non-zero base image.
+			const vehicles = this.object().vehicles;
+			let idx = vehicles.length;
+			while (idx-- > 0)
+			{
+				if (vehicles[idx].baseImageId > 0)
+				{
+					break;
+				}
+			}
+			this._variants = (idx + 1);
 		}
 		return this._variants;
 	}
