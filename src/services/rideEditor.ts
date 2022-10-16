@@ -122,7 +122,7 @@ function updateRideSetting(args: UpdateRideSettingArgs, playerId: number): void
 		case nausea:
 		case buildMonth:
 		{
-			(<Ride>ride)[key] = <number>value;
+			ride[key] = <number>value;
 			break;
 		}
 		case RideLifeCycleFlags.Indestructable:
@@ -131,11 +131,11 @@ function updateRideSetting(args: UpdateRideSettingArgs, playerId: number): void
 		{
 			if (value)
 			{
-				(<Ride>ride).lifecycleFlags |= key;
+				ride.lifecycleFlags |= key;
 			}
 			else
 			{
-				(<Ride>ride).lifecycleFlags &= ~key;
+				ride.lifecycleFlags &= ~key;
 			}
 			break;
 		}
