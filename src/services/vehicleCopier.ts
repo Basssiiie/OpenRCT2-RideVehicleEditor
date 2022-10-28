@@ -10,6 +10,20 @@ const execute = register<PasteVehicleSettingsArgs>("rve-paste-car", pasteVehicle
 
 
 /**
+ * Available copy options as an enum.
+ */
+export const enum CopyOptions
+{
+	AllVehiclesOnTrain,
+	PrecedingVehiclesOnTrain,
+	FollowingVehiclesOnTrain,
+	AllVehiclesOnAllTrains,
+	PrecedingVehiclesOnAllTrains,
+	FollowingVehiclesOnAllTrains,
+	SameVehicleOnAllTrains,
+}
+
+/**
  * The available copy options.
  */
 export const copyOptions =
@@ -43,41 +57,41 @@ export const enum CopyFilter
 
 /**
  * Gets the targeted vehicles based on the selected copy option, in the following
- * format; [[ car id, amount of following cars ], ...].
+ * format; [[ car id, amount of following cars (inclusive) ], ...].
  */
-export function getTargets(copyOption: number, ride: [ParkRide, number] | null, train: [RideTrain, number] | null, vehicle: [RideVehicle, number] | null):  [number, number | null][]
+export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | null, train: [RideTrain, number] | null, vehicle: [RideVehicle, number] | null):  [number, number | null][]
 {
 	if (ride && train && vehicle)
 	{
 		switch(copyOption)
 		{
-			case 0: // "All vehicles on this train"
+			case CopyOptions.AllVehiclesOnTrain:
 			{
 				return [[ train[0].carId, null ]];
 			}
-			case 1: // "Preceding vehicles on this train"
+			case CopyOptions.PrecedingVehiclesOnTrain:
 			{
-				return [[ train[0].carId, vehicle[1] ]];
+				return [[ train[0].carId, vehicle[1] + 1 ]];
 			}
-			case 2: // "Following vehicles on this train"
+			case CopyOptions.FollowingVehiclesOnTrain:
 			{
 				return [[ vehicle[0].id, null ]];
 			}
-			case 3: // "All vehicles on all trains"
+			case CopyOptions.AllVehiclesOnAllTrains:
 			{
 				return getTargetsOnAllTrains(ride, t => [ t.carId, null ]);
 			}
-			case 4: // "Preceding vehicles on all trains"
+			case CopyOptions.PrecedingVehiclesOnAllTrains:
 			{
 				const amountOfVehicles = (vehicle[1] + 1);
 				return getTargetsOnAllTrains(ride, t => [ t.carId, amountOfVehicles ]);
 			}
-			case 5: // "Following vehicles on all trains"
+			case CopyOptions.FollowingVehiclesOnAllTrains:
 			{
 				const index = vehicle[1];
 				return getTargetsOnAllTrains(ride, t => [ t.at(index).id, null ]);
 			}
-			case 6: // "Same vehicle on all trains"
+			case CopyOptions.SameVehicleOnAllTrains:
 			{
 				const index = vehicle[1];
 				return getTargetsOnAllTrains(ride, t => [ t.at(index).id, 1 ]);

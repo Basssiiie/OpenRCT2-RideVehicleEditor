@@ -45,6 +45,9 @@ export class ParkRide
 	}
 
 
+	/**
+	 * Refresh the internal ride reference object.
+	 */
 	refresh(): void
 	{
 		this._trains = null;

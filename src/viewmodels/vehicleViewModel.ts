@@ -4,13 +4,15 @@ import { RideTrain } from "../objects/rideTrain";
 import { getAllRideTypes, RideType } from "../objects/rideType";
 import { RideVehicle } from "../objects/rideVehicle";
 import { getSpacingToPrecedingVehicle } from "../services/spacingEditor";
-import { CopyFilter, getTargets, VehicleSettings } from "../services/vehicleCopier";
+import { CopyFilter, CopyOptions, getTargets, VehicleSettings } from "../services/vehicleCopier";
 import { VehicleSpan } from "../services/vehicleSpan";
 import { findIndex } from "../utilities/arrayHelper";
 import * as Log from "../utilities/logger";
 
 
-
+/**
+ * Viewmodel for the currently selected vehicle.
+ */
 export class VehicleViewModel
 {
 	readonly selectedRide = store<[ParkRide, number] | null>(null);
@@ -48,7 +50,7 @@ export class VehicleViewModel
 	readonly tertiaryColour = store<Colour>(0);
 
 	readonly copyFilters = store<CopyFilter>(0);
-	readonly copyTargetOption = store<number>(0);
+	readonly copyTargetOption = store<CopyOptions>(0);
 	readonly copyTargets = compute(this.copyTargetOption, this.selectedVehicle, (o, v) => getTargets(o, this.selectedRide.get(), this.selectedTrain.get(), v));
 	readonly synchronizeTargets = store<boolean>(false);
 	readonly clipboard = store<VehicleSettings | null>(null);
@@ -228,7 +230,9 @@ export class VehicleViewModel
 
 
 
-
+/**
+ * Selects the correct entity based on the specified index, or null if anything was deselected.
+ */
 function updateSelectionOrNull<T>(value: Store<[T, number] | null>, items: T[]): void
 {
 	let selection: [T, number] | null = null;
@@ -242,6 +246,9 @@ function updateSelectionOrNull<T>(value: Store<[T, number] | null>, items: T[]):
 }
 
 
+/**
+ * Updates the viewmodel with refreshed information from a car entity.
+ */
 function updateFromCar(model: VehicleViewModel, car: Car, index: number): void
 {
 	model.variant.set(car.vehicleObject);
@@ -261,6 +268,10 @@ function updateFromCar(model: VehicleViewModel, car: Car, index: number): void
 }
 
 
+/**
+ * If the vehicle is in a moving state, the xyz positions cannot be edited, because
+ * the game will automatically discard all change attempts.
+ */
 function isMoving(status: VehicleStatus): boolean
 {
 	switch (status)
