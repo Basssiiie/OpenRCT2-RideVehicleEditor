@@ -1,6 +1,6 @@
 import { store } from "openrct2-flexui";
+import { RideLifeCycleFlags } from "../../lib/openrct2.extended";
 import { ParkRide } from "../objects/parkRide";
-import { RideLifeCycleFlags } from "../objects/rideLifeCycleFlags";
 import * as Log from "../utilities/logger";
 
 

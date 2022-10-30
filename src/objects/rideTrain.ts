@@ -9,27 +9,26 @@ export class RideTrain
 {
 	readonly carId: number;
 	private _vehicles?: RideVehicle[] | null;
-	private _onMissing: () => void;
 
 
 	/**
 	 * Creates a new train for a ride.
 	 * @param carId Gets the entity id for the first car of this train.
-	 * @param onMissing Callback that should get triggered when the entity has disappeared.
 	 */
-	constructor(carId: number, onMissing: () => void)
+	constructor(carId: number)
 	{
 		Log.assert(carId !== 0xFFFF, "Invalid car id");
 		this.carId = carId;
-		this._onMissing = onMissing;
 		this.refresh();
 	}
 
 
-	refresh(): void
+	/**
+	 * Refreshes the vehicle entities for this train, in case they got respawned.
+	 */
+	refresh(): boolean
 	{
 		const vehicleList: RideVehicle[] = [];
-		const missingCar = (): void => this.refresh();
 
 		let currentId: (number | null) = this.carId;
 		let car: Car | null = null;
@@ -39,19 +38,19 @@ export class RideTrain
 			&& (car = <Car>map.getEntity(currentId))
 			&& car.type === "car")
 		{
-			vehicleList.push(new RideVehicle(car, missingCar));
+			vehicleList.push(new RideVehicle(car));
 			currentId = car.nextCarOnTrain;
 		}
 
 		if (vehicleList.length > 0)
 		{
 			this._vehicles = vehicleList;
+			return true;
 		}
-		else
-		{
-			this._vehicles = null;
-			this._onMissing();
-		}
+
+		Log.debug(`Ride train refresh(): selected train with id '${this.carId}' went missing.`);
+		this._vehicles = null;
+		return false;
 	}
 
 

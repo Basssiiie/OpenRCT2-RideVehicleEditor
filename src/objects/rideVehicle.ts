@@ -9,18 +9,15 @@ export class RideVehicle
 	readonly id: number;
 	private _entity?: Car | null;
 	private _type?: RideObjectVehicle | null;
-	private _onMissing: () => void;
 
 
 	/**
 	 * Creates a new ride vehicle to wrap a car.
 	 */
-	constructor(car: Car, onMissing: () => void);
-	constructor(id: number, onMissing: () => void);
-	constructor(param: Car | number, onMissing: () => void)
+	constructor(car: Car);
+	constructor(id: number);
+	constructor(param: Car | number)
 	{
-		this._onMissing = onMissing;
-
 		if (typeof param === "number")
 		{
 			this.id = param;
@@ -35,18 +32,22 @@ export class RideVehicle
 		Log.assert(typeof this.id === "number", "Ride vehicle entity is invalid.");
 	}
 
-	refresh(): void
+
+	/**
+	 * Refreshes the referenced entity for this vehicle, in case it got respawned.
+	 */
+	refresh(): boolean
 	{
 		const car = map.getEntity(this.id);
 		if (car && car.type === "car")
 		{
 			this._entity = <Car>car;
+			return true;
 		}
-		else
-		{
-			this._entity = null;
-			this._onMissing();
-		}
+
+		Log.debug(`Ride vehicle refresh(): selected car with id '${this.id}' went missing.`);
+		this._entity = null;
+		return false;
 	}
 
 

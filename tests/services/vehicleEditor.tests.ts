@@ -4,7 +4,7 @@ import test from "ava";
 import Mock from "openrct2-mocks";
 import { RideType } from "../../src/objects/rideType";
 import { initActions } from "../../src/services/actions";
-import { changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../../src/services/vehicleEditor";
+import { setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../../src/services/vehicleEditor";
 
 
 function setupCarMock(carId: number): Car

@@ -48,10 +48,18 @@ export class ParkRide
 	/**
 	 * Refresh the internal ride reference object.
 	 */
-	refresh(): void
+	refresh(): boolean
 	{
+		Log.debug(`Park ride refresh()`);
 		this._trains = null;
-		this._ride = map.getRide(this.id) || null;
+		const ride = map.getRide(this.id);
+		if (ride)
+		{
+			this._ride = ride;
+			return true;
+		}
+		this._ride = null;
+		return false;
 	}
 
 
@@ -72,13 +80,12 @@ export class ParkRide
 	{
 		if (!this._trains)
 		{
-			const missingTrain = (): void => this.refresh();
 			const trainIds = this.ride().vehicles;
 			if (trainIds.indexOf(0xFFFF) >= 0)
 			{
 				return [];
 			}
-			this._trains = trainIds.map(r => new RideTrain(r, missingTrain));
+			this._trains = trainIds.map(r => new RideTrain(r));
 		}
 		return this._trains;
 	}

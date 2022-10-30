@@ -1,7 +1,7 @@
-import { RideLifeCycleFlags } from "../objects/rideLifeCycleFlags";
 import { hasPermissions, register, requiredEditPermission } from "./actions";
 import * as Log from "../utilities/logger";
 import { ParkRide } from "../objects/parkRide";
+import { RideLifeCycleFlags } from "../../lib/openrct2.extended";
 
 
 const execute = register<UpdateRideSettingArgs>("rve-update-ride", updateRideSetting);

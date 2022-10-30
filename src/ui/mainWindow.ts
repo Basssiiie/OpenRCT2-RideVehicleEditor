@@ -25,8 +25,9 @@ for (const key in model)
 	}
 }
 */
-
-model.selectedVehicle.subscribe(v => console.log(`new vehicle: ${v}`));
+model.selectedRide.subscribe(v => console.log(`selected ride changed to: ${v}`));
+model.selectedTrain.subscribe(v => console.log(`selected train changed to: ${v}`));
+model.selectedVehicle.subscribe(v => console.log(`selected vehicle changed to: ${v}`));
 
 const buttonSize = 24;
 const controlsWidth = 244;

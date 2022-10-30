@@ -1,4 +1,5 @@
 import { Colour, compute, Store, store } from "openrct2-flexui";
+import { RideSetStatusArgs } from "../../lib/openrct2.extended";
 import { getAllRides, ParkRide } from "../objects/parkRide";
 import { RideTrain } from "../objects/rideTrain";
 import { getAllRideTypes, RideType } from "../objects/rideType";
@@ -172,7 +173,7 @@ export class VehicleViewModel
 		}
 		else
 		{
-			Log.debug(`Failed to modify vehicle with '${action}' to '${value}'; none is selected.`);
+			Log.debug(`Failed to modify vehicle with '${action?.name}' to '${value}'; none is selected.`);
 		}
 	}
 
@@ -196,6 +197,10 @@ export class VehicleViewModel
 	 */
 	private _onPlayerActionExecuted(event: GameActionEventArgs): void
 	{
+		if (event.isClientOnly)
+		{
+			return;
+		}
 		const action = event.action as ActionType;
 		switch (action)
 		{
@@ -206,32 +211,36 @@ export class VehicleViewModel
 				this.rides.set(getAllRides());
 				break;
 			}
-			/* case "ridesetstatus": // close/reopen ride
+			case "ridesetstatus": // close/reopen ride
 			{
-				const index = this.selector.rideIndex;
-				if (index !== null)
+				const ride = this.selectedRide.get();
+				const statusArgs = <RideSetStatusArgs>event.args;
+				if (ride && ride[0].id === statusArgs.ride)
 				{
-					const ride = this.selector.ride.get();
-					const statusUpdate = (event.args as RideSetStatusArgs);
-
-					if (ride !== null && ride.rideId === statusUpdate.ride)
+					const train = this.selectedTrain.get();
+					if (!train && ride[0].refresh())
 					{
-						Log.debug("(watcher) Ride status changed.");
-						this.selector.selectRide(index, this.selector.trainIndex ?? 0, this.selector.vehicleIndex ?? 0);
+						Log.debug(`Selected ride: status changed to ${statusArgs.status}, get newly spawned trains`);
+						this.trains.set(ride[0].trains());
+					}
+					else if (train && !train[0].refresh())
+					{
+						Log.debug(`Selected ride: status changed to ${statusArgs.status}, all trains removed`);
+						this.trains.set([]);
 					}
 				}
 				break;
-			} */
+			}
+			default: return;
 		}
 
-		Log.debug(`<${action}>\n\t- type: ${event.type}\n\t- args: ${JSON.stringify(event.args)}\n\t- result: ${JSON.stringify(event.result)}`);
+		Log.debug(`<${action}>\n\t- type: ${event.type} (client: ${event.isClientOnly})\n\t- args: ${JSON.stringify(event.args)}\n\t- result: ${JSON.stringify(event.result)}`);
 	}
 }
 
 
-
 /**
- * Selects the correct entity based on the specified index, or null if anything was deselected.
+ * Selects the correct entity based on the specified index in the store, or null if anything was deselected.
  */
 function updateSelectionOrNull<T>(value: Store<[T, number] | null>, items: T[]): void
 {
