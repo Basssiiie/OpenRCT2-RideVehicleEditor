@@ -41,6 +41,15 @@ export function setRideType(vehicles: VehicleSpan[], type: RideType): void
 
 
 /**
+ * Sets the vehicle sprite variant. (e.g. locomotive, tender or passenger car)
+ */
+export function setVariant(vehicles: VehicleSpan[], variant: number): void
+{
+	updateValue(vehicles, variantKey, variant);
+}
+
+
+/**
  * Moves the vehicle a relative distance along the track.
  */
 export function changeTrackProgress(vehicles: VehicleSpan[], trackProgress: number): void
@@ -55,15 +64,6 @@ export function changeTrackProgress(vehicles: VehicleSpan[], trackProgress: numb
 export function changeSpacing(vehicles: VehicleSpan[], trackProgress: number): void
 {
 	updateValue(vehicles, spacingKey, trackProgress);
-}
-
-
-/**
- * Sets the vehicle sprite variant. (e.g. locomotive, tender or passenger car)
- */
-export function setVariant(vehicles: VehicleSpan[], variant: number): void
-{
-	updateValue(vehicles, variantKey, variant);
 }
 
 
