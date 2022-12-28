@@ -85,7 +85,10 @@ export function getDistanceFromProgress(car: Car, trackProgress: number): number
 	return (trackProgress < 0) ? -totalDistance : totalDistance;
 }
 
-
+/**
+ * Calculate how much spacing there is between the current vehicle and the preceding
+ * vehicle on the specified train. Returns `null` if it is too far away.
+ */
 export function getSpacingToPrecedingVehicle(train: RideTrain, car: Car, carIndex: number): number | null
 {
 	if (carIndex <= 0)

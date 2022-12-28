@@ -9,6 +9,7 @@ export class RideVehicle
 	readonly id: number;
 	private _entity?: Car | null;
 	private _type?: RideObjectVehicle | null;
+	private _typeHash?: number;
 
 
 	/**
@@ -67,11 +68,16 @@ export class RideVehicle
 	 */
 	type(): RideObjectVehicle
 	{
-		if (!this._type)
+		const entity = this.car();
+		const rideObj = entity.rideObject;
+		const vehicleObj = entity.vehicleObject;
+		const hash = ((rideObj << 2) | vehicleObj); // ensure ride type and vehicle are unchanged
+
+		if (!this._type || hash !== this._typeHash)
 		{
-			const entity = this.car();
-			const rideObject = context.getObject("ride", entity.rideObject);
-			this._type = rideObject.vehicles[entity.vehicleObject];
+			const rideObject = context.getObject("ride", rideObj);
+			this._type = rideObject.vehicles[vehicleObj];
+			this._typeHash = hash;
 		}
 		return this._type;
 	}

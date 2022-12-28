@@ -4,6 +4,7 @@ import { getAllRides, ParkRide } from "../objects/parkRide";
 import { RideTrain } from "../objects/rideTrain";
 import { getAllRideTypes, RideType } from "../objects/rideType";
 import { RideVehicle } from "../objects/rideVehicle";
+import { refreshVehicle } from "../services/events";
 import { getSpacingToPrecedingVehicle } from "../services/spacingEditor";
 import { CopyFilter, CopyOptions, getTargets, VehicleSettings } from "../services/vehicleCopier";
 import { VehicleSpan } from "../services/vehicleSpan";
@@ -25,14 +26,6 @@ export class VehicleViewModel
 	readonly trains = compute(this.selectedRide, r => (r) ? r[0].trains() : []);
 	readonly vehicles = compute(this.selectedTrain, t => (t) ? t[0].vehicles() : []);
 
-	readonly isMoving = store(false);
-	readonly isUnpowered = compute(this.selectedVehicle, v => !v || !v[0].isPowered());
-	readonly isPicking = store<boolean>(false);
-	readonly isEditDisabled = compute(this.selectedVehicle, v => !v);
-	readonly isPositionDisabled = compute(this.isMoving, this.isEditDisabled, (m, e) => m || e);
-	readonly formatPosition = (pos: number): string => (this.isEditDisabled.get() ? "Not available" : pos.toString());
-	readonly multiplier = store<number>(1);
-
 	readonly type = store<[RideType, number] | null>(null);
 	readonly maximumVariants = compute(this.type, t => (t) ? t[0].variants() : 4);
 	readonly variant = store<number>(0);
@@ -50,6 +43,14 @@ export class VehicleViewModel
 	readonly secondaryColour = store<Colour>(0);
 	readonly tertiaryColour = store<Colour>(0);
 
+	readonly isMoving = store(false);
+	readonly isUnpowered = compute(this.selectedVehicle, this.type, this.variant, v => !v || !v[0].isPowered());
+	readonly isPicking = store<boolean>(false);
+	readonly isEditDisabled = compute(this.selectedVehicle, v => !v);
+	readonly isPositionDisabled = compute(this.isMoving, this.isEditDisabled, (m, e) => m || e);
+	readonly formatPosition = (pos: number): string => (this.isEditDisabled.get() ? "Not available" : pos.toString());
+	readonly multiplier = store<number>(1);
+
 	readonly copyFilters = store<CopyFilter>(0);
 	readonly copyTargetOption = store<CopyOptions>(0);
 	readonly copyTargets = compute(this.copyTargetOption, this.selectedVehicle, (o, v) => getTargets(o, this.selectedRide.get(), this.selectedTrain.get(), v));
@@ -64,22 +65,19 @@ export class VehicleViewModel
 		this.trains.subscribe(t => updateSelectionOrNull(this.selectedTrain, t));
 		this.vehicles.subscribe(v => updateSelectionOrNull(this.selectedVehicle, v));
 
-		this.selectedVehicle.subscribe(v =>
+		this.selectedVehicle.subscribe(vehicle =>
 		{
-			if (v)
+			if (vehicle)
 			{
-				const vehicle = v[0], car = vehicle.car(), types = this.rideTypes.get();
-				const typeIdx = findIndex(types, t => t.id === car.rideObject);
-				const colours = car.colours;
-
-				this.type.set((typeIdx === null) ? null : [ types[typeIdx], typeIdx ]);
-				this.seats.set(car.numSeats);
-				this.poweredAcceleration.set(car.poweredAcceleration);
-				this.poweredMaxSpeed.set(car.poweredMaxSpeed);
-				this.primaryColour.set(colours.body);
-				this.secondaryColour.set(colours.trim);
-				this.tertiaryColour.set(colours.tertiary);
-				updateFromCar(this, car, v[1]);
+				this._updateVehicleInfo(vehicle[0], vehicle[1]);
+			}
+		});
+		refreshVehicle.push(id =>
+		{
+			const vehicle = this.selectedVehicle.get();
+			if (vehicle && vehicle[0].id === id)
+			{
+				this._updateVehicleInfo(vehicle[0], vehicle[1]);
 			}
 		});
 	}
@@ -115,7 +113,7 @@ export class VehicleViewModel
 		const vehicle = this.selectedVehicle.get();
 		if (vehicle)
 		{
-			updateFromCar(this, vehicle[0].car(), vehicle[1]);
+			this._updateDynamicDataFromCar(vehicle[0].car(), vehicle[1]);
 		}
 	}
 
@@ -190,6 +188,45 @@ export class VehicleViewModel
 		);
 	}
 
+	/**
+	 * Updates the viewmodel with refreshed information from a ride vehicle.
+	 */
+	private _updateVehicleInfo(vehicle: RideVehicle, index: number): void
+	{
+		const car = vehicle.car(), types = this.rideTypes.get();
+		const typeIdx = findIndex(types, t => t.id === car.rideObject);
+		const colours = car.colours;
+
+		this.type.set((typeIdx === null) ? null : [ types[typeIdx], typeIdx ]);
+		this.seats.set(car.numSeats);
+		this.poweredAcceleration.set(car.poweredAcceleration);
+		this.poweredMaxSpeed.set(car.poweredMaxSpeed);
+		this.primaryColour.set(colours.body);
+		this.secondaryColour.set(colours.trim);
+		this.tertiaryColour.set(colours.tertiary);
+		this._updateDynamicDataFromCar(car, index);
+	}
+
+	/**
+	 * Updates the viewmodel with refreshed information from a car entity.
+	 */
+	private _updateDynamicDataFromCar(car: Car, index: number): void
+	{
+		this.variant.set(car.vehicleObject);
+		this.mass.set(car.mass);
+		this.trackProgress.set(car.trackProgress);
+		this.x.set(car.x);
+		this.y.set(car.y);
+		this.z.set(car.z);
+
+		const train = this.selectedTrain.get();
+		if (train)
+		{
+			const status = train[0].at(0).car().status;
+			this.isMoving.set(isMoving(status));
+			this.spacing.set(getSpacingToPrecedingVehicle(train[0], car, index));
+		}
+	}
 
 	/**
 	 * Triggers for every executed player action.
@@ -254,27 +291,6 @@ function updateSelectionOrNull<T>(value: Store<[T, number] | null>, items: T[]):
 	value.set(selection);
 }
 
-
-/**
- * Updates the viewmodel with refreshed information from a car entity.
- */
-function updateFromCar(model: VehicleViewModel, car: Car, index: number): void
-{
-	model.variant.set(car.vehicleObject);
-	model.mass.set(car.mass);
-	model.trackProgress.set(car.trackProgress);
-	model.x.set(car.x);
-	model.y.set(car.y);
-	model.z.set(car.z);
-
-	const train = model.selectedTrain.get();
-	if (train)
-	{
-		const status = train[0].at(0).car().status;
-		model.isMoving.set(isMoving(status));
-		model.spacing.set(getSpacingToPrecedingVehicle(train[0], car, index));
-	}
-}
 
 
 /**

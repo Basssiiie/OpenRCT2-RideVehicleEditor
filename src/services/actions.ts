@@ -16,7 +16,7 @@ export type Action<T> = (args: T, player: number) => void;
 /**
  * Callback to invoke the specific action.
  */
- export type ExecuteAction<T> = (args: T) => void;
+export type ExecuteAction<T> = (args: T) => void;
 
 
 const noop = (): GameActionResult => ({});
