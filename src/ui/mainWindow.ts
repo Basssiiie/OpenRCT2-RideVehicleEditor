@@ -275,7 +275,7 @@ export const mainWindow = window({
 								minimum: 0,
 								maximum: model.maximumVariants,
 								wrapMode: "wrap",
-								disabled: compute(model.isEditDisabled, model.maximumVariants, (noEdit, max) => (noEdit || !max)),
+								disabled: compute(model.isEditDisabled, model.maximumVariants, (noEdit, max) => (noEdit || max < 2)),
 								value: model.variant,
 								onChange: value => model.modifyVehicle(setVariant, value)
 							}),
