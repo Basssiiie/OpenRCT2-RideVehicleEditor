@@ -8,7 +8,8 @@ registerPlugin({
 	name: "RideVehicleEditor",
 	version: Environment.pluginVersion,
 	authors: ["Basssiiie"],
-	type: "local",
+	type: "remote",
 	licence: "MIT",
+	targetApiVersion: 65,
 	main,
 });

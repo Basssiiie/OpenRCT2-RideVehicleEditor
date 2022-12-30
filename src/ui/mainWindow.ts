@@ -108,14 +108,14 @@ export const mainWindow = window({
 								toggle({
 									width: buttonSize, height: buttonSize,
 									tooltip: "Use the picker to select a vehicle by clicking it",
-									image: 29467, // SPR_G2_EYEDROPPER
+									image: "eyedropper", // SPR_G2_EYEDROPPER
 									isPressed: model.isPicking,
 									onChange: pressed => toggleVehiclePicker(pressed, c => model.select(c), () => model.isPicking.set(false))
 								}),
 								toggle({
 									width: buttonSize, height: buttonSize,
 									tooltip: "Copies the current vehicle settings to your clipboard, so you can use it on another ride",
-									image: 29434, // SPR_G2_COPY,
+									image: "copy", // SPR_G2_COPY,
 									disabled: model.isEditDisabled,
 									isPressed: compute(model.clipboard, clip => !!clip),
 									onChange: pressed =>
@@ -127,7 +127,7 @@ export const mainWindow = window({
 								button({
 									width: buttonSize, height: buttonSize,
 									tooltip: "Pastes the previously copied vehicle settings over the currently selected vehicle",
-									image: 29435, // SPR_G2_PASTE,
+									image: "paste", // SPR_G2_PASTE,
 									disabled: compute(model.isEditDisabled, model.clipboard, (edit, clip) => edit || !clip),
 									onClick: () =>
 									{
