@@ -77,7 +77,7 @@ test("Get all settings of the vehicle", t =>
 		poweredMaxSpeed: 20,
 		colours: { body: 3, trim: 7, tertiary: 11 }
 	});
-	const vehicle = new RideVehicle(car, () => { /* nothing */ });
+	const vehicle = new RideVehicle(car);
 
 	const settings = getVehicleSettings(vehicle, CopyFilter.All);
 
@@ -105,7 +105,7 @@ test("Get none of the settings of the vehicle", t =>
 		poweredMaxSpeed: 20,
 		colours: { body: 3, trim: 7, tertiary: 11 }
 	});
-	const vehicle = new RideVehicle(car, () => { /* nothing */ });
+	const vehicle = new RideVehicle(car);
 
 	const settings = getVehicleSettings(vehicle, 0);
 
@@ -130,7 +130,7 @@ test("Get no powered settings of unpowered vehicle", t =>
 		poweredAcceleration: 10,
 		poweredMaxSpeed: 20,
 	});
-	const vehicle = new RideVehicle(car, () => { /* nothing */ });
+	const vehicle = new RideVehicle(car);
 
 	const settings = getVehicleSettings(vehicle, CopyFilter.All);
 
