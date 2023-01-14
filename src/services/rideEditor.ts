@@ -1,4 +1,4 @@
-import { hasPermissions, register, requiredEditPermission } from "./actions";
+import { register } from "./actions";
 import * as Log from "../utilities/logger";
 import { ParkRide } from "../objects/parkRide";
 import { RideLifeCycleFlags } from "../../lib/openrct2.extended";
@@ -102,11 +102,8 @@ function updateValue(rideId: number, key: RideUpdateKeys, value: number | boolea
 /**
  * Update one specific setting on the specified ride.
  */
-function updateRideSetting(args: UpdateRideSettingArgs, playerId: number): void
+function updateRideSetting(args: UpdateRideSettingArgs): void
 {
-	if (!hasPermissions(playerId, requiredEditPermission))
-		return;
-
 	const ride = map.getRide(args.id);
 	if (!ride)
 	{

@@ -1,7 +1,7 @@
 import { ParkRide } from "../objects/parkRide";
 import { RideTrain } from "../objects/rideTrain";
 import { RideVehicle } from "../objects/rideVehicle";
-import { hasPermissions, register, requiredEditPermission } from "./actions";
+import { register } from "./actions";
 import * as Log from "../utilities/logger";
 import { forEachVehicle, VehicleSpan } from "./vehicleSpan";
 import { invoke, refreshVehicle } from "./events";
@@ -186,11 +186,8 @@ interface PasteVehicleSettingsArgs
 /**
  * Applies the specified settings from player `playerId` to the current client.
  */
-function pasteVehicleSettings(args: PasteVehicleSettingsArgs, playerId: number): void
+function pasteVehicleSettings(args: PasteVehicleSettingsArgs): void
 {
-	if (!hasPermissions(playerId, requiredEditPermission))
-		return;
-
 	forEachVehicle(args.targets, car => applyVehicleSettings(car, args.settings));
 }
 

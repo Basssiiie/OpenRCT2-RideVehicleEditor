@@ -29,3 +29,12 @@ export const isDevelopment = (buildConfiguration === "development");
  * Returns true if the UI is available, or false if the game is running in headless mode.
  */
 export const isUiAvailable = (typeof ui !== "undefined");
+
+
+/**
+ * Returns true if the player is in a multiplayer server, or false if it is a singleplayer game.
+ */
+export function isMultiplayer(): boolean
+{
+	return (network.mode !== "none");
+}

@@ -1,25 +1,14 @@
+import { isMultiplayer } from "../environment";
 import * as Log from "../utilities/logger";
-
-
-/**
- * Required permission for editing anything with this plugin.
- */
-export const requiredEditPermission: PermissionType = "ride_properties";
 
 
 /**
  * Callback for executing the specific action.
  */
-export type Action<T> = (args: T, player: number) => void;
+export type Action<T> = (args: T) => void;
 
 
-/**
- * Callback to invoke the specific action.
- */
-export type ExecuteAction<T> = (args: T) => void;
-
-
-const noop = (): GameActionResult => ({});
+const requiredEditPermission: PermissionType = "ride_properties";
 const registeredActions: Record<string, Action<never>> = {};
 
 
@@ -27,10 +16,10 @@ const registeredActions: Record<string, Action<never>> = {};
  * Register a new custom action that can be executed and synchronized in multiplayer contexts.
  * @returns A callback to execute the specific action.
  */
-export function register<T>(name: string, action: Action<T>): ExecuteAction<T>
+export function register<T>(name: string, action: Action<T>): Action<T>
 {
 	registeredActions[name] = action;
-	return (args: T): void => context.executeAction(name, <never>args, noop);
+	return (args: T): void => context.executeAction(name, <never>args);
 }
 
 
@@ -41,27 +30,40 @@ export function initActions(): void
 {
 	for (const action in registeredActions)
 	{
-		context.registerAction(action, noop, noop);
+		context.registerAction(action, queryPermissionCheck, (args) =>
+		{
+			const params = ("args" in args) ? args.args : args;
+			registeredActions[action](<never>params);
+			return {};
+		});
+	}
+}
+
+
+/**
+ * Callback for registered actions to check permissions.
+ */
+function queryPermissionCheck(args: GameActionEventArgs<unknown>): GameActionResult
+{
+	if (hasPermissions(args.player, requiredEditPermission))
+	{
+		return {};
 	}
 
-	context.subscribe("action.execute", (event: GameActionEventArgs) =>
-	{
-		const { type, action, args, player } = event;
-
-		if (type === 80 && action in registeredActions)
-		{
-			registeredActions[action](<never>args, player);
-		}
-	});
+	return {
+		error: 2, // GameActions::Status::Disallowed
+		errorTitle: "Missing permissions!",
+		errorMessage: "Permission 'Ride Properties' is required to use the RideVehicleEditor on this server."
+	};
 }
 
 
 /**
  * Check if the player has the correct permissions, if in a multiplayer server.
  */
-export function hasPermissions(playerId: number, permission: PermissionType): boolean
+function hasPermissions(playerId: number, permission: PermissionType): boolean
 {
-	if (network.mode !== "none")
+	if (isMultiplayer())
 	{
 		const player = network.getPlayer(playerId);
 		const group = network.getGroup(player.group);

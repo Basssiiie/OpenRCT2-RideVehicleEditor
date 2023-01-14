@@ -1,7 +1,7 @@
 import { Colour } from "openrct2-flexui";
 import { RideType } from "../objects/rideType";
 import * as Log from "../utilities/logger";
-import { hasPermissions, register, requiredEditPermission } from "./actions";
+import { register } from "./actions";
 import { getDistanceFromProgress } from "./spacingEditor";
 import { forEachVehicle, VehicleSpan } from "./vehicleSpan";
 
@@ -181,11 +181,8 @@ function updateValue(vehicles: VehicleSpan[], key: VehicleUpdateKeys, value: num
 /**
  * Update one specific setting on the specified vehicle.
  */
-function updateVehicleSetting(args: UpdateVehicleSettingArgs, playerId: number): void
+function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 {
-	if (!hasPermissions(playerId, requiredEditPermission))
-		return;
-
 	const { targets, key, value } = args;
 	let callback: (car: Car, index: number) => void;
 	switch (key) // Restrict key to permitted set.
