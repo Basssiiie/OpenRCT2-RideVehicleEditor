@@ -1,21 +1,4 @@
 /**
- * Returned arguments for the 'ridesetstatus' action.
- */
-export interface RideSetStatusArgs
-{
-	/**
-	 * The id of the ride that was changed.
-	 */
-	ride: number;
-
-	/**
-	 * The new status for the ride. (0 = closed, 1 = open, 2 = test-mode)
-	 */
-	status: number;
-}
-
-
-/**
  * Flags used in game actions.
  */
 export const enum GameActionFlags

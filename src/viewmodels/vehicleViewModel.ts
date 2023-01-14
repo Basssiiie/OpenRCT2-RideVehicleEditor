@@ -1,5 +1,4 @@
 import { Colour, compute, Store, store } from "openrct2-flexui";
-import { RideSetStatusArgs } from "../../lib/openrct2.extended";
 import { getAllRides, ParkRide } from "../objects/parkRide";
 import { RideTrain } from "../objects/rideTrain";
 import { getAllRideTypes, RideType } from "../objects/rideType";
