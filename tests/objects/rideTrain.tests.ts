@@ -11,7 +11,7 @@ test("Ride train gets created from single car id", t =>
 		Mock.car({ id: 78 })
 	]});
 
-	const rideTrain = new RideTrain(78, () => t.fail("Car id not found"));
+	const rideTrain = new RideTrain(78);
 
 	t.is(rideTrain.carId, 78);
 	t.is(rideTrain.vehicles().length, 1);
@@ -28,7 +28,7 @@ test("Ride train gets created from multiple car ids", t =>
 		Mock.car({ id: 66, nextCarOnTrain: 7 }),
 	]});
 
-	const rideTrain = new RideTrain(15, () => t.fail("Car id not found"));
+	const rideTrain = new RideTrain(15);
 
 	t.is(rideTrain.carId, 15);
 	t.is(rideTrain.vehicles().length, 4);
@@ -43,11 +43,12 @@ const invalidId = 0xFFFF;
 
 test("Ride train with invalid head car id fails", t =>
 {
-	const calls: string[] = [];
-	const rideTrain = new RideTrain(invalidId, () => calls.push("fail"));
+	const rideTrain = new RideTrain(invalidId);
 
 	t.is(rideTrain.carId, invalidId);
-	t.deepEqual(calls, [ "fail" ]);
+
+	const result = rideTrain.refresh();
+	t.false(result);
 });
 
 
@@ -57,7 +58,7 @@ test("Ride train with invalid car id in train ends train", t =>
 		Mock.car({ id: 6, nextCarOnTrain: invalidId }),
 	]});
 
-	const rideTrain = new RideTrain(6, () => t.fail());
+	const rideTrain = new RideTrain(6);
 
 	t.is(rideTrain.carId, 6);
 	t.is(rideTrain.vehicles().length, 1);
@@ -79,7 +80,7 @@ const atIndexTest = test.macro({
 			Mock.car({ id: 7, nextCarOnTrain: 6 }),
 		]});
 
-		const rideTrain = new RideTrain(8, () => t.fail());
+		const rideTrain = new RideTrain(8);
 
 		t.is(rideTrain.at(index).id, expectedId);
 	}

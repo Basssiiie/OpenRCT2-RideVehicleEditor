@@ -26,7 +26,7 @@ export class VehicleViewModel
 	readonly vehicles = compute(this.selectedTrain, t => (t) ? t[0].vehicles() : []);
 
 	readonly type = store<[RideType, number] | null>(null);
-	readonly maximumVariants = compute(this.type, t => (t) ? t[0].variants() : 4);
+	readonly variants = compute(this.type, t => (t) ? t[0].variants() : []);
 	readonly variant = store<number>(0);
 	readonly seats = store<number>(0);
 	readonly mass = store<number>(0);

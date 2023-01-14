@@ -1,5 +1,6 @@
 import { button, checkbox, colourPicker, compute, dropdown, dropdownSpinner, FlexiblePosition, groupbox, horizontal, label, LabelParams, SpinnerParams, SpinnerWrapMode, toggle, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
 import { isDevelopment, pluginVersion } from "../environment";
+import { VehicleVisibility } from "../objects/rideVehicleVariant";
 import { applyToTargets, CopyFilter, getTargets, getVehicleSettings } from "../services/vehicleCopier";
 import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
 import { locate } from "../services/vehicleLocater";
@@ -273,11 +274,12 @@ export const mainWindow = window({
 								text: "Variant:",
 								tooltip: "Sprite variant to use from the selected ride type",
 								minimum: 0,
-								maximum: model.maximumVariants,
+								maximum: compute(model.variants, v => Math.max(v.length, 1)),
 								wrapMode: "wrap",
-								disabled: compute(model.isEditDisabled, model.maximumVariants, (noEdit, max) => (noEdit || max < 2)),
+								disabled: compute(model.isEditDisabled, model.variants, (noEdit, variants) => (noEdit || variants.length < 2)),
 								value: model.variant,
-								onChange: value => model.modifyVehicle(setVariant, value)
+								onChange: value => model.modifyVehicle(setVariant, value),
+								format: formatVariants
 							}),
 							horizontal([
 								label({
@@ -441,13 +443,19 @@ export const mainWindow = window({
 });
 
 
+/**
+ * Updates the viewmodel with the new vehicle type.
+ */
 function updateVehicleType(typeIdx: number): void
 {
 	const type = model.rideTypes.get()[typeIdx];
 	model.modifyVehicle(setRideType, type);
-	model.maximumVariants.set(type.variants());
+	model.variants.set(type.variants());
 }
 
+/**
+ * Apply settings of current vehicle to other vehicles in the ride.
+ */
 function applySelectedSettingsToRide(): void
 {
 	const vehicle = model.selectedVehicle.get();
@@ -460,11 +468,32 @@ function applySelectedSettingsToRide(): void
 	}
 }
 
+/**
+ * Format function that labels variants invisible if they are.
+ */
+function formatVariants(variantIndex: number): string
+{
+	const variants = model.variants.get();
+	let visibility: VehicleVisibility;
+	if (variantIndex >= variants.length || (visibility = variants[variantIndex].visibility) === VehicleVisibility.Visible)
+	{
+		return variantIndex.toString();
+	}
+	const visibilityLabel = (!visibility) ? "green square" : "invisible";
+	return `${variantIndex}  (${visibilityLabel})`;
+}
+
+/**
+ * Combines a label and a spinner into one widget creator.
+ */
 function labelSpinner(params: LabelParams & SpinnerParams): WidgetCreator<FlexiblePosition>
 {
 	return combinedLabelSpinner(controlsLabelWidth, controlsSpinnerWidth, params);
 }
 
+/**
+ * Combines a label and a spinner into one widget creator, with the same tooltip for the location spinners.
+ */
 function positionSpinner(params: LabelParams & SpinnerParams): WidgetCreator<FlexiblePosition>
 {
 	params.tooltip = "The fantastic map location of your vehicle and where to find it. Only works when the vehicle is not moving.";

@@ -1,4 +1,5 @@
 import * as Log from "../utilities/logger";
+import { isPowered } from "./rideVehicleVariant";
 
 
 /**
@@ -90,8 +91,7 @@ export class RideVehicle
 	 */
 	isPowered(): boolean
 	{
-		// 'VEHICLE_ENTRY_FLAG_POWERED' is required.
-		return !!(this.type().flags & (1 << 19));
+		return isPowered(this.type());
 	}
 
 

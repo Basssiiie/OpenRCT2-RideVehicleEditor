@@ -3,6 +3,7 @@
 import test from "ava";
 import Mock from "openrct2-mocks";
 import { getAllRideTypes, RideType } from "../../src/objects/rideType";
+import { VehicleVisibility } from "../../src/objects/rideVehicleVariant";
 
 
 
@@ -108,16 +109,20 @@ test("Ride type counts all variants", t =>
 {
 	const rideObject = Mock.rideObject({
 		vehicles: [
-			Mock.rideObjectVehicle({ baseImageId: 15 }),
-			Mock.rideObjectVehicle({ baseImageId: 125 }),
+			Mock.rideObjectVehicle({ baseImageId: 15, spriteWidth: 1, spriteHeightPositive: 1 }),
+			Mock.rideObjectVehicle({ baseImageId: 125, spriteWidth: 1, spriteHeightPositive: 1 }),
 			Mock.rideObjectVehicle({ baseImageId: 0 }),
 			Mock.rideObjectVehicle({ baseImageId: 0 })
 		]
 	});
 
 	const rideType = new RideType(rideObject);
+	const variants = rideType.variants();
 
-	t.is(rideType.variants(), 2);
+	t.is(variants[0].visibility, VehicleVisibility.Visible);
+	t.is(variants[1].visibility, VehicleVisibility.Visible);
+	t.is(variants[2].visibility, VehicleVisibility.GreenSquare);
+	t.is(variants.length, 3);
 });
 
 
@@ -125,16 +130,23 @@ test("Ride type recognises gaps in variants", t =>
 {
 	const rideObject = Mock.rideObject({
 		vehicles: [
-			Mock.rideObjectVehicle({ baseImageId: 15 }),
+			Mock.rideObjectVehicle({ baseImageId: 15, spriteWidth: 1, spriteHeightPositive: 1 }),
 			Mock.rideObjectVehicle({ baseImageId: 0 }),
-			Mock.rideObjectVehicle({ baseImageId: 125 }),
-			Mock.rideObjectVehicle({ baseImageId: 0 })
+			Mock.rideObjectVehicle({ baseImageId: 0 }),
+			Mock.rideObjectVehicle({ baseImageId: 125, spriteWidth: 1, spriteHeightPositive: 1 }),
+			Mock.rideObjectVehicle({ baseImageId: 5 }),
 		]
 	});
 
 	const rideType = new RideType(rideObject);
+	const variants = rideType.variants();
 
-	t.is(rideType.variants(), 3);
+	t.is(variants[0].visibility, VehicleVisibility.Visible);
+	t.is(variants[1].visibility, VehicleVisibility.GreenSquare);
+	t.is(variants[2].visibility, VehicleVisibility.GreenSquare);
+	t.is(variants[3].visibility, VehicleVisibility.Visible);
+	t.is(variants[4].visibility, VehicleVisibility.Invisible);
+	t.is(variants.length, 5);
 });
 
 
@@ -148,8 +160,10 @@ test("Ride type with zero variants", t =>
 	});
 
 	const rideType = new RideType(rideObject);
+	const variants = rideType.variants();
 
-	t.is(rideType.variants(), 0);
+	t.is(variants[0].visibility, VehicleVisibility.GreenSquare); // extra invisible
+	t.is(variants.length, 1);
 });
 
 
@@ -157,14 +171,19 @@ test("Ride type with all variants", t =>
 {
 	const rideObject = Mock.rideObject({
 		vehicles: [
-			Mock.rideObjectVehicle({ baseImageId: 10 }),
-			Mock.rideObjectVehicle({ baseImageId: 11 }),
-			Mock.rideObjectVehicle({ baseImageId: 12 }),
-			Mock.rideObjectVehicle({ baseImageId: 13 })
+			Mock.rideObjectVehicle({ baseImageId: 10, spriteWidth: 1, spriteHeightPositive: 1 }),
+			Mock.rideObjectVehicle({ baseImageId: 11, spriteWidth: 1, spriteHeightPositive: 1 }),
+			Mock.rideObjectVehicle({ baseImageId: 12, spriteWidth: 1, spriteHeightPositive: 1 }),
+			Mock.rideObjectVehicle({ baseImageId: 13, spriteWidth: 1, spriteHeightPositive: 1 })
 		]
 	});
 
 	const rideType = new RideType(rideObject);
+	const variants = rideType.variants();
 
-	t.is(rideType.variants(), 4);
+	t.is(variants[0].visibility, VehicleVisibility.Visible);
+	t.is(variants[1].visibility, VehicleVisibility.Visible);
+	t.is(variants[2].visibility, VehicleVisibility.Visible);
+	t.is(variants[3].visibility, VehicleVisibility.Visible);
+	t.is(variants.length, 4);
 });

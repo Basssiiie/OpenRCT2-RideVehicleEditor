@@ -1,4 +1,5 @@
 import * as Log from "../utilities/logger";
+import { getVisibility, RideVehicleVariant } from "./rideVehicleVariant";
 
 
 /**
@@ -21,7 +22,7 @@ export class RideType
 {
 	readonly id: number;
 	private _object?: RideObject | null;
-	private _variants: number = -1;
+	private _variants?: RideVehicleVariant[];
 
 
 	/**
@@ -61,23 +62,36 @@ export class RideType
 
 
 	/**
-	 * The amount of different variants (vehicle sprites) this ride has.
+	 * The variants (vehicle sprites) this ride has.
 	 */
-	variants(): number
+	variants(): RideVehicleVariant[]
 	{
-		if (this._variants === -1)
+		if (!this._variants)
 		{
 			// Find last vehicle with non-zero base image.
 			const vehicles = this.object().vehicles;
-			let idx = vehicles.length;
-			while (idx-- > 0)
+
+			const length = vehicles.length;
+			let validUpperBound = length;
+			while (validUpperBound-- > 0 && !getVisibility(vehicles[validUpperBound]))
 			{
-				if (vehicles[idx].baseImageId > 0)
-				{
-					break;
-				}
+				// Just decrement the upper bound until a valid vehicle shows up.
 			}
-			this._variants = (idx + 1);
+
+			const variants: RideVehicleVariant[] = [];
+			for (let idx = 0; idx <= validUpperBound; idx++)
+			{
+				const variant = new RideVehicleVariant(vehicles[idx]);
+				variants.push(variant);
+			}
+			if (++validUpperBound < length)
+			{
+				// Put a green square variant at the end if it fits.
+				const variant = new RideVehicleVariant(vehicles[validUpperBound]);
+				variants.push(variant);
+			}
+
+			this._variants = variants;
 		}
 		return this._variants;
 	}

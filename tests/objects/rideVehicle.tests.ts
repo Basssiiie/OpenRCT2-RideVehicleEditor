@@ -11,7 +11,7 @@ test("Ride vehicle gets created from car id", t =>
 		Mock.car({ id: 12, x: 34 })
 	]});
 
-	const rideVehicle = new RideVehicle(12, () => t.fail("Car id not found"));
+	const rideVehicle = new RideVehicle(12);
 
 	t.is(rideVehicle.id, 12);
 	t.is(rideVehicle.car().id, 12);
@@ -24,7 +24,7 @@ test("Ride vehicle gets created from car entity", t =>
 {
 	const car = Mock.car({ id: 45, x: 77 });
 
-	const rideVehicle = new RideVehicle(car, () => t.fail("Car id not found"));
+	const rideVehicle = new RideVehicle(car);
 
 	t.is(rideVehicle.id, 45);
 	t.is(rideVehicle.car().id, 45);
@@ -36,15 +36,12 @@ test("Ride vehicle gets created from car entity", t =>
 test("Ride vehicle goes missing after refresh", t =>
 {
 	const car = Mock.car({ id: 42 });
-
-	const calls: string[] = [];
-	const rideVehicle = new RideVehicle(car, () => calls.push("missing"));
+	const rideVehicle = new RideVehicle(car);
 
 	t.is(rideVehicle.id, 42);
-	t.deepEqual(calls, []);
 
-	rideVehicle.refresh();
-	t.deepEqual(calls, [ "missing" ]);
+	const result = rideVehicle.refresh();
+	t.false(result);
 });
 
 
@@ -60,7 +57,7 @@ test("Ride vehicle gets vehicle type from ride", t =>
 		Mock.car({ id: 42, rideObject: 11, vehicleObject: 1 })
 	]});
 
-	const rideVehicle = new RideVehicle(42, () => t.fail("Car id not found"));
+	const rideVehicle = new RideVehicle(42);
 
 	t.is(rideVehicle.id, 42);
 	t.is(rideVehicle.type().poweredAcceleration, 65);
@@ -80,7 +77,7 @@ test("Ride vehicle type is cached", t =>
 		Mock.car({ id: 42, rideObject: 11, vehicleObject: 1 })
 	]});
 
-	const rideVehicle = new RideVehicle(42, () => t.fail("Car id not found"));
+	const rideVehicle = new RideVehicle(42);
 
 	const type1 = rideVehicle.type();
 	const type2 = rideVehicle.type();
@@ -102,7 +99,7 @@ test("Ride vehicle is powered", t =>
 		Mock.car({ id: 77, rideObject: 24, vehicleObject: 0 })
 	]});
 
-	const rideVehicle = new RideVehicle(77, () => t.fail("Car id not found"));
+	const rideVehicle = new RideVehicle(77);
 
 	t.true(rideVehicle.isPowered());
 });
@@ -119,7 +116,7 @@ test("Ride vehicle is not powered", t =>
 		Mock.car({ id: 68, rideObject: 9, vehicleObject: 0 })
 	]});
 
-	const rideVehicle = new RideVehicle(68, () => t.fail("Car id not found"));
+	const rideVehicle = new RideVehicle(68);
 
 	t.false(rideVehicle.isPowered());
 });
