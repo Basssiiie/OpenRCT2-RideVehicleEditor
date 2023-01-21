@@ -1,3 +1,5 @@
+import { invoke, refreshVehicle } from "./events";
+
 /**
  * A tuple for targeting a span of entities. The first tuple value specifies a car id
  * and the second tuple value specifies to how many vehicles the change should be applied.
@@ -27,6 +29,7 @@ export function forEachVehicle(vehicles: VehicleSpan[], action: (car: Car, index
 				break;
 
 			action(car, count);
+			invoke(refreshVehicle, currentId);
 
 			const nextId = car.nextCarOnTrain;
 			if (nextId === null)

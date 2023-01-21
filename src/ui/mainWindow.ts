@@ -53,7 +53,6 @@ export const mainWindow = window({
 	height: 401,
 	spacing: 5,
 	onOpen: () => model.open(),
-	onUpdate: () => model.update(),
 	onClose: () => rideWindow.close(),
 	content: [
 		groupbox([ // selection top bar
@@ -329,7 +328,7 @@ export const mainWindow = window({
 								disabled: compute(model.isEditDisabled, model.selectedVehicle, (noEdit, vehicle) => (noEdit || !vehicle || vehicle[1] === 0)),
 								step: model.multiplier,
 								value: compute(model.spacing, v => v || 0),
-								format: v => (v) ? v.toString() : "Too far away",
+								format: v => (v > 0) ? v.toString() : "Too far away",
 								onChange: (_, incr) => model.modifyVehicle(changeSpacing, incr)
 							}),
 							positionSpinner({

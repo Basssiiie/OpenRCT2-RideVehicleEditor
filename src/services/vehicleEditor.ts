@@ -216,7 +216,7 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 		{
 			callback = (car, index): void =>
 			{
-				const distance = getDistanceFromProgress(car, value * (index + 1));
+				const distance = getDistanceFromProgress(car, value * -(index + 1));
 				car.travelBy(distance);
 			};
 			break;

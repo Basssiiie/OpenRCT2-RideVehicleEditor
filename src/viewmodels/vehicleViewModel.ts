@@ -57,6 +57,7 @@ export class VehicleViewModel
 	readonly clipboard = store<VehicleSettings | null>(null);
 
 	private _onPlayerAction?: IDisposable;
+	private _onGameTick?: IDisposable;
 
 	constructor()
 	{
@@ -73,6 +74,7 @@ export class VehicleViewModel
 		});
 		refreshVehicle.push(id =>
 		{
+			Log.debug("[VehicleViewModel] Refresh vehicle!");
 			const vehicle = this.selectedVehicle.get();
 			if (vehicle && vehicle[0].id === id)
 			{
@@ -90,6 +92,7 @@ export class VehicleViewModel
 		this.rides.set(getAllRides());
 
 		this._onPlayerAction ||= context.subscribe("action.execute", e => this._onPlayerActionExecuted(e));
+		this._onGameTick ||= context.subscribe("interval.tick", () => this._onGameTickExecuted());
 	}
 
 	/**
@@ -97,23 +100,17 @@ export class VehicleViewModel
 	 */
 	close(): void
 	{
+		Log.debug("[VehicleViewModel] Window closed!");
 		if (this._onPlayerAction)
 		{
 			this._onPlayerAction.dispose();
 		}
-		this._onPlayerAction = undefined;
-	}
-
-	/**
-	 * Synchronise the data of the model with the car.
-	 */
-	update(): void
-	{
-		const vehicle = this.selectedVehicle.get();
-		if (vehicle)
+		if (this._onGameTick)
 		{
-			this._updateDynamicDataFromCar(vehicle[0].car(), vehicle[1]);
+			this._onGameTick.dispose();
 		}
+		this._onPlayerAction = undefined;
+		this._onGameTick = undefined;
 	}
 
 	/**
@@ -224,6 +221,18 @@ export class VehicleViewModel
 			const status = train[0].at(0).car().status;
 			this.isMoving.set(isMoving(status));
 			this.spacing.set(getSpacingToPrecedingVehicle(train[0], car, index));
+		}
+	}
+
+	/**
+	 * Synchronise the data of the model with the car.
+	 */
+	private _onGameTickExecuted(): void
+	{
+		const vehicle = this.selectedVehicle.get();
+		if (vehicle)
+		{
+			this._updateDynamicDataFromCar(vehicle[0].car(), vehicle[1]);
 		}
 	}
 

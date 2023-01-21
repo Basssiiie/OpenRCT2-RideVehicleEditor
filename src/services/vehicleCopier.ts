@@ -4,7 +4,6 @@ import { RideVehicle } from "../objects/rideVehicle";
 import { register } from "./actions";
 import * as Log from "../utilities/logger";
 import { forEachVehicle, VehicleSpan } from "./vehicleSpan";
-import { invoke, refreshVehicle } from "./events";
 
 
 const execute = register<PasteVehicleSettingsArgs>("rve-paste-car", pasteVehicleSettings);
@@ -216,12 +215,6 @@ function applyVehicleSettings(car: Car, settings: VehicleSettings): void
 	if (colours)
 	{
 		car.colours = { body: colours[0], trim: colours[1], tertiary: colours[2] };
-	}
-
-	const id = car.id;
-	if (id !== null)
-	{
-		invoke(refreshVehicle, id);
 	}
 }
 

@@ -2,8 +2,11 @@ import { RideTrain } from "../objects/rideTrain";
 import { getSubpositionTranslationDistance, getTrackDistances, TrackDistances } from "./subpositionHelper";
 import * as Log from "../utilities/logger";
 
-const MaxForwardIterations = 5;
+const MaxForwardIterations = 10;
 const UnitsPerTile = 32;
+const MaximumDistanceFromCap = 3277;
+const ForwardDistanceCap = (13_962 - MaximumDistanceFromCap);
+const BackwardDistanceCap = (0 + MaximumDistanceFromCap);
 
 
 /**
@@ -40,6 +43,7 @@ export function getDistanceFromProgress(car: Car, trackProgress: number): number
 
 	let trackPosition = currentTrackLocation;
 	let trackDistances = getTrackDistances(iteratorSegment, subposition, trackPosition.direction);
+	subpositionIterator._setInitialDistanceFromCarRemainingDistance(car.remainingDistance);
 
 	while (subpositionIterator._remainingProgress > 0 && iteratorSegment)
 	{
@@ -127,6 +131,7 @@ export function getSpacingToPrecedingVehicle(train: RideTrain, car: Car, carInde
 	for (let i = 0; i < MaxForwardIterations; i++)
 	{
 		iterator.next();
+		totalDistance++;
 
 		const iteratorPosition = iterator.position;
 		if (isLocationEqual(iteratorPosition, inFrontTrackLocation))
@@ -217,6 +222,12 @@ abstract class SubpositionIterator
 	}
 
 	/**
+	 * Add some extra distance to offset the game's internal movement cap. This fixes a +1 not
+	 * actually doing a +1 because the vehicle didn't reach the cap for moving yet.
+	 */
+	abstract _setInitialDistanceFromCarRemainingDistance(remainingDistance: number): void;
+
+	/**
 	 * Walk through a track piece subposition list until the remaining progress runs out.
 	 */
 	abstract _iterateSegment(trackDistances: Readonly<TrackDistances>): void;
@@ -237,6 +248,13 @@ abstract class SubpositionIterator
  */
 class ForwardIterator extends SubpositionIterator
 {
+	override _setInitialDistanceFromCarRemainingDistance(remainingDistance: number): void
+	{
+		if (remainingDistance < ForwardDistanceCap)
+		{
+			this._totalDistance += (ForwardDistanceCap - remainingDistance);
+		}
+	}
 	override _iterateSegment(trackDistances: Readonly<TrackDistances>): void
 	{
 		const trackPieceLength = trackDistances._progressLength;
@@ -276,6 +294,13 @@ class ForwardIterator extends SubpositionIterator
  */
 class BackwardIterator extends SubpositionIterator
 {
+	override _setInitialDistanceFromCarRemainingDistance(remainingDistance: number): void
+	{
+		if (remainingDistance > BackwardDistanceCap)
+		{
+			this._totalDistance += (remainingDistance - BackwardDistanceCap);
+		}
+	}
 	override _iterateSegment(trackDistances: Readonly<TrackDistances>): void
 	{
 		const trackPieceLength = trackDistances._progressLength;

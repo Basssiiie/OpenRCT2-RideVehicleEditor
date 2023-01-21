@@ -22,3 +22,9 @@ export function invoke(event: Event<never>, params?: never): void
  * Event to indicate the specified vehicle should be refreshed.
  */
 export const refreshVehicle: Event<number> = [];
+
+
+/**
+ * Event to indicate the specified ride should be refreshed.
+ */
+export const refreshRide: Event<number> = [];
