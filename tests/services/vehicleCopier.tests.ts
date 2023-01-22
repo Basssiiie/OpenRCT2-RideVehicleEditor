@@ -29,8 +29,8 @@ const getTargetsMacro = test.macro((t, option: CopyOptions, trainIndex: number, 
 		...createTrain(40),
 	]});
 	const ride = new ParkRide(Mock.ride({ vehicles: [ 10, 20, 30, 40 ] }));
-	const train = ride.trains()[trainIndex];
-	const vehicle = train.at(vehicleIndex);
+	const train = ride._trains()[trainIndex];
+	const vehicle = train._at(vehicleIndex);
 
 	const targets = getTargets(option, [ride, 25], [train, trainIndex], [vehicle, vehicleIndex]);
 
@@ -81,13 +81,13 @@ test("Get all settings of the vehicle", t =>
 
 	const settings = getVehicleSettings(vehicle, CopyFilter.All);
 
-	t.is(settings.rideTypeId, 23);
-	t.is(settings.variant, 1);
-	t.is(settings.seats, 8);
-	t.is(settings.mass, 7500);
-	t.is(settings.poweredAcceleration, 10);
-	t.is(settings.poweredMaxSpeed, 20);
-	t.deepEqual(settings.colours, [3, 7, 11]);
+	t.is(settings._rideTypeId, 23);
+	t.is(settings._variant, 1);
+	t.is(settings._seats, 8);
+	t.is(settings._mass, 7500);
+	t.is(settings._poweredAcceleration, 10);
+	t.is(settings._poweredMaxSpeed, 20);
+	t.deepEqual(settings._colours, [3, 7, 11]);
 });
 
 
@@ -109,13 +109,13 @@ test("Get none of the settings of the vehicle", t =>
 
 	const settings = getVehicleSettings(vehicle, 0);
 
-	t.is(settings.rideTypeId, undefined);
-	t.is(settings.variant, undefined);
-	t.is(settings.seats, undefined);
-	t.is(settings.mass, undefined);
-	t.is(settings.poweredAcceleration, undefined);
-	t.is(settings.poweredMaxSpeed, undefined);
-	t.deepEqual(settings.colours, undefined);
+	t.is(settings._rideTypeId, undefined);
+	t.is(settings._variant, undefined);
+	t.is(settings._seats, undefined);
+	t.is(settings._mass, undefined);
+	t.is(settings._poweredAcceleration, undefined);
+	t.is(settings._poweredMaxSpeed, undefined);
+	t.deepEqual(settings._colours, undefined);
 });
 
 
@@ -134,8 +134,8 @@ test("Get no powered settings of unpowered vehicle", t =>
 
 	const settings = getVehicleSettings(vehicle, CopyFilter.All);
 
-	t.is(settings.poweredAcceleration, undefined);
-	t.is(settings.poweredMaxSpeed, undefined);
+	t.is(settings._poweredAcceleration, undefined);
+	t.is(settings._poweredMaxSpeed, undefined);
 });
 
 
@@ -161,13 +161,13 @@ test("Paste all vehicle settings on single car", t =>
 	]});
 
 	const settings: VehicleSettings = {
-		rideTypeId: 21,
-		variant: 3,
-		seats: 6,
-		mass: 102,
-		poweredAcceleration: 34,
-		poweredMaxSpeed: 4,
-		colours: [ 13, 15, 18 ]
+		_rideTypeId: 21,
+		_variant: 3,
+		_seats: 6,
+		_mass: 102,
+		_poweredAcceleration: 34,
+		_poweredMaxSpeed: 4,
+		_colours: [ 13, 15, 18 ]
 	};
 
 	applyToTargets(settings, [[ 99, 1 ]]);
@@ -195,13 +195,13 @@ test("Paste all vehicle settings on a car does not affect other cars", t =>
 	]});
 
 	const settings: VehicleSettings = {
-		rideTypeId: 21,
-		variant: 3,
-		seats: 6,
-		mass: 102,
-		poweredAcceleration: 34,
-		poweredMaxSpeed: 4,
-		colours: [ 13, 15, 18 ]
+		_rideTypeId: 21,
+		_variant: 3,
+		_seats: 6,
+		_mass: 102,
+		_poweredAcceleration: 34,
+		_poweredMaxSpeed: 4,
+		_colours: [ 13, 15, 18 ]
 	};
 
 	applyToTargets(settings, [[ 99, 3 ], [ 99, null ]]);
@@ -258,13 +258,13 @@ test("Paste all vehicle settings on multiple trains car affects all", t =>
 	]});
 
 	const settings: VehicleSettings = {
-		rideTypeId: 76,
-		variant: 2,
-		seats: 1,
-		mass: 19,
-		poweredAcceleration: 67,
-		poweredMaxSpeed: 110,
-		colours: [ 8, 6, 5 ]
+		_rideTypeId: 76,
+		_variant: 2,
+		_seats: 1,
+		_mass: 19,
+		_poweredAcceleration: 67,
+		_poweredMaxSpeed: 110,
+		_colours: [ 8, 6, 5 ]
 	};
 
 	applyToTargets(settings, [[ 98, 4 ], [ 97, null ]]);

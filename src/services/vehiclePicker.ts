@@ -22,7 +22,7 @@ export function toggleVehiclePicker(isPressed: boolean, onPick: (car: Car) => vo
 					const entity = map.getEntity(entityId);
 					if (!entity || entity.type !== "car")
 					{
-						Log.debug(`(selector) Invalid entity id selected: ${entityId}.`);
+						Log.debug("(selector) Invalid entity id selected:", entityId);
 						return;
 					}
 

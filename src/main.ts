@@ -33,10 +33,10 @@ function openEditorWindow(): void
  */
 function showUpdateError(message: string): void
 {
-	const title = "Please update the game!";
+	const title = "Please update the game! ";
 
 	ui.showError(title, message);
-	console.log(`[RideVehicleEditor] ${title} ${message}`);
+	console.log("[RideVehicleEditor] " + title + message);
 }
 
 

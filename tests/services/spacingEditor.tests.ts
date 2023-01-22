@@ -407,7 +407,7 @@ test("Flat track: get spacing to preceding vehicle 1 step away", t =>
 		{ trackProgress: 16, trackLocation: flatTrackPiece.position }
 	]);
 
-	const spacing = getSpacingToPrecedingVehicle(train, train.at(1).car(), 1);
+	const spacing = getSpacingToPrecedingVehicle(train, train._at(1)._car(), 1);
 
 	t.is(spacing, 1);
 });
@@ -421,7 +421,7 @@ test("Flat track: get spacing to preceding vehicle 10 step away", t =>
 		{ trackProgress: 7, trackLocation: flatTrackPiece.position }
 	]);
 
-	const spacing = getSpacingToPrecedingVehicle(train, train.at(1).car(), 1);
+	const spacing = getSpacingToPrecedingVehicle(train, train._at(1)._car(), 1);
 
 	t.is(spacing, 10);
 });
@@ -435,7 +435,7 @@ test("Flat track: get spacing to preceding vehicle 31 step away", t =>
 		{ trackProgress: 0, trackLocation: flatTrackPiece.position } // back car
 	]);
 
-	const spacing = getSpacingToPrecedingVehicle(train, train.at(1).car(), 1);
+	const spacing = getSpacingToPrecedingVehicle(train, train._at(1)._car(), 1);
 
 	t.is(spacing, 31);
 });
@@ -449,7 +449,7 @@ test("Flat track: get spacing to preceding vehicle is too far away", t =>
 		{ trackProgress: 10, trackLocation: flatTrackPiece.position }
 	]);
 
-	const spacing = getSpacingToPrecedingVehicle(train, train.at(1).car(), 1);
+	const spacing = getSpacingToPrecedingVehicle(train, train._at(1)._car(), 1);
 
 	t.is(spacing, null);
 });
@@ -463,7 +463,7 @@ test("Two flat tracks: get spacing to next track piece by 1", t =>
 		{ trackProgress: 0, trackLocation: pieces[1].position }, // front car
 		{ trackProgress: 31, trackLocation: pieces[0].position } // back car
 	]);
-	const car = train.at(1).car();
+	const car = train._at(1)._car();
 
 	const spacing = getSpacingToPrecedingVehicle(train, car, 1);
 
@@ -479,7 +479,7 @@ test("Two flat tracks: get spacing to next track piece by 10", t =>
 		{ trackProgress: 3, trackLocation: pieces[1].position }, // front car
 		{ trackProgress: 25, trackLocation: pieces[0].position } // back car
 	]);
-	const car = train.at(1).car();
+	const car = train._at(1)._car();
 
 	const spacing = getSpacingToPrecedingVehicle(train, car, 1);
 
@@ -495,7 +495,7 @@ test("Three flat tracks: get spacing to next track piece by 50", t =>
 		{ trackProgress: 5, trackLocation: pieces[2].position }, // front car
 		{ trackProgress: 19, trackLocation: pieces[0].position } // back car
 	]);
-	const car = train.at(1).car();
+	const car = train._at(1)._car();
 
 	const spacing = getSpacingToPrecedingVehicle(train, car, 1);
 

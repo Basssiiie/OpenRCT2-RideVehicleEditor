@@ -18,12 +18,12 @@ test("getAllRideTypes() gets all ride types", t =>
 	const rideTypes = getAllRideTypes();
 
 	t.is(rideTypes.length, 3);
-	t.is(rideTypes[0].id, 3);
-	t.is(rideTypes[0].object().name, "Log flume");
-	t.is(rideTypes[1].id, 4);
-	t.is(rideTypes[1].object().name, "Space Rings");
-	t.is(rideTypes[2].id, 5);
-	t.is(rideTypes[2].object().name, "Twister");
+	t.is(rideTypes[0]._id, 3);
+	t.is(rideTypes[0]._object().name, "Log flume");
+	t.is(rideTypes[1]._id, 4);
+	t.is(rideTypes[1]._object().name, "Space Rings");
+	t.is(rideTypes[2]._id, 5);
+	t.is(rideTypes[2]._object().name, "Twister");
 });
 
 
@@ -38,12 +38,12 @@ test("getAllRideTypes() sorts ride types alphabetically", t =>
 	const rideTypes = getAllRideTypes();
 
 	t.is(rideTypes.length, 3);
-	t.is(rideTypes[0].id, 4);
-	t.is(rideTypes[0].object().name, "Log flume");
-	t.is(rideTypes[1].id, 5);
-	t.is(rideTypes[1].object().name, "Space Rings");
-	t.is(rideTypes[2].id, 3);
-	t.is(rideTypes[2].object().name, "Twister");
+	t.is(rideTypes[0]._id, 4);
+	t.is(rideTypes[0]._object().name, "Log flume");
+	t.is(rideTypes[1]._id, 5);
+	t.is(rideTypes[1]._object().name, "Space Rings");
+	t.is(rideTypes[2]._id, 3);
+	t.is(rideTypes[2]._object().name, "Twister");
 });
 
 
@@ -58,8 +58,8 @@ test("getAllRideTypes() skips stalls", t =>
 	const rideTypes = getAllRideTypes();
 
 	t.is(rideTypes.length, 1);
-	t.is(rideTypes[0].id, 6);
-	t.is(rideTypes[0].object().name, "Log flume");
+	t.is(rideTypes[0]._id, 6);
+	t.is(rideTypes[0]._object().name, "Log flume");
 });
 
 
@@ -72,8 +72,8 @@ test("Ride type gets created from type id", t =>
 
 	const rideType = new RideType(12);
 
-	t.is(rideType.id, 12);
-	t.is(rideType.object().name, "Log flume");
+	t.is(rideType._id, 12);
+	t.is(rideType._object().name, "Log flume");
 });
 
 
@@ -83,8 +83,8 @@ test("Ride type gets created from ride object", t =>
 
 	const rideType = new RideType(rideObject);
 
-	t.is(rideType.id, 14);
-	t.is(rideType.object().name, "Dinghy Slide");
+	t.is(rideType._id, 14);
+	t.is(rideType._object().name, "Dinghy Slide");
 });
 
 
@@ -97,11 +97,11 @@ test("Ride type refreshes correctly", t =>
 
 	const rideType = new RideType(12);
 
-	t.is(rideType.id, 12);
-	t.is(rideType.object().name, "Log flume");
+	t.is(rideType._id, 12);
+	t.is(rideType._object().name, "Log flume");
 
-	rideType.refresh();
-	t.is(rideType.object().name, "Log flume");
+	rideType._refresh();
+	t.is(rideType._object().name, "Log flume");
 });
 
 
@@ -117,11 +117,11 @@ test("Ride type counts all variants", t =>
 	});
 
 	const rideType = new RideType(rideObject);
-	const variants = rideType.variants();
+	const variants = rideType._variants();
 
-	t.is(variants[0].visibility, VehicleVisibility.Visible);
-	t.is(variants[1].visibility, VehicleVisibility.Visible);
-	t.is(variants[2].visibility, VehicleVisibility.GreenSquare);
+	t.is(variants[0]._visibility, VehicleVisibility.Visible);
+	t.is(variants[1]._visibility, VehicleVisibility.Visible);
+	t.is(variants[2]._visibility, VehicleVisibility.GreenSquare);
 	t.is(variants.length, 3);
 });
 
@@ -139,13 +139,13 @@ test("Ride type recognises gaps in variants", t =>
 	});
 
 	const rideType = new RideType(rideObject);
-	const variants = rideType.variants();
+	const variants = rideType._variants();
 
-	t.is(variants[0].visibility, VehicleVisibility.Visible);
-	t.is(variants[1].visibility, VehicleVisibility.GreenSquare);
-	t.is(variants[2].visibility, VehicleVisibility.GreenSquare);
-	t.is(variants[3].visibility, VehicleVisibility.Visible);
-	t.is(variants[4].visibility, VehicleVisibility.Invisible);
+	t.is(variants[0]._visibility, VehicleVisibility.Visible);
+	t.is(variants[1]._visibility, VehicleVisibility.GreenSquare);
+	t.is(variants[2]._visibility, VehicleVisibility.GreenSquare);
+	t.is(variants[3]._visibility, VehicleVisibility.Visible);
+	t.is(variants[4]._visibility, VehicleVisibility.Invisible);
 	t.is(variants.length, 5);
 });
 
@@ -160,9 +160,9 @@ test("Ride type with zero variants", t =>
 	});
 
 	const rideType = new RideType(rideObject);
-	const variants = rideType.variants();
+	const variants = rideType._variants();
 
-	t.is(variants[0].visibility, VehicleVisibility.GreenSquare); // extra invisible
+	t.is(variants[0]._visibility, VehicleVisibility.GreenSquare); // extra invisible
 	t.is(variants.length, 1);
 });
 
@@ -179,11 +179,11 @@ test("Ride type with all variants", t =>
 	});
 
 	const rideType = new RideType(rideObject);
-	const variants = rideType.variants();
+	const variants = rideType._variants();
 
-	t.is(variants[0].visibility, VehicleVisibility.Visible);
-	t.is(variants[1].visibility, VehicleVisibility.Visible);
-	t.is(variants[2].visibility, VehicleVisibility.Visible);
-	t.is(variants[3].visibility, VehicleVisibility.Visible);
+	t.is(variants[0]._visibility, VehicleVisibility.Visible);
+	t.is(variants[1]._visibility, VehicleVisibility.Visible);
+	t.is(variants[2]._visibility, VehicleVisibility.Visible);
+	t.is(variants[3]._visibility, VehicleVisibility.Visible);
 	t.is(variants.length, 4);
 });

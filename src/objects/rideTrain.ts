@@ -7,8 +7,8 @@ import { RideVehicle } from "./rideVehicle";
  */
 export class RideTrain
 {
-	readonly carId: number;
-	private _vehicles?: RideVehicle[] | null;
+	readonly _carId: number;
+	private _rideVehicles?: RideVehicle[] | null;
 
 
 	/**
@@ -18,19 +18,19 @@ export class RideTrain
 	constructor(carId: number)
 	{
 		Log.assert(carId !== 0xFFFF, "Invalid car id");
-		this.carId = carId;
-		this.refresh();
+		this._carId = carId;
+		this._refresh();
 	}
 
 
 	/**
 	 * Refreshes the vehicle entities for this train, in case they got respawned.
 	 */
-	refresh(): boolean
+	_refresh(): boolean
 	{
 		const vehicleList: RideVehicle[] = [];
 
-		let currentId: (number | null) = this.carId;
+		let currentId: (number | null) = this._carId;
 		let car: Car | null = null;
 
 		while (currentId != null
@@ -44,12 +44,12 @@ export class RideTrain
 
 		if (vehicleList.length > 0)
 		{
-			this._vehicles = vehicleList;
+			this._rideVehicles = vehicleList;
 			return true;
 		}
 
-		Log.debug(`Ride train refresh(): selected train with id '${this.carId}' went missing.`);
-		this._vehicles = null;
+		Log.debug("Ride train refresh(): selected train with id", this._carId, "went missing.");
+		this._rideVehicles = null;
 		return false;
 	}
 
@@ -57,20 +57,20 @@ export class RideTrain
 	/**
 	 * Gets a list of all cars in this train, from front to back.
 	 */
-	vehicles(): RideVehicle[]
+	_vehicles(): RideVehicle[]
 	{
-		Log.assert(!!this._vehicles, `Selected train with car id '${this.carId}' is missing.`);
-		return <RideVehicle[]>this._vehicles;
+		Log.assert(!!this._rideVehicles, "Selected train with car id", this._carId, "is missing.");
+		return <RideVehicle[]>this._rideVehicles;
 	}
 
 
 	/**
 	 * Gets the vehicle at the specific index.
 	 */
-	at(index: number): RideVehicle
+	_at(index: number): RideVehicle
 	{
-		const vehicles = this.vehicles();
-		Log.assert(0 <= index && index < vehicles.length, `Vehicle index ${index} out of range for train of length ${vehicles.length}`);
+		const vehicles = this._vehicles();
+		Log.assert(0 <= index && index < vehicles.length, "Vehicle index", index, "out of range for train of length", vehicles.length);
 		return vehicles[index];
 	}
 }

@@ -16,56 +16,56 @@ import * as Log from "../utilities/logger";
  */
 export class VehicleViewModel
 {
-	readonly selectedRide = store<[ParkRide, number] | null>(null);
-	readonly selectedTrain = store<[RideTrain, number] | null>(null);
-	readonly selectedVehicle = store<[RideVehicle, number] | null>(null);
+	readonly _selectedRide = store<[ParkRide, number] | null>(null);
+	readonly _selectedTrain = store<[RideTrain, number] | null>(null);
+	readonly _selectedVehicle = store<[RideVehicle, number] | null>(null);
 
-	readonly rideTypes = store<RideType[]>([]);
-	readonly rides = store<ParkRide[]>([]);
-	readonly trains = compute(this.selectedRide, r => (r) ? r[0].trains() : []);
-	readonly vehicles = compute(this.selectedTrain, t => (t) ? t[0].vehicles() : []);
+	readonly _rideTypes = store<RideType[]>([]);
+	readonly _rides = store<ParkRide[]>([]);
+	readonly _trains = compute(this._selectedRide, r => (r) ? r[0]._trains() : []);
+	readonly _vehicles = compute(this._selectedTrain, t => (t) ? t[0]._vehicles() : []);
 
-	readonly type = store<[RideType, number] | null>(null);
-	readonly variants = compute(this.type, t => (t) ? t[0].variants() : []);
-	readonly variant = store<number>(0);
-	readonly seats = store<number>(0);
-	readonly mass = store<number>(0);
-	readonly poweredAcceleration = store<number>(0);
-	readonly poweredMaxSpeed = store<number>(0);
-	readonly trackProgress = store<number>(0);
-	readonly spacing = store<number | null>(0);
-	readonly x = store<number>(0);
-	readonly y = store<number>(0);
-	readonly z = store<number>(0);
+	readonly _type = store<[RideType, number] | null>(null);
+	readonly _variants = compute(this._type, t => (t) ? t[0]._variants() : []);
+	readonly _variant = store<number>(0);
+	readonly _seats = store<number>(0);
+	readonly _mass = store<number>(0);
+	readonly _poweredAcceleration = store<number>(0);
+	readonly _poweredMaxSpeed = store<number>(0);
+	readonly _trackProgress = store<number>(0);
+	readonly _spacing = store<number | null>(0);
+	readonly _x = store<number>(0);
+	readonly _y = store<number>(0);
+	readonly _z = store<number>(0);
 
-	readonly primaryColour = store<Colour>(0);
-	readonly secondaryColour = store<Colour>(0);
-	readonly tertiaryColour = store<Colour>(0);
+	readonly _primaryColour = store<Colour>(0);
+	readonly _secondaryColour = store<Colour>(0);
+	readonly _tertiaryColour = store<Colour>(0);
 
-	readonly isMoving = store(false);
-	readonly isUnpowered = compute(this.selectedVehicle, this.type, this.variant, v => !v || !v[0].isPowered());
-	readonly isPicking = store<boolean>(false);
-	readonly isEditDisabled = compute(this.selectedVehicle, v => !v);
-	readonly isPositionDisabled = compute(this.isMoving, this.isEditDisabled, (m, e) => m || e);
-	readonly formatPosition = (pos: number): string => (this.isEditDisabled.get() ? "Not available" : pos.toString());
-	readonly multiplier = store<number>(1);
+	readonly _isMoving = store(false);
+	readonly _isUnpowered = compute(this._selectedVehicle, this._type, this._variant, v => !v || !v[0]._isPowered());
+	readonly _isPicking = store<boolean>(false);
+	readonly _isEditDisabled = compute(this._selectedVehicle, v => !v);
+	readonly _isPositionDisabled = compute(this._isMoving, this._isEditDisabled, (m, e) => m || e);
+	readonly _formatPosition = (pos: number): string => (this._isEditDisabled.get() ? "Not available" : pos.toString());
+	readonly _multiplier = store<number>(1);
 
-	readonly copyFilters = store<CopyFilter>(0);
-	readonly copyTargetOption = store<CopyOptions>(0);
-	readonly copyTargets = compute(this.copyTargetOption, this.selectedVehicle, (o, v) => getTargets(o, this.selectedRide.get(), this.selectedTrain.get(), v));
-	readonly synchronizeTargets = store<boolean>(false);
-	readonly clipboard = store<VehicleSettings | null>(null);
+	readonly _copyFilters = store<CopyFilter>(0);
+	readonly _copyTargetOption = store<CopyOptions>(0);
+	readonly _copyTargets = compute(this._copyTargetOption, this._selectedVehicle, (o, v) => getTargets(o, this._selectedRide.get(), this._selectedTrain.get(), v));
+	readonly _synchronizeTargets = store<boolean>(false);
+	readonly _clipboard = store<VehicleSettings | null>(null);
 
 	private _onPlayerAction?: IDisposable;
 	private _onGameTick?: IDisposable;
 
 	constructor()
 	{
-		this.rides.subscribe(r => updateSelectionOrNull(this.selectedRide, r));
-		this.trains.subscribe(t => updateSelectionOrNull(this.selectedTrain, t));
-		this.vehicles.subscribe(v => updateSelectionOrNull(this.selectedVehicle, v));
+		this._rides.subscribe(r => updateSelectionOrNull(this._selectedRide, r));
+		this._trains.subscribe(t => updateSelectionOrNull(this._selectedTrain, t));
+		this._vehicles.subscribe(v => updateSelectionOrNull(this._selectedVehicle, v));
 
-		this.selectedVehicle.subscribe(vehicle =>
+		this._selectedVehicle.subscribe(vehicle =>
 		{
 			if (vehicle)
 			{
@@ -75,8 +75,8 @@ export class VehicleViewModel
 		refreshVehicle.push(id =>
 		{
 			Log.debug("[VehicleViewModel] Refresh vehicle!");
-			const vehicle = this.selectedVehicle.get();
-			if (vehicle && vehicle[0].id === id)
+			const vehicle = this._selectedVehicle.get();
+			if (vehicle && vehicle[0]._id === id)
 			{
 				this._updateVehicleInfo(vehicle[0], vehicle[1]);
 			}
@@ -86,10 +86,10 @@ export class VehicleViewModel
 	/**
 	 * Reload available rides and ride types when the window opens.
 	 */
-	open(): void
+	_open(): void
 	{
-		this.rideTypes.set(getAllRideTypes());
-		this.rides.set(getAllRides());
+		this._rideTypes.set(getAllRideTypes());
+		this._rides.set(getAllRides());
 
 		this._onPlayerAction ||= context.subscribe("action.execute", e => this._onPlayerActionExecuted(e));
 		this._onGameTick ||= context.subscribe("interval.tick", () => this._onGameTickExecuted());
@@ -98,7 +98,7 @@ export class VehicleViewModel
 	/**
 	 * Disposes events that were being listened for.
 	 */
-	close(): void
+	_close(): void
 	{
 		Log.debug("[VehicleViewModel] Window closed!");
 		if (this._onPlayerAction)
@@ -116,32 +116,32 @@ export class VehicleViewModel
 	/**
 	 * Select a specific car entity.
 	 */
-	select(car: Car): void
+	_select(car: Car): void
 	{
 		const
-			rides = this.rides.get(),
+			rides = this._rides.get(),
 			carId = car.id,
 			rideId = car.ride,
-			carRideIndex = findIndex(rides, r => r.id === rideId);
+			carRideIndex = findIndex(rides, r => r._id === rideId);
 
 		if (carRideIndex === null)
 		{
-			Log.debug(`Could not find ride id ${rideId} for selected entity id ${carId}.`);
+			Log.debug("Could not find ride id", rideId, "for selected entity id", carId);
 			return;
 		}
 
-		this.selectedRide.set([ rides[carRideIndex], carRideIndex ]);
+		this._selectedRide.set([ rides[carRideIndex], carRideIndex ]);
 
-		const trains = this.trains.get();
+		const trains = this._trains.get();
 		for (let t = 0; t < trains.length; t++)
 		{
-			const vehicles = trains[t].vehicles();
+			const vehicles = trains[t]._vehicles();
 			for (let v = 0; v < vehicles.length; v++)
 			{
-				if (vehicles[v].id === carId)
+				if (vehicles[v]._id === carId)
 				{
-					this.selectedTrain.set([ trains[t], t ]);
-					this.selectedVehicle.set([ vehicles[v], v ]);
+					this._selectedTrain.set([ trains[t], t ]);
+					this._selectedVehicle.set([ vehicles[v], v ]);
 					return;
 				}
 			}
@@ -151,34 +151,34 @@ export class VehicleViewModel
 	/**
 	 * Attempt to modify the vehicle with the specified action, if a vehicle is selected.
 	 */
-	modifyVehicle<T>(action: (vehicles: VehicleSpan[], value: T) => void, value: T): void
+	_modifyVehicle<T>(action: (vehicles: VehicleSpan[], value: T) => void, value: T): void
 	{
-		const vehicle = this.selectedVehicle.get();
+		const vehicle = this._selectedVehicle.get();
 		if (vehicle)
 		{
-			if (this.synchronizeTargets.get())
+			if (this._synchronizeTargets.get())
 			{
-				action(this.copyTargets.get(), value);
+				action(this._copyTargets.get(), value);
 			}
 			else
 			{
-				action([[ vehicle[0].id, 1 ]], value);
+				action([[ vehicle[0]._id, 1 ]], value);
 			}
 		}
 		else
 		{
-			Log.debug(`Failed to modify vehicle with '${action?.name}' to '${value}'; none is selected.`);
+			Log.debug("Failed to modify vehicle with", action?.name, "to", value, "; none is selected.");
 		}
 	}
 
 	/**
 	 * Toggle a filter on or off.
 	 */
-	setFilter(filter: CopyFilter, toggle: boolean): void
+	_setFilter(filter: CopyFilter, toggle: boolean): void
 	{
-		const enabledFilters = this.copyFilters.get();
+		const enabledFilters = this._copyFilters.get();
 
-		this.copyFilters.set((toggle)
+		this._copyFilters.set((toggle)
 			? (enabledFilters | filter)
 			: (enabledFilters & ~filter)
 		);
@@ -189,17 +189,17 @@ export class VehicleViewModel
 	 */
 	private _updateVehicleInfo(vehicle: RideVehicle, index: number): void
 	{
-		const car = vehicle.car(), types = this.rideTypes.get();
-		const typeIdx = findIndex(types, t => t.id === car.rideObject);
+		const car = vehicle._car(), types = this._rideTypes.get();
+		const typeIdx = findIndex(types, t => t._id === car.rideObject);
 		const colours = car.colours;
 
-		this.type.set((typeIdx === null) ? null : [ types[typeIdx], typeIdx ]);
-		this.seats.set(car.numSeats);
-		this.poweredAcceleration.set(car.poweredAcceleration);
-		this.poweredMaxSpeed.set(car.poweredMaxSpeed);
-		this.primaryColour.set(colours.body);
-		this.secondaryColour.set(colours.trim);
-		this.tertiaryColour.set(colours.tertiary);
+		this._type.set((typeIdx === null) ? null : [ types[typeIdx], typeIdx ]);
+		this._seats.set(car.numSeats);
+		this._poweredAcceleration.set(car.poweredAcceleration);
+		this._poweredMaxSpeed.set(car.poweredMaxSpeed);
+		this._primaryColour.set(colours.body);
+		this._secondaryColour.set(colours.trim);
+		this._tertiaryColour.set(colours.tertiary);
 		this._updateDynamicDataFromCar(car, index);
 	}
 
@@ -208,19 +208,19 @@ export class VehicleViewModel
 	 */
 	private _updateDynamicDataFromCar(car: Car, index: number): void
 	{
-		this.variant.set(car.vehicleObject);
-		this.mass.set(car.mass);
-		this.trackProgress.set(car.trackProgress);
-		this.x.set(car.x);
-		this.y.set(car.y);
-		this.z.set(car.z);
+		this._variant.set(car.vehicleObject);
+		this._mass.set(car.mass);
+		this._trackProgress.set(car.trackProgress);
+		this._x.set(car.x);
+		this._y.set(car.y);
+		this._z.set(car.z);
 
-		const train = this.selectedTrain.get();
+		const train = this._selectedTrain.get();
 		if (train)
 		{
-			const status = train[0].at(0).car().status;
-			this.isMoving.set(isMoving(status));
-			this.spacing.set(getSpacingToPrecedingVehicle(train[0], car, index));
+			const status = train[0]._at(0)._car().status;
+			this._isMoving.set(isMoving(status));
+			this._spacing.set(getSpacingToPrecedingVehicle(train[0], car, index));
 		}
 	}
 
@@ -229,10 +229,10 @@ export class VehicleViewModel
 	 */
 	private _onGameTickExecuted(): void
 	{
-		const vehicle = this.selectedVehicle.get();
+		const vehicle = this._selectedVehicle.get();
 		if (vehicle)
 		{
-			this._updateDynamicDataFromCar(vehicle[0].car(), vehicle[1]);
+			this._updateDynamicDataFromCar(vehicle[0]._car(), vehicle[1]);
 		}
 	}
 
@@ -253,25 +253,25 @@ export class VehicleViewModel
 			case "ridedemolish":
 			case "ridesetname":
 			{
-				this.rides.set(getAllRides());
+				this._rides.set(getAllRides());
 				break;
 			}
 			case "ridesetstatus": // close/reopen ride
 			{
-				const ride = this.selectedRide.get();
+				const ride = this._selectedRide.get();
 				const statusArgs = <RideSetStatusArgs>event.args;
-				if (ride && ride[0].id === statusArgs.ride)
+				if (ride && ride[0]._id === statusArgs.ride)
 				{
-					const train = this.selectedTrain.get();
-					if (!train && ride[0].refresh())
+					const train = this._selectedTrain.get();
+					if (!train && ride[0]._refresh())
 					{
-						Log.debug(`Selected ride: status changed to ${statusArgs.status}, get newly spawned trains`);
-						this.trains.set(ride[0].trains());
+						Log.debug("Selected ride: status changed to", statusArgs.status, ", get newly spawned trains");
+						this._trains.set(ride[0]._trains());
 					}
-					else if (train && !train[0].refresh())
+					else if (train && !train[0]._refresh())
 					{
-						Log.debug(`Selected ride: status changed to ${statusArgs.status}, all trains removed`);
-						this.trains.set([]);
+						Log.debug("Selected ride: status changed to", statusArgs.status, ", all trains removed");
+						this._trains.set([]);
 					}
 				}
 				break;
@@ -279,7 +279,7 @@ export class VehicleViewModel
 			default: return;
 		}
 
-		Log.debug(`<${action}>\n\t- type: ${event.type} (client: ${event.isClientOnly})\n\t- args: ${JSON.stringify(event.args)}\n\t- result: ${JSON.stringify(event.result)}`);
+		Log.debug("<", action, ">\n\t- type:", event.type, "(client:", event.isClientOnly, ")\n\t- args:", JSON.stringify(event.args), "\n\t- result:", JSON.stringify(event.result));
 	}
 }
 

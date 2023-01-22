@@ -19,9 +19,9 @@ const isDuktapeAvailable = (typeof Duktape !== "undefined");
 /**
  * Prints a message with the specified logging and plugin identifier.
  */
-function print(level: LogLevel, message: string): void
+function print(level: LogLevel, messages: unknown[]): void
 {
-	console.log(`<RVE/${level}> ${message}`);
+	console.log(`<FUI/${level}> ${messages.join(" ")}`);
 }
 
 
@@ -67,11 +67,11 @@ if (Environment.isDevelopment && isDuktapeAvailable)
 /**
  * Prints a debug message if the plugin is run in development mode.
  */
-export function debug(message: string): void
+export function debug(...messages: unknown[]): void
 {
 	if (Environment.isDevelopment)
 	{
-		print("debug", message);
+		print("debug", messages);
 	}
 }
 
@@ -79,9 +79,9 @@ export function debug(message: string): void
 /**
  * Prints a warning message to the console.
  */
-export function warning(message: string): void
+export function warning(...messages: unknown[]): void
 {
-	print("warning", message);
+	print("warning", messages);
 }
 
 
@@ -89,13 +89,13 @@ export function warning(message: string): void
  * Prints an error message to the console and an additional stacktrace
  * if the plugin is run in development mode.
  */
-export function error(message: string): void
+export function error(...messages: unknown[]): void
 {
 	if (Environment.isDevelopment)
 	{
-		message += (`\r\n${stacktrace()}`);
+		messages.push(`\r\n${stacktrace()}`);
 	}
-	print("error", message);
+	print("error", messages);
 }
 
 
@@ -103,11 +103,11 @@ export function error(message: string): void
  * Prints an error message to the console and an additional stacktrace
  * if the assert fails and the plugin is run in development mode.
  */
-export function assert(condition: boolean, message: string): void
+export function assert(condition: boolean, ...messages: unknown[]): void
 {
 	if (Environment.isDevelopment && !condition)
 	{
-		throw Error(`Assertion failed! ${message}`);
+		throw Error(`Assertion failed! ${messages.join(" ")}`);
 	}
 	return <never>0;
 }

@@ -16,12 +16,12 @@ test("getAllRides() returns park's rides", t =>
 	const rides = getAllRides();
 
 	t.is(rides.length, 2);
-	t.is(rides[0].id, 1);
-	t.is(rides[0].ride().classification, "ride");
-	t.is(rides[0].ride().name, "Freefall");
-	t.is(rides[1].id, 2);
-	t.is(rides[1].ride().classification, "ride");
-	t.is(rides[1].ride().name, "Twister");
+	t.is(rides[0]._id, 1);
+	t.is(rides[0]._ride().classification, "ride");
+	t.is(rides[0]._ride().name, "Freefall");
+	t.is(rides[1]._id, 2);
+	t.is(rides[1]._ride().classification, "ride");
+	t.is(rides[1]._ride().name, "Twister");
 });
 
 
@@ -36,15 +36,15 @@ test("getAllRides() returns park's rides sorted alphabetically", t =>
 	const rides = getAllRides();
 
 	t.is(rides.length, 3);
-	t.is(rides[0].id, 4);
-	t.is(rides[0].ride().classification, "ride");
-	t.is(rides[0].ride().name, "Bob Coaster");
-	t.is(rides[1].id, 2);
-	t.is(rides[1].ride().classification, "ride");
-	t.is(rides[1].ride().name, "Corkscrew Coaster");
-	t.is(rides[2].id, 3);
-	t.is(rides[2].ride().classification, "ride");
-	t.is(rides[2].ride().name, "Dipper");
+	t.is(rides[0]._id, 4);
+	t.is(rides[0]._ride().classification, "ride");
+	t.is(rides[0]._ride().name, "Bob Coaster");
+	t.is(rides[1]._id, 2);
+	t.is(rides[1]._ride().classification, "ride");
+	t.is(rides[1]._ride().name, "Corkscrew Coaster");
+	t.is(rides[2]._id, 3);
+	t.is(rides[2]._ride().classification, "ride");
+	t.is(rides[2]._ride().name, "Dipper");
 });
 
 
@@ -59,9 +59,9 @@ test("getAllRides() does not return stalls or facilities", t =>
 	const rides = getAllRides();
 
 	t.is(rides.length, 1);
-	t.is(rides[0].id, 11);
-	t.is(rides[0].ride().classification, "ride");
-	t.is(rides[0].ride().name, "Car Ride");
+	t.is(rides[0]._id, 11);
+	t.is(rides[0]._ride().classification, "ride");
+	t.is(rides[0]._ride().name, "Car Ride");
 });
 
 
@@ -71,9 +71,9 @@ test("Park ride gets created from ride", t =>
 
 	const parkRide = new ParkRide(ride);
 
-	t.is(parkRide.id, 15);
-	t.is(parkRide.ride().classification, "ride");
-	t.is(parkRide.ride().name, "Ferris Wheel");
+	t.is(parkRide._id, 15);
+	t.is(parkRide._ride().classification, "ride");
+	t.is(parkRide._ride().name, "Ferris Wheel");
 });
 
 
@@ -85,9 +85,9 @@ test("Park ride gets created from id", t =>
 
 	const parkRide = new ParkRide(37);
 
-	t.is(parkRide.id, 37);
-	t.is(parkRide.ride().classification, "ride");
-	t.is(parkRide.ride().name, "Crooked House");
+	t.is(parkRide._id, 37);
+	t.is(parkRide._ride().classification, "ride");
+	t.is(parkRide._ride().name, "Crooked House");
 });
 
 
@@ -98,16 +98,16 @@ test("Park ride refreshes correctly", t =>
 
 	const parkRide = new ParkRide(37);
 
-	t.is(parkRide.id, 37);
-	t.is(parkRide.ride().classification, "ride");
-	t.is(parkRide.ride().name, "Crooked House");
+	t.is(parkRide._id, 37);
+	t.is(parkRide._ride().classification, "ride");
+	t.is(parkRide._ride().name, "Crooked House");
 
 	ride.name = "Crooky Building";
-	parkRide.refresh();
+	parkRide._refresh();
 
-	t.is(parkRide.id, 37);
-	t.is(parkRide.ride().classification, "ride");
-	t.is(parkRide.ride().name, "Crooky Building");
+	t.is(parkRide._id, 37);
+	t.is(parkRide._ride().classification, "ride");
+	t.is(parkRide._ride().name, "Crooky Building");
 });
 
 
@@ -120,15 +120,15 @@ test("Park ride refreshes to missing ride", t =>
 
 	const parkRide = new ParkRide(32);
 
-	t.is(parkRide.id, 32);
-	t.is(parkRide.ride().classification, "ride");
-	t.is(parkRide.ride().name, "Dinghy Slide");
+	t.is(parkRide._id, 32);
+	t.is(parkRide._ride().classification, "ride");
+	t.is(parkRide._ride().name, "Dinghy Slide");
 
 	map.rides.length = 0; // remove all rides
-	parkRide.refresh();
+	parkRide._refresh();
 
-	t.is(parkRide.id, 32);
-	t.is(parkRide.ride(), null!);
+	t.is(parkRide._id, 32);
+	t.is(parkRide._ride(), null!);
 });
 
 
@@ -137,11 +137,11 @@ test("Park ride is cached", t =>
 	const ride = Mock.ride({ classification: "ride", name: "River Rapids", id: 2 });
 	const parkRide = new ParkRide(ride);
 
-	const ride1 = parkRide.ride();
-	const ride2 = parkRide.ride();
+	const ride1 = parkRide._ride();
+	const ride2 = parkRide._ride();
 	t.is(ride2, ride1);
 
-	const trains3 = parkRide.ride();
+	const trains3 = parkRide._ride();
 	t.is(trains3, ride1);
 });
 
@@ -151,12 +151,12 @@ test("Park ride gets all trains", t =>
 	const ride = Mock.ride({ classification: "ride", name: "River Rapids", id: 2, vehicles: [ 5, 6, 7 ] });
 	const parkRide = new ParkRide(ride);
 
-	const trains = parkRide.trains();
+	const trains = parkRide._trains();
 
 	t.is(trains.length, 3);
-	t.is(trains[0].carId, 5);
-	t.is(trains[1].carId, 6);
-	t.is(trains[2].carId, 7);
+	t.is(trains[0]._carId, 5);
+	t.is(trains[1]._carId, 6);
+	t.is(trains[2]._carId, 7);
 });
 
 
@@ -165,12 +165,12 @@ test("Park ride trains are cached", t =>
 	const ride = Mock.ride({ classification: "ride", name: "River Rapids", id: 2, vehicles: [ 5, 6, 7 ] });
 	const parkRide = new ParkRide(ride);
 
-	const trains1 = parkRide.trains();
-	const trains2 = parkRide.trains();
+	const trains1 = parkRide._trains();
+	const trains2 = parkRide._trains();
 	t.is(trains1.length, 3);
 	t.is(trains2, trains1);
 
-	const trains3 = parkRide.trains();
+	const trains3 = parkRide._trains();
 	t.is(trains3, trains1);
 });
 
@@ -180,7 +180,7 @@ test("Park ride ignores invalid trains", t =>
 	const ride = Mock.ride({ classification: "ride", name: "River Rapids", id: 2, vehicles: [ 5, 0xFFFF, 7 ] });
 	const parkRide = new ParkRide(ride);
 
-	const trains = parkRide.trains();
+	const trains = parkRide._trains();
 
 	t.is(trains.length, 0);
 	t.deepEqual(trains, []);

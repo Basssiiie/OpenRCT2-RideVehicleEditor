@@ -1,6 +1,6 @@
-import babel from "@rollup/plugin-babel";
 import resolve from "@rollup/plugin-node-resolve";
 import replace from "@rollup/plugin-replace";
+import typescript from "@rollup/plugin-typescript";
 import getPath from "platform-folders";
 import { terser } from "rollup-plugin-terser";
 
@@ -56,37 +56,7 @@ const config = {
 				__BUILD_CONFIGURATION__: JSON.stringify(build)
 			}
 		}),
-		babel({
-			assumptions: {
-				constantReexports: true,
-				constantSuper: true,
-				enumerableModuleMeta: true,
-				ignoreFunctionLength: true,
-				ignoreToPrimitiveHint: true,
-				iterableIsArray: true,
-				mutableTemplateObject: true,
-				noClassCalls: true,
-				noDocumentAll: true,
-				noIncompleteNsImportDetection: true,
-				noNewArrows: true,
-				objectRestNoSymbols: true,
-				privateFieldsAsProperties: true,
-				pureGetters: true,
-				setClassMethods: true,
-				setComputedProperties: true,
-				setPublicClassFields: true,
-				setSpreadProperties: true,
-				skipForOfIteratorClosing: true,
-				superIsCallableConstructor: true,
-			},
-			babelHelpers: "bundled",
-			babelrc: false,
-			extensions,
-			presets: [
-				"@babel/preset-env",
-				"@babel/preset-typescript"
-			]
-		}),
+		typescript(),
 		terser({
 			compress: {
 				passes: 5,

@@ -1,7 +1,7 @@
 import { register } from "./actions";
 import * as Log from "../utilities/logger";
 import { ParkRide } from "../objects/parkRide";
-import { RideLifeCycleFlags } from "../../lib/openrct2.extended";
+import { RideLifeCycleFlags } from "../objects/rideLifeCycleFlags";
 
 
 const execute = register<UpdateRideSettingArgs>("rve-update-ride", updateRideSetting);
@@ -21,7 +21,7 @@ const
  */
 export function setExcitementRating(ride: ParkRide, amount: number): void
 {
-	updateValue(ride.id, excitement, amount);
+	updateValue(ride._id, excitement, amount);
 }
 
 
@@ -30,7 +30,7 @@ export function setExcitementRating(ride: ParkRide, amount: number): void
  */
 export function setIntensityRating(ride: ParkRide, amount: number): void
 {
-	updateValue(ride.id, intensity, amount);
+	updateValue(ride._id, intensity, amount);
 }
 
 
@@ -39,7 +39,7 @@ export function setIntensityRating(ride: ParkRide, amount: number): void
  */
 export function setNauseaRating(ride: ParkRide, amount: number): void
 {
-	updateValue(ride.id, nausea, amount);
+	updateValue(ride._id, nausea, amount);
 }
 
 
@@ -48,7 +48,7 @@ export function setNauseaRating(ride: ParkRide, amount: number): void
  */
 export function setFrozenRatings(ride: ParkRide, enabled: boolean): void
 {
-	updateValue(ride.id, RideLifeCycleFlags.FixedRatings, enabled);
+	updateValue(ride._id, RideLifeCycleFlags.FixedRatings, enabled);
 }
 
 
@@ -57,7 +57,7 @@ export function setFrozenRatings(ride: ParkRide, enabled: boolean): void
  */
 export function setBuildMonth(ride: ParkRide, amount: number): void
 {
-	updateValue(ride.id, buildMonth, amount);
+	updateValue(ride._id, buildMonth, amount);
 }
 
 
@@ -66,7 +66,7 @@ export function setBuildMonth(ride: ParkRide, amount: number): void
  */
 export function setCustomDesign(ride: ParkRide, enabled: boolean): void
 {
-	updateValue(ride.id, RideLifeCycleFlags.NotCustomDesign, !enabled);
+	updateValue(ride._id, RideLifeCycleFlags.NotCustomDesign, !enabled);
 }
 
 
@@ -75,7 +75,7 @@ export function setCustomDesign(ride: ParkRide, enabled: boolean): void
  */
 export function setIndestructable(ride: ParkRide, enabled: boolean): void
 {
-	updateValue(ride.id, RideLifeCycleFlags.Indestructable, enabled);
+	updateValue(ride._id, RideLifeCycleFlags.Indestructable, enabled);
 }
 
 
@@ -84,9 +84,9 @@ export function setIndestructable(ride: ParkRide, enabled: boolean): void
  */
 interface UpdateRideSettingArgs
 {
-	id: number;
-	key: RideUpdateKeys;
-	value: number | boolean;
+	_id: number;
+	_key: RideUpdateKeys;
+	_value: number | boolean;
 }
 
 
@@ -95,7 +95,7 @@ interface UpdateRideSettingArgs
  */
 function updateValue(rideId: number, key: RideUpdateKeys, value: number | boolean): void
 {
-	execute({ id: rideId, key, value });
+	execute({ _id: rideId, _key: key, _value: value });
 }
 
 
@@ -104,14 +104,14 @@ function updateValue(rideId: number, key: RideUpdateKeys, value: number | boolea
  */
 function updateRideSetting(args: UpdateRideSettingArgs): void
 {
-	const ride = map.getRide(args.id);
+	const ride = map.getRide(args._id);
 	if (!ride)
 	{
-		Log.debug(`Ride ${args.id} not found.`);
+		Log.debug("Ride", args._id, "not found.");
 		return;
 	}
 
-	const { key, value } = args;
+	const { _key: key, _value: value } = args;
 	switch (key) // Restrict key to permitted set.
 	{
 		case excitement:
@@ -138,7 +138,7 @@ function updateRideSetting(args: UpdateRideSettingArgs): void
 		}
 		default:
 		{
-			Log.debug(`Setting '${key}' not valid. Value: ${value}`);
+			Log.debug("Setting", key, "not valid. Value:", value);
 			break;
 		}
 	}

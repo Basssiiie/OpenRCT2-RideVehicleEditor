@@ -10,7 +10,7 @@ export function formatMonthAndYear(months: number): string
 	const month = (((months % amountOfMonths) + amountOfMonths) % amountOfMonths);
 	const year = (Math.floor(months / amountOfMonths) + 1);
 
-	return `${monthNames[month]}, year ${year}`;
+	return (monthNames[month] + ", year " + year);
 }
 
 
@@ -29,16 +29,16 @@ export function formatRelativeDate(relativeDate: number): string
 		yearString = combineAndPluralise(year, "year");
 
 	const combined = (monthString && yearString)
-		? (`${yearString}, ${monthString}`)
+		? (yearString + ", " + monthString)
 		: (monthString || yearString || "This month");
 
 	if ((relativeDate < 0))
 	{
-		return `${combined} ago`;
+		return (combined + " ago");
 	}
 	else if (relativeDate > 0)
 	{
-		return `In ${combined}`;
+		return ("In " + combined);
 	}
 	else
 	{
@@ -54,7 +54,7 @@ function combineAndPluralise(amount: number, noun: string): string | null
 {
 	if (amount > 0)
 	{
-		let combination = `${amount} ${noun}`;
+		let combination = (amount + " " + noun);
 		if (amount > 1)
 		{
 			combination += "s";

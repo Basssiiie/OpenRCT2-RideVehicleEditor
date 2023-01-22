@@ -7,9 +7,9 @@ import { isPowered } from "./rideVehicleVariant";
  */
 export class RideVehicle
 {
-	readonly id: number;
+	readonly _id: number;
 	private _entity?: Car | null;
-	private _type?: RideObjectVehicle | null;
+	private _vehicleObject?: RideObjectVehicle | null;
 	private _typeHash?: number;
 
 
@@ -22,32 +22,32 @@ export class RideVehicle
 	{
 		if (typeof param === "number")
 		{
-			this.id = param;
-			this.refresh();
+			this._id = param;
+			this._refresh();
 		}
 		else
 		{
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			this.id = param.id!;
+			this._id = param.id!;
 			this._entity = param;
 		}
-		Log.assert(typeof this.id === "number", "Ride vehicle entity is invalid.");
+		Log.assert(typeof this._id === "number", "Ride vehicle entity is invalid.");
 	}
 
 
 	/**
 	 * Refreshes the referenced entity for this vehicle, in case it got respawned.
 	 */
-	refresh(): boolean
+	_refresh(): boolean
 	{
-		const car = map.getEntity(this.id);
+		const car = map.getEntity(this._id);
 		if (car && car.type === "car")
 		{
 			this._entity = <Car>car;
 			return true;
 		}
 
-		Log.debug(`Ride vehicle refresh(): selected car with id '${this.id}' went missing.`);
+		Log.debug("Ride vehicle refresh(): selected car with id", this._id, "went missing.");
 		this._entity = null;
 		return false;
 	}
@@ -56,10 +56,10 @@ export class RideVehicle
 	/**
 	 * Gets the associated vehicle data from the game.
 	 */
-	car(): Car
+	_car(): Car
 	{
-		Log.assert(!!this._entity, `Selected car with id '${this.id}' is missing.`);
-		Log.assert(this._entity?.type === "car", `Selected car with id '${this.id}' is not of type 'car', but of type '${this._entity?.type}'.`);
+		Log.assert(!!this._entity, "Selected car with id", this._id, "is missing.");
+		Log.assert(this._entity?.type === "car", "Selected car with id", this._id, "is not of type 'car', but of type", this._entity?.type);
 		return <Car>this._entity;
 	}
 
@@ -67,20 +67,20 @@ export class RideVehicle
 	/**
 	 * Returns the object definition for this car.
 	 */
-	type(): RideObjectVehicle
+	_type(): RideObjectVehicle
 	{
-		const entity = this.car();
+		const entity = this._car();
 		const rideObj = entity.rideObject;
 		const vehicleObj = entity.vehicleObject;
 		const hash = ((rideObj << 2) | vehicleObj); // ensure ride type and vehicle are unchanged
 
-		if (!this._type || hash !== this._typeHash)
+		if (!this._vehicleObject || hash !== this._typeHash)
 		{
 			const rideObject = context.getObject("ride", rideObj);
-			this._type = rideObject.vehicles[vehicleObj];
+			this._vehicleObject = rideObject.vehicles[vehicleObj];
 			this._typeHash = hash;
 		}
-		return this._type;
+		return this._vehicleObject;
 	}
 
 
@@ -89,9 +89,9 @@ export class RideVehicle
 	 * Currently not all vehicle types support this property in
 	 * the openrct2 source code.
 	 */
-	isPowered(): boolean
+	_isPowered(): boolean
 	{
-		return isPowered(this.type());
+		return isPowered(this._type());
 	}
 
 

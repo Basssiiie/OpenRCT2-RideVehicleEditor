@@ -6,6 +6,6 @@ import { RideVehicle } from "../objects/rideVehicle";
  */
 export function locate(vehicle: RideVehicle): void
 {
-	const car = vehicle.car();
+	const car = vehicle._car();
 	ui.mainViewport.scrollTo({ x: car.x, y: car.y, z: car.z });
 }

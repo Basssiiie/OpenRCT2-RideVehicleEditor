@@ -18,7 +18,7 @@ export function getDistanceFromProgress(car: Car, trackProgress: number): number
 	const currentTrackIndex = getIndexForTrackElementAt(currentTrackLocation);
 	if (currentTrackIndex === null)
 	{
-		Log.debug(`Could not find track for car at position; ${currentTrackLocation.x}, ${currentTrackLocation.y}, ${currentTrackLocation.z}, direction; ${currentTrackLocation.direction}`);
+		Log.debug("Could not find track for car at position;", currentTrackLocation.x, ",", currentTrackLocation.y, ",", currentTrackLocation.z, ", direction:", currentTrackLocation.direction);
 		return 0;
 	}
 
@@ -31,7 +31,7 @@ export function getDistanceFromProgress(car: Car, trackProgress: number): number
 	let iteratorSegment = iterator.segment;
 	if (!iteratorSegment)
 	{
-		Log.debug(`Track iterator does not have segment for car at position; ${currentTrackLocation.x}, ${currentTrackLocation.y}, ${currentTrackLocation.z}, direction; ${currentTrackLocation.direction}, index; ${currentTrackIndex}`);
+		Log.debug("Track iterator does not have segment for car at position;", currentTrackLocation.x, ",", currentTrackLocation.y, ",", currentTrackLocation.z, ", direction:", currentTrackLocation.direction, ", index:", currentTrackIndex);
 		return 0;
 	}
 
@@ -47,7 +47,7 @@ export function getDistanceFromProgress(car: Car, trackProgress: number): number
 
 	while (subpositionIterator._remainingProgress > 0 && iteratorSegment)
 	{
-		Log.debug(`Remaining progress: ${subpositionIterator._remainingProgress}, total: ${subpositionIterator._totalDistance}`);
+		Log.debug("Remaining progress:", subpositionIterator._remainingProgress, ", total:", subpositionIterator._totalDistance);
 
 		const trackPieceLength = trackDistances._progressLength;
 
@@ -56,7 +56,7 @@ export function getDistanceFromProgress(car: Car, trackProgress: number): number
 			// Quick add whole segment.
 			subpositionIterator._totalDistance += trackDistances._totalDistance;
 			subpositionIterator._remainingProgress -= trackPieceLength;
-			Log.debug(`total += ${trackDistances._totalDistance} = ${subpositionIterator._totalDistance} (whole segment)`);
+			Log.debug("total +=", trackDistances._totalDistance, "=", subpositionIterator._totalDistance, "(whole segment)");
 		}
 		else
 		{
@@ -85,13 +85,13 @@ export function getDistanceFromProgress(car: Car, trackProgress: number): number
 	}
 
 	const totalDistance = subpositionIterator._totalDistance;
-	Log.debug(`Move vehicle ${totalDistance}; progress change: ${trackProgress}`);
+	Log.debug("Move vehicle", totalDistance, "; progress change:", trackProgress);
 	return (trackProgress < 0) ? -totalDistance : totalDistance;
 }
 
 /**
  * Calculate how much spacing there is between the current vehicle and the preceding
- * vehicle on the specified train. Returns `null` if it is too far away.
+ * vehicle on the specified train. Returns "null" if it is too far away.
  */
 export function getSpacingToPrecedingVehicle(train: RideTrain, car: Car, carIndex: number): number | null
 {
@@ -100,7 +100,7 @@ export function getSpacingToPrecedingVehicle(train: RideTrain, car: Car, carInde
 		return null;
 	}
 
-	const carInFront = train.at(carIndex - 1).car();
+	const carInFront = train._at(carIndex - 1)._car();
 
 	const currentProgress = car.trackProgress;
 	const inFrontProgress = carInFront.trackProgress;
@@ -121,7 +121,7 @@ export function getSpacingToPrecedingVehicle(train: RideTrain, car: Car, carInde
 	let iteratorSegment = iterator.segment;
 	if (!iteratorSegment)
 	{
-		Log.debug(`Track iterator does not have segment for car at position; ${currentTrackLocation.x}, ${currentTrackLocation.y}, ${currentTrackLocation.z}, direction; ${currentTrackLocation.direction}`);
+		Log.debug("Track iterator does not have segment for car at position;", currentTrackLocation.x, ",", currentTrackLocation.y, ",", currentTrackLocation.z, ", direction;", currentTrackLocation.direction);
 		return null;
 	}
 
@@ -159,14 +159,14 @@ function getTrackIteratorAtLocation(trackLocation: CoordsXYZD): TrackIterator | 
 	const currentTrackIndex = getIndexForTrackElementAt(trackLocation);
 	if (currentTrackIndex === null)
 	{
-		Log.debug(`Could not find track for car at position; ${trackLocation.x}, ${trackLocation.y}, ${trackLocation.z}, direction; ${trackLocation.direction}`);
+		Log.debug("Could not find track for car at position;", trackLocation.x, ",", trackLocation.y, ",", trackLocation.z, ", direction;", trackLocation.direction);
 		return null;
 	}
 
 	const iterator = map.getTrackIterator(trackLocation, currentTrackIndex);
 	if (!iterator)
 	{
-		Log.debug(`Could not start track iterator for car at position; ${trackLocation.x}, ${trackLocation.y}, ${trackLocation.z}, direction; ${trackLocation.direction}, index; ${currentTrackIndex}`);
+		Log.debug("Could not start track iterator for car at position;", trackLocation.x, ",", trackLocation.y, ",", trackLocation.z, ", direction;", trackLocation.direction, ", index;", currentTrackIndex);
 		return null;
 	}
 	return iterator;
@@ -265,7 +265,7 @@ class ForwardIterator extends SubpositionIterator
 		for (; distanceIdx < trackPieceLength && remainingProgress > 0; distanceIdx++)
 		{
 			this._totalDistance += distances[distanceIdx];
-			Log.debug(`total += ${distances[distanceIdx]} = ${this._totalDistance} (step: ${distanceIdx}, remaining: ${remainingProgress})`);
+			Log.debug("total +=", distances[distanceIdx], "=", this._totalDistance, "(step:", distanceIdx, ", remaining:", remainingProgress, ")");
 			remainingProgress--;
 		}
 
@@ -311,7 +311,7 @@ class BackwardIterator extends SubpositionIterator
 		while (--distanceIdx >= 0 && remainingProgress > 0)
 		{
 			this._totalDistance += distances[distanceIdx];
-			Log.debug(`total += ${distances[distanceIdx]} = ${this._totalDistance} (step: ${distanceIdx}, remaining: ${remainingProgress})`);
+			Log.debug("total +=", distances[distanceIdx], "=", this._totalDistance, "(step:", distanceIdx, ", remaining:", remainingProgress, ")");
 			remainingProgress--;
 		}
 		this._remainingProgress = remainingProgress;

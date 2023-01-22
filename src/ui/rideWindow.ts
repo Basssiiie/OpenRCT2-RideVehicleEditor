@@ -14,7 +14,7 @@ export const model = new RideViewModel();
 
 
 export const rideWindow = window({
-	title: model.title,
+	title: model._title,
 	position: "center",
 	width: 255, minWidth: 225, maxWidth: 275,
 	height: 216,
@@ -28,8 +28,8 @@ export const rideWindow = window({
 				labelSpinner({
 					text: "Excitement",
 					tooltip: "Happy guests make for a happy life.",
-					value: model.excitement,
-					step: model.multiplier,
+					value: model._excitement,
+					step: model._multiplier,
 					minimum: int16min,
 					maximum: int16max,
 					format: formatRating,
@@ -38,8 +38,8 @@ export const rideWindow = window({
 				labelSpinner({
 					text: "Intensity",
 					tooltip: "Guests will prefer rides that match their intensity preference.",
-					value: model.intensity,
-					step: model.multiplier,
+					value: model._intensity,
+					step: model._multiplier,
 					minimum: int16min,
 					maximum: int16max,
 					format: formatRating,
@@ -48,8 +48,8 @@ export const rideWindow = window({
 				labelSpinner({
 					text: "Nausea",
 					tooltip: "The higher the value, the more yellow your paths will be.",
-					value: model.nausea,
-					step: model.multiplier,
+					value: model._nausea,
+					step: model._multiplier,
 					minimum: int16min,
 					maximum: int16max,
 					format: formatRating,
@@ -59,7 +59,7 @@ export const rideWindow = window({
 					checkbox({
 						text: "Freeze rating calculation",
 						tooltip: "When ticked, the ratings will not be recalculated anymore. Your ride will always be awesome even if it sucks.",
-						isChecked: model.freezeStats,
+						isChecked: model._freezeStats,
 						onChange: v => modifyRide(setFrozenRatings, v)
 					}),
 					dropdown({
@@ -67,7 +67,7 @@ export const rideWindow = window({
 						padding: { left: "1w" },
 						items: ["x1", "x10", "x100"],
 						tooltip: "Multiplies all spinner controls by the specified amount",
-						onChange: idx => model.multiplier.set(10 ** idx),
+						onChange: idx => model._multiplier.set(10 ** idx),
 					})
 				])
 			]
@@ -80,7 +80,7 @@ export const rideWindow = window({
 				labelSpinner({
 					text: "Build month",
 					tooltip: "The month in which this ride was built. Somehow never in the winter months.",
-					value: model.buildMonth,
+					value: model._buildMonth,
 					minimum: int16min,
 					maximum: int16max,
 					format: formatMonthAndYear,
@@ -89,7 +89,7 @@ export const rideWindow = window({
 				labelSpinner({
 					text: "Construction",
 					tooltip: "The amount of time ago the ride was built, in months and years. Rides get older as well, just like you.",
-					value: compute(model.buildMonth, v => (v - date.monthsElapsed)),
+					value: compute(model._buildMonth, v => (v - date.monthsElapsed)),
 					minimum: int16min,
 					maximum: int16max,
 					format: formatRelativeDate,
@@ -98,13 +98,13 @@ export const rideWindow = window({
 				labelCheckbox({
 					text: "Custom design",
 					tooltip: "Whether or not the ride is a custom design or a standard track design, which is used for the 'Best custom-designed rides' award.",
-					isChecked: model.customDesign,
+					isChecked: model._customDesign,
 					onChange: v => modifyRide(setCustomDesign, v)
 				}),
 				labelCheckbox({
 					text: "Indestructable",
 					tooltip: "Indestructable rides cannot be demolished, even if you ask them nicely.",
-					isChecked: model.indestructable,
+					isChecked: model._indestructable,
 					onChange: v => modifyRide(setIndestructable, v)
 				}),
 			]
@@ -130,13 +130,13 @@ function formatRating(value: number): string
 
 function modifyRide<T>(action: (ride: ParkRide, value: T) => void, value: T): void
 {
-	const ride = model.ride.get();
+	const ride = model._ride.get();
 	if (ride)
 	{
 		action(ride, value);
 	}
 	else
 	{
-		Log.debug(`Failed to modify ride with '${action}' to '${value}'; none is selected.`);
+		Log.debug("Failed to modify ride with", action, "to", value, "; none is selected.");
 	}
 }

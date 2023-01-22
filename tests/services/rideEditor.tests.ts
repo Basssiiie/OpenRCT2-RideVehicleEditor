@@ -2,8 +2,8 @@
 
 import test from "ava";
 import Mock from "openrct2-mocks";
-import { RideLifeCycleFlags } from "../../lib/openrct2.extended";
 import { ParkRide } from "../../src/objects/parkRide";
+import { RideLifeCycleFlags } from "../../src/objects/rideLifeCycleFlags";
 import { initActions } from "../../src/services/actions";
 import { setBuildMonth, setCustomDesign, setExcitementRating, setFrozenRatings, setIndestructable, setIntensityRating, setNauseaRating } from "../../src/services/rideEditor";
 

@@ -20,9 +20,9 @@ export function getAllRideTypes(): RideType[]
  */
 export class RideType
 {
-	readonly id: number;
-	private _object?: RideObject | null;
-	private _variants?: RideVehicleVariant[];
+	readonly _id: number;
+	private _rideObject?: RideObject | null;
+	private _vehicleVariants?: RideVehicleVariant[];
 
 
 	/**
@@ -34,42 +34,42 @@ export class RideType
 	{
 		if (typeof param === "number")
 		{
-			this.id = param;
-			this.refresh();
+			this._id = param;
+			this._refresh();
 		}
 		else
 		{
-			this.id = param.index;
-			this._object = param;
+			this._id = param.index;
+			this._rideObject = param;
 		}
 	}
 
 
-	refresh(): void
+	_refresh(): void
 	{
-		this._object = context.getObject("ride", this.id) || null;
+		this._rideObject = context.getObject("ride", this._id) || null;
 	}
 
 
 	/*
 	 * Gets the associated ride definition from the game.
 	 */
-	object(): RideObject
+	_object(): RideObject
 	{
-		Log.assert(!!this._object, `Selected ride object with id '${this.id}' is missing.`);
-		return <RideObject>this._object;
+		Log.assert(!!this._rideObject, "Selected ride object with id", this._id, "is missing.");
+		return <RideObject>this._rideObject;
 	}
 
 
 	/**
 	 * The variants (vehicle sprites) this ride has.
 	 */
-	variants(): RideVehicleVariant[]
+	_variants(): RideVehicleVariant[]
 	{
-		if (!this._variants)
+		if (!this._vehicleVariants)
 		{
 			// Find last vehicle with non-zero base image.
-			const vehicles = this.object().vehicles;
+			const vehicles = this._object().vehicles;
 
 			const length = vehicles.length;
 			let validUpperBound = length;
@@ -91,8 +91,8 @@ export class RideType
 				variants.push(variant);
 			}
 
-			this._variants = variants;
+			this._vehicleVariants = variants;
 		}
-		return this._variants;
+		return this._vehicleVariants;
 	}
 }

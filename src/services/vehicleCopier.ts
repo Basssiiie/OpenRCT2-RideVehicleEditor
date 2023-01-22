@@ -67,38 +67,38 @@ export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | n
 		{
 			case CopyOptions.AllVehiclesOnTrain:
 			{
-				return [[ train[0].carId, null ]];
+				return [[ train[0]._carId, null ]];
 			}
 			case CopyOptions.PrecedingVehiclesOnTrain:
 			{
-				return [[ train[0].carId, vehicle[1] + 1 ]];
+				return [[ train[0]._carId, vehicle[1] + 1 ]];
 			}
 			case CopyOptions.FollowingVehiclesOnTrain:
 			{
-				return [[ vehicle[0].id, null ]];
+				return [[ vehicle[0]._id, null ]];
 			}
 			case CopyOptions.AllVehiclesOnAllTrains:
 			{
-				return getTargetsOnAllTrains(ride, t => [ t.carId, null ]);
+				return getTargetsOnAllTrains(ride, t => [ t._carId, null ]);
 			}
 			case CopyOptions.PrecedingVehiclesOnAllTrains:
 			{
 				const amountOfVehicles = (vehicle[1] + 1);
-				return getTargetsOnAllTrains(ride, t => [ t.carId, amountOfVehicles ]);
+				return getTargetsOnAllTrains(ride, t => [ t._carId, amountOfVehicles ]);
 			}
 			case CopyOptions.FollowingVehiclesOnAllTrains:
 			{
 				const index = vehicle[1];
-				return getTargetsOnAllTrains(ride, t => [ t.at(index).id, null ]);
+				return getTargetsOnAllTrains(ride, t => [ t._at(index)._id, null ]);
 			}
 			case CopyOptions.SameVehicleOnAllTrains:
 			{
 				const index = vehicle[1];
-				return getTargetsOnAllTrains(ride, t => [ t.at(index).id, 1 ]);
+				return getTargetsOnAllTrains(ride, t => [ t._at(index)._id, 1 ]);
 			}
 		}
 	}
-	Log.assert(true, `getTargets(), selected copy option out of range: ${copyOption}, or vehicle not selected: ${vehicle}`);
+	Log.assert(true, "getTargets(), selected copy option out of range:", copyOption, ", or vehicle not selected:", vehicle);
 	return [];
 }
 
@@ -109,35 +109,35 @@ export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | n
 export function getVehicleSettings(source: RideVehicle, filters: CopyFilter): VehicleSettings
 {
 	const
-		car = source.car(),
-		isPowered = source.isPowered(),
+		car = source._car(),
+		isPowered = source._isPowered(),
 		settings: VehicleSettings = {};
 
 	if (filters & CopyFilter.TypeAndVariant)
 	{
-		settings.rideTypeId = car.rideObject;
-		settings.variant = car.vehicleObject;
+		settings._rideTypeId = car.rideObject;
+		settings._variant = car.vehicleObject;
 	}
 	if (filters & CopyFilter.Seats)
 	{
-		settings.seats = car.numSeats;
+		settings._seats = car.numSeats;
 	}
 	if (filters & CopyFilter.Mass)
 	{
-		settings.mass = car.mass;
+		settings._mass = car.mass;
 	}
 	if (isPowered && (filters & CopyFilter.PoweredAcceleration))
 	{
-		settings.poweredAcceleration = car.poweredAcceleration;
+		settings._poweredAcceleration = car.poweredAcceleration;
 	}
 	if (isPowered && (filters & CopyFilter.PoweredMaxSpeed))
 	{
-		settings.poweredMaxSpeed = car.poweredMaxSpeed;
+		settings._poweredMaxSpeed = car.poweredMaxSpeed;
 	}
 	if (filters & CopyFilter.Colours)
 	{
 		const cols = car.colours;
-		settings.colours = [ cols.body, cols.trim, cols.tertiary ];
+		settings._colours = [ cols.body, cols.trim, cols.tertiary ];
 	}
 	return settings;
 }
@@ -148,7 +148,7 @@ export function getVehicleSettings(source: RideVehicle, filters: CopyFilter): Ve
  */
 export function applyToTargets(settings: VehicleSettings, targets: [number, number | null][]): void
 {
-	execute({ settings, targets });
+	execute({ _settings: settings, _targets: targets });
 }
 
 
@@ -157,13 +157,13 @@ export function applyToTargets(settings: VehicleSettings, targets: [number, numb
  */
 export interface VehicleSettings
 {
-	rideTypeId?: number;
-	variant?: number;
-	seats?: number;
-	mass?: number;
-	poweredAcceleration?: number;
-	poweredMaxSpeed?: number;
-	colours?: number[];
+	_rideTypeId?: number;
+	_variant?: number;
+	_seats?: number;
+	_mass?: number;
+	_poweredAcceleration?: number;
+	_poweredMaxSpeed?: number;
+	_colours?: number[];
 }
 
 
@@ -177,8 +177,8 @@ export interface VehicleSettings
  */
 interface PasteVehicleSettingsArgs
 {
-	settings: VehicleSettings;
-	targets: VehicleSpan[];
+	_settings: VehicleSettings;
+	_targets: VehicleSpan[];
 }
 
 
@@ -187,7 +187,7 @@ interface PasteVehicleSettingsArgs
  */
 function pasteVehicleSettings(args: PasteVehicleSettingsArgs): void
 {
-	forEachVehicle(args.targets, car => applyVehicleSettings(car, args.settings));
+	forEachVehicle(args._targets, car => applyVehicleSettings(car, args._settings));
 }
 
 
@@ -204,14 +204,14 @@ function applyVehicleSettings(car: Car, settings: VehicleSettings): void
 		}
 	}
 
-	apply("rideObject", settings.rideTypeId);
-	apply("vehicleObject", settings.variant);
-	apply("numSeats", settings.seats);
-	apply("mass", settings.mass);
-	apply("poweredAcceleration", settings.poweredAcceleration);
-	apply("poweredMaxSpeed", settings.poweredMaxSpeed);
+	apply("rideObject", settings._rideTypeId);
+	apply("vehicleObject", settings._variant);
+	apply("numSeats", settings._seats);
+	apply("mass", settings._mass);
+	apply("poweredAcceleration", settings._poweredAcceleration);
+	apply("poweredMaxSpeed", settings._poweredMaxSpeed);
 
-	const colours = settings.colours;
+	const colours = settings._colours;
 	if (colours)
 	{
 		car.colours = { body: colours[0], trim: colours[1], tertiary: colours[2] };
@@ -224,5 +224,5 @@ function applyVehicleSettings(car: Car, settings: VehicleSettings): void
  */
 function getTargetsOnAllTrains(ride: [ParkRide, number], callback: (train: RideTrain) => [number, number | null]): [number, number | null][]
 {
-	return ride[0].trains().map(callback);
+	return ride[0]._trains().map(callback);
 }

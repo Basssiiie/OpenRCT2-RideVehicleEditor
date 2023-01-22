@@ -39,10 +39,10 @@ export function isPowered(variant: RideObjectVehicle): boolean
  */
 export class RideVehicleVariant
 {
-	readonly visibility: VehicleVisibility;
+	readonly _visibility: VehicleVisibility;
 
 	constructor(variant: RideObjectVehicle)
 	{
-		this.visibility = getVisibility(variant);
+		this._visibility = getVisibility(variant);
 	}
 }

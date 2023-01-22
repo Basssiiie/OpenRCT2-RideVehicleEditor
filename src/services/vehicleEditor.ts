@@ -36,7 +36,7 @@ const
  */
 export function setRideType(vehicles: VehicleSpan[], type: RideType): void
 {
-	updateValue(vehicles, rideTypeKey, type.id);
+	updateValue(vehicles, rideTypeKey, type._id);
 }
 
 
@@ -163,9 +163,9 @@ export function setPositionZ(vehicles: VehicleSpan[], z: number): void
  */
 interface UpdateVehicleSettingArgs
 {
-	targets: VehicleSpan[];
-	key: VehicleUpdateKeys;
-	value: number;
+	_targets: VehicleSpan[];
+	_key: VehicleUpdateKeys;
+	_value: number;
 }
 
 
@@ -174,7 +174,7 @@ interface UpdateVehicleSettingArgs
  */
 function updateValue(vehicles: VehicleSpan[], key: VehicleUpdateKeys, value: number): void
 {
-	execute({ targets: vehicles, key, value });
+	execute({ _targets: vehicles, _key: key, _value: value });
 }
 
 
@@ -183,7 +183,7 @@ function updateValue(vehicles: VehicleSpan[], key: VehicleUpdateKeys, value: num
  */
 function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 {
-	const { targets, key, value } = args;
+	const { _targets: targets, _key: key, _value: value } = args;
 	let callback: (car: Car, index: number) => void;
 	switch (key) // Restrict key to permitted set.
 	{
@@ -235,7 +235,7 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 		}
 		default:
 		{
-			Log.debug(`Setting '${key}' not valid. Value: ${value}`);
+			Log.debug("Setting", key, "not valid. Value:", value);
 			return;
 		}
 	}

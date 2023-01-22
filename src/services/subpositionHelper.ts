@@ -14,9 +14,7 @@ const subpositionTranslationDistances =
 ];
 
 
-type CacheKey = `${number}-${Direction}-${number}`;
-
-const distanceCache: Record<CacheKey, TrackDistances> = {};
+const distanceCache: Record<string, TrackDistances> = {};
 
 
 /**
@@ -50,9 +48,9 @@ export function getSubpositionTranslationDistance(x1: number, y1: number, z1: nu
 /**
  * Creates a key for caching subposition data for the specific track element.
  */
-function createCacheKey(trackType: number, subposition: number, direction: Direction): CacheKey
+function createCacheKey(trackType: number, subposition: number, direction: Direction): string
 {
-	return `${trackType}-${direction}-${subposition}`;
+	return (trackType + "-" + direction + "-" + subposition);
 }
 
 

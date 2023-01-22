@@ -69,7 +69,7 @@ function hasPermissions(playerId: number, permission: PermissionType): boolean
 		const group = network.getGroup(player.group);
 		if (group.permissions.indexOf(permission) < 0)
 		{
-			Log.debug(`Cannot apply update from player ${playerId}: lacking '${permission}' permission.`);
+			Log.debug("Cannot apply update from player", playerId, ": lacking", permission, "permission.");
 			return false;
 		}
 	}
