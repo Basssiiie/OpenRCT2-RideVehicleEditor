@@ -1,4 +1,5 @@
 import { isMultiplayer } from "../environment";
+import { find } from "../utilities/arrayHelper";
 import * as Log from "../utilities/logger";
 
 
@@ -66,7 +67,15 @@ function hasPermissions(playerId: number, permission: PermissionType): boolean
 	if (isMultiplayer())
 	{
 		const player = network.getPlayer(playerId);
-		const group = network.getGroup(player.group);
+		const groupId = player.group;
+		// Cannot use getGroup, because it uses indices instead of ids and player.group is an id.
+		const group = find(network.groups, g => g.id === groupId);
+
+		if (!group)
+		{
+			Log.debug("Cannot apply update from player", playerId, ": group id", groupId, "not found.");
+			return false;
+		}
 		if (group.permissions.indexOf(permission) < 0)
 		{
 			Log.debug("Cannot apply update from player", playerId, ": lacking", permission, "permission.");

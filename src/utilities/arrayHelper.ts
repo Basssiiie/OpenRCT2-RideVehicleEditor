@@ -27,11 +27,11 @@ export function getAtIndex<T>(array: T[] | null, index: number | null): T | null
  */
 export function findIndex<T>(array: T[], predicate: (item: T) => boolean): number | null
 {
-	for (let i = 0; i < array.length; i++)
+	for (let idx = 0, end = array.length; idx < end; idx++)
 	{
-		if (predicate(array[i]))
+		if (predicate(array[idx]))
 		{
-			return i;
+			return idx;
 		}
 	}
 	return null;
