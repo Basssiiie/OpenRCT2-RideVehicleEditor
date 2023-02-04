@@ -188,6 +188,14 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 	switch (key) // Restrict key to permitted set.
 	{
 		case rideTypeKey:
+		{
+			callback = (car): void =>
+			{
+				car[key] = value;
+				car.vehicleObject = 0;
+			};
+			break;
+		}
 		case variantKey:
 		case seatsKey:
 		case massKey:
