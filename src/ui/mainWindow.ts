@@ -1,6 +1,7 @@
 import { button, checkbox, colourPicker, compute, dropdown, dropdownSpinner, FlexiblePosition, groupbox, horizontal, label, LabelParams, SpinnerParams, SpinnerWrapMode, toggle, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
 import { isDevelopment, pluginVersion } from "../environment";
 import { VehicleVisibility } from "../objects/rideVehicleVariant";
+import { invoke, refreshRide } from "../services/events";
 import { applyToTargets, CopyFilter, getTargets, getVehicleSettings } from "../services/vehicleCopier";
 import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
 import { locate } from "../services/vehicleLocater";
@@ -48,7 +49,11 @@ export const mainWindow = window({
 					width: 100,
 					height: 14,
 					disabled: model._isEditDisabled,
-					onClick: () => rideWindow.open()
+					onClick: () =>
+					{
+						invoke(refreshRide);
+						rideWindow.open();
+					}
 				})
 			]),
 			dropdown({ // ride list
@@ -384,7 +389,7 @@ export const mainWindow = window({
 								text: "Max. speed:",
 								tooltip: "The (il)legal speed limit for your vehicle, self-powered vehicles only",
 								disabledMessage: "Powered vehicles only",
-								minimum: 0,
+								minimum: 1,
 								maximum: 256,
 								wrapMode: clampThenWrapMode,
 								disabled: model._isUnpowered,
