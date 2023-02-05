@@ -88,6 +88,7 @@ export class VehicleViewModel
 	 */
 	_open(): void
 	{
+		Log.debug("[VehicleViewModel] Window opened!");
 		this._rideTypes.set(getAllRideTypes());
 		this._rides.set(getAllRides());
 

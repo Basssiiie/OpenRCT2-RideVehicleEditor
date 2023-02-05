@@ -51,8 +51,12 @@ export const mainWindow = window({
 					disabled: model._isEditDisabled,
 					onClick: () =>
 					{
-						invoke(refreshRide);
-						rideWindow.open();
+						const ride = model._selectedRide.get();
+						if (ride)
+						{
+							invoke(refreshRide, ride[0]._id);
+							rideWindow.open();
+						}
 					}
 				})
 			]),

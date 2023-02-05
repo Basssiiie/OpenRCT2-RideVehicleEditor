@@ -38,6 +38,7 @@ export class RideViewModel
 
 	_open(): void
 	{
+		Log.debug("[RideViewModel] Window opened!");
 		this._rideSubscription = this._ride.subscribe(r =>
 		{
 			if (r)
@@ -60,20 +61,22 @@ export class RideViewModel
 
 	_close(): void
 	{
-		const unsubscribe = this._rideSubscription;
-		const hook = this._ratingCalculationHook;
-		if (unsubscribe)
+		Log.debug("[RideViewModel] Window closed!");
+		if (this._rideSubscription)
 		{
-			unsubscribe();
+			this._rideSubscription();
 		}
-		if (hook)
+		if (this._ratingCalculationHook)
 		{
-			hook.dispose();
+			this._ratingCalculationHook.dispose();
 		}
+		this._rideSubscription = undefined;
+		this._ratingCalculationHook = undefined;
 	}
 
 	private _updateRideInfo(parkRide: ParkRide): void
 	{
+		Log.debug("[RideViewModel] Update ride info to", parkRide._ride().name);
 		const ride = parkRide._ride();
 		this._title.set(ride.name);
 

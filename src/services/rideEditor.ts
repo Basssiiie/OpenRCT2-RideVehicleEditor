@@ -2,6 +2,7 @@ import { register } from "./actions";
 import * as Log from "../utilities/logger";
 import { ParkRide } from "../objects/parkRide";
 import { RideLifeCycleFlags } from "../objects/rideLifeCycleFlags";
+import { invoke, refreshRide } from "./events";
 
 
 const execute = register<UpdateRideSettingArgs>("rve-update-ride", updateRideSetting);
@@ -104,10 +105,11 @@ function updateValue(rideId: number, key: RideUpdateKeys, value: number | boolea
  */
 function updateRideSetting(args: UpdateRideSettingArgs): void
 {
-	const ride = map.getRide(args._id);
+	const rideId = args._id;
+	const ride = map.getRide(rideId);
 	if (!ride)
 	{
-		Log.debug("Ride", args._id, "not found.");
+		Log.debug("Ride", rideId, "not found.");
 		return;
 	}
 
@@ -142,4 +144,5 @@ function updateRideSetting(args: UpdateRideSettingArgs): void
 			break;
 		}
 	}
+	invoke(refreshRide, rideId);
 }
