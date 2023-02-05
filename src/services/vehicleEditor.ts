@@ -163,9 +163,9 @@ export function setPositionZ(vehicles: VehicleSpan[], z: number): void
  */
 interface UpdateVehicleSettingArgs
 {
-	_targets: VehicleSpan[];
-	_key: VehicleUpdateKeys;
-	_value: number;
+	targets: VehicleSpan[];
+	key: VehicleUpdateKeys;
+	value: number;
 }
 
 
@@ -174,7 +174,7 @@ interface UpdateVehicleSettingArgs
  */
 function updateValue(vehicles: VehicleSpan[], key: VehicleUpdateKeys, value: number): void
 {
-	execute({ _targets: vehicles, _key: key, _value: value });
+	execute({ targets: vehicles, key, value });
 }
 
 
@@ -183,7 +183,7 @@ function updateValue(vehicles: VehicleSpan[], key: VehicleUpdateKeys, value: num
  */
 function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 {
-	const { _targets: targets, _key: key, _value: value } = args;
+	const { targets, key, value } = args;
 	let callback: (car: Car, index: number) => void;
 	switch (key) // Restrict key to permitted set.
 	{

@@ -118,29 +118,29 @@ export function getVehicleSettings(source: RideVehicle, filters: CopyFilter): Ve
 
 	if (filters & CopyFilter.TypeAndVariant)
 	{
-		settings._rideTypeId = car.rideObject;
-		settings._variant = car.vehicleObject;
+		settings.rideTypeId = car.rideObject;
+		settings.variant = car.vehicleObject;
 	}
 	if (filters & CopyFilter.Seats)
 	{
-		settings._seats = car.numSeats;
+		settings.seats = car.numSeats;
 	}
 	if (filters & CopyFilter.Mass)
 	{
-		settings._mass = car.mass;
+		settings.mass = car.mass;
 	}
 	if (isPowered && (filters & CopyFilter.PoweredAcceleration))
 	{
-		settings._poweredAcceleration = car.poweredAcceleration;
+		settings.poweredAcceleration = car.poweredAcceleration;
 	}
 	if (isPowered && (filters & CopyFilter.PoweredMaxSpeed))
 	{
-		settings._poweredMaxSpeed = car.poweredMaxSpeed;
+		settings.poweredMaxSpeed = car.poweredMaxSpeed;
 	}
 	if (filters & CopyFilter.Colours)
 	{
 		const cols = car.colours;
-		settings._colours = [ cols.body, cols.trim, cols.tertiary ];
+		settings.colours = [ cols.body, cols.trim, cols.tertiary ];
 	}
 	return settings;
 }
@@ -151,7 +151,7 @@ export function getVehicleSettings(source: RideVehicle, filters: CopyFilter): Ve
  */
 export function applyToTargets(settings: VehicleSettings, targets: [number, number | null][]): void
 {
-	execute({ _settings: settings, _targets: targets });
+	execute({ settings: settings, targets: targets });
 }
 
 
@@ -160,13 +160,13 @@ export function applyToTargets(settings: VehicleSettings, targets: [number, numb
  */
 export interface VehicleSettings
 {
-	_rideTypeId?: number;
-	_variant?: number;
-	_seats?: number;
-	_mass?: number;
-	_poweredAcceleration?: number;
-	_poweredMaxSpeed?: number;
-	_colours?: number[];
+	rideTypeId?: number;
+	variant?: number;
+	seats?: number;
+	mass?: number;
+	poweredAcceleration?: number;
+	poweredMaxSpeed?: number;
+	colours?: number[];
 }
 
 
@@ -180,8 +180,8 @@ export interface VehicleSettings
  */
 interface PasteVehicleSettingsArgs
 {
-	_settings: VehicleSettings;
-	_targets: VehicleSpan[];
+	settings: VehicleSettings;
+	targets: VehicleSpan[];
 }
 
 
@@ -190,7 +190,7 @@ interface PasteVehicleSettingsArgs
  */
 function pasteVehicleSettings(args: PasteVehicleSettingsArgs): void
 {
-	forEachVehicle(args._targets, car => applyVehicleSettings(car, args._settings));
+	forEachVehicle(args.targets, car => applyVehicleSettings(car, args.settings));
 }
 
 
@@ -207,14 +207,14 @@ function applyVehicleSettings(car: Car, settings: VehicleSettings): void
 		}
 	}
 
-	apply("rideObject", settings._rideTypeId);
-	apply("vehicleObject", settings._variant);
-	apply("numSeats", settings._seats);
-	apply("mass", settings._mass);
-	apply("poweredAcceleration", settings._poweredAcceleration);
-	apply("poweredMaxSpeed", settings._poweredMaxSpeed);
+	apply("rideObject", settings.rideTypeId);
+	apply("vehicleObject", settings.variant);
+	apply("numSeats", settings.seats);
+	apply("mass", settings.mass);
+	apply("poweredAcceleration", settings.poweredAcceleration);
+	apply("poweredMaxSpeed", settings.poweredMaxSpeed);
 
-	const colours = settings._colours;
+	const colours = settings.colours;
 	if (colours)
 	{
 		car.colours = { body: colours[0], trim: colours[1], tertiary: colours[2] };

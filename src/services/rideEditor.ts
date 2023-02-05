@@ -85,9 +85,9 @@ export function setIndestructable(ride: ParkRide, enabled: boolean): void
  */
 interface UpdateRideSettingArgs
 {
-	_id: number;
-	_key: RideUpdateKeys;
-	_value: number | boolean;
+	id: number;
+	key: RideUpdateKeys;
+	value: number | boolean;
 }
 
 
@@ -96,7 +96,7 @@ interface UpdateRideSettingArgs
  */
 function updateValue(rideId: number, key: RideUpdateKeys, value: number | boolean): void
 {
-	execute({ _id: rideId, _key: key, _value: value });
+	execute({ id: rideId, key, value });
 }
 
 
@@ -105,7 +105,7 @@ function updateValue(rideId: number, key: RideUpdateKeys, value: number | boolea
  */
 function updateRideSetting(args: UpdateRideSettingArgs): void
 {
-	const rideId = args._id;
+	const rideId = args.id;
 	const ride = map.getRide(rideId);
 	if (!ride)
 	{
@@ -113,7 +113,7 @@ function updateRideSetting(args: UpdateRideSettingArgs): void
 		return;
 	}
 
-	const { _key: key, _value: value } = args;
+	const { key, value } = args;
 	switch (key) // Restrict key to permitted set.
 	{
 		case excitement:
