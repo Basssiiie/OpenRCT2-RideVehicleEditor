@@ -7,7 +7,7 @@ import { refreshVehicle } from "../services/events";
 import { getSpacingToPrecedingVehicle } from "../services/spacingEditor";
 import { CopyFilter, CopyOptions, getTargets, VehicleSettings } from "../services/vehicleCopier";
 import { VehicleSpan } from "../services/vehicleSpan";
-import { findIndex } from "../utilities/arrayHelper";
+import { find, findIndex } from "../utilities/arrayHelper";
 import * as Log from "../utilities/logger";
 
 
@@ -272,20 +272,27 @@ export class VehicleViewModel
 			}
 			case "ridesetstatus": // close/reopen ride
 			{
-				const ride = this._selectedRide.get();
-				const statusArgs = <RideSetStatusArgs>event.args;
-				if (ride && ride[0]._id === statusArgs.ride)
+				const args = <RideSetStatusArgs>event.args;
+				const rideId = args.ride;
+				const rides = this._rides.get();
+				const ride = find(rides, r => r._id === rideId);
+				if (ride !== null)
 				{
-					const train = this._selectedTrain.get();
-					if (!train && ride[0]._refresh())
+					const rideExists = ride._refresh();
+					const selectedRide = this._selectedRide.get();
+					if (selectedRide && selectedRide[0]._id === rideId)
 					{
-						Log.debug("Selected ride: status changed to", statusArgs.status, ", get newly spawned trains");
-						this._trains.set(ride[0]._trains());
-					}
-					else if (train && !train[0]._refresh())
-					{
-						Log.debug("Selected ride: status changed to", statusArgs.status, ", all trains removed");
-						this._trains.set([]);
+						const selectedTrain = this._selectedTrain.get();
+						if (rideExists && !selectedTrain)
+						{
+							Log.debug("Selected ride: status changed to", args.status, ", get newly spawned trains");
+							this._trains.set(ride._trains());
+						}
+						else if (!rideExists || (selectedTrain && !selectedTrain[0]._refresh()))
+						{
+							Log.debug("Selected ride: status changed to", args.status, ", all trains removed");
+							this._trains.set([]);
+						}
 					}
 				}
 				break;
@@ -310,6 +317,7 @@ function updateSelectionOrNull<T>(value: Store<[T, number] | null>, items: T[]):
 		const selectedIdx = (previous && previous[1] < items.length) ? previous[1] : 0;
 		selection = [ items[selectedIdx], selectedIdx ];
 	}
+	Log.debug("[updateSelectionOrNull] =>", selection);
 	value.set(selection);
 }
 

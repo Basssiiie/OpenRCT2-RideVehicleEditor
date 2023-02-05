@@ -71,7 +71,8 @@ const config = {
 
 				beautify: isDev,
 			},
-			mangle: {
+			mangle: isDev ? {}
+			: {
 				properties: {
 					regex: /^_/
 				}
