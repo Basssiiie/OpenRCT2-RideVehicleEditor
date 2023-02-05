@@ -113,6 +113,9 @@ export function getVehicleSettings(source: RideVehicle, filters: CopyFilter): Ve
 		isPowered = source._isPowered(),
 		settings: VehicleSettings = {};
 
+	// If nothing is set, copy all filters.
+	filters ||= CopyFilter.All;
+
 	if (filters & CopyFilter.TypeAndVariant)
 	{
 		settings._rideTypeId = car.rideObject;
