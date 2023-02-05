@@ -5,7 +5,7 @@ import { invoke, refreshRide } from "../services/events";
 import { applyToTargets, CopyFilter, getTargets, getVehicleSettings } from "../services/vehicleCopier";
 import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
 import { locate } from "../services/vehicleLocater";
-import { toggleVehiclePicker } from "../services/vehiclePicker";
+import { cancelVehiclePicker, toggleVehiclePicker } from "../services/vehiclePicker";
 import { VehicleViewModel } from "../viewmodels/vehicleViewModel";
 import { model as rideModel, rideWindow } from "./rideWindow";
 import { combinedLabelSpinner } from "./utilityControls";
@@ -27,7 +27,11 @@ if (isDevelopment)
 {
 	title += " [DEBUG]";
 }
-model._selectedRide.subscribe(r => rideModel._ride.set((r) ? r[0] : null));
+model._selectedRide.subscribe(r =>
+{
+	rideModel._ride.set((r) ? r[0] : null);
+	rideWindow.focus();
+});
 
 
 export const mainWindow = window({
@@ -36,7 +40,12 @@ export const mainWindow = window({
 	height: 401,
 	spacing: 5,
 	onOpen: () => model._open(),
-	onClose: () => rideWindow.close(),
+	onClose: () =>
+	{
+		cancelVehiclePicker();
+		rideWindow.close();
+		model._close();
+	},
 	content: [
 		groupbox([ // selection top bar
 			horizontal([
@@ -54,8 +63,8 @@ export const mainWindow = window({
 						const ride = model._selectedRide.get();
 						if (ride)
 						{
-							invoke(refreshRide, ride[0]._id);
 							rideWindow.open();
+							invoke(refreshRide, ride[0]._id);
 						}
 					}
 				})
@@ -415,7 +424,8 @@ export const mainWindow = window({
 							width: 45,
 							padding: { top: -2, right: 6 },
 							items: ["x1", "x10", "x100"],
-							onChange: idx => model._multiplier.set(10 ** idx),
+							selectedIndex: model._multiplierIndex,
+							onChange: idx => model._multiplierIndex.set(idx),
 						})
 					])
 				]

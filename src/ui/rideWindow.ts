@@ -10,15 +10,23 @@ import { combinedLabelCheckbox, combinedLabelSpinner } from "./utilityControls";
 const int16max = 32_767, int16min = -32_768;
 
 
+/**
+ * The viewmodel that interacts with the ride window.
+ */
 export const model = new RideViewModel();
 
 
+/**
+ * Window to edit properties of the currently selected ride.
+ */
 export const rideWindow = window({
 	title: model._title,
 	position: "center",
 	width: 255, minWidth: 225, maxWidth: 275,
 	height: 216,
 	colours: [ 24, 24 ],
+	onOpen: () => model._open(),
+	onClose: () => model._close(),
 	content: [
 		groupbox({
 			text: "Ratings",

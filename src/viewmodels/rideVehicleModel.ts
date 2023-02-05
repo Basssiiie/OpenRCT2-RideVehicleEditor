@@ -20,6 +20,7 @@ export class RideViewModel
 	readonly _customDesign = store<boolean>(false);
 	readonly _indestructable = store<boolean>(false);
 
+	private _isOpen?: boolean;
 	private _rideSubscription?: () => void;
 	private _ratingCalculationHook?: IDisposable;
 
@@ -27,6 +28,11 @@ export class RideViewModel
 	{
 		refreshRide.push(id =>
 		{
+			if (!this._isOpen)
+			{
+				Log.debug("[RideViewModel] Refresh ignored, window not open.");
+				return;
+			}
 			Log.debug("[RideViewModel] Refresh ride!");
 			const ride = this._ride.get();
 			if (ride && ride._id === id)
@@ -39,6 +45,7 @@ export class RideViewModel
 	_open(): void
 	{
 		Log.debug("[RideViewModel] Window opened!");
+		this._isOpen = true;
 		this._rideSubscription = this._ride.subscribe(r =>
 		{
 			if (r)
@@ -62,6 +69,7 @@ export class RideViewModel
 	_close(): void
 	{
 		Log.debug("[RideViewModel] Window closed!");
+		this._isOpen = false;
 		if (this._rideSubscription)
 		{
 			this._rideSubscription();

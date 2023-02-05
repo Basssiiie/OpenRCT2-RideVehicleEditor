@@ -48,7 +48,8 @@ export class VehicleViewModel
 	readonly _isEditDisabled = compute(this._selectedVehicle, v => !v);
 	readonly _isPositionDisabled = compute(this._isMoving, this._isEditDisabled, (m, e) => m || e);
 	readonly _formatPosition = (pos: number): string => (this._isEditDisabled.get() ? "Not available" : pos.toString());
-	readonly _multiplier = store<number>(1);
+	readonly _multiplierIndex = store<number>(0);
+	readonly _multiplier = compute(this._multiplierIndex, idx => (10 ** idx));
 
 	readonly _copyFilters = store<CopyFilter>(0);
 	readonly _copyTargetOption = store<CopyOptions>(0);
@@ -56,6 +57,7 @@ export class VehicleViewModel
 	readonly _synchronizeTargets = store<boolean>(false);
 	readonly _clipboard = store<VehicleSettings | null>(null);
 
+	private _isOpen?: boolean;
 	private _onPlayerAction?: IDisposable;
 	private _onGameTick?: IDisposable;
 
@@ -67,13 +69,18 @@ export class VehicleViewModel
 
 		this._selectedVehicle.subscribe(vehicle =>
 		{
-			if (vehicle)
+			if (vehicle && this._isOpen)
 			{
 				this._updateVehicleInfo(vehicle[0], vehicle[1]);
 			}
 		});
 		refreshVehicle.push(id =>
 		{
+			if (!this._isOpen)
+			{
+				Log.debug("[VehicleViewModel] Refresh ignored, window not open.");
+				return;
+			}
 			Log.debug("[VehicleViewModel] Refresh vehicle!");
 			const vehicle = this._selectedVehicle.get();
 			if (vehicle && vehicle[0]._id === id)
@@ -89,6 +96,7 @@ export class VehicleViewModel
 	_open(): void
 	{
 		Log.debug("[VehicleViewModel] Window opened!");
+		this._isOpen = true;
 		this._rideTypes.set(getAllRideTypes());
 		this._rides.set(getAllRides());
 
@@ -102,6 +110,7 @@ export class VehicleViewModel
 	_close(): void
 	{
 		Log.debug("[VehicleViewModel] Window closed!");
+		this._isOpen = false;
 		if (this._onPlayerAction)
 		{
 			this._onPlayerAction.dispose();
@@ -112,6 +121,10 @@ export class VehicleViewModel
 		}
 		this._onPlayerAction = undefined;
 		this._onGameTick = undefined;
+
+		// Reset values
+		this._multiplierIndex.set(0);
+		this._synchronizeTargets.set(false);
 	}
 
 	/**
