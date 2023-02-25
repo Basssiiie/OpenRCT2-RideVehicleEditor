@@ -201,13 +201,20 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 		case massKey:
 		case poweredAccelerationKey:
 		case poweredMaxSpeedKey:
+		{
+			callback = (car): void =>
+			{
+				car[key] = value;
+			};
+			break;
+		}
 		case xPosition:
 		case yPosition:
 		case zPosition:
 		{
 			callback = (car): void =>
 			{
-				car[key] = value;
+				car[key] += value;
 			};
 			break;
 		}

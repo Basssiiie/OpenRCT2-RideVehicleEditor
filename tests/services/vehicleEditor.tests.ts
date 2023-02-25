@@ -137,11 +137,14 @@ test("Set x position", t =>
 {
 	const car = setupCarMock(29);
 
-	setPositionX([[ 29, 1 ]], 10090);
-	t.is(car.x, 10090);
+	setPositionX([[ 29, 1 ]], 10);
+	t.is(car.x, 10);
 
-	setPositionX([[ 29, 1 ]], 3);
-	t.is(car.x, 3);
+	setPositionX([[ 29, 1 ]], 10090);
+	t.is(car.x, 10 + 10090);
+
+	setPositionX([[ 29, 1 ]], -3);
+	t.is(car.x, 10 + 10090 - 3);
 });
 
 
@@ -152,8 +155,11 @@ test("Set y position", t =>
 	setPositionY([[ 10, 1 ]], 5020);
 	t.is(car.y, 5020);
 
-	setPositionY([[ 10, 1 ]], 302010);
-	t.is(car.y, 302010);
+	setPositionY([[ 10, 1 ]], -302010);
+	t.is(car.y, 5020 - 302010);
+
+	setPositionY([[ 10, 1 ]], 15);
+	t.is(car.y, 5020 - 302010 + 15);
 });
 
 
@@ -161,9 +167,12 @@ test("Set z position", t =>
 {
 	const car = setupCarMock(101);
 
-	setPositionZ([[ 101, 1 ]], 698);
-	t.is(car.z, 698);
+	setPositionZ([[ 101, 1 ]], -698);
+	t.is(car.z, -698);
 
 	setPositionZ([[ 101, 1 ]], 653);
-	t.is(car.z, 653);
+	t.is(car.z, -698 + 653);
+
+	setPositionZ([[ 101, 1 ]], -10);
+	t.is(car.z, -653 + 653 - 10);
 });

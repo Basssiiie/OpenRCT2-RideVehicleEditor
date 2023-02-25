@@ -345,7 +345,7 @@ export const mainWindow = window({
 								step: model._multiplier,
 								value: model._x,
 								format: model._formatPosition,
-								onChange: value => model._modifyVehicle(setPositionX, value),
+								onChange: (_, incr) => model._modifyVehicle(setPositionX, incr),
 							}),
 							positionSpinner({
 								text: "Y position:",
@@ -354,7 +354,7 @@ export const mainWindow = window({
 								step: model._multiplier,
 								value: model._y,
 								format: model._formatPosition,
-								onChange: value => model._modifyVehicle(setPositionY, value)
+								onChange: (_, incr) => model._modifyVehicle(setPositionY, incr)
 							}),
 							positionSpinner({
 								text: "Z position:",
@@ -363,7 +363,7 @@ export const mainWindow = window({
 								step: model._multiplier,
 								value: model._z,
 								format: model._formatPosition,
-								onChange: value => model._modifyVehicle(setPositionZ, value)
+								onChange: (_, incr) => model._modifyVehicle(setPositionZ, incr)
 							})
 						]
 					}),
