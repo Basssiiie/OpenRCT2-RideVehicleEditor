@@ -15,7 +15,7 @@ const model = new VehicleViewModel();
 const buttonSize = 24;
 const controlsWidth = 244;
 const controlsLabelWidth = 82;
-const controlsSpinnerWidth = 146; // controlsWidth - (controlsLabelWidth + 4 + 12); // include spacing
+const controlsSpinnerWidth = controlsWidth - (controlsLabelWidth + 4 + 12); // include spacing
 const clampThenWrapMode: SpinnerWrapMode = "clampThenWrap";
 
 // Tips that are used multiple times
@@ -37,7 +37,7 @@ model._selectedRide.subscribe(r =>
 export const mainWindow = window({
 	title,
 	width: 500, minWidth: 465, maxWidth: 560,
-	height: 401,
+	height: 389,
 	spacing: 5,
 	onOpen: () => model._open(),
 	onClose: () =>
@@ -69,17 +69,18 @@ export const mainWindow = window({
 					}
 				})
 			]),
-			dropdown({ // ride list
-				items: compute(model._rides, c => c.map(r => r._ride().name)),
-				tooltip: "List of rides in the park",
-				disabledMessage: "No rides in this park",
-				autoDisable: "empty",
-				selectedIndex: compute(model._selectedRide, r => r ? r[1] : 0),
-				onChange: i => model._selectedRide.set([model._rides.get()[i], i]),
-			}),
 			horizontal([
+				dropdownSpinner({ // ride list
+					items: compute(model._rides, c => c.map(r => r._ride().name)),
+					tooltip: "List of rides in the park",
+					disabledMessage: "No rides in this park",
+					autoDisable: "empty",
+					selectedIndex: compute(model._selectedRide, r => r ? r[1] : 0),
+					onChange: i => model._selectedRide.set([model._rides.get()[i], i]),
+				}),
 				dropdownSpinner({ // train list
 					items: compute(model._trains, c => c.map((_, i) => ("Train " + (i + 1)))),
+					width: "30%",
 					tooltip: "List of trains on the currently selected ride",
 					disabledMessage: "No trains available",
 					autoDisable: "single",
@@ -88,6 +89,7 @@ export const mainWindow = window({
 				}),
 				dropdownSpinner({ // vehicle list
 					items: compute(model._vehicles, c => c.map((_, i) => ("Vehicle " + (i + 1)))),
+					width: "30%",
 					tooltip: "List of vehicles on the currently selected train",
 					disabledMessage: "No vehicles available",
 					autoDisable: "single",
@@ -162,6 +164,7 @@ export const mainWindow = window({
 					]),
 					groupbox({
 						text: "Apply & synchronize",
+						spacing: 7,
 						content: [
 							horizontal([
 								vertical([
@@ -432,8 +435,7 @@ export const mainWindow = window({
 			})
 		]),
 		label({ // credits
-			height: 11,
-			padding: [ 0, 20 ], // do not cover the resize corner
+			padding: [ -1, 20, 0, 20 ], // do not cover the resize corner
 			text: "github.com/Basssiiie/OpenRCT2-RideVehicleEditor",
 			tooltip: "Go to this URL to check for the latest updates",
 			alignment: "centred",

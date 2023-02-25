@@ -43,7 +43,9 @@ const config = {
 	output: {
 		file: getOutput(),
 		format: "iife",
+		compact: true
 	},
+	treeshake: "smallest",
 	plugins: [
 		resolve({
 			extensions,
