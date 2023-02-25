@@ -207,6 +207,7 @@ export class VehicleViewModel
 		const typeIdx = findIndex(types, t => t._id === car.rideObject);
 		const colours = car.colours;
 
+		this._updateDynamicDataFromCar(car, index);
 		this._type.set((typeIdx === null) ? null : [ types[typeIdx], typeIdx ]);
 		this._seats.set(car.numSeats);
 		this._poweredAcceleration.set(car.poweredAcceleration);
@@ -214,7 +215,6 @@ export class VehicleViewModel
 		this._primaryColour.set(colours.body);
 		this._secondaryColour.set(colours.trim);
 		this._tertiaryColour.set(colours.tertiary);
-		this._updateDynamicDataFromCar(car, index);
 	}
 
 	/**
@@ -265,9 +265,31 @@ export class VehicleViewModel
 		{
 			case "ridecreate":
 			case "ridedemolish":
-			case "ridesetname":
 			{
 				this._rides.set(getAllRides());
+				break;
+			}
+			case "ridesetname":
+			{
+				const currentRide = this._selectedRide.get();
+				const currentVehicle = this._selectedVehicle.get();
+				const allRides = getAllRides();
+				this._rides.set(allRides);
+				if (currentVehicle)
+				{
+					// Reselect same vehicle
+					this._select(currentVehicle[0]._car());
+				}
+				else if (currentRide)
+				{
+					// No vehicles were spawned, try to find the same ride again.
+					const rideId = currentRide[0]._id;
+					const rideIdx = findIndex(allRides, r => r._id === rideId);
+					if (rideIdx !== null)
+					{
+						this._selectedRide.set([allRides[rideIdx], rideIdx]);
+					}
+				}
 				break;
 			}
 			case "ridesetstatus": // close/reopen ride

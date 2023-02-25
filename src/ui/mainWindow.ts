@@ -276,7 +276,11 @@ export const mainWindow = window({
 								text: "Variant:",
 								tooltip: "Sprite variant to use from the selected ride type",
 								minimum: 0,
-								maximum: compute(model._variants, v => Math.max(v.length, 1)),
+								maximum: compute(model._variants, v =>
+								{
+									const length = (v.length - 1);
+									return (length > 1) ? length : 1;
+								}),
 								wrapMode: "wrap",
 								disabled: compute(model._isEditDisabled, model._variants, (noEdit, variants) => (noEdit || variants.length < 2)),
 								value: model._variant,
@@ -371,7 +375,7 @@ export const mainWindow = window({
 								text: "Seats:",
 								tooltip: "Total amount of passengers that can cuddle up in this vehicle",
 								minimum: 0,
-								maximum: 33, // vehicles refuse more than 32 guests, leaving them stuck just before entering.
+								maximum: 32, // vehicles refuse more than 32 guests, leaving them stuck just before entering.
 								wrapMode: clampThenWrapMode,
 								disabled: model._isEditDisabled,
 								step: model._multiplier,
@@ -382,7 +386,7 @@ export const mainWindow = window({
 								text: "Mass:",
 								tooltip: "Total amount of mass (weight) of this vehicle, including all its passengers and your mom",
 								minimum: 0,
-								maximum: 65_536,
+								maximum: 65_535,
 								wrapMode: clampThenWrapMode,
 								disabled: model._isEditDisabled,
 								step: model._multiplier,
@@ -394,7 +398,7 @@ export const mainWindow = window({
 								tooltip: "Cranks up the engines to accelerate faster, self-powered vehicles only",
 								disabledMessage: "Powered vehicles only",
 								minimum: 0,
-								maximum: 256,
+								maximum: 255,
 								wrapMode: clampThenWrapMode,
 								disabled: model._isUnpowered,
 								step: model._multiplier,
@@ -406,7 +410,7 @@ export const mainWindow = window({
 								tooltip: "The (il)legal speed limit for your vehicle, self-powered vehicles only",
 								disabledMessage: "Powered vehicles only",
 								minimum: 1,
-								maximum: 256,
+								maximum: 255,
 								wrapMode: clampThenWrapMode,
 								disabled: model._isUnpowered,
 								step: model._multiplier,

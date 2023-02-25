@@ -7,7 +7,7 @@ import { RideViewModel } from "../viewmodels/rideVehicleModel";
 import { combinedLabelCheckbox, combinedLabelSpinner } from "./utilityControls";
 
 
-const int16max = 32_767, int16min = -32_768;
+const int16max = 32_766, int16min = -32_768;
 
 
 /**
