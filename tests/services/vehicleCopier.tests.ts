@@ -22,7 +22,7 @@ function createTrain(startIndex: number): Car[]
 
 const getTargetsMacro = test.macro((t, option: CopyOptions, trainIndex: number, vehicleIndex: number, expectedTargets: [number, number | null][]) =>
 {
-	global.map = Mock.map({ entities: [
+	globalThis.map = Mock.map({ entities: [
 		...createTrain(30),
 		...createTrain(20),
 		...createTrain(10),
@@ -65,7 +65,7 @@ test("Get targets of same vehicle on all trains from last train, last car", getT
 
 test("Get all settings of the vehicle", t =>
 {
-	global.context = Mock.context({ objects: [
+	globalThis.context = Mock.context({ objects: [
 		Mock.rideObject({ index: 23, vehicles: [ Mock.rideObjectVehicle(), Mock.rideObjectVehicle({ flags: (1 << 19) })]})
 	]});
 	const car = Mock.car({
@@ -93,7 +93,7 @@ test("Get all settings of the vehicle", t =>
 
 test("Get all of the settings of the vehicle while selecting nothing", t =>
 {
-	global.context = Mock.context({ objects: [
+	globalThis.context = Mock.context({ objects: [
 		Mock.rideObject({ index: 23, vehicles: [ Mock.rideObjectVehicle(), Mock.rideObjectVehicle({ flags: (1 << 19) })]})
 	]});
 	const car = Mock.car({
@@ -121,7 +121,7 @@ test("Get all of the settings of the vehicle while selecting nothing", t =>
 
 test("Get ride type and variant settings of the vehicle and nothing else", t =>
 {
-	global.context = Mock.context({ objects: [
+	globalThis.context = Mock.context({ objects: [
 		Mock.rideObject({ index: 23, vehicles: [ Mock.rideObjectVehicle(), Mock.rideObjectVehicle({ flags: (1 << 19) })]})
 	]});
 	const car = Mock.car({
@@ -149,7 +149,7 @@ test("Get ride type and variant settings of the vehicle and nothing else", t =>
 
 test("Get seats settings of the vehicle and nothing else", t =>
 {
-	global.context = Mock.context({ objects: [
+	globalThis.context = Mock.context({ objects: [
 		Mock.rideObject({ index: 23, vehicles: [ Mock.rideObjectVehicle(), Mock.rideObjectVehicle({ flags: (1 << 19) })]})
 	]});
 	const car = Mock.car({
@@ -177,7 +177,7 @@ test("Get seats settings of the vehicle and nothing else", t =>
 
 test("Get no powered settings of unpowered vehicle", t =>
 {
-	global.context = Mock.context({ objects: [
+	globalThis.context = Mock.context({ objects: [
 		Mock.rideObject({ index: 28, vehicles: [ Mock.rideObjectVehicle() ]})
 	]});
 	const car = Mock.car({
@@ -197,10 +197,10 @@ test("Get no powered settings of unpowered vehicle", t =>
 
 function initActionTestHelpers(permissions: PermissionType[] = [ "ride_properties" ]): void
 {
-	global.context = Mock.context({
+	globalThis.context = Mock.context({
 		getTypeIdForAction: () => 80
 	});
-	global.network = Mock.network({
+	globalThis.network = Mock.network({
 		groups: [ Mock.playerGroup({ permissions })]
 	});
 	initActions();
@@ -210,7 +210,7 @@ function initActionTestHelpers(permissions: PermissionType[] = [ "ride_propertie
 test("Paste all vehicle settings on single car", t =>
 {
 	initActionTestHelpers();
-	global.map = Mock.map({ entities: [
+	globalThis.map = Mock.map({ entities: [
 		Mock.car({ id: 98, rideObject: 2 }),
 		Mock.car({ id: 99, rideObject: 2 }),
 		Mock.car({ id: 97, rideObject: 2 }),
@@ -244,7 +244,7 @@ test("Paste all vehicle settings on single car", t =>
 test("Paste all vehicle settings on a car does not affect other cars", t =>
 {
 	initActionTestHelpers();
-	global.map = Mock.map({ entities: [
+	globalThis.map = Mock.map({ entities: [
 		Mock.car({ id: 98, rideObject: 2 }),
 		Mock.car({ id: 99, rideObject: 2 }),
 		Mock.car({ id: 97, rideObject: 2 }),
@@ -283,7 +283,7 @@ test("Paste all vehicle settings on a car does not affect other cars", t =>
 test("Paste empty vehicle settings on single car does not do anything", t =>
 {
 	initActionTestHelpers();
-	global.map = Mock.map({ entities: [
+	globalThis.map = Mock.map({ entities: [
 		Mock.car({ id: 98, rideObject: 2 }),
 		Mock.car({ id: 99, rideObject: 2 }),
 		Mock.car({ id: 97, rideObject: 2 }),
@@ -306,7 +306,7 @@ test("Paste empty vehicle settings on single car does not do anything", t =>
 test("Paste all vehicle settings on multiple trains car affects all", t =>
 {
 	initActionTestHelpers();
-	global.map = Mock.map({ entities: [
+	globalThis.map = Mock.map({ entities: [
 		Mock.car({ id: 98, rideObject: 2, nextCarOnTrain: 99 }),
 		Mock.car({ id: 99, rideObject: 2 }),
 		Mock.car({ id: 97, rideObject: 2, nextCarOnTrain: 90 }),

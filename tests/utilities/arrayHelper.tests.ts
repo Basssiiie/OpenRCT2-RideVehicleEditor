@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import test from "ava";
-import * as ArrayHelper from "../../src/utilities/arrayHelper";
+import * as ArrayHelper from "../../src/utilities/array";
 
 
 test("isValidIndex()", t =>
@@ -45,12 +45,12 @@ test("findIndex()", t =>
 {
 	const array = [ "one", "two", "three" ];
 
-	t.is(ArrayHelper.findIndex(array, i => i.startsWith("o")), 0);
-	t.is(ArrayHelper.findIndex(array, i => i.startsWith("tw")), 1);
-	t.is(ArrayHelper.findIndex(array, i => i.startsWith("th")), 2);
+	t.is(ArrayHelper.findIndex(array, i => i.indexOf("o") === 0), 0);
+	t.is(ArrayHelper.findIndex(array, i => i.indexOf("tw") === 0), 1);
+	t.is(ArrayHelper.findIndex(array, i => i.indexOf("th") === 0), 2);
 	t.is(ArrayHelper.findIndex(array, () => true), 0);
 
-	t.is(ArrayHelper.findIndex(array, i => i.startsWith("z")), null);
+	t.is(ArrayHelper.findIndex(array, i => i.indexOf("z") === 0), null);
 	t.is(ArrayHelper.findIndex(array, () => false), null);
 	t.is(ArrayHelper.findIndex([], () => false), null);
 });

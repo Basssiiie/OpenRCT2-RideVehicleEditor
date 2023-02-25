@@ -9,7 +9,7 @@ import { VehicleVisibility } from "../../src/objects/rideVehicleVariant";
 
 test("getAllRideTypes() gets all ride types", t =>
 {
-	global.context = Mock.context({ objects: [
+	globalThis.context = Mock.context({ objects: [
 		Mock.rideObject({ index: 3, carsPerFlatRide: 255, name: "Log flume" }),
 		Mock.rideObject({ index: 4, carsPerFlatRide: 4, name: "Space Rings" }),
 		Mock.rideObject({ index: 5, carsPerFlatRide: 1, name: "Twister" }),
@@ -29,7 +29,7 @@ test("getAllRideTypes() gets all ride types", t =>
 
 test("getAllRideTypes() sorts ride types alphabetically", t =>
 {
-	global.context = Mock.context({ objects: [
+	globalThis.context = Mock.context({ objects: [
 		Mock.rideObject({ index: 3, carsPerFlatRide: 1, name: "Twister" }),
 		Mock.rideObject({ index: 4, carsPerFlatRide: 255, name: "Log flume" }),
 		Mock.rideObject({ index: 5, carsPerFlatRide: 4, name: "Space Rings" }),
@@ -49,7 +49,7 @@ test("getAllRideTypes() sorts ride types alphabetically", t =>
 
 test("getAllRideTypes() skips stalls", t =>
 {
-	global.context = Mock.context({ objects: [
+	globalThis.context = Mock.context({ objects: [
 		Mock.rideObject({ index: 5, carsPerFlatRide: 0, name: "Info Kiosk" }),
 		Mock.rideObject({ index: 6, carsPerFlatRide: 255, name: "Log flume" }),
 		Mock.rideObject({ index: 7, carsPerFlatRide: 0, name: "Pizza Stall" }),
@@ -65,7 +65,7 @@ test("getAllRideTypes() skips stalls", t =>
 
 test("Ride type gets created from type id", t =>
 {
-	global.context = Mock.context({ objects: [
+	globalThis.context = Mock.context({ objects: [
 		Mock.rideObject({ index: 5, carsPerFlatRide: 0, name: "Info Kiosk" }),
 		Mock.rideObject({ index: 12, carsPerFlatRide: 255, name: "Log flume" }),
 	]});
@@ -90,7 +90,7 @@ test("Ride type gets created from ride object", t =>
 
 test("Ride type refreshes correctly", t =>
 {
-	global.context = Mock.context({ objects: [
+	globalThis.context = Mock.context({ objects: [
 		Mock.rideObject({ index: 5, carsPerFlatRide: 0, name: "Info Kiosk" }),
 		Mock.rideObject({ index: 12, carsPerFlatRide: 255, name: "Log flume" }),
 	]});

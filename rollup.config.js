@@ -1,14 +1,13 @@
 import resolve from "@rollup/plugin-node-resolve";
 import replace from "@rollup/plugin-replace";
+import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
-import getPath from "platform-folders";
-import { terser } from "rollup-plugin-terser";
+import { getConfigHome, getDocumentsFolder } from "platform-folders";
 
 
 // Environment variables
 const build = process.env.BUILD || "development";
 const isDev = (build === "development");
-const extensions = [ ".js", ".ts" ];
 
 /**
  * Tip: if you change the path here to your personal user folder,
@@ -27,10 +26,13 @@ function getOutput()
 		return "./dist/RideVehicleEditor.js";
 
 	const pluginPath = "OpenRCT2/plugin/RideVehicleEditor.js";
-	switch (process.platform)
+	if (process.platform === "win32")
 	{
-		case "win32": return `${getPath("documents")}/${pluginPath}`;
-		default: return `${getPath("userData")}/${pluginPath}`; // for both Mac and Linux
+		return `${getDocumentsFolder()}/${pluginPath}`;
+	}
+	else // for both Mac and Linux
+	{
+		return `${getConfigHome()}/${pluginPath}`;
 	}
 }
 
@@ -47,11 +49,8 @@ const config = {
 	},
 	treeshake: "smallest",
 	plugins: [
-		resolve({
-			extensions,
-		}),
+		resolve(),
 		replace({
-			extensions,
 			include: "./src/environment.ts",
 			preventAssignment: true,
 			values: {

@@ -10,17 +10,17 @@ import { setBuildMonth, setCustomDesign, setExcitementRating, setFrozenRatings, 
 
 function setupRideMock(rideId: number, permissions: PermissionType[] = [ "ride_properties" ]): Ride
 {
-	global.network = Mock.network({
+	globalThis.network = Mock.network({
 		groups: [ Mock.playerGroup({ permissions })]
 	});
 
 	const ride = Mock.ride({ id: rideId });
-	global.map = Mock.map({ rides: [ ride ]});
+	globalThis.map = Mock.map({ rides: [ ride ]});
 	return ride;
 }
 test.before(() =>
 {
-	global.context = Mock.context({
+	globalThis.context = Mock.context({
 		getTypeIdForAction: () => 80
 	});
 	initActions();

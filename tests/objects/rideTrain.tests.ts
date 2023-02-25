@@ -7,7 +7,7 @@ import { RideTrain } from "../../src/objects/rideTrain";
 
 test("Ride train gets created from single car id", t =>
 {
-	global.map = Mock.map({ entities: [
+	globalThis.map = Mock.map({ entities: [
 		Mock.car({ id: 78 })
 	]});
 
@@ -21,7 +21,7 @@ test("Ride train gets created from single car id", t =>
 
 test("Ride train gets created from multiple car ids", t =>
 {
-	global.map = Mock.map({ entities: [
+	globalThis.map = Mock.map({ entities: [
 		Mock.car({ id: 12 }),
 		Mock.car({ id: 15, nextCarOnTrain: 66 }),
 		Mock.car({ id: 7, nextCarOnTrain: 12 }),
@@ -54,7 +54,7 @@ test("Ride train with invalid head car id fails", t =>
 
 test("Ride train with invalid car id in train ends train", t =>
 {
-	global.map = Mock.map({ entities: [
+	globalThis.map = Mock.map({ entities: [
 		Mock.car({ id: 6, nextCarOnTrain: invalidId }),
 	]});
 
@@ -73,7 +73,7 @@ const atIndexTest = test.macro({
 	},
 	exec(t, index: number, expectedId: number)
 	{
-		global.map = Mock.map({ entities: [
+		globalThis.map = Mock.map({ entities: [
 			Mock.car({ id: 5, nextCarOnTrain: 7 }),
 			Mock.car({ id: 6 }),
 			Mock.car({ id: 8, nextCarOnTrain: 5 }),

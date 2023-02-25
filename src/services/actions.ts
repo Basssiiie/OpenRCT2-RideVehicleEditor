@@ -1,5 +1,5 @@
 import { isMultiplayer } from "../environment";
-import { find } from "../utilities/arrayHelper";
+import { find } from "../utilities/array";
 import * as Log from "../utilities/logger";
 
 

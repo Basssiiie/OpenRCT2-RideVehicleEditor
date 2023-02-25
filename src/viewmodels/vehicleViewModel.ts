@@ -7,7 +7,7 @@ import { refreshVehicle } from "../services/events";
 import { getSpacingToPrecedingVehicle } from "../services/spacingEditor";
 import { CopyFilter, CopyOptions, getTargets, VehicleSettings } from "../services/vehicleCopier";
 import { VehicleSpan } from "../services/vehicleSpan";
-import { find, findIndex } from "../utilities/arrayHelper";
+import { find, findIndex } from "../utilities/array";
 import * as Log from "../utilities/logger";
 
 
@@ -181,7 +181,8 @@ export class VehicleViewModel
 		}
 		else
 		{
-			Log.debug("Failed to modify vehicle with", action?.name, "to", value, "; none is selected.");
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			Log.debug("Failed to modify vehicle with", (<any>action).name, "to", value, "; none is selected.");
 		}
 	}
 

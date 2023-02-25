@@ -38,8 +38,8 @@ function setupTrackIterator(trackPieces: TrackPiece[], trackStartIndex?: number)
 {
 	const mock = Mock.map({
 		tiles: trackPieces.map(p => Mock.tile({
-			x: Math.trunc(p.position.x / 32),
-			y: Math.trunc(p.position.y / 32),
+			x: Math.floor(p.position.x / 32),
+			y: Math.floor(p.position.y / 32),
 			elements: [
 				Mock.trackElement({ type: "track", baseZ: p.position.z })
 			]
@@ -56,7 +56,7 @@ function setupTrackIterator(trackPieces: TrackPiece[], trackStartIndex?: number)
 			});
 		},
 	});
-	global.map = mock;
+	globalThis.map = mock;
 	return mock;
 }
 

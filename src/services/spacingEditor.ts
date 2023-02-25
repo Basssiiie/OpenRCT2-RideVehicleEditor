@@ -1,6 +1,7 @@
 import { RideTrain } from "../objects/rideTrain";
 import { getSubpositionTranslationDistance, getTrackDistances, TrackDistances } from "./subpositionHelper";
 import * as Log from "../utilities/logger";
+import { abs, floor } from "../utilities/math";
 
 const MaxForwardIterations = 10;
 const UnitsPerTile = 32;
@@ -39,7 +40,7 @@ export function getDistanceFromProgress(car: Car, trackProgress: number): number
 	const subposition = car.subposition;
 	const subpositionIterator = (trackProgress >= 0)
 		? new ForwardIterator(trackProgress, currentProgress)
-		: new BackwardIterator(Math.abs(trackProgress), currentProgress);
+		: new BackwardIterator(abs(trackProgress), currentProgress);
 
 	let trackPosition = currentTrackLocation;
 	let trackDistances = getTrackDistances(iteratorSegment, subposition, trackPosition.direction);
@@ -177,7 +178,7 @@ function getTrackIteratorAtLocation(trackLocation: CoordsXYZD): TrackIterator | 
  */
 function getIndexForTrackElementAt(coords: CoordsXYZD): number | null
 {
-	const tile = map.getTile(Math.trunc(coords.x / UnitsPerTile), Math.trunc(coords.y / UnitsPerTile));
+	const tile = map.getTile(floor(coords.x / UnitsPerTile), floor(coords.y / UnitsPerTile));
 	const allElements = tile.elements, len = allElements.length;
 
 	for (let i = 0; i < len; i++)

@@ -10,15 +10,15 @@ import { setMass, setPositionX, setPositionY, setPositionZ, setPoweredAccelerati
 function setupCarMock(carId: number): Car
 {
 	const car = Mock.car({ id: carId, rideObject: 2 });
-	global.map = Mock.map({ entities: [ car ]});
+	globalThis.map = Mock.map({ entities: [ car ]});
 	return car;
 }
 test.before(() =>
 {
-	global.context = Mock.context({
+	globalThis.context = Mock.context({
 		getTypeIdForAction: () => 80
 	});
-	global.network = Mock.network({
+	globalThis.network = Mock.network({
 		groups: [ Mock.playerGroup({ permissions: [ "ride_properties" ] })]
 	});
 	initActions();
@@ -174,5 +174,5 @@ test("Set z position", t =>
 	t.is(car.z, -698 + 653);
 
 	setPositionZ([[ 101, 1 ]], -10);
-	t.is(car.z, -653 + 653 - 10);
+	t.is(car.z, -698 + 653 - 10);
 });

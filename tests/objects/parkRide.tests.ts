@@ -8,7 +8,7 @@ import { getAllRides, ParkRide } from "../../src/objects/parkRide";
 
 test("getAllRides() returns park's rides", t =>
 {
-	global.map = Mock.map({ rides: [
+	globalThis.map = Mock.map({ rides: [
 		Mock.ride({ classification: "ride", name: "Freefall", id: 1 }),
 		Mock.ride({ classification: "ride", name: "Twister", id: 2 }),
 	]});
@@ -27,7 +27,7 @@ test("getAllRides() returns park's rides", t =>
 
 test("getAllRides() returns park's rides sorted alphabetically", t =>
 {
-	global.map = Mock.map({ rides: [
+	globalThis.map = Mock.map({ rides: [
 		Mock.ride({ classification: "ride", name: "Corkscrew Coaster", id: 2 }),
 		Mock.ride({ classification: "ride", name: "Dipper", id: 3 }),
 		Mock.ride({ classification: "ride", name: "Bob Coaster", id: 4 }),
@@ -50,7 +50,7 @@ test("getAllRides() returns park's rides sorted alphabetically", t =>
 
 test("getAllRides() does not return stalls or facilities", t =>
 {
-	global.map = Mock.map({ rides: [
+	globalThis.map = Mock.map({ rides: [
 		Mock.ride({ classification: "stall", name: "Pizza Stall", id: 10 }),
 		Mock.ride({ classification: "ride", name: "Car Ride", id: 11 }),
 		Mock.ride({ classification: "facility", name: "Restroom", id: 12 }),
@@ -79,7 +79,7 @@ test("Park ride gets created from ride", t =>
 
 test("Park ride gets created from id", t =>
 {
-	global.map = Mock.map({ rides: [
+	globalThis.map = Mock.map({ rides: [
 		Mock.ride({ classification: "ride", name: "Crooked House", id: 37 })
 	]});
 
@@ -94,7 +94,7 @@ test("Park ride gets created from id", t =>
 test("Park ride refreshes correctly", t =>
 {
 	const ride = Mock.ride({ classification: "ride", name: "Crooked House", id: 37 });
-	global.map = Mock.map({ rides: [ ride ]	});
+	globalThis.map = Mock.map({ rides: [ ride ]	});
 
 	const parkRide = new ParkRide(37);
 
@@ -116,7 +116,7 @@ test("Park ride refreshes to missing ride", t =>
 	const map = Mock.map({ rides: [
 		Mock.ride({ classification: "ride", name: "Dinghy Slide", id: 32 })
 	]});
-	global.map = map;
+	globalThis.map = map;
 
 	const parkRide = new ParkRide(32);
 

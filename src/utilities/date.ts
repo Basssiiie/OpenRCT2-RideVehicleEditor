@@ -1,3 +1,5 @@
+import { abs, floor } from "./math";
+
 const monthNames = [ "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug.", "Sep.", "Oct." ];
 
 
@@ -8,7 +10,7 @@ export function formatMonthAndYear(months: number): string
 {
 	const amountOfMonths = monthNames.length;
 	const month = (((months % amountOfMonths) + amountOfMonths) % amountOfMonths);
-	const year = (Math.floor(months / amountOfMonths) + 1);
+	const year = (floor(months / amountOfMonths) + 1);
 
 	return (monthNames[month] + ", year " + year);
 }
@@ -22,9 +24,9 @@ export function formatRelativeDate(relativeDate: number): string
 {
 	const
 		amountOfMonths = monthNames.length,
-		absolute = Math.abs(relativeDate),
+		absolute = abs(relativeDate),
 		month = (absolute % amountOfMonths),
-		year = Math.floor(absolute / amountOfMonths),
+		year = floor(absolute / amountOfMonths),
 		monthString = combineAndPluralise(month, "month"),
 		yearString = combineAndPluralise(year, "year");
 

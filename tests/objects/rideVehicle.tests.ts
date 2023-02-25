@@ -7,7 +7,7 @@ import { RideVehicle } from "../../src/objects/rideVehicle";
 
 test("Ride vehicle gets created from car id", t =>
 {
-	global.map = Mock.map({ entities: [
+	globalThis.map = Mock.map({ entities: [
 		Mock.car({ id: 12, x: 34 })
 	]});
 
@@ -47,13 +47,13 @@ test("Ride vehicle goes missing after refresh", t =>
 
 test("Ride vehicle gets vehicle type from ride", t =>
 {
-	global.context = Mock.context({ objects: [
+	globalThis.context = Mock.context({ objects: [
 		Mock.rideObject({ index: 11, name: "Log Flume", vehicles: [
 			Mock.rideObjectVehicle({ poweredAcceleration: 25, numSeats: 4 }),
 			Mock.rideObjectVehicle({ poweredAcceleration: 65, numSeats: 6 })
 		]})
 	]});
-	global.map = Mock.map({ entities: [
+	globalThis.map = Mock.map({ entities: [
 		Mock.car({ id: 42, rideObject: 11, vehicleObject: 1 })
 	]});
 
@@ -67,13 +67,13 @@ test("Ride vehicle gets vehicle type from ride", t =>
 
 test("Ride vehicle type is cached", t =>
 {
-	global.context = Mock.context({ objects: [
+	globalThis.context = Mock.context({ objects: [
 		Mock.rideObject({ index: 11, name: "Log Flume", vehicles: [
 			Mock.rideObjectVehicle({ poweredAcceleration: 25, numSeats: 4 }),
 			Mock.rideObjectVehicle({ poweredAcceleration: 65, numSeats: 6 })
 		]})
 	]});
-	global.map = Mock.map({ entities: [
+	globalThis.map = Mock.map({ entities: [
 		Mock.car({ id: 42, rideObject: 11, vehicleObject: 1 })
 	]});
 
@@ -90,12 +90,12 @@ test("Ride vehicle type is cached", t =>
 
 test("Ride vehicle is powered", t =>
 {
-	global.context = Mock.context({ objects: [
+	globalThis.context = Mock.context({ objects: [
 		Mock.rideObject({ index: 24, name: "Monorail", vehicles: [
 			Mock.rideObjectVehicle({ flags: (1 << 19) }),
 		]})
 	]});
-	global.map = Mock.map({ entities: [
+	globalThis.map = Mock.map({ entities: [
 		Mock.car({ id: 77, rideObject: 24, vehicleObject: 0 })
 	]});
 
@@ -107,12 +107,12 @@ test("Ride vehicle is powered", t =>
 
 test("Ride vehicle is not powered", t =>
 {
-	global.context = Mock.context({ objects: [
+	globalThis.context = Mock.context({ objects: [
 		Mock.rideObject({ index: 9, name: "Monorail", vehicles: [
 			Mock.rideObjectVehicle({ flags: (1 << 18) }),
 		]})
 	]});
-	global.map = Mock.map({ entities: [
+	globalThis.map = Mock.map({ entities: [
 		Mock.car({ id: 68, rideObject: 9, vehicleObject: 0 })
 	]});
 
