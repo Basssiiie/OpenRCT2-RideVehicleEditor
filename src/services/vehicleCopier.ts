@@ -120,6 +120,7 @@ export function getVehicleSettings(source: RideVehicle, filters: CopyFilter): Ve
 	{
 		settings.rideTypeId = car.rideObject;
 		settings.variant = car.vehicleObject;
+		settings.isReversed = car.isReversed;
 	}
 	if (filters & CopyFilter.Seats)
 	{
@@ -162,6 +163,7 @@ export interface VehicleSettings
 {
 	rideTypeId?: number;
 	variant?: number;
+	isReversed?: boolean;
 	seats?: number;
 	mass?: number;
 	poweredAcceleration?: number;
@@ -209,6 +211,7 @@ function applyVehicleSettings(car: Car, settings: VehicleSettings): void
 
 	apply("rideObject", settings.rideTypeId);
 	apply("vehicleObject", settings.variant);
+	apply("isReversed", settings.isReversed);
 	apply("numSeats", settings.seats);
 	apply("mass", settings.mass);
 	apply("poweredAcceleration", settings.poweredAcceleration);

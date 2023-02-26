@@ -28,6 +28,7 @@ export class VehicleViewModel
 	readonly _type = store<[RideType, number] | null>(null);
 	readonly _variants = compute(this._type, t => (t) ? t[0]._variants() : []);
 	readonly _variant = store<number>(0);
+	readonly _isReversed = store<boolean>(false);
 	readonly _seats = store<number>(0);
 	readonly _mass = store<number>(0);
 	readonly _poweredAcceleration = store<number>(0);
@@ -210,6 +211,7 @@ export class VehicleViewModel
 
 		this._updateDynamicDataFromCar(car, index);
 		this._type.set((typeIdx === null) ? null : [ types[typeIdx], typeIdx ]);
+		this._isReversed.set(car.isReversed);
 		this._seats.set(car.numSeats);
 		this._poweredAcceleration.set(car.poweredAcceleration);
 		this._poweredMaxSpeed.set(car.poweredMaxSpeed);

@@ -3,7 +3,7 @@ import { isDevelopment, pluginVersion } from "../environment";
 import { VehicleVisibility } from "../objects/rideVehicleVariant";
 import { invoke, refreshRide } from "../services/events";
 import { applyToTargets, CopyFilter, getTargets, getVehicleSettings } from "../services/vehicleCopier";
-import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
+import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setReversed, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
 import { locate } from "../services/vehicleLocater";
 import { cancelVehiclePicker, toggleVehiclePicker } from "../services/vehiclePicker";
 import { VehicleViewModel } from "../viewmodels/vehicleViewModel";
@@ -21,6 +21,7 @@ const clampThenWrapMode: SpinnerWrapMode = "clampThenWrap";
 // Tips that are used multiple times
 const applyOptionsTip = "Copy the selected vehicle settings to a specific set of other vehicles on this ride.";
 const multiplierTip = "Multiplies all spinner controls by the specified amount";
+const reversedTip = "Look behind you!";
 
 let title = ("Ride vehicle editor (v" + pluginVersion + ")");
 if (isDevelopment)
@@ -37,7 +38,7 @@ model._selectedRide.subscribe(r =>
 export const mainWindow = window({
 	title,
 	width: 500, minWidth: 465, maxWidth: 560,
-	height: 389,
+	height: 407,
 	spacing: 5,
 	onOpen: () => model._open(),
 	onClose: () =>
@@ -289,6 +290,20 @@ export const mainWindow = window({
 							}),
 							horizontal([
 								label({
+									text: "Reversed:",
+									tooltip: reversedTip,
+									width: controlsLabelWidth,
+									disabled: model._isEditDisabled,
+								}),
+								checkbox({
+									tooltip: reversedTip,
+									isChecked: model._isReversed,
+									disabled: model._isEditDisabled,
+									onChange: value => model._modifyVehicle(setReversed, value)
+								})
+							]),
+							horizontal([
+								label({
 									text: "Colours:",
 									tooltip: "The three important boxes that make the vehicle pretty on demand.",
 									width: controlsLabelWidth,
@@ -312,7 +327,7 @@ export const mainWindow = window({
 									disabled: model._isEditDisabled,
 									onChange: value => model._modifyVehicle(setTertiaryColour, value)
 								})
-							]),
+							])
 						]
 					}),
 					groupbox({
