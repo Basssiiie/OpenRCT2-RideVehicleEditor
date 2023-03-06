@@ -39,7 +39,6 @@ export function setRideType(vehicles: VehicleSpan[], type: RideType): void
 	updateValue(vehicles, rideTypeKey, type._id);
 }
 
-
 /**
  * Sets the vehicle sprite variant. (e.g. locomotive, tender or passenger car)
  */
@@ -47,7 +46,6 @@ export function setVariant(vehicles: VehicleSpan[], variant: number): void
 {
 	updateValue(vehicles, variantKey, variant);
 }
-
 
 /**
  * Moves the vehicle a relative distance along the track.
@@ -57,7 +55,6 @@ export function changeTrackProgress(vehicles: VehicleSpan[], trackProgress: numb
 	updateValue(vehicles, trackProgressKey, trackProgress);
 }
 
-
 /**
  * Moves the vehicle a relative distance away from the vehicle before it.
  */
@@ -65,7 +62,6 @@ export function changeSpacing(vehicles: VehicleSpan[], trackProgress: number): v
 {
 	updateValue(vehicles, spacingKey, trackProgress);
 }
-
 
 /**
  * Sets the maximum number of seats for this vehicle.
@@ -75,7 +71,6 @@ export function setSeatCount(vehicles: VehicleSpan[], seats: number): void
 	updateValue(vehicles, seatsKey, seats);
 }
 
-
 /**
  * Sets the mass for this vehicle.
  */
@@ -83,7 +78,6 @@ export function setMass(vehicles: VehicleSpan[], mass: number): void
 {
 	updateValue(vehicles, massKey, mass);
 }
-
 
 /**
  * Sets the powered acceleration for this vehicle.
@@ -93,7 +87,6 @@ export function setPoweredAcceleration(vehicles: VehicleSpan[], power: number): 
 	updateValue(vehicles, poweredAccelerationKey, power);
 }
 
-
 /**
  * Sets the powered acceleration for this vehicle.
  */
@@ -101,7 +94,6 @@ export function setPoweredMaximumSpeed(vehicles: VehicleSpan[], maximumSpeed: nu
 {
 	updateValue(vehicles, poweredMaxSpeedKey, maximumSpeed);
 }
-
 
 /**
  * Sets the primary colour for this vehicle.
@@ -111,7 +103,6 @@ export function setPrimaryColour(vehicles: VehicleSpan[], colour: Colour): void
 	updateValue(vehicles, primaryColour, colour);
 }
 
-
 /**
  * Sets the secondary colour for this vehicle.
  */
@@ -119,7 +110,6 @@ export function setSecondaryColour(vehicles: VehicleSpan[], colour: Colour): voi
 {
 	updateValue(vehicles, secondaryColour, colour);
 }
-
 
 /**
  * Sets the tertiary colour for this vehicle.
@@ -129,7 +119,6 @@ export function setTertiaryColour(vehicles: VehicleSpan[], colour: Colour): void
 	updateValue(vehicles, tertiaryColour, colour);
 }
 
-
 /**
  * Sets the primary colour for this vehicle.
  */
@@ -137,7 +126,6 @@ export function setPositionX(vehicles: VehicleSpan[], x: number): void
 {
 	updateValue(vehicles, xPosition, x);
 }
-
 
 /**
  * Sets the secondary colour for this vehicle.
@@ -147,7 +135,6 @@ export function setPositionY(vehicles: VehicleSpan[], y: number): void
 	updateValue(vehicles, yPosition, y);
 }
 
-
 /**
  * Sets the tertiary colour for this vehicle.
  */
@@ -155,7 +142,6 @@ export function setPositionZ(vehicles: VehicleSpan[], z: number): void
 {
 	updateValue(vehicles, zPosition, z);
 }
-
 
 
 /**
@@ -168,7 +154,6 @@ interface UpdateVehicleSettingArgs
 	value: number;
 }
 
-
 /**
  * Dispatches an update game action to other clients to update the specified key.
  */
@@ -177,6 +162,26 @@ function updateValue(vehicles: VehicleSpan[], key: VehicleUpdateKeys, value: num
 	execute({ targets: vehicles, key, value });
 }
 
+/**
+ * Sets the properties of the specified car to the default properties of the
+ * specified ride type.
+ */
+function setRideTypeDefaults(car: Car, rideObjectIndex: number, variantIndex: number): void
+{
+	const oldRideObjectId = car.rideObject;
+	const oldRideObject = context.getObject("ride", oldRideObjectId);
+	const newRideObject = (oldRideObjectId === rideObjectIndex) ? oldRideObject : context.getObject("ride", rideObjectIndex);
+
+	const oldVariant = oldRideObject.vehicles[car.vehicleObject];
+	const newVariant = newRideObject.vehicles[variantIndex];
+
+	car.rideObject = rideObjectIndex;
+	car.vehicleObject = variantIndex;
+	car.numSeats = (newVariant.numSeats & 0x7F); // VEHICLE_SEAT_NUM_MASK
+	car.mass = (newVariant.carMass + (car.mass - oldVariant.carMass));
+	car.poweredAcceleration = newVariant.poweredAcceleration;
+	car.poweredMaxSpeed = newVariant.poweredMaxSpeed;
+}
 
 /**
  * Update one specific setting on the specified vehicle.
@@ -191,12 +196,18 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 		{
 			callback = (car): void =>
 			{
-				car[key] = value;
-				car.vehicleObject = 0;
+				setRideTypeDefaults(car, value, 0);
 			};
 			break;
 		}
 		case variantKey:
+		{
+			callback = (car): void =>
+			{
+				setRideTypeDefaults(car, car.rideObject, value);
+			};
+			break;
+		}
 		case seatsKey:
 		case massKey:
 		case poweredAccelerationKey:

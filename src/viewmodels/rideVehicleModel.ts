@@ -55,10 +55,10 @@ export class RideViewModel
 		});
 		this._ratingCalculationHook = context.subscribe("ride.ratings.calculate", args =>
 		{
-			Log.debug("Update ratings for ride", args.rideId);
 			const ride = this._ride.get();
 			if (ride && args.rideId === ride._id)
 			{
+				Log.debug("Update ratings for selected ride", args.rideId);
 				this._excitement.set(args.excitement);
 				this._intensity.set(args.intensity);
 				this._nausea.set(args.nausea);
