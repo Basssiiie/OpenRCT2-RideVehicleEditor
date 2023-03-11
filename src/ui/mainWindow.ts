@@ -3,9 +3,11 @@ import { isDevelopment, pluginVersion } from "../environment";
 import { VehicleVisibility } from "../objects/rideVehicleVariant";
 import { invoke, refreshRide } from "../services/events";
 import { applyToTargets, CopyFilter, getTargets, getVehicleSettings } from "../services/vehicleCopier";
+import { dragToolId, toggleVehicleDragger } from "../services/vehicleDragger";
 import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
 import { locate } from "../services/vehicleLocater";
-import { cancelVehiclePicker, toggleVehiclePicker } from "../services/vehiclePicker";
+import { pickerToolId, toggleVehiclePicker } from "../services/vehiclePicker";
+import { cancelTools } from "../utilities/tools";
 import { VehicleViewModel } from "../viewmodels/vehicleViewModel";
 import { model as rideModel, rideWindow } from "./rideWindow";
 import { combinedLabelSpinner } from "./utilityControls";
@@ -42,7 +44,7 @@ export const mainWindow = window({
 	onOpen: () => model._open(),
 	onClose: () =>
 	{
-		cancelVehiclePicker();
+		cancelTools(pickerToolId, dragToolId);
 		rideWindow.close();
 		model._close();
 	},
@@ -105,7 +107,7 @@ export const mainWindow = window({
 					horizontal([
 						vertical({
 							padding: [ "1w", 0 ],
-							spacing: 8,
+							spacing: 6,
 							content: [ // buttons
 								toggle({
 									width: buttonSize, height: buttonSize,
@@ -113,6 +115,14 @@ export const mainWindow = window({
 									image: "eyedropper", // SPR_G2_EYEDROPPER
 									isPressed: model._isPicking,
 									onChange: pressed => toggleVehiclePicker(pressed, c => model._select(c), () => model._isPicking.set(false))
+								}),
+								toggle({
+									width: buttonSize, height: buttonSize,
+									tooltip: "Drag stationary vehicles to new places on the map",
+									image: 5174, // SPR_PICKUP_BTN
+									isPressed: model._isDragging,
+									disabled: model._isPositionDisabled,
+									onChange: pressed => toggleVehicleDragger(pressed, model._selectedVehicle, model._x, model._y, model._z, () => model._isDragging.set(false))
 								}),
 								toggle({
 									width: buttonSize, height: buttonSize,

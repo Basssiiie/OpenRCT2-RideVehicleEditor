@@ -42,27 +42,9 @@ export function initActions(): void
 
 
 /**
- * Callback for registered actions to check permissions.
- */
-function queryPermissionCheck(args: GameActionEventArgs<unknown>): GameActionResult
-{
-	if (hasPermissions(args.player, requiredEditPermission))
-	{
-		return {};
-	}
-
-	return {
-		error: 2, // GameActions::Status::Disallowed
-		errorTitle: "Missing permissions!",
-		errorMessage: "Permission 'Ride Properties' is required to use the RideVehicleEditor on this server."
-	};
-}
-
-
-/**
  * Check if the player has the correct permissions, if in a multiplayer server.
  */
-function hasPermissions(playerId: number, permission: PermissionType): boolean
+export function hasPermissions(playerId: number): boolean
 {
 	if (isMultiplayer())
 	{
@@ -76,11 +58,29 @@ function hasPermissions(playerId: number, permission: PermissionType): boolean
 			Log.debug("Cannot apply update from player", playerId, ": group id", groupId, "not found.");
 			return false;
 		}
-		if (group.permissions.indexOf(permission) < 0)
+		if (group.permissions.indexOf(requiredEditPermission) < 0)
 		{
-			Log.debug("Cannot apply update from player", playerId, ": lacking", permission, "permission.");
+			Log.debug("Cannot apply update from player", playerId, ": lacking", requiredEditPermission, "permission.");
 			return false;
 		}
 	}
 	return true;
+}
+
+
+/**
+ * Callback for registered actions to check permissions.
+ */
+function queryPermissionCheck(args: GameActionEventArgs<unknown>): GameActionResult
+{
+	if (hasPermissions(args.player))
+	{
+		return {};
+	}
+
+	return {
+		error: 2, // GameActions::Status::Disallowed
+		errorTitle: "Missing permissions!",
+		errorMessage: "Permission 'Ride Properties' is required to use the RideVehicleEditor on this server."
+	};
 }

@@ -6,9 +6,11 @@ import { RideVehicle } from "../objects/rideVehicle";
 import { refreshVehicle } from "../services/events";
 import { getSpacingToPrecedingVehicle } from "../services/spacingEditor";
 import { CopyFilter, CopyOptions, getTargets, VehicleSettings } from "../services/vehicleCopier";
+import { dragToolId } from "../services/vehicleDragger";
 import { VehicleSpan } from "../services/vehicleSpan";
 import { find, findIndex } from "../utilities/array";
 import * as Log from "../utilities/logger";
+import { cancelTools } from "../utilities/tools";
 
 
 /**
@@ -45,6 +47,7 @@ export class VehicleViewModel
 	readonly _isMoving = store(false);
 	readonly _isUnpowered = compute(this._selectedVehicle, this._type, this._variant, v => !v || !v[0]._isPowered());
 	readonly _isPicking = store<boolean>(false);
+	readonly _isDragging = store<boolean>(false);
 	readonly _isEditDisabled = compute(this._selectedVehicle, v => !v);
 	readonly _isPositionDisabled = compute(this._isMoving, this._isEditDisabled, (m, e) => m || e);
 	readonly _formatPosition = (pos: number): string => (this._isEditDisabled.get() ? "Not available" : pos.toString());
@@ -69,6 +72,7 @@ export class VehicleViewModel
 
 		this._selectedVehicle.subscribe(vehicle =>
 		{
+			cancelTools(dragToolId);
 			if (vehicle && this._isOpen)
 			{
 				this._updateVehicleInfo(vehicle[0], vehicle[1]);

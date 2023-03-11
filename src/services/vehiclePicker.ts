@@ -1,7 +1,11 @@
 import * as Log from "../utilities/logger";
+import { cancelCurrentTool, cancelTools } from "../utilities/tools";
 
 
-const pickerToolId = "rve-pick-vehicle";
+/**
+ * Id of the picker tool.
+ */
+export const pickerToolId = "rve-pick-vehicle";
 
 
 /**
@@ -11,7 +15,7 @@ export function toggleVehiclePicker(isPressed: boolean, onPick: (car: Car) => vo
 {
 	if (!isPressed)
 	{
-		cancelVehiclePicker();
+		cancelTools(pickerToolId);
 		return;
 	}
 
@@ -26,27 +30,14 @@ export function toggleVehiclePicker(isPressed: boolean, onPick: (car: Car) => vo
 				const entity = map.getEntity(entityId);
 				if (!entity || entity.type !== "car")
 				{
-					Log.debug("(selector) Invalid entity id selected:", entityId);
+					Log.debug("[VehiclePicker] Invalid entity id selected:", entityId);
 					return;
 				}
 
 				onPick(<Car>entity);
-				ui.tool?.cancel();
+				cancelCurrentTool();
 			}
 		},
 		onFinish: onCancel
 	});
-}
-
-
-/**
- * Cancels the vehicle picker if it's currently active.
- */
-export function cancelVehiclePicker(): void
-{
-	const tool = ui.tool;
-	if (tool && tool.id === pickerToolId)
-	{
-		tool.cancel();
-	}
 }
