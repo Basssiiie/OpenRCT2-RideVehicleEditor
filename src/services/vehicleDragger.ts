@@ -95,7 +95,7 @@ interface DragVehicleArgs
 /**
  * Get a possible position to drag the vehicle to.
  */
-function getPositionFromTool(args: ToolEventArgs, vehicleType: RideObjectVehicle): CoordsXYZ | null
+function getPositionFromTool(args: ToolEventArgs, vehicleType: RideObjectVehicle | null): CoordsXYZ | null
 {
 	const { entityId, mapCoords, tileElementIndex } = args;
 	let x: number | undefined, y: number | undefined, z: number | undefined;
@@ -114,7 +114,7 @@ function getPositionFromTool(args: ToolEventArgs, vehicleType: RideObjectVehicle
 		const tile = map.getTile(x / 32, y / 32);
 		const element = tile.getElement(tileElementIndex);
 		const type = element.type;
-		const tabHeight = vehicleType.tabHeight;
+		const tabHeight = (vehicleType) ? vehicleType.tabHeight : 0;
 
 		z = (type === "footpath" || type === "banner" || type === "wall")
 			? element.baseZ : element.clearanceZ;

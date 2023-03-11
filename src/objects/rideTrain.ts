@@ -3,23 +3,82 @@ import { RideVehicle } from "./rideVehicle";
 
 
 /**
+ * Creates a train from any car regardless at what index it is.
+ * @returns The train and the index where the original car is.
+ */
+export function createTrainFromAnyCar(car: Car): [RideTrain, number]
+{
+	const vehicles: RideVehicle[] = [];
+
+	// Insert all vehicles in front
+	let currentCar = car, currentCarId: number | null;
+	while((currentCarId = currentCar.previousCarOnRide) !== null)
+	{
+		currentCar = <Car>map.getEntity(currentCarId);
+		if (currentCar.type !== "car")
+		{
+			Log.debug("Previous entity id", currentCarId, "for type", currentCar.type, "is invalid in train");
+			break;
+		}
+		if (currentCar.nextCarOnTrain === null)
+		{
+			break;
+		}
+		vehicles.unshift(new RideVehicle(currentCar));
+	}
+
+	const carIndex = vehicles.length;
+	vehicles.push(new RideVehicle(car));
+
+	// Insert all vehicles behind
+	for (currentCar = car; (currentCarId = currentCar.nextCarOnTrain) !== null;)
+	{
+		currentCar = <Car>map.getEntity(currentCarId);
+		if (currentCar.type !== "car")
+		{
+			Log.debug("Next entity id", currentCarId, "for type", currentCar.type, "is invalid in train");
+			break;
+		}
+		vehicles.push(new RideVehicle(currentCar));
+	}
+	return [new RideTrain(vehicles, true), carIndex];
+}
+
+
+/**
  * Represents a train with one or more vehicles on a ride in the park.
  */
 export class RideTrain
 {
 	readonly _carId: number;
+	readonly _special?: boolean;
 	private _rideVehicles?: RideVehicle[] | null;
 
 
 	/**
 	 * Creates a new train for a ride.
-	 * @param carId Gets the entity id for the first car of this train.
+	 * @param frontCarId The entity id for the first car of this train.
+	 * @param vehicles The list of all vehicles in the train.
+	 * @param special Sets it as a special hidden train, which does not show up in
+	 * the regular ride window (like Giga lifthill entities).
 	 */
-	constructor(carId: number)
+	constructor(frontCarId: number, special?: boolean);
+	constructor(vehicles: RideVehicle[], special?: boolean);
+	constructor(param: number | RideVehicle[], special?: boolean)
 	{
-		Log.assert(carId !== 0xFFFF, "Invalid car id");
-		this._carId = carId;
-		this._refresh();
+		if (typeof param === "number")
+		{
+			Log.assert(param !== 0xFFFF, "Invalid car id");
+			this._carId = param;
+			this._refresh();
+		}
+		else
+		{
+			Log.assert(param.length > 0, "Invalid train length");
+			this._carId = param[0]._id;
+			this._rideVehicles = param;
+		}
+		this._special = special;
 	}
 
 

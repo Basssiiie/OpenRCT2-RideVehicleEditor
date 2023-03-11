@@ -25,6 +25,7 @@ export function toggleVehiclePicker(isPressed: boolean, onPick: (car: Car) => vo
 		onDown: args =>
 		{
 			const entityId = args.entityId;
+			Log.debug("entity", entityId, "coords", JSON.stringify(args.mapCoords), "idx", args.tileElementIndex);
 			if (entityId)
 			{
 				const entity = map.getEntity(entityId);
@@ -36,6 +37,10 @@ export function toggleVehiclePicker(isPressed: boolean, onPick: (car: Car) => vo
 
 				onPick(<Car>entity);
 				cancelCurrentTool();
+			}
+			else
+			{
+				//Log.debug("coords", JSON.stringify(args.mapCoords), "idx", args.tileElementIndex);
 			}
 		},
 		onFinish: onCancel

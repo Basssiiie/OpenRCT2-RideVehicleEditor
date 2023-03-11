@@ -1,6 +1,6 @@
 import { Colour, compute, Store, store } from "openrct2-flexui";
 import { getAllRides, ParkRide } from "../objects/parkRide";
-import { RideTrain } from "../objects/rideTrain";
+import { createTrainFromAnyCar, RideTrain } from "../objects/rideTrain";
 import { getAllRideTypes, RideType } from "../objects/rideType";
 import { RideVehicle } from "../objects/rideVehicle";
 import { refreshVehicle } from "../services/events";
@@ -164,6 +164,14 @@ export class VehicleViewModel
 				}
 			}
 		}
+
+		Log.debug("Could not find vehicle entity id", carId, "on ride id", rideId, ", adding special train");
+		const [specialTrain, carIndex] = createTrainFromAnyCar(car);
+		const vehicle = specialTrain._vehicles()[carIndex];
+
+		this._trains.set(trains.concat(specialTrain));
+		this._selectedTrain.set([ specialTrain, trains.length ]);
+		this._selectedVehicle.set([ vehicle, carIndex ]);
 	}
 
 	/**

@@ -60,8 +60,8 @@ test("Ride vehicle gets vehicle type from ride", t =>
 	const rideVehicle = new RideVehicle(42);
 
 	t.is(rideVehicle._id, 42);
-	t.is(rideVehicle._type().poweredAcceleration, 65);
-	t.is(rideVehicle._type().numSeats, 6);
+	t.is(rideVehicle._type()?.poweredAcceleration, 65);
+	t.is(rideVehicle._type()?.numSeats, 6);
 });
 
 

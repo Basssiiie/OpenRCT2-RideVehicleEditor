@@ -2,7 +2,7 @@
 
 import test from "ava";
 import Mock from "openrct2-mocks";
-import { RideTrain } from "../../src/objects/rideTrain";
+import { createTrainFromAnyCar, RideTrain } from "../../src/objects/rideTrain";
 
 
 test("Ride train gets created from single car id", t =>
@@ -90,3 +90,37 @@ test(atIndexTest, 0, 8);
 test(atIndexTest, 1, 5);
 test(atIndexTest, 2, 7);
 test(atIndexTest, 3, 6);
+
+
+const fromyAnyCarTest = test.macro({
+	title(_, id: number)
+	{
+		return `Ride train create from any car, id ${id}`;
+	},
+	exec(t, id: number, expectedIndex: number)
+	{
+		globalThis.map = Mock.map({ entities: [
+			// 8 -> 5 -> 7 -> 6
+			Mock.car({ id: 5, nextCarOnTrain: 7, previousCarOnRide: 8 }),
+			Mock.car({ id: 6, previousCarOnRide: 7 }),
+			Mock.car({ id: 8, nextCarOnTrain: 5, previousCarOnRide: 6 }),
+			Mock.car({ id: 7, nextCarOnTrain: 6, previousCarOnRide: 5 }),
+		]});
+
+		const car = map.getEntity(id);
+		const [rideTrain, carIdx] = createTrainFromAnyCar(<Car>car);
+
+		t.is(rideTrain._carId, 8);
+		t.is(rideTrain._vehicles().length, 4);
+		t.is(rideTrain._vehicles()[0]._id, 8);
+		t.is(rideTrain._vehicles()[1]._id, 5);
+		t.is(rideTrain._vehicles()[2]._id, 7);
+		t.is(rideTrain._vehicles()[3]._id, 6);
+		t.is(carIdx, expectedIndex);
+	}
+});
+
+test(fromyAnyCarTest, 5, 1);
+test(fromyAnyCarTest, 6, 3);
+test(fromyAnyCarTest, 7, 2);
+test(fromyAnyCarTest, 8, 0);

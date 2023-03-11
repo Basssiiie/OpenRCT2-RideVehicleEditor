@@ -67,7 +67,7 @@ export class RideVehicle
 	/**
 	 * Returns the object definition for this car.
 	 */
-	_type(): RideObjectVehicle
+	_type(): RideObjectVehicle | null
 	{
 		const entity = this._car();
 		const rideObj = entity.rideObject;
@@ -77,6 +77,10 @@ export class RideVehicle
 		if (!this._vehicleObject || hash !== this._typeHash)
 		{
 			const rideObject = context.getObject("ride", rideObj);
+			if (!rideObject)
+			{
+				return null;
+			}
 			this._vehicleObject = rideObject.vehicles[vehicleObj];
 			this._typeHash = hash;
 		}
@@ -91,7 +95,8 @@ export class RideVehicle
 	 */
 	_isPowered(): boolean
 	{
-		return isPowered(this._type());
+		const type = this._type();
+		return !type || isPowered(type);
 	}
 
 

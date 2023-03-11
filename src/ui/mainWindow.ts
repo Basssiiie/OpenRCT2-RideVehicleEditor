@@ -81,7 +81,7 @@ export const mainWindow = window({
 					onChange: i => model._selectedRide.set([model._rides.get()[i], i]),
 				}),
 				dropdownSpinner({ // train list
-					items: compute(model._trains, c => c.map((_, i) => ("Train " + (i + 1)))),
+					items: compute(model._trains, c => c.map((t, i) => ("Train " + (t._special ? "?" : (i + 1))))),
 					width: "30%",
 					tooltip: "List of trains on the currently selected ride",
 					disabledMessage: "No trains available",
@@ -277,7 +277,7 @@ export const mainWindow = window({
 								items: compute(model._rideTypes, c => c.map(t => t._object().name)),
 								tooltip: "All ride types currently available in the park",
 								disabledMessage: "No ride types available",
-								disabled: model._isEditDisabled,
+								disabled: compute(model._isEditDisabled, model._type, (noEdit, type) => (noEdit || !type)),
 								autoDisable: "empty",
 								selectedIndex: compute(model._type, t => (t) ? t[1] : 0),
 								onChange: idx => updateVehicleType(idx)
