@@ -5,7 +5,7 @@ import Mock from "openrct2-mocks";
 import { ParkRide } from "../../src/objects/parkRide";
 import { RideLifeCycleFlags } from "../../src/objects/rideLifeCycleFlags";
 import { initActions } from "../../src/services/actions";
-import { setBuildMonth, setCustomDesign, setExcitementRating, setFrozenRatings, setIndestructable, setIntensityRating, setNauseaRating } from "../../src/services/rideEditor";
+import { setBuildMonth, setBuildYear, setCustomDesign, setExcitementRating, setFrozenRatings, setIndestructable, setIntensityRating, setNauseaRating } from "../../src/services/rideEditor";
 
 
 function setupRideMock(rideId: number, permissions: PermissionType[] = [ "ride_properties" ]): Ride
@@ -14,7 +14,7 @@ function setupRideMock(rideId: number, permissions: PermissionType[] = [ "ride_p
 		groups: [ Mock.playerGroup({ permissions })]
 	});
 
-	const ride = Mock.ride({ id: rideId });
+	const ride = Mock.ride({ id: rideId, buildDate: 0 });
 	globalThis.map = Mock.map({ rides: [ ride ]});
 	return ride;
 }
@@ -74,11 +74,22 @@ test("Freeze ratings", t => {
 test("Set build month", t => {
 	const ride = setupRideMock(74);
 
-	setBuildMonth(new ParkRide(74), 12);
-	t.is(ride.buildDate, 12);
+	setBuildMonth(new ParkRide(74), 6);
+	t.is(ride.buildDate, 6);
 
-	setBuildMonth(new ParkRide(74), -66);
-	t.is(ride.buildDate, -66);
+	setBuildMonth(new ParkRide(74), 1);
+	t.is(ride.buildDate, 1);
+});
+
+
+test("Set build year", t => {
+	const ride = setupRideMock(74);
+
+	setBuildYear(new ParkRide(74), 12);
+	t.is(ride.buildDate, (12 - 1) * 8);
+
+	setBuildYear(new ParkRide(74), -66);
+	t.is(ride.buildDate, (-66 - 1) * 8);
 });
 
 

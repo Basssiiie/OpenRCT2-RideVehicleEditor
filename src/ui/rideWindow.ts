@@ -1,13 +1,15 @@
-import { checkbox, CheckboxParams, compute, dropdown, FlexiblePosition, groupbox, horizontal, LabelParams, SpinnerParams, WidgetCreator, window } from "openrct2-flexui";
+import { checkbox, compute, dropdown, DropdownParams, FlexiblePosition, groupbox, label, LabelParams, WidgetCreator, window } from "openrct2-flexui";
 import { ParkRide } from "../objects/parkRide";
-import { setBuildMonth, setCustomDesign, setExcitementRating, setFrozenRatings, setIndestructable, setIntensityRating, setNauseaRating } from "../services/rideEditor";
-import { formatMonthAndYear, formatRelativeDate } from "../utilities/date";
+import { setBuildMonth, setBuildYear, setCustomDesign, setExcitementRating, setFrozenRatings, setIndestructable, setIntensityRating, setNauseaRating } from "../services/rideEditor";
+import { formatRelativeDate, monthCount, monthNames } from "../utilities/date";
 import * as Log from "../utilities/logger";
+import { floor } from "../utilities/math";
 import { RideViewModel } from "../viewmodels/rideVehicleModel";
-import { combinedLabelCheckbox, combinedLabelSpinner } from "./utilityControls";
+import { labelled, labelledSpinner, LabelledSpinnerParams, multiplier } from "./utilityControls";
 
 
-const int16max = 32_766, int16min = -32_768;
+const int16max = 32_767, int16min = -32_768;
+const controlsLabelWidth = 85;
 
 
 /**
@@ -22,8 +24,8 @@ export const model = new RideViewModel();
 export const rideWindow = window({
 	title: model._title,
 	position: "center",
-	width: 255, minWidth: 225, maxWidth: 275,
-	height: 216,
+	width: 233, minWidth: 185, maxWidth: 250,
+	height: 252,
 	colours: [ 24, 24 ],
 	onOpen: () => model._open(),
 	onClose: () => model._close(),
@@ -34,50 +36,41 @@ export const rideWindow = window({
 			padding: { top: 4 },
 			content: [
 				labelSpinner({
-					text: "Excitement",
+					_label: { text: "Excitement:" },
 					tooltip: "Happy guests make for a happy life.",
 					value: model._excitement,
 					step: model._multiplier,
 					minimum: int16min,
 					maximum: int16max,
 					format: formatRating,
-					onChange: v => modifyRide(setExcitementRating, v)
+					onChange: value => modifyRide(setExcitementRating, value)
 				}),
 				labelSpinner({
-					text: "Intensity",
+					_label: { text: "Intensity:" },
 					tooltip: "Guests will prefer rides that match their intensity preference.",
 					value: model._intensity,
 					step: model._multiplier,
 					minimum: int16min,
 					maximum: int16max,
 					format: formatRating,
-					onChange: v => modifyRide(setIntensityRating, v)
+					onChange: value => modifyRide(setIntensityRating, value)
 				}),
 				labelSpinner({
-					text: "Nausea",
+					_label: { text: "Nausea:" },
 					tooltip: "The higher the value, the more yellow your paths will be.",
 					value: model._nausea,
 					step: model._multiplier,
 					minimum: int16min,
 					maximum: int16max,
 					format: formatRating,
-					onChange: v => modifyRide(setNauseaRating, v)
+					onChange: value => modifyRide(setNauseaRating, value)
 				}),
-				horizontal([
-					checkbox({
-						text: "Freeze rating calculation",
-						tooltip: "When ticked, the ratings will not be recalculated anymore. Your ride will always be awesome even if it sucks.",
-						isChecked: model._freezeStats,
-						onChange: v => modifyRide(setFrozenRatings, v)
-					}),
-					dropdown({
-						width: 45,
-						padding: { left: "1w" },
-						items: ["x1", "x10", "x100"],
-						tooltip: "Multiplies all spinner controls by the specified amount",
-						onChange: idx => model._multiplier.set(10 ** idx),
-					})
-				])
+				checkbox({
+					text: "Freeze rating calculation",
+					tooltip: "When ticked, the ratings will not be recalculated anymore. Your ride will always be awesome even if it sucks.",
+					isChecked: model._freezeStats,
+					onChange: v => modifyRide(setFrozenRatings, v)
+				})
 			]
 		}),
 		groupbox({
@@ -85,50 +78,52 @@ export const rideWindow = window({
 			tooltip: "Edit properties related to the construction of the ride",
 			padding: { top: 4 },
 			content: [
-				labelSpinner({
-					text: "Build month",
+				labelled<DropdownParams>({
+					_control: dropdown,
+					_label: { text: "Build month:", width: controlsLabelWidth },
 					tooltip: "The month in which this ride was built. Somehow never in the winter months.",
-					value: model._buildMonth,
-					minimum: int16min,
-					maximum: int16max,
-					format: formatMonthAndYear,
-					onChange: v => modifyRide(setBuildMonth, v)
+					items: monthNames,
+					onChange: value => modifyRide(setBuildMonth, value)
 				}),
 				labelSpinner({
-					text: "Construction",
-					tooltip: "The amount of time ago the ride was built, in months and years. Rides get older as well, just like you.",
-					value: compute(model._buildMonth, v => (v - date.monthsElapsed)),
-					minimum: int16min,
-					maximum: int16max,
-					format: formatRelativeDate,
-					onChange: v => modifyRide(setBuildMonth, v - date.monthsElapsed)
+					_label: { text: "Build year:" },
+					tooltip: "The year in which this ride was built.",
+					wrapMode: "clamp",
+					value: compute(model._buildMonth, month => (floor(month / monthCount) + 1)),
+					step: model._multiplier,
+					minimum: -268_435_456, // 32-bit min / 8 months + 1
+					maximum: 268_435_455, // 32-bit max / 8 months
+					onChange: value => modifyRide(setBuildYear, value)
 				}),
-				labelCheckbox({
+				labelled<LabelParams>({
+					_control: label,
+					_label: { text: "Construction:", width: controlsLabelWidth },
+					text: compute(model._buildMonth, model._currentMonth, (build, current) => formatRelativeDate(build - current)),
+					tooltip: "The amount of time ago the ride was built, in months and years. Rides get older as well, just like you.",
+				}),
+				checkbox({
 					text: "Custom design",
 					tooltip: "Whether or not the ride is a custom design or a standard track design, which is used for the 'Best custom-designed rides' award.",
 					isChecked: model._customDesign,
-					onChange: v => modifyRide(setCustomDesign, v)
+					onChange: value => modifyRide(setCustomDesign, value)
 				}),
-				labelCheckbox({
+				checkbox({
 					text: "Indestructable",
 					tooltip: "Indestructable rides cannot be demolished, even if you ask them nicely.",
 					isChecked: model._indestructable,
-					onChange: v => modifyRide(setIndestructable, v)
-				}),
+					onChange: value => modifyRide(setIndestructable, value)
+				})
 			]
-		})
+		}),
+		multiplier(model._multiplierIndex)
 	]
 });
 
 
-function labelSpinner(params: LabelParams & SpinnerParams): WidgetCreator<FlexiblePosition>
+function labelSpinner(params: LabelledSpinnerParams & FlexiblePosition): WidgetCreator<FlexiblePosition>
 {
-	return combinedLabelSpinner(85, "1w", params);
-}
-
-function labelCheckbox(params: LabelParams & CheckboxParams): WidgetCreator<FlexiblePosition>
-{
-	return combinedLabelCheckbox(85, params);
+	params._label.width = controlsLabelWidth;
+	return labelledSpinner(params);
 }
 
 function formatRating(value: number): string

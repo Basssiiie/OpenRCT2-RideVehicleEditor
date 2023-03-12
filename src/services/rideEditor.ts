@@ -3,6 +3,7 @@ import * as Log from "../utilities/logger";
 import { ParkRide } from "../objects/parkRide";
 import { RideLifeCycleFlags } from "../objects/rideLifeCycleFlags";
 import { invoke, refreshRide } from "./events";
+import { updateDateMonth, updateDateYear } from "../utilities/date";
 
 
 const execute = register<UpdateRideSettingArgs>("rve-update-ride", updateRideSetting);
@@ -14,7 +15,7 @@ const
 	excitement = "excitement",
 	intensity = "intensity",
 	nausea = "nausea",
-	buildMonth = "buildDate";
+	buildDate = "buildDate";
 
 
 /**
@@ -25,7 +26,6 @@ export function setExcitementRating(ride: ParkRide, amount: number): void
 	updateValue(ride._id, excitement, amount);
 }
 
-
 /**
  * Sets the ride's intensity rating.
  */
@@ -33,7 +33,6 @@ export function setIntensityRating(ride: ParkRide, amount: number): void
 {
 	updateValue(ride._id, intensity, amount);
 }
-
 
 /**
  * Sets the ride's nausea rating.
@@ -43,7 +42,6 @@ export function setNauseaRating(ride: ParkRide, amount: number): void
 	updateValue(ride._id, nausea, amount);
 }
 
-
 /**
  * Sets whether the current ratings are frozen or not.
  */
@@ -52,15 +50,23 @@ export function setFrozenRatings(ride: ParkRide, enabled: boolean): void
 	updateValue(ride._id, RideLifeCycleFlags.FixedRatings, enabled);
 }
 
-
 /**
  * Sets the month in which the ride was built.
  */
-export function setBuildMonth(ride: ParkRide, amount: number): void
+export function setBuildMonth(ride: ParkRide, month: number): void
 {
-	updateValue(ride._id, buildMonth, amount);
+	const newDate = updateDateMonth(ride._ride().buildDate, month);
+	updateValue(ride._id, buildDate, newDate);
 }
 
+/**
+ * Sets the year in which the ride was built.
+ */
+export function setBuildYear(ride: ParkRide, year: number): void
+{
+	const newDate = updateDateYear(ride._ride().buildDate, year);
+	updateValue(ride._id, buildDate, newDate);
+}
 
 /**
  * Sets whether the ride is a custom design or a prebuilt track design.
@@ -69,7 +75,6 @@ export function setCustomDesign(ride: ParkRide, enabled: boolean): void
 {
 	updateValue(ride._id, RideLifeCycleFlags.NotCustomDesign, !enabled);
 }
-
 
 /**
  * Sets whether the ride can be demolished or not.
@@ -119,7 +124,7 @@ function updateRideSetting(args: UpdateRideSettingArgs): void
 		case excitement:
 		case intensity:
 		case nausea:
-		case buildMonth:
+		case buildDate:
 		{
 			ride[key] = <number>value;
 			break;

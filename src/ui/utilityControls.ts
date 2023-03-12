@@ -1,44 +1,76 @@
-import { checkbox, CheckboxParams, FlexiblePosition, horizontal, label, LabelParams, Scale, spinner, SpinnerParams, WidgetCreator } from "openrct2-flexui";
+import { dropdown, dropdownSpinner, DropdownSpinnerParams, ElementParams, FlexiblePosition, horizontal, label, LabelParams, Scale, spinner, SpinnerParams, Store, WidgetCreator } from "openrct2-flexui";
 
 
 /**
- * A spinner with a label on the left side.
+ * Creates a small multiplier control that can affect other spinners.
  */
-export function combinedLabelSpinner(labelWidth: Scale, spinnerWidth: Scale, params: LabelParams & SpinnerParams, fallbackDisabledMessage: boolean = true): WidgetCreator<FlexiblePosition>
+export function multiplier(multiplierIndex: Store<number>): WidgetCreator<FlexiblePosition>
 {
-	(<FlexiblePosition>params).width = spinnerWidth;
-	params.wrapMode ||= "clampThenWrap";
-	if (fallbackDisabledMessage)
-	{
-		params.disabledMessage ||= "Not available";
-	}
+	const multiplierTip = "Multiplies all spinner controls by the specified amount";
 
 	return horizontal([
 		label({
-			width: labelWidth,
-			disabled: params.disabled,
-			text: params.text,
-			tooltip: params.tooltip
+			text: "Multiplier:",
+			tooltip: multiplierTip,
+			width: 60,
+			padding: { left: "1w" }
 		}),
-		spinner(params)
+		dropdown({
+			tooltip: multiplierTip,
+			width: 45,
+			padding: { right: 6 },
+			items: ["x1", "x10", "x100"],
+			selectedIndex: multiplierIndex,
+			onChange: idx => multiplierIndex.set(idx),
+		})
 	]);
 }
 
 
 /**
- * A checkbox with a label on the left side.
+ * Parameters for a label-control combination.
  */
-export function combinedLabelCheckbox(labelWidth: Scale, params: LabelParams & CheckboxParams): WidgetCreator<FlexiblePosition>
+export type LabelledControlParams<TParams extends ElementParams = ElementParams> = TParams &
 {
-	const text = params.text;
-	params.text = "";
+	_control: (params: TParams) => WidgetCreator<FlexiblePosition>
+	_label: { text: string, width?: Scale };
+};
+
+/**
+ * A control with a label on the left side.
+ */
+export function labelled<TParams extends ElementParams>(params: LabelledControlParams<TParams>): WidgetCreator<FlexiblePosition>
+{
+	const labelParams = <LabelParams>params._label;
+	labelParams.disabled = params.disabled;
+	labelParams.tooltip = params.tooltip;
+
 	return horizontal([
-		label({
-			width: labelWidth,
-			disabled: params.disabled,
-			tooltip: params.tooltip,
-			text
-		}),
-		checkbox(params)
+		label(labelParams),
+		params._control(params)
 	]);
+}
+
+
+/**
+ * Parameters for a label-spinner combination.
+ */
+export type LabelledSpinnerParams<TParams extends (SpinnerParams | DropdownSpinnerParams) = SpinnerParams> = Omit<LabelledControlParams<TParams>, "_control"> &
+{
+	_control?: (typeof spinner | typeof dropdownSpinner);
+	_noDisabledMessage?: boolean;
+};
+
+/**
+ * A spinner with a label on the left side.
+ */
+export function labelledSpinner<TParams extends (SpinnerParams | DropdownSpinnerParams)>(params: LabelledSpinnerParams<TParams> & FlexiblePosition): WidgetCreator<FlexiblePosition>
+{
+	params.wrapMode ||= "clampThenWrap";
+	params._control ||= spinner;
+	if (!params._noDisabledMessage)
+	{
+		params.disabledMessage ||= "Not available";
+	}
+	return labelled(<never>params);
 }

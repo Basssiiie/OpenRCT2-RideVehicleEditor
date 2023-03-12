@@ -1,4 +1,4 @@
-import { store } from "openrct2-flexui";
+import { compute, store } from "openrct2-flexui";
 import { ParkRide } from "../objects/parkRide";
 import { RideLifeCycleFlags } from "../objects/rideLifeCycleFlags";
 import { refreshRide } from "../services/events";
@@ -13,16 +13,19 @@ export class RideViewModel
 	readonly _excitement = store<number>(0);
 	readonly _intensity = store<number>(0);
 	readonly _nausea = store<number>(0);
-	readonly _multiplier = store<number>(1);
+	readonly _multiplierIndex = store<number>(0);
+	readonly _multiplier = compute(this._multiplierIndex, idx => (10 ** idx));
 	readonly _freezeStats = store<boolean>(false);
 
 	readonly _buildMonth = store<number>(0);
+	readonly _currentMonth = store<number>(0);
 	readonly _customDesign = store<boolean>(false);
 	readonly _indestructable = store<boolean>(false);
 
 	private _isOpen?: boolean;
 	private _rideSubscription?: () => void;
 	private _ratingCalculationHook?: IDisposable;
+	private _dayIntervalHook?: IDisposable;
 
 	constructor()
 	{
@@ -46,6 +49,8 @@ export class RideViewModel
 	{
 		Log.debug("[RideViewModel] Window opened!");
 		this._isOpen = true;
+		this._currentMonth.set(date.monthsElapsed);
+
 		this._rideSubscription = this._ride.subscribe(r =>
 		{
 			if (r)
@@ -64,6 +69,14 @@ export class RideViewModel
 				this._nausea.set(args.nausea);
 			}
 		});
+		this._dayIntervalHook = context.subscribe("interval.day", () =>
+		{
+			const ride = this._ride.get();
+			if (ride)
+			{
+				this._currentMonth.set(date.monthsElapsed);
+			}
+		});
 	}
 
 	_close(): void
@@ -78,8 +91,16 @@ export class RideViewModel
 		{
 			this._ratingCalculationHook.dispose();
 		}
+		if (this._dayIntervalHook)
+		{
+			this._dayIntervalHook.dispose();
+		}
 		this._rideSubscription = undefined;
 		this._ratingCalculationHook = undefined;
+		this._dayIntervalHook = undefined;
+
+		// Reset values
+		this._multiplierIndex.set(0);
 	}
 
 	private _updateRideInfo(parkRide: ParkRide): void

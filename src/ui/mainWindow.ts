@@ -1,6 +1,6 @@
-import { button, checkbox, colourPicker, compute, dropdown, dropdownSpinner, FlexiblePosition, groupbox, horizontal, label, LabelParams, SpinnerParams, SpinnerWrapMode, toggle, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
+import { button, checkbox, colourPicker, compute, dropdown, dropdownSpinner, DropdownSpinnerParams, FlexiblePosition, groupbox, horizontal, label, SpinnerParams, SpinnerWrapMode, toggle, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
 import { isDevelopment, pluginVersion } from "../environment";
-import { VehicleVisibility } from "../objects/rideVehicleVariant";
+import { RideVehicleVariant, VehicleVisibility } from "../objects/rideVehicleVariant";
 import { invoke, refreshRide } from "../services/events";
 import { applyToTargets, CopyFilter, getTargets, getVehicleSettings } from "../services/vehicleCopier";
 import { dragToolId, toggleVehicleDragger } from "../services/vehicleDragger";
@@ -10,7 +10,7 @@ import { pickerToolId, toggleVehiclePicker } from "../services/vehiclePicker";
 import { cancelTools } from "../utilities/tools";
 import { VehicleViewModel } from "../viewmodels/vehicleViewModel";
 import { model as rideModel, rideWindow } from "./rideWindow";
-import { combinedLabelSpinner } from "./utilityControls";
+import { labelledSpinner, LabelledSpinnerParams, multiplier } from "./utilityControls";
 
 
 const model = new VehicleViewModel();
@@ -22,7 +22,6 @@ const clampThenWrapMode: SpinnerWrapMode = "clampThenWrap";
 
 // Tips that are used multiple times
 const applyOptionsTip = "Copy the selected vehicle settings to a specific set of other vehicles on this ride.";
-const multiplierTip = "Multiplies all spinner controls by the specified amount";
 
 let title = ("Ride vehicle editor (v" + pluginVersion + ")");
 if (isDevelopment)
@@ -78,7 +77,7 @@ export const mainWindow = window({
 					disabledMessage: "No rides in this park",
 					autoDisable: "empty",
 					selectedIndex: compute(model._selectedRide, r => r ? r[1] : 0),
-					onChange: i => model._selectedRide.set([model._rides.get()[i], i]),
+					onChange: idx => model._selectedRide.set([model._rides.get()[idx], idx]),
 				}),
 				dropdownSpinner({ // train list
 					items: compute(model._trains, c => c.map((t, i) => ("Train " + (t._special ? "?" : (i + 1))))),
@@ -87,7 +86,7 @@ export const mainWindow = window({
 					disabledMessage: "No trains available",
 					autoDisable: "single",
 					selectedIndex: compute(model._selectedTrain, t => t ? t[1] : 0),
-					onChange: i => model._selectedTrain.set([model._trains.get()[i], i]),
+					onChange: idx => model._selectedTrain.set([model._trains.get()[idx], idx]),
 				}),
 				dropdownSpinner({ // vehicle list
 					items: compute(model._vehicles, c => c.map((_, i) => ("Vehicle " + (i + 1)))),
@@ -96,7 +95,7 @@ export const mainWindow = window({
 					disabledMessage: "No vehicles available",
 					autoDisable: "single",
 					selectedIndex: compute(model._selectedVehicle, v => v ? v[1] : 0),
-					onChange: i => model._selectedVehicle.set([model._vehicles.get()[i], i]),
+					onChange: idx => model._selectedVehicle.set([model._vehicles.get()[idx], idx]),
 				})
 			])
 		]),
@@ -282,20 +281,15 @@ export const mainWindow = window({
 								selectedIndex: compute(model._type, t => (t) ? t[1] : 0),
 								onChange: idx => updateVehicleType(idx)
 							}),
-							labelSpinner({
-								text: "Variant:",
+							labelSpinner<DropdownSpinnerParams>({
+								_label: { text: "Variant:" },
+								_control: dropdownSpinner,
 								tooltip: "Sprite variant to use from the selected ride type",
-								minimum: 0,
-								maximum: compute(model._variants, v =>
-								{
-									const length = (v.length - 1);
-									return (length > 1) ? length : 1;
-								}),
+								items: compute(model._variants, c => c.map((v, i) => formatVariant(v, i))),
 								wrapMode: "wrap",
 								disabled: compute(model._isEditDisabled, model._variants, (noEdit, variants) => (noEdit || variants.length < 2)),
-								value: model._variant,
+								selectedIndex: model._variant,
 								onChange: value => model._modifyVehicle(setVariant, value),
-								format: formatVariants
 							}),
 							horizontal([
 								label({
@@ -330,7 +324,7 @@ export const mainWindow = window({
 						spacing: 3,
 						content: [
 							labelSpinner({
-								text: "Track progress:",
+								_label: { text: "Track progress:" },
 								tooltip: "Distance in steps of how far the vehicle has progressed along the current track piece",
 								minimum: 0,
 								disabled: model._isEditDisabled,
@@ -339,17 +333,17 @@ export const mainWindow = window({
 								onChange: (_, incr) => model._modifyVehicle(changeTrackProgress, incr)
 							}),
 							labelSpinner({
-								text: "Spacing:",
+								_label: { text: "Spacing:" },
 								tooltip: "Choose whether either tailgating or social distancing is the best for your vehicle",
 								minimum: 0,
 								disabled: compute(model._isEditDisabled, model._selectedVehicle, (noEdit, vehicle) => (noEdit || !vehicle || vehicle[1] === 0)),
 								step: model._multiplier,
 								value: compute(model._spacing, v => v || 0),
-								format: v => (v > 0) ? v.toString() : "Too far away",
+								format: (v: number) => (v > 0) ? v.toString() : "Too far away",
 								onChange: (_, incr) => model._modifyVehicle(changeSpacing, incr)
 							}),
 							positionSpinner({
-								text: "X position:",
+								_label: { text: "X position:" },
 								minimum: 0,
 								disabled: model._isPositionDisabled,
 								step: model._multiplier,
@@ -358,7 +352,7 @@ export const mainWindow = window({
 								onChange: (_, incr) => model._modifyVehicle(setPositionX, incr),
 							}),
 							positionSpinner({
-								text: "Y position:",
+								_label: { text: "Y position:" },
 								minimum: 0,
 								disabled: model._isPositionDisabled,
 								step: model._multiplier,
@@ -367,7 +361,7 @@ export const mainWindow = window({
 								onChange: (_, incr) => model._modifyVehicle(setPositionY, incr)
 							}),
 							positionSpinner({
-								text: "Z position:",
+								_label: { text: "Z position:" },
 								minimum: 0,
 								disabled: model._isPositionDisabled,
 								step: model._multiplier,
@@ -382,7 +376,7 @@ export const mainWindow = window({
 						spacing: 3,
 						content: [
 							labelSpinner({
-								text: "Seats:",
+								_label: { text: "Seats:" },
 								tooltip: "Total amount of passengers that can cuddle up in this vehicle",
 								minimum: 0,
 								maximum: 32, // vehicles refuse more than 32 guests, leaving them stuck just before entering.
@@ -393,7 +387,7 @@ export const mainWindow = window({
 								onChange: value => model._modifyVehicle(setSeatCount, value)
 							}),
 							labelSpinner({
-								text: "Mass:",
+								_label: { text: "Mass:" },
 								tooltip: "Total amount of mass (weight) of this vehicle, including all its passengers and your mom",
 								minimum: 0,
 								maximum: 65_535,
@@ -404,7 +398,7 @@ export const mainWindow = window({
 								onChange: value => model._modifyVehicle(setMass, value)
 							}),
 							labelSpinner({
-								text: "Acceleration:",
+								_label: { text: "Acceleration:" },
 								tooltip: "Cranks up the engines to accelerate faster, self-powered vehicles only",
 								disabledMessage: "Powered vehicles only",
 								minimum: 0,
@@ -416,7 +410,7 @@ export const mainWindow = window({
 								onChange: value => model._modifyVehicle(setPoweredAcceleration, value)
 							}),
 							labelSpinner({
-								text: "Max. speed:",
+								_label: { text: "Max. speed:" },
 								tooltip: "The (il)legal speed limit for your vehicle, self-powered vehicles only",
 								disabledMessage: "Powered vehicles only",
 								minimum: 1,
@@ -429,22 +423,7 @@ export const mainWindow = window({
 							})
 						]
 					}),
-					horizontal([
-						label({
-							text: "Multiplier:",
-							tooltip: multiplierTip,
-							width: 60,
-							padding: { left: "1w" }
-						}),
-						dropdown({
-							tooltip: multiplierTip,
-							width: 45,
-							padding: { top: -2, right: 6 },
-							items: ["x1", "x10", "x100"],
-							selectedIndex: model._multiplierIndex,
-							onChange: idx => model._multiplierIndex.set(idx),
-						})
-					])
+					multiplier(model._multiplierIndex)
 				]
 			})
 		]),
@@ -487,31 +466,33 @@ function applySelectedSettingsToRide(): void
 /**
  * Format function that labels variants invisible if they are.
  */
-function formatVariants(variantIndex: number): string
+function formatVariant(variant: RideVehicleVariant, index: number): string
 {
-	const variants = model._variants.get();
-	let visibility: VehicleVisibility;
-	if (variantIndex >= variants.length || (visibility = variants[variantIndex]._visibility) === VehicleVisibility.Visible)
+	const visibility = variant._visibility;
+	if (visibility === VehicleVisibility.Visible)
 	{
-		return variantIndex.toString();
+		return index.toString();
 	}
 	const visibilityLabel = (!visibility) ? "green square" : "invisible";
-	return (variantIndex + "  (" + visibilityLabel + ")");
+	return (index + "  (" + visibilityLabel + ")");
 }
 
 /**
  * Combines a label and a spinner into one widget creator.
  */
-function labelSpinner(params: LabelParams & SpinnerParams): WidgetCreator<FlexiblePosition>
+function labelSpinner<T extends (SpinnerParams | DropdownSpinnerParams) = SpinnerParams>(params: LabelledSpinnerParams<T> & FlexiblePosition): WidgetCreator<FlexiblePosition>
 {
-	return combinedLabelSpinner(controlsLabelWidth, controlsSpinnerWidth, params);
+	params.width = controlsSpinnerWidth;
+	params._label.width = controlsLabelWidth;
+	return labelledSpinner(params);
 }
 
 /**
  * Combines a label and a spinner into one widget creator, with the same tooltip for the location spinners.
  */
-function positionSpinner(params: LabelParams & SpinnerParams): WidgetCreator<FlexiblePosition>
+function positionSpinner(params: LabelledSpinnerParams & FlexiblePosition): WidgetCreator<FlexiblePosition>
 {
 	params.tooltip = "The fantastic map location of your vehicle and where to find it. Only works when the vehicle is not moving.";
-	return combinedLabelSpinner(controlsLabelWidth, controlsSpinnerWidth, params, false);
+	params._noDisabledMessage = true;
+	return labelSpinner(params);
 }
