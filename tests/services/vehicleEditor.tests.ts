@@ -9,14 +9,29 @@ import { setMass, setPositionX, setPositionY, setPositionZ, setPoweredAccelerati
 
 function setupCarMock(carId: number): Car
 {
-	const car = Mock.car({ id: carId, rideObject: 2 });
+	const car = Mock.car({ id: carId, rideObject: 2, mass: 25 + 31 });
 	globalThis.map = Mock.map({ entities: [ car ]});
 	return car;
 }
 test.before(() =>
 {
 	globalThis.context = Mock.context({
-		getTypeIdForAction: () => 80
+		getTypeIdForAction: () => 80,
+		objects: [
+			Mock.rideObject({ index: 2, vehicles: [
+				Mock.rideObjectVehicle({ carMass: 25, numSeats: 4 }),
+				Mock.rideObjectVehicle({ carMass: 100, numSeats: 0 }),
+				Mock.rideObjectVehicle({ carMass: 85, numSeats: 6 }),
+				Mock.rideObjectVehicle({ carMass: 1400, numSeats: 14, poweredAcceleration: 11, poweredMaxSpeed: 12 })
+			]}),
+			Mock.rideObject({ index: 23, vehicles: [
+				Mock.rideObjectVehicle({ carMass: 800, numSeats: 10, poweredAcceleration: 40, poweredMaxSpeed: 35 }),
+				Mock.rideObjectVehicle({ carMass: 550, numSeats: 1 })
+			]}),
+			Mock.rideObject({ index: 55 ,vehicles: [
+				Mock.rideObjectVehicle({ carMass: 265, numSeats: 12 }),
+			]})
+		]
 	});
 	globalThis.network = Mock.network({
 		groups: [ Mock.playerGroup({ permissions: [ "ride_properties" ] })]
@@ -32,8 +47,22 @@ test("Set ride type", t =>
 	setRideType([[ 99, 1 ]], new RideType(Mock.rideObject({ index: 23 })));
 	t.is(car.rideObject, 23);
 
+	// Reset other properties
+	t.is(car.vehicleObject, 0);
+	t.is(car.mass, 800 + 31);
+	t.is(car.numSeats, 10);
+	t.is(car.poweredAcceleration, 40);
+	t.is(car.poweredMaxSpeed, 35);
+
 	setRideType([[ 99, 1 ]], new RideType(Mock.rideObject({ index: 55 })));
 	t.is(car.rideObject, 55);
+
+	// Reset other properties
+	t.is(car.vehicleObject, 0);
+	t.is(car.mass, 265 + 31);
+	t.is(car.numSeats, 12);
+	t.is(car.poweredAcceleration, 0);
+	t.is(car.poweredMaxSpeed, 0);
 });
 
 
@@ -44,8 +73,22 @@ test("Set variant", t =>
 	setVariant([[ 56, 1 ]], 3);
 	t.is(car.vehicleObject, 3);
 
+	// Reset other properties
+	t.is(car.rideObject, 2);
+	t.is(car.mass, 1400 + 31);
+	t.is(car.numSeats, 14);
+	t.is(car.poweredAcceleration, 11);
+	t.is(car.poweredMaxSpeed, 12);
+
 	setVariant([[ 56, 1 ]], 1);
 	t.is(car.vehicleObject, 1);
+
+	// Reset other properties
+	t.is(car.rideObject, 2);
+	t.is(car.mass, 100 + 31);
+	t.is(car.numSeats, 0);
+	t.is(car.poweredAcceleration, 0);
+	t.is(car.poweredMaxSpeed, 0);
 });
 
 
