@@ -11,6 +11,7 @@ import { cancelTools } from "../utilities/tools";
 import { VehicleViewModel } from "../viewmodels/vehicleViewModel";
 import { model as rideModel, rideWindow } from "./rideWindow";
 import { labelledSpinner, LabelledSpinnerParams, multiplier } from "./utilityControls";
+import * as Log from "../utilities/logger";
 
 
 const model = new VehicleViewModel();
@@ -445,7 +446,6 @@ function updateVehicleType(typeIdx: number): void
 {
 	const type = model._rideTypes.get()[typeIdx];
 	model._modifyVehicle(setRideType, type);
-	model._variants.set(type._variants());
 }
 
 /**

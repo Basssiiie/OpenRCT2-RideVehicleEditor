@@ -20,7 +20,11 @@ const registeredActions: Record<string, Action<never>> = {};
 export function register<T>(name: string, action: Action<T>): Action<T>
 {
 	registeredActions[name] = action;
-	return (args: T): void => context.executeAction(name, <never>args);
+	return (args: T): void =>
+	{
+		Log.debug("Execute action", name, "with args:", JSON.stringify(args));
+		context.executeAction(name, <never>args);
+	};
 }
 
 

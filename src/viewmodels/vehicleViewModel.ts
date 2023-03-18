@@ -220,8 +220,9 @@ export class VehicleViewModel
 		const typeIdx = findIndex(types, t => t._id === car.rideObject);
 		const colours = car.colours;
 
-		this._updateDynamicDataFromCar(car, index);
+		this._variant.set(0); // fixes any out of bounds updates
 		this._type.set((typeIdx === null) ? null : [ types[typeIdx], typeIdx ]);
+		this._updateDynamicDataFromCar(car, index);
 		this._seats.set(car.numSeats);
 		this._poweredAcceleration.set(car.poweredAcceleration);
 		this._poweredMaxSpeed.set(car.poweredMaxSpeed);
