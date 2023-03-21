@@ -51,10 +51,10 @@ const config = {
 	plugins: [
 		resolve(),
 		replace({
-			include: "./src/environment.ts",
 			preventAssignment: true,
 			values: {
-				__BUILD_CONFIGURATION__: JSON.stringify(build)
+				__BUILD_CONFIGURATION__: JSON.stringify(build),
+				...(isDev ? {} : { "Log.debug": "//" })
 			}
 		}),
 		typescript(),
