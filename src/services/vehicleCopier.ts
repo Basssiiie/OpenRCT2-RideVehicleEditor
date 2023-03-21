@@ -43,6 +43,7 @@ export const copyOptions =
  */
 export const enum CopyFilter
 {
+	Default =               (0),
 	TypeAndVariant =      (1 << 0),
 	Colours =             (1 << 1),
 	TrackProgress =       (1 << 2),

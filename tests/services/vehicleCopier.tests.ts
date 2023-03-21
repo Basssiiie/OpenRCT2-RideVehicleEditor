@@ -79,7 +79,7 @@ test("Get all settings of the vehicle", t =>
 	});
 	const vehicle = new RideVehicle(car);
 
-	const settings = getVehicleSettings(vehicle, CopyFilter.All);
+	const settings = getVehicleSettings(vehicle, CopyFilter.Default);
 
 	t.is(settings.rideTypeId, 23);
 	t.is(settings.variant, 1);

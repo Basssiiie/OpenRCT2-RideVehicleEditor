@@ -1,14 +1,14 @@
-import { Colour, compute, Store, store } from "openrct2-flexui";
+import { Colour, compute, store, WritableStore } from "openrct2-flexui";
 import { getAllRides, ParkRide } from "../objects/parkRide";
 import { createTrainFromAnyCar, RideTrain } from "../objects/rideTrain";
-import { getAllRideTypes, RideType } from "../objects/rideType";
+import { getAllRideTypes, gigaCableLiftHillType, gigaCableLiftHillTypeId, RideType } from "../objects/rideType";
 import { RideVehicle } from "../objects/rideVehicle";
 import { refreshVehicle } from "../services/events";
 import { getSpacingToPrecedingVehicle } from "../services/spacingEditor";
 import { CopyFilter, CopyOptions, getTargets, VehicleSettings } from "../services/vehicleCopier";
 import { dragToolId } from "../services/vehicleDragger";
 import { VehicleSpan } from "../services/vehicleSpan";
-import { find, findIndex } from "../utilities/array";
+import { find, findIndex, orderByName } from "../utilities/array";
 import * as Log from "../utilities/logger";
 import { cancelTools } from "../utilities/tools";
 
@@ -54,13 +54,14 @@ export class VehicleViewModel
 	readonly _multiplierIndex = store<number>(0);
 	readonly _multiplier = compute(this._multiplierIndex, idx => (10 ** idx));
 
-	readonly _copyFilters = store<CopyFilter>(0);
+	readonly _copyFilters = store(CopyFilter.Default);
 	readonly _copyTargetOption = store<CopyOptions>(0);
 	readonly _copyTargets = compute(this._copyTargetOption, this._selectedVehicle, (o, v) => getTargets(o, this._selectedRide.get(), this._selectedTrain.get(), v));
 	readonly _synchronizeTargets = store<boolean>(false);
 	readonly _clipboard = store<VehicleSettings | null>(null);
 
 	private _isOpen?: boolean;
+	private _isRefreshing?: boolean;
 	private _onPlayerAction?: IDisposable;
 	private _onGameTick?: IDisposable;
 
@@ -179,6 +180,11 @@ export class VehicleViewModel
 	 */
 	_modifyVehicle<T>(action: (vehicles: VehicleSpan[], value: T) => void, value: T): void
 	{
+		if (this._isRefreshing)
+		{
+			Log.debug("Vehicle modify ignored, is refreshing!");
+			return;
+		}
 		const vehicle = this._selectedVehicle.get();
 		if (vehicle)
 		{
@@ -216,12 +222,38 @@ export class VehicleViewModel
 	 */
 	private _updateVehicleInfo(vehicle: RideVehicle, index: number): void
 	{
-		const car = vehicle._car(), types = this._rideTypes.get();
-		const typeIdx = findIndex(types, t => t._id === car.rideObject);
+		this._isRefreshing = true;
+		const car = vehicle._car();
+		const rideObjectId = car.rideObject;
 		const colours = car.colours;
+		let types = this._rideTypes.get();
+		let typeIdx = findIndex(types, t => t._id === car.rideObject);
+		let type: [RideType, number] | null;
 
-		this._variant.set(0); // fixes any out of bounds updates
-		this._type.set((typeIdx === null) ? null : [ types[typeIdx], typeIdx ]);
+		if (typeIdx !== null)
+		{
+			type = [ types[typeIdx], typeIdx ];
+		}
+		else if (rideObjectId === gigaCableLiftHillTypeId) // Special Giga Lifthill
+		{
+			Log.debug("Adding special Giga cable lift ride type");
+			types = types
+				.concat(gigaCableLiftHillType)
+				.sort((l, r) => orderByName(l._object(), r._object()));
+
+			typeIdx = findIndex(types, t => t._id === gigaCableLiftHillTypeId);
+			Log.assert(typeIdx !== null);
+
+			type = [ gigaCableLiftHillType, <number>typeIdx ];
+			this._rideTypes.set(types);
+		}
+		else
+		{
+			type = null;
+		}
+		Log.debug("Current", this._type.get(), "new", typeIdx);
+
+		this._type.set(type);
 		this._updateDynamicDataFromCar(car, index);
 		this._seats.set(car.numSeats);
 		this._poweredAcceleration.set(car.poweredAcceleration);
@@ -229,6 +261,7 @@ export class VehicleViewModel
 		this._primaryColour.set(colours.body);
 		this._secondaryColour.set(colours.trim);
 		this._tertiaryColour.set(colours.tertiary);
+		this._isRefreshing = false;
 	}
 
 	/**
@@ -344,7 +377,7 @@ export class VehicleViewModel
 /**
  * Selects the correct entity based on the specified index in the store, or null if anything was deselected.
  */
-function updateSelectionOrNull<T>(value: Store<[T, number] | null>, items: T[]): void
+function updateSelectionOrNull<T>(value: WritableStore<[T, number] | null>, items: T[]): void
 {
 	let selection: [T, number] | null = null;
 	if (items.length > 0)

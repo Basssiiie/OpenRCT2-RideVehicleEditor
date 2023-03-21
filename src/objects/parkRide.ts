@@ -1,3 +1,4 @@
+import { orderByName } from "../utilities/array";
 import * as Log from "../utilities/logger";
 import { RideTrain } from "./rideTrain";
 
@@ -10,7 +11,7 @@ export function getAllRides(): ParkRide[]
 	return map
 		.rides
 		.filter(r => r.classification === "ride")
-		.sort((a, b) => a.name.localeCompare(b.name))
+		.sort(orderByName)
 		.map(r => new ParkRide(r));
 }
 

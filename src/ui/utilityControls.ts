@@ -1,10 +1,10 @@
-import { dropdown, dropdownSpinner, DropdownSpinnerParams, ElementParams, FlexiblePosition, horizontal, label, LabelParams, Scale, spinner, SpinnerParams, Store, WidgetCreator } from "openrct2-flexui";
+import { dropdown, dropdownSpinner, DropdownSpinnerParams, ElementParams, FlexiblePosition, horizontal, label, LabelParams, Scale, spinner, SpinnerParams, twoway, WidgetCreator, WritableStore } from "openrct2-flexui";
 
 
 /**
  * Creates a small multiplier control that can affect other spinners.
  */
-export function multiplier(multiplierIndex: Store<number>): WidgetCreator<FlexiblePosition>
+export function multiplier(multiplierIndex: WritableStore<number>): WidgetCreator<FlexiblePosition>
 {
 	const multiplierTip = "Multiplies all spinner controls by the specified amount";
 
@@ -20,8 +20,7 @@ export function multiplier(multiplierIndex: Store<number>): WidgetCreator<Flexib
 			width: 45,
 			padding: { right: 6 },
 			items: ["x1", "x10", "x100"],
-			selectedIndex: multiplierIndex,
-			onChange: idx => multiplierIndex.set(idx),
+			selectedIndex: twoway(multiplierIndex)
 		})
 	]);
 }

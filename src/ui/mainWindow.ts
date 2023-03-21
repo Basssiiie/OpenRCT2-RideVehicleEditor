@@ -1,4 +1,4 @@
-import { button, checkbox, colourPicker, compute, dropdown, dropdownSpinner, DropdownSpinnerParams, FlexiblePosition, groupbox, horizontal, label, SpinnerParams, SpinnerWrapMode, toggle, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
+import { button, checkbox, colourPicker, compute, dropdown, dropdownSpinner, DropdownSpinnerParams, FlexiblePosition, groupbox, horizontal, label, SpinnerParams, SpinnerWrapMode, toggle, twoway, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
 import { isDevelopment, pluginVersion } from "../environment";
 import { RideVehicleVariant, VehicleVisibility } from "../objects/rideVehicleVariant";
 import { invoke, refreshRide } from "../services/events";
@@ -11,7 +11,6 @@ import { cancelTools } from "../utilities/tools";
 import { VehicleViewModel } from "../viewmodels/vehicleViewModel";
 import { model as rideModel, rideWindow } from "./rideWindow";
 import { labelledSpinner, LabelledSpinnerParams, multiplier } from "./utilityControls";
-import * as Log from "../utilities/logger";
 
 
 const model = new VehicleViewModel();
@@ -113,14 +112,14 @@ export const mainWindow = window({
 									width: buttonSize, height: buttonSize,
 									tooltip: "Use the picker to select a vehicle by clicking it",
 									image: "eyedropper", // SPR_G2_EYEDROPPER
-									isPressed: model._isPicking,
+									isPressed: twoway(model._isPicking),
 									onChange: pressed => toggleVehiclePicker(pressed, c => model._select(c), () => model._isPicking.set(false))
 								}),
 								toggle({
 									width: buttonSize, height: buttonSize,
 									tooltip: "Drag stationary vehicles to new places on the map",
 									image: 5174, // SPR_PICKUP_BTN
-									isPressed: model._isDragging,
+									isPressed: twoway(model._isDragging),
 									disabled: model._isPositionDisabled,
 									onChange: pressed => toggleVehicleDragger(pressed, model._selectedVehicle, model._x, model._y, model._z, () => model._isDragging.set(false))
 								}),
@@ -279,7 +278,7 @@ export const mainWindow = window({
 								disabledMessage: "No ride types available",
 								disabled: compute(model._isEditDisabled, model._type, (noEdit, type) => (noEdit || !type)),
 								autoDisable: "empty",
-								selectedIndex: compute(model._type, t => (t) ? t[1] : 0),
+								selectedIndex: twoway(compute(model._type, t => (t) ? t[1] : 0)),
 								onChange: idx => updateVehicleType(idx)
 							}),
 							labelSpinner<DropdownSpinnerParams>({

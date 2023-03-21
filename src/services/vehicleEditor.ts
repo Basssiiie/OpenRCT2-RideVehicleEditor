@@ -1,5 +1,5 @@
 import { Colour } from "openrct2-flexui";
-import { RideType } from "../objects/rideType";
+import { getRideObject, RideType } from "../objects/rideType";
 import * as Log from "../utilities/logger";
 import { register } from "./actions";
 import { getDistanceFromProgress } from "./spacingEditor";
@@ -169,8 +169,8 @@ function updateValue(vehicles: VehicleSpan[], key: VehicleUpdateKeys, value: num
 function setRideTypeDefaults(car: Car, rideObjectIndex: number, variantIndex: number): void
 {
 	const oldRideObjectId = car.rideObject;
-	const oldRideObject = context.getObject("ride", oldRideObjectId);
-	const newRideObject = (oldRideObjectId === rideObjectIndex) ? oldRideObject : context.getObject("ride", rideObjectIndex);
+	const oldRideObject = getRideObject(oldRideObjectId);
+	const newRideObject = (oldRideObjectId === rideObjectIndex) ? oldRideObject : getRideObject(rideObjectIndex);
 
 	const oldVariant = oldRideObject.vehicles[car.vehicleObject];
 	const newVariant = newRideObject.vehicles[variantIndex];

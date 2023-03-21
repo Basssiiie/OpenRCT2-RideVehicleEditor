@@ -88,23 +88,6 @@ test("Ride type gets created from ride object", t =>
 });
 
 
-test("Ride type refreshes correctly", t =>
-{
-	globalThis.context = Mock.context({ objects: [
-		Mock.rideObject({ index: 5, carsPerFlatRide: 0, name: "Info Kiosk" }),
-		Mock.rideObject({ index: 12, carsPerFlatRide: 255, name: "Log flume" }),
-	]});
-
-	const rideType = new RideType(12);
-
-	t.is(rideType._id, 12);
-	t.is(rideType._object().name, "Log flume");
-
-	rideType._refresh();
-	t.is(rideType._object().name, "Log flume");
-});
-
-
 test("Ride type counts all variants", t =>
 {
 	const rideObject = Mock.rideObject({

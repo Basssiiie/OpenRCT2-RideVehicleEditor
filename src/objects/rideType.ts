@@ -1,3 +1,4 @@
+import { orderByName } from "../utilities/array";
 import * as Log from "../utilities/logger";
 import { getVisibility, RideVehicleVariant } from "./rideVehicleVariant";
 
@@ -10,8 +11,20 @@ export function getAllRideTypes(): RideType[]
 	return context
 		.getAllObjects("ride")
 		.filter(r => r.carsPerFlatRide !== 0) // tracked rides == 255, flatrides >= 1, shops == 0
-		.sort((a, b) => a.name.localeCompare(b.name))
+		.sort(orderByName)
 		.map(r => new RideType(r));
+}
+
+/**
+ * Gets the ride object from the OpenRCT2 API, or the special secret giga cable lift hill if the id matches.
+ */
+export function getRideObject(index: number): RideObject
+{
+	if (index === gigaCableLiftHillTypeId)
+	{
+		return gigaCableLiftObject;
+	}
+	return context.getObject("ride", index);
 }
 
 
@@ -35,7 +48,7 @@ export class RideType
 		if (typeof param === "number")
 		{
 			this._id = param;
-			this._refresh();
+			this._rideObject = getRideObject(this._id) || null;
 		}
 		else
 		{
@@ -43,13 +56,6 @@ export class RideType
 			this._rideObject = param;
 		}
 	}
-
-
-	_refresh(): void
-	{
-		this._rideObject = context.getObject("ride", this._id) || null;
-	}
-
 
 	/*
 	 * Gets the associated ride definition from the game.
@@ -59,7 +65,6 @@ export class RideType
 		Log.assert(!!this._rideObject, "Selected ride object with id", this._id, "is missing.");
 		return <RideObject>this._rideObject;
 	}
-
 
 	/**
 	 * The variants (vehicle sprites) this ride has.
@@ -96,3 +101,44 @@ export class RideType
 		return this._vehicleVariants;
 	}
 }
+
+/**
+ * Create an entry for the Giga Coaster cable lift.
+ */
+function gigaCableLiftHillEntry(mass: number, acceleration: number, maxSpeed: number, imageId: number, spriteSize: number): RideObjectVehicle
+{
+	return {
+		carMass: mass,
+		poweredAcceleration: acceleration,
+		poweredMaxSpeed: maxSpeed,
+		numSeats: 0,
+		flags: 0,
+		baseImageId: imageId,
+		spriteWidth: spriteSize,
+		spriteHeightPositive: spriteSize,
+		tabHeight: 0
+	} as RideObjectVehicle;
+}
+
+/**
+ * The ride object id for the cable lift hill of the Giga Coaster.
+ */
+export const gigaCableLiftHillTypeId = 65_535;
+
+/**
+ * A cached object of the cable lift hill for the Giga Coaster.
+ */
+const gigaCableLiftObject =
+{
+	index: gigaCableLiftHillTypeId,
+	name: "Giga Coaster Cable Lift Hill",
+	vehicles: [
+		gigaCableLiftHillEntry(100, 80, 20, 29_110, 10),
+		gigaCableLiftHillEntry(0, 0, 0, 0, 0)
+	]
+} as RideObject;
+
+/**
+ * A ride type for the cable lift hill of the Giga Coaster.
+ */
+export const gigaCableLiftHillType = new RideType(gigaCableLiftObject);

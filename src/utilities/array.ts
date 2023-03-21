@@ -8,7 +8,6 @@ export function isValidIndex<T>(array: T[] | null, index: number | null): boolea
 	return (array != null && index != null && index >= 0 && index < array.length);
 }
 
-
 /**
  * Gets the item at the index if the index is a valid index for this array.
  * @param array The array to check.
@@ -18,7 +17,6 @@ export function getAtIndex<T>(array: T[] | null, index: number | null): T | null
 {
 	return (array != null && index != null && index >= 0 && index < array.length) ? array[index] : null;
 }
-
 
 /**
  * Gets index of the first matching item. Returns -1 if no items match the predicate.
@@ -37,7 +35,6 @@ export function findIndex<T>(array: T[], predicate: (item: T) => boolean): numbe
 	return null;
 }
 
-
 /**
  * Gets the first matching item. Returns null if no items match the predicate.
  * @param array The array to check.
@@ -49,7 +46,6 @@ export function find<T>(array: T[], predicate: (item: T) => boolean): T | null
 	return (idx === null) ? null : array[idx];
 }
 
-
 /**
  * Gets the first item of the array, or null if it has no items.
  * @param array The array to check.
@@ -57,4 +53,12 @@ export function find<T>(array: T[], predicate: (item: T) => boolean): T | null
 export function firstOrNull<T>(array: T[]): T | null
 {
 	return (array.length > 0) ? array[0] : null;
+}
+
+/**
+ * Sorting function that can order an array by name alphabetically.
+ */
+export function orderByName(left: { name: string }, right: { name: string }): number
+{
+	return left.name.localeCompare(right.name);
 }

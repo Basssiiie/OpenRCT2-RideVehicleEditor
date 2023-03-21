@@ -1,4 +1,5 @@
 import * as Log from "../utilities/logger";
+import { getRideObject } from "./rideType";
 import { isPowered } from "./rideVehicleVariant";
 
 
@@ -76,7 +77,7 @@ export class RideVehicle
 
 		if (!this._vehicleObject || hash !== this._typeHash)
 		{
-			const rideObject = context.getObject("ride", rideObj);
+			const rideObject = getRideObject(rideObj);
 			if (!rideObject)
 			{
 				return null;
