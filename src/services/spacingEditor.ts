@@ -90,6 +90,16 @@ export function getDistanceFromProgress(car: Car, trackProgress: number): number
 	return (trackProgress < 0) ? -totalDistance : totalDistance;
 }
 
+// Cache last spacing calculation
+let lastPrecedingVehicleX: number | undefined;
+let lastPrecedingVehicleY: number | undefined;
+let lastPrecedingVehicleZ: number | undefined;
+let lastFollowingVehicleX: number | undefined;
+let lastFollowingVehicleY: number | undefined;
+let lastFollowingVehicleZ: number | undefined;
+let lastSpacingResult: number | null | undefined;
+
+
 /**
  * Calculate how much spacing there is between the current vehicle and the preceding
  * vehicle on the specified train. Returns "null" if it is too far away.
@@ -103,6 +113,31 @@ export function getSpacingToPrecedingVehicle(train: RideTrain, car: Car, carInde
 
 	const carInFront = train._at(carIndex - 1)._car();
 
+	// Check if spacing calculation is already cached:
+	const followingCarX = car.x, followingCarY = car.y, followingCarZ = car.z,
+		precedingCarX = carInFront.x, precedingCarY = carInFront.y, precedingCarZ = carInFront.z;
+
+	if (lastSpacingResult === undefined
+		|| followingCarX !== lastFollowingVehicleX || followingCarY !== lastFollowingVehicleY || followingCarZ !== lastFollowingVehicleZ
+		|| precedingCarX !== lastPrecedingVehicleX || precedingCarY !== lastPrecedingVehicleY || precedingCarZ !== lastPrecedingVehicleZ)
+	{
+		Log.debug("Cached spacing value invalid; recalculate...");
+		lastFollowingVehicleX = followingCarX;
+		lastFollowingVehicleY = followingCarY;
+		lastFollowingVehicleZ = followingCarZ;
+		lastPrecedingVehicleX = precedingCarX;
+		lastPrecedingVehicleY = precedingCarY;
+		lastPrecedingVehicleZ = precedingCarZ;
+		lastSpacingResult = calculateSpacingToPrecedingVehicle(car, carInFront);
+	}
+	return lastSpacingResult;
+}
+
+/**
+ * Performs the actual spacing calculation.
+ */
+function calculateSpacingToPrecedingVehicle(car: Car, carInFront: Car): number | null
+{
 	const currentProgress = car.trackProgress;
 	const inFrontProgress = carInFront.trackProgress;
 	const currentTrackLocation = car.trackLocation;
@@ -186,7 +221,8 @@ function getIndexForTrackElementAt(coords: CoordsXYZD): number | null
 		const element = tile.elements[i];
 		if (element.type === "track"
 			&& element.baseZ === coords.z
-			&& element.direction === coords.direction)
+			&& element.direction === coords.direction
+			&& element.sequence === 0)
 		{
 			return i;
 		}
