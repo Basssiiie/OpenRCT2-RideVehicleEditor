@@ -386,6 +386,8 @@ function createTrain(mapMock: GameMapMock, cars: Partial<Car>[]): RideTrain
 	for (let idx = length - 1; idx >= 0; idx--)
 	{
 		const mock =  Mock.car(cars[idx]);
+		mock.x = <number>mock.id; // break caching
+		mock.y = Math.floor(Math.random() * 0xFFFF_FFFF_FFFF);
 		mock.nextCarOnTrain = lastId;
 		lastId = mock.id;
 		carMocks[idx] = mock;
