@@ -1,9 +1,8 @@
 import { checkbox, compute, dropdown, DropdownParams, FlexiblePosition, groupbox, label, LabelParams, WidgetCreator, window } from "openrct2-flexui";
 import { ParkRide } from "../objects/parkRide";
 import { setBuildMonth, setBuildYear, setCustomDesign, setExcitementRating, setFrozenRatings, setIndestructable, setIntensityRating, setNauseaRating } from "../services/rideEditor";
-import { formatRelativeDate, monthCount, monthNames } from "../utilities/date";
+import { formatRelativeDate, getDateMonth, getDateYear, monthNames } from "../utilities/date";
 import * as Log from "../utilities/logger";
-import { floor } from "../utilities/math";
 import { RideViewModel } from "../viewmodels/rideVehicleModel";
 import { labelled, labelledSpinner, LabelledSpinnerParams, multiplier } from "./utilityControls";
 
@@ -83,13 +82,14 @@ export const rideWindow = window({
 					_label: { text: "Build month:", width: controlsLabelWidth },
 					tooltip: "The month in which this ride was built. Somehow never in the winter months.",
 					items: monthNames,
+					selectedIndex: compute(model._buildMonth, month => getDateMonth(month)),
 					onChange: value => modifyRide(setBuildMonth, value)
 				}),
 				labelSpinner({
 					_label: { text: "Build year:" },
 					tooltip: "The year in which this ride was built.",
 					wrapMode: "clamp",
-					value: compute(model._buildMonth, month => (floor(month / monthCount) + 1)),
+					value: compute(model._buildMonth, month => getDateYear(month)),
 					step: model._multiplier,
 					minimum: -268_435_456, // 32-bit min / 8 months + 1
 					maximum: 268_435_455, // 32-bit max / 8 months

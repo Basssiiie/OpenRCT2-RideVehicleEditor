@@ -10,8 +10,28 @@ export const monthNames = [ "March", "April", "May", "June", "July", "August", "
 /**
  * The amount of months in the game.
  */
-export const monthCount = 8;
+const monthCount = 8;
 
+
+/**
+ * Get the month part from the date.
+ * @param date Total amount of months since March year 1.
+ * @returns The index of the month from 0 to 7 inclusive.
+ */
+export function getDateMonth(date: number): number
+{
+	return (((date % monthCount) + monthCount) % monthCount);
+}
+
+/**
+ * Get the year part of the date.
+ * @param date Total amount of months since March year 1.
+ * @returns The number of the year.
+ */
+export function getDateYear(date: number): number
+{
+	return floor(date / monthCount) + 1;
+}
 
 /**
  * Updates the date number to be in the specified month without changing the year.
@@ -20,7 +40,7 @@ export const monthCount = 8;
  */
 export function updateDateMonth(date: number, month: number): number
 {
-	const year = floor(date / monthCount);
+	const year = (getDateYear(date) - 1);
 	Log.debug("UPDATE MONRTH -> date", date, ", year", year, ", month", month, "=", ((year * monthCount) + month));
 	return ((year * monthCount) + month);
 }
@@ -32,7 +52,7 @@ export function updateDateMonth(date: number, month: number): number
  */
 export function updateDateYear(date: number, year: number): number
 {
-	const month = (((date % monthCount) + monthCount) % monthCount);
+	const month = getDateMonth(date);
 	Log.debug("UPDATE YEAR -> date", date, ", year", year, ", month", month, "=", month + ((year - 1) * monthCount));
 	return month + ((year - 1) * monthCount);
 }
@@ -44,10 +64,9 @@ export function updateDateYear(date: number, year: number): number
 export function formatRelativeDate(relativeDate: number): string
 {
 	const
-		amountOfMonths = monthNames.length,
 		absolute = abs(relativeDate),
-		month = (absolute % amountOfMonths),
-		year = floor(absolute / amountOfMonths),
+		month = getDateMonth(absolute),
+		year = (getDateYear(absolute) - 1),
 		monthString = combineAndPluralise(month, "month"),
 		yearString = combineAndPluralise(year, "year");
 
