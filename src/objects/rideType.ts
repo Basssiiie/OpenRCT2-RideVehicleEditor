@@ -1,5 +1,6 @@
 import { orderByName } from "../utilities/array";
 import * as Log from "../utilities/logger";
+import { isNumber } from "../utilities/type";
 import { getVisibility, RideVehicleVariant } from "./rideVehicleVariant";
 
 
@@ -45,7 +46,7 @@ export class RideType
 	constructor(id: number);
 	constructor(param: RideObject | number)
 	{
-		if (typeof param === "number")
+		if (isNumber(param))
 		{
 			this._id = param;
 			this._rideObject = getRideObject(this._id) || null;

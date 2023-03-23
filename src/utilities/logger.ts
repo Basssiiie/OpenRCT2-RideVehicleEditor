@@ -13,7 +13,7 @@ type LogLevel = "debug" | "warning" | "error";
 /**
  * Returns true if Duktape is available, or false if not.
  */
-const isDuktapeAvailable = (typeof Duktape !== "undefined");
+const isDuktapeAvailable = (!!Duktape);
 
 
 /**

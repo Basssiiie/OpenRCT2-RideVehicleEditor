@@ -4,7 +4,7 @@
 /**
  * Returns the current version of the plugin.
  */
-export const pluginVersion = "1.2";
+export const pluginVersion = "2.0";
 
 
 /**
@@ -28,7 +28,7 @@ export const isDevelopment = (buildConfiguration === "development");
 /**
  * Returns true if the UI is available, or false if the game is running in headless mode.
  */
-export const isUiAvailable = (typeof ui !== "undefined");
+export const isUiAvailable = (!!ui);
 
 
 /**

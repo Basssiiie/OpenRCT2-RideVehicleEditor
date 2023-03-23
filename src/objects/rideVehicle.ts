@@ -1,7 +1,25 @@
 import * as Log from "../utilities/logger";
+import { isNumber } from "../utilities/type";
 import { getRideObject } from "./rideType";
 import { isPowered } from "./rideVehicleVariant";
 
+
+/**
+ * Returns a car entity by id, or null if the entity was not found or not a car.
+ */
+export function getCarById(id: number): Car | null
+{
+	const entity = map.getEntity(id);
+	return (entity && isCar(entity)) ? entity : null;
+}
+
+/**
+ * Returns true if the entity is a car, or false if not.
+ */
+export function isCar(entity: Entity): entity is Car
+{
+	return (entity.type === "car");
+}
 
 /**
  * A single vehicle on a train currently in the park.
@@ -13,7 +31,6 @@ export class RideVehicle
 	private _vehicleObject?: RideObjectVehicle | null;
 	private _typeHash?: number;
 
-
 	/**
 	 * Creates a new ride vehicle to wrap a car.
 	 */
@@ -21,7 +38,7 @@ export class RideVehicle
 	constructor(id: number);
 	constructor(param: Car | number)
 	{
-		if (typeof param === "number")
+		if (isNumber(param))
 		{
 			this._id = param;
 			this._refresh();
@@ -32,19 +49,18 @@ export class RideVehicle
 			this._id = param.id!;
 			this._entity = param;
 		}
-		Log.assert(typeof this._id === "number", "Ride vehicle entity is invalid.");
+		Log.assert(isNumber(this._id), "Ride vehicle entity is invalid.");
 	}
-
 
 	/**
 	 * Refreshes the referenced entity for this vehicle, in case it got respawned.
 	 */
 	_refresh(): boolean
 	{
-		const car = map.getEntity(this._id);
-		if (car && car.type === "car")
+		const car = getCarById(this._id);
+		if (car)
 		{
-			this._entity = <Car>car;
+			this._entity = car;
 			return true;
 		}
 
@@ -52,7 +68,6 @@ export class RideVehicle
 		this._entity = null;
 		return false;
 	}
-
 
 	/**
 	 * Gets the associated vehicle data from the game.
@@ -63,7 +78,6 @@ export class RideVehicle
 		Log.assert(this._entity?.type === "car", "Selected car with id", this._id, "is not of type 'car', but of type", this._entity?.type);
 		return <Car>this._entity;
 	}
-
 
 	/**
 	 * Returns the object definition for this car.
@@ -88,7 +102,6 @@ export class RideVehicle
 		return this._vehicleObject;
 	}
 
-
 	/**
 	 * Returns true if this car does use powered acceleration.
 	 * Currently not all vehicle types support this property in
@@ -99,30 +112,4 @@ export class RideVehicle
 		const type = this._type();
 		return !type || isPowered(type);
 	}
-
-
-	/**
-	 * Returns the total amount of mass the guests on the vehicle take up.
-	 * @param car The car to calculate the guest mass of.
-	 */
-	/* // This doesn't work yet because the peep array does not get refreshed properly..
-	static massOfPeeps(car: Car): number
-	{
-		const guests = car.peeps;
-		let totalGuestMass = 0;
-		for (let i = 0; i < guests.length; i++)
-		{
-			const peepId = guests[i];
-			if (peepId !== null)
-			{
-				const guest = map.getEntity(peepId) as Guest;
-				if (guest)
-				{
-					totalGuestMass += guest.mass;
-				}
-			}
-		}
-		return totalGuestMass;
-	}
-	*/
 }

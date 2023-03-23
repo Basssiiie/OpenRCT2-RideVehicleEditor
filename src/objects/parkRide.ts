@@ -1,5 +1,6 @@
 import { orderByName } from "../utilities/array";
 import * as Log from "../utilities/logger";
+import { isNumber } from "../utilities/type";
 import { RideTrain } from "./rideTrain";
 
 
@@ -33,7 +34,7 @@ export class ParkRide
 	constructor(id: number);
 	constructor(param: Ride | number)
 	{
-		if (typeof param === "number")
+		if (isNumber(param))
 		{
 			this._id = param;
 			this._refresh();

@@ -54,7 +54,10 @@ const config = {
 			preventAssignment: true,
 			values: {
 				__BUILD_CONFIGURATION__: JSON.stringify(build),
-				...(isDev ? {} : { "Log.debug": "//" })
+				...(isDev ? {} : {
+					"Log.debug": "//",
+					"Log.assert": "//"
+				})
 			}
 		}),
 		typescript(),

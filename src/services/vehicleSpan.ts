@@ -1,3 +1,5 @@
+import { getCarById } from "../objects/rideVehicle";
+import { isNull } from "../utilities/type";
 import { invoke, refreshVehicle } from "./events";
 
 /**
@@ -22,17 +24,17 @@ export function forEachVehicle(vehicles: VehicleSpan[], action: (car: Car, index
 		let currentId = span[0];
 		let count = 0;
 
-		while (maximum === null || count < maximum)
+		while (isNull(maximum) || count < maximum)
 		{
-			const car = <Car>map.getEntity(currentId);
-			if (!car || car.type !== "car")
+			const car = getCarById(currentId);
+			if (!car)
 				break;
 
 			action(car, count);
 			invoke(refreshVehicle, currentId);
 
 			const nextId = car.nextCarOnTrain;
-			if (nextId === null)
+			if (isNull(nextId))
 				break;
 
 			currentId = nextId;

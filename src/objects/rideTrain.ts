@@ -1,5 +1,6 @@
 import * as Log from "../utilities/logger";
-import { RideVehicle } from "./rideVehicle";
+import { isNull, isNumber } from "../utilities/type";
+import { getCarById, RideVehicle } from "./rideVehicle";
 
 
 /**
@@ -11,16 +12,11 @@ export function createTrainFromAnyCar(car: Car): [RideTrain, number]
 	const vehicles: RideVehicle[] = [];
 
 	// Insert all vehicles in front
-	let currentCar = car, currentCarId: number | null;
-	while((currentCarId = currentCar.previousCarOnRide) !== null)
+	let currentCar: Car | null = car, currentCarId: number | null;
+	while(!isNull(currentCarId = currentCar.previousCarOnRide))
 	{
-		currentCar = <Car>map.getEntity(currentCarId);
-		if (currentCar.type !== "car")
-		{
-			Log.debug("Previous entity id", currentCarId, "for type", currentCar.type, "is invalid in train");
-			break;
-		}
-		if (currentCar.nextCarOnTrain === null)
+		currentCar = getCarById(currentCarId);
+		if (!currentCar || isNull(currentCar.nextCarOnTrain))
 		{
 			break;
 		}
@@ -31,12 +27,11 @@ export function createTrainFromAnyCar(car: Car): [RideTrain, number]
 	vehicles.push(new RideVehicle(car));
 
 	// Insert all vehicles behind
-	for (currentCar = car; (currentCarId = currentCar.nextCarOnTrain) !== null;)
+	for (currentCar = car; !isNull(currentCarId = currentCar.nextCarOnTrain);)
 	{
-		currentCar = <Car>map.getEntity(currentCarId);
-		if (currentCar.type !== "car")
+		currentCar = getCarById(currentCarId);
+		if (!currentCar)
 		{
-			Log.debug("Next entity id", currentCarId, "for type", currentCar.type, "is invalid in train");
 			break;
 		}
 		vehicles.push(new RideVehicle(currentCar));
@@ -66,7 +61,7 @@ export class RideTrain
 	constructor(vehicles: RideVehicle[], special?: boolean);
 	constructor(param: number | RideVehicle[], special?: boolean)
 	{
-		if (typeof param === "number")
+		if (isNumber(param))
 		{
 			Log.assert(param !== 0xFFFF, "Invalid car id");
 			this._carId = param;
@@ -94,8 +89,7 @@ export class RideTrain
 
 		while (currentId != null
 			&& currentId != 0xFFFF // = invalid vehicle
-			&& (car = <Car>map.getEntity(currentId))
-			&& car.type === "car")
+			&& (car = getCarById(currentId)))
 		{
 			vehicleList.push(new RideVehicle(car));
 			currentId = car.nextCarOnTrain;

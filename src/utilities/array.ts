@@ -1,3 +1,5 @@
+import { isNull } from "./type";
+
 /**
  * Checks if the index is a valid index for this array.
  * @param array The array to check.
@@ -43,7 +45,7 @@ export function findIndex<T>(array: T[], predicate: (item: T) => boolean): numbe
 export function find<T>(array: T[], predicate: (item: T) => boolean): T | null
 {
 	const idx = findIndex(array, predicate);
-	return (idx === null) ? null : array[idx];
+	return (isNull(idx)) ? null : array[idx];
 }
 
 /**

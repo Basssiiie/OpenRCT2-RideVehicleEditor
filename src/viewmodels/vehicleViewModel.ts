@@ -11,6 +11,7 @@ import { VehicleSpan } from "../services/vehicleSpan";
 import { find, findIndex, orderByName } from "../utilities/array";
 import * as Log from "../utilities/logger";
 import { cancelTools } from "../utilities/tools";
+import { isNull } from "../utilities/type";
 
 
 /**
@@ -143,7 +144,7 @@ export class VehicleViewModel
 			rideId = car.ride,
 			carRideIndex = findIndex(rides, r => r._id === rideId);
 
-		if (carRideIndex === null)
+		if (isNull(carRideIndex))
 		{
 			Log.debug("Could not find ride id", rideId, "for selected entity id", carId);
 			return;
@@ -230,7 +231,7 @@ export class VehicleViewModel
 		let typeIdx = findIndex(types, t => t._id === car.rideObject);
 		let type: [RideType, number] | null;
 
-		if (typeIdx !== null)
+		if (!isNull(typeIdx))
 		{
 			type = [ types[typeIdx], typeIdx ];
 		}
@@ -242,7 +243,7 @@ export class VehicleViewModel
 				.sort((l, r) => orderByName(l._object(), r._object()));
 
 			typeIdx = findIndex(types, t => t._id === gigaCableLiftHillTypeId);
-			Log.assert(typeIdx !== null);
+			Log.assert(!isNull(typeIdx));
 
 			type = [ gigaCableLiftHillType, <number>typeIdx ];
 			this._rideTypes.set(types);
@@ -251,7 +252,6 @@ export class VehicleViewModel
 		{
 			type = null;
 		}
-		Log.debug("Current", this._type.get(), "new", typeIdx);
 
 		this._type.set(type);
 		this._updateDynamicDataFromCar(car, index);
@@ -332,7 +332,7 @@ export class VehicleViewModel
 					// No vehicles were spawned, try to find the same ride again.
 					const rideId = currentRide[0]._id;
 					const rideIdx = findIndex(allRides, r => r._id === rideId);
-					if (rideIdx !== null)
+					if (!isNull(rideIdx))
 					{
 						this._selectedRide.set([allRides[rideIdx], rideIdx]);
 					}
@@ -345,7 +345,7 @@ export class VehicleViewModel
 				const rideId = args.ride;
 				const rides = this._rides.get();
 				const ride = find(rides, r => r._id === rideId);
-				if (ride !== null)
+				if (!isNull(ride))
 				{
 					const rideExists = ride._refresh();
 					const selectedRide = this._selectedRide.get();

@@ -1,10 +1,12 @@
 import { Store } from "openrct2-flexui";
-import { RideVehicle } from "../objects/rideVehicle";
-import { cancelCurrentTool, cancelTools } from "../utilities/tools";
+import { isMultiplayer } from "../environment";
+import { getCarById, RideVehicle } from "../objects/rideVehicle";
+import { getTileElement } from "../utilities/map";
 import { floor } from "../utilities/math";
+import { cancelCurrentTool, cancelTools } from "../utilities/tools";
+import { isUndefined } from "../utilities/type";
 import { register } from "./actions";
 import { invoke, refreshVehicle } from "./events";
-import { isMultiplayer } from "../environment";
 
 
 const execute = register<DragVehicleArgs>("rve-drag-car", updateVehicleDrag);
@@ -100,19 +102,18 @@ function getPositionFromTool(args: ToolEventArgs, vehicleType: RideObjectVehicle
 	const { entityId, mapCoords, tileElementIndex } = args;
 	let x: number | undefined, y: number | undefined, z: number | undefined;
 
-	if (entityId !== undefined)
+	if (!isUndefined(entityId))
 	{
 		const entity = map.getEntity(entityId);
 		x = entity.x;
 		y = entity.y;
 		z = entity.z;
 	}
-	else if (mapCoords && tileElementIndex !== undefined)
+	else if (mapCoords && !isUndefined(tileElementIndex))
 	{
 		x = (mapCoords.x + 16);
 		y = (mapCoords.y + 16);
-		const tile = map.getTile(x / 32, y / 32);
-		const element = tile.getElement(tileElementIndex);
+		const element = getTileElement(x, y, tileElementIndex);
 		const type = element.type;
 		const tabHeight = (vehicleType) ? vehicleType.tabHeight : 0;
 
@@ -158,8 +159,8 @@ function updateCarPosition(vehicle: [RideVehicle, number], position: CoordsXYZ, 
 function updateVehicleDrag(args: DragVehicleArgs): void
 {
 	const id = args.target;
-	const car = map.getEntity(args.target);
-	if (!car || car.type !== "car")
+	const car = getCarById(args.target);
+	if (!car)
 	{
 		return;
 	}

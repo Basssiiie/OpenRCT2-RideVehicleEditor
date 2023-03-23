@@ -4,6 +4,7 @@ import { RideVehicle } from "../objects/rideVehicle";
 import { register } from "./actions";
 import * as Log from "../utilities/logger";
 import { forEachVehicle, VehicleSpan } from "./vehicleSpan";
+import { isUndefined } from "../utilities/type";
 
 
 const execute = register<PasteVehicleSettingsArgs>("rve-paste-car", pasteVehicleSettings);
@@ -202,7 +203,7 @@ function applyVehicleSettings(car: Car, settings: VehicleSettings): void
 {
 	function apply<K extends keyof Car>(key: K, value: Car[K] | undefined): void
 	{
-		if (value !== undefined)
+		if (!isUndefined(value))
 		{
 			car[key] = value;
 		}

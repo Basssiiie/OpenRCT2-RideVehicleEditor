@@ -1,10 +1,12 @@
 import { RideTrain } from "../objects/rideTrain";
-import { getSubpositionTranslationDistance, getTrackDistances, TrackDistances } from "./subpositionHelper";
 import * as Log from "../utilities/logger";
-import { abs, floor } from "../utilities/math";
+import { getTileByCoords } from "../utilities/map";
+import { abs } from "../utilities/math";
+import { isNull, isUndefined } from "../utilities/type";
+import { getSubpositionTranslationDistance, getTrackDistances, TrackDistances } from "./subpositionHelper";
+
 
 const MaxForwardIterations = 10;
-const UnitsPerTile = 32;
 const MaximumDistanceFromCap = 3277;
 const ForwardDistanceCap = (13_962 - MaximumDistanceFromCap);
 const BackwardDistanceCap = (0 + MaximumDistanceFromCap);
@@ -17,7 +19,7 @@ export function getDistanceFromProgress(car: Car, trackProgress: number): number
 {
 	const currentTrackLocation = car.trackLocation;
 	const currentTrackIndex = getIndexForTrackElementAt(currentTrackLocation);
-	if (currentTrackIndex === null)
+	if (isNull(currentTrackIndex))
 	{
 		Log.debug("Could not find track for car at position;", currentTrackLocation.x, ",", currentTrackLocation.y, ",", currentTrackLocation.z, ", direction:", currentTrackLocation.direction);
 		return 0;
@@ -117,7 +119,7 @@ export function getSpacingToPrecedingVehicle(train: RideTrain, car: Car, carInde
 	const followingCarX = car.x, followingCarY = car.y, followingCarZ = car.z,
 		precedingCarX = carInFront.x, precedingCarY = carInFront.y, precedingCarZ = carInFront.z;
 
-	if (lastSpacingResult === undefined
+	if (isUndefined(lastSpacingResult)
 		|| followingCarX !== lastFollowingVehicleX || followingCarY !== lastFollowingVehicleY || followingCarZ !== lastFollowingVehicleZ
 		|| precedingCarX !== lastPrecedingVehicleX || precedingCarY !== lastPrecedingVehicleY || precedingCarZ !== lastPrecedingVehicleZ)
 	{
@@ -176,7 +178,7 @@ function calculateSpacingToPrecedingVehicle(car: Car, carInFront: Car): number |
 		}
 
 		iteratorSegment = iterator.segment;
-		if (iteratorSegment === null)
+		if (isNull(iteratorSegment))
 		{
 			return null;
 		}
@@ -193,7 +195,7 @@ function calculateSpacingToPrecedingVehicle(car: Car, carInFront: Car): number |
 function getTrackIteratorAtLocation(trackLocation: CoordsXYZD): TrackIterator | null
 {
 	const currentTrackIndex = getIndexForTrackElementAt(trackLocation);
-	if (currentTrackIndex === null)
+	if (isNull(currentTrackIndex))
 	{
 		Log.debug("Could not find track for car at position;", trackLocation.x, ",", trackLocation.y, ",", trackLocation.z, ", direction;", trackLocation.direction);
 		return null;
@@ -213,7 +215,7 @@ function getTrackIteratorAtLocation(trackLocation: CoordsXYZD): TrackIterator | 
  */
 function getIndexForTrackElementAt(coords: CoordsXYZD): number | null
 {
-	const tile = map.getTile(floor(coords.x / UnitsPerTile), floor(coords.y / UnitsPerTile));
+	const tile = getTileByCoords(coords.x, coords.y);
 	const allElements = tile.elements, len = allElements.length;
 
 	for (let i = 0; i < len; i++)
