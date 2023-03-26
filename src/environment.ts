@@ -1,5 +1,7 @@
 /// <reference path="environment.d.ts" />
 
+import { isUndefined } from "./utilities/type";
+
 
 /**
  * Returns the current version of the plugin.
@@ -28,7 +30,7 @@ export const isDevelopment = (buildConfiguration === "development");
 /**
  * Returns true if the UI is available, or false if the game is running in headless mode.
  */
-export const isUiAvailable = (!!ui);
+export const isUiAvailable = (typeof ui !== "undefined");
 
 
 /**
