@@ -2,37 +2,138 @@
 
 This plugin lets you edit vehicles on any ride in your park on the fly.
 
-![(Image of train with edited vehicles)](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/master/img/chaos.png)
+![(Manticore's carrousel with edited vehicles)](/img/manticore-carrousel.png)
+
+*<p align="right">Carrousel made by Manticore</p>*
 
 ### Current features
-- Select and switch through all ride vehicles in your park, or use the picker to click on the vehicle directly.
-- Change the vehicle type for each vehicle independently.
-- Switch through different variants of the same ride type. (E.g. locomotive, tender or passenger car.)
-- Modify properties like mass, number of seats, (powered) acceleration of each vehicle.
-- Modify spacing between different vehicles on the same train.
-- Copy and paste the settings of a vehicle over other completely unrelated vehicles.
-- Easily apply your changes to all vehicles on the train or the ride.
+- Select and switch through **all ride vehicles** in your park, or use the **picker** to click on the vehicle directly.
+- **Modify properties** like vehicle type, colour, mass, number of seats, (powered) acceleration of each vehicle.
+- Switch through **different variants** of the same ride type. (E.g. locomotive, tender or passenger car.)
+- Modify the **track position** of or **spacing** between different vehicles on the same train.
+- **[Pick up and move](#move-vehicles-off-the-track)** stationery vehicles to different places on the map.
+- [**Copy** and **paste**](#copy--paste-vehicles) the settings of a vehicle over other completely unrelated vehicles.
+- Easily **[apply your changes to all vehicles](#apply-or-copy-and-paste-changes-to-multiple-vehicles)** on the train or the ride, or **[update multiple vehicles](#sychronize-changes-to-multiple-vehicles)** at the same time.
+- **Edit** and **freeze** the ride's excitement, intensity or nausea ratings.
 
 ### Planned features
 - Please submit any ideas under [Issues](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/issues).
 
-## See it in action
-
-A few people made some great videos showcasing how to use the plugin.
-
-- **[Mini Vehicle Hacking Contest - The Results](https://youtu.be/ThXNZdzY3Ys)**, by Deurklink and his DKMP community (using v1.0)
-- **[Git Gud at OpenRCT2 #93: Vehicle hacking with the Ride Vehicle Editor Plugin!](https://youtu.be/xSzyTD7xFss)**, by Deurklink (using v1.0)
-- **[The Joy of Hacking OpenRCT2: Vehicle Hacking 101](https://youtu.be/gqQHDqQQRDw)**, by Zarathustra (using v0.3)
-
 ## Installation
 
-1. This plugin requires at least OpenRCT2 version v0.3.3 (release) or the newest develop version.
+1. This plugin requires at least OpenRCT2 version v0.4.4.
 2. Download the latest version of the plugin from the [Releases page](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/releases).
 3. To install it, put the downloaded `*.js` file into your `/OpenRCT2/plugin` folder.
     - Easiest way to find the OpenRCT2-folder is by launching the OpenRCT2 game, click and hold on the red toolbox in the main menu, and select "Open custom content folder".
     - Otherwise this folder is commonly found in `C:/Users/<YOUR NAME>/Documents/OpenRCT2/plugin` on Windows.
     - If you already had this plugin installed before, you can safely overwrite the old file.
 4. Once the file is there, it should show up ingame in the dropdown menu under the map icon.
+
+## Inspirations!
+
+Here are some inspirations and examples of what you can do with this plugin.
+
+| ![Toy machine, by Manticore](/img/inspirations/manticore-toy-machine.gif)<br>Toy machine, by Manticore | ![Parking lot, by Fidwell](/img/inspirations/fidwell-parking-lot.png)<br>Parking lot, by Fidwell |
+|--|--|
+
+| ![Bicycle parking, by Enox](/img/inspirations/enox-bicycle-parking.png)<br>Bicycle parking, by Enox | ![Space mine train, by Deurklink](/img/inspirations/deurklink-space-mine-train.png)<br>Space mine train, by Deurklink |
+|--|--|
+
+| ![Train with different carriages, by Emiel](/img/inspirations/emiel-train-travel-classes.png)<br>Train with different carriages, by Emiel | ![Shark chasing row boat, by Deurklink](/img/inspirations/deurklink-shark.gif)<br>Shark chasing row boat, by Deurklink |
+|--|--|
+
+| ![Horse carriage, by Zarathustra](/img/inspirations/zarathustra-and-left-handed-coffee-mug-horse-carriage.png)<br>Horse carriage, by Zarathustra | ![Dragon ships, by Mamarillas](/img/inspirations/mamarillas-dragons.png)<br>Dragon ships, by Mamarillas |
+|--|--|
+
+## See it in action
+
+The plugin was featured in these plugin recommendations/rankings!
+
+- **[Top 10 OpenRCT2 Plugins](https://youtu.be/IeLoyNDq_7A)**, by Marcel Vos
+- **[Top 5 Plugins for OpenRCT2](https://youtu.be/isfXGf9cUu4)**, by Fidwell
+
+The plugin was also featured in the following videos (grouped by plugin version):
+
+### v1.1
+
+- **[OpenRCT2 hacking: Self-powered shark](https://youtu.be/YhqCHzH9-64)**, by Fidwell
+- **[RCT2 Hacking Tutorial: Intamin Impulse with Holding Brake](https://youtu.be/scjxYx2GAEg)**, by Brian Andrelczyk (CP6)
+- **[RCT2 Hacking Tutorial: Diagonal and Triple Launch](https://youtu.be/TaNBwGBC0n0)**,  by Brian Andrelczyk (CP6)
+- **[Git Gud at OpenRCT2 #105: Turning any train into a powered train!](https://youtu.be/gQaxfdcq-Vw)**, by Deurklink
+
+### v1.0
+
+- **[Mini Vehicle Hacking Contest - The Results](https://youtu.be/ThXNZdzY3Ys)**, by Deurklink and his DKMP community
+- **[Git Gud at OpenRCT2 #95: Basic parking lots!](https://youtu.be/kXOf1IMlkow)**, by Deurklink
+- **[Git Gud at OpenRCT2 #93: Vehicle hacking with the Ride Vehicle Editor Plugin!](https://youtu.be/xSzyTD7xFss)**, by Deurklink
+
+### v0.3
+
+- **[The Joy of Hacking OpenRCT2: Vehicle Hacking 101](https://youtu.be/gqQHDqQQRDw)**, by Zarathustra
+
+---
+
+## Tutorials
+
+### Copy & paste vehicles
+
+To copy the settings of a vehicle to any other ride, you can use the copy and paste feature.
+
+1. Click the **copy** button to the left of the viewport (the two papers).
+   - If a copy is currently selected, the button will be in the pressed state.
+2. Select another vehicle that you want to override.
+3. Click the **paste** button to the left of the viewport (the paper off the clipboard).
+4. All settings from the copied vehicle will be pasted onto the currently selected vehicle.
+
+![How to copy and paste](/img/tutorials/copy-and-paste.gif)
+
+### Synchronize changes to multiple vehicles
+
+By enabling the synchronize option, all changes made to the selected vehicle will also be applied to a specific set of other vehicles on the same ride.
+
+1. From the dropdown in the **Apply & synchronize** section, select the vehicles that should be updated alongside the currently selected vehicle.
+2. Enable synchronization by clicking the **Synchronize** button.
+3. Any changes you make to the selected vehicle, will instantly be applied to the other vehicles as well.
+
+If you only want to synchronize specific settings, you can use the checkboxes in the **Apply & synchronize** section to limit what settings should synchronize.
+
+![How to synchronize changes to multiple vehicles](/img/tutorials/synchronize.gif)
+
+### Apply or copy and paste changes to multiple vehicles
+
+With the **Apply** button it is possible to copy and paste the currently selected vehicle to multiple other vehicles in a single click.
+
+1. Select the vehicle you want to copy.
+2. From the dropdown in the **Apply & synchronize** section, select the set of vehicles where the settings should be pasted to.
+3. Optionally, use the checkboxes to specify which settings should be copied.
+4. Click the **Apply** button to copy and paste all settings to selected set of vehicles.
+
+![How to apply changes to multiple vehicles](/img/tutorials/apply-multiple.gif)
+
+### Move vehicles off the track
+
+When a vehicle is in a stationary position, like waiting in a closed station, it is possible to move the vehicle off the track to another position on the map.
+
+1. Put the selected vehicle in a **still-standing state**, like waiting in a station.
+2. Use the **clipper** button to the left of the viewport to pick up the selected currently vehicle.
+3. Place it down at a new location on the map.
+
+For more detailed placement, it is recommended to use the X, Y and Z position settings.
+
+**Note:** if a vehicle starts "moving" again (for example: leaving the station), it will teleport back to its appropriate position on the track. To make it work permanently, keep the vehicle stationary, by for example keeping the ride closed.
+
+![How to move a vehicle to another location](/img/tutorials/drag-vehicle.gif)
+
+
+### Multiplayer! (How to setup)
+
+This plugin supports multiplayer! A few key points to note:
+
+1. For the plugin to work in multiplayer, **it needs to be installed on the server.** Make sure it is installed in the plugin's folder of the server's user directory.
+2. When the server is started, the plugin will be distributed to every player joining the server. Players do not need to install the plugin for themselves.
+3. Players need the **Ride Properties** permission to be able to modify any vehicles.
+4. When a player who did not have the plugin before joining leaves the server, the plugin will be removed from the game.
+5. When the plugin is installed in singleplayer, but not on the server, the plugin will be disabled on the server.
 
 ## FAQ
 
@@ -59,7 +160,7 @@ A few people made some great videos showcasing how to use the plugin.
 
 ---
 
-## Building the source code
+## For developers: building the source code
 
 This project is based on [wisnia74's Typescript modding template](https://github.com/wisnia74/openrct2-typescript-mod-template) and uses [Nodemon](https://nodemon.io/), [ESLint](https://eslint.org/) and [TypeScript](https://www.typescriptlang.org/) from this template.
 
@@ -69,7 +170,13 @@ This project is based on [wisnia74's Typescript modding template](https://github
 4. Find `openrct2.d.ts` TypeScript API declaration file in OpenRCT2 files and copy it to `lib` folder (this file can usually be found in `C:/Users/<YOUR NAME>/Documents/OpenRCT2/bin/` or `C:/Program Files/OpenRCT2/`).
     - Alternatively, you can make a symbolic link instead of copying the file, which will keep the file up to date whenever you install new versions of OpenRCT2.
 5. Run `npm run build` (release build) or `npm run build:dev` (develop build) to build the project.
-    - The default output folder is `(project directory)/dist` and can be changed in `rollup.config.prod.js` and `rollup.config.dev.js` respectively.
+    - For the release build, the default output folder is `(project directory)/dist`.
+    - For the develop build, the project tries to put the plugin into your game's plugin directory.
+    - These output paths can be changed in `rollup.config.js`.
+
+### User interface
+
+This plugin makes use of the [FlexUI](https://github.com/Basssiiie/OpenRCT2-FlexUI) framework to create and manage the user interface. It is automatically fetched from NPM with `npm install`.
 
 ### Hot reload
 
@@ -85,6 +192,6 @@ This project supports the [OpenRCT2 hot reload feature](https://github.com/OpenR
 6. Each time you save any of the files in `./src/`, the server will compile `./src/registerPlugin.ts` and place compiled plugin file inside your local OpenRCT2 plugin directory.
 7. OpenRCT2 will notice file changes and it will reload the plugin.
 
-## Notes
+### Final notes
 
-Thanks to [wisnia74](https://github.com/wisnia74/openrct2-typescript-mod-template) for providing the template for this mod and readme.
+Thanks to [wisnia74](https://github.com/wisnia74/openrct2-typescript-mod-template) for providing the template for this mod and readme. Thanks to the community for the enthusiasm for this plugin and their amazing creations.

@@ -1,7 +1,5 @@
 /// <reference path="environment.d.ts" />
 
-import { isUndefined } from "./utilities/type";
-
 
 /**
  * Returns the current version of the plugin.
