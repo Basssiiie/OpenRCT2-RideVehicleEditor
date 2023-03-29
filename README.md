@@ -6,7 +6,7 @@ This plugin lets you edit vehicles on any ride in your park on the fly.
 
 *<p align="right">Carrousel made by Manticore</p>*
 
-### Current features
+## Current features
 - Select and switch through **all ride vehicles** in your park, or use the **picker** to click on the vehicle directly.
 - **Modify properties** like vehicle type, colour, mass, number of seats, (powered) acceleration of each vehicle.
 - Switch through **different variants** of the same ride type. (E.g. locomotive, tender or passenger car.)
@@ -47,7 +47,7 @@ Here are some inspirations and examples of what you can do with this plugin.
 
 ## See it in action
 
-The plugin was featured in these plugin recommendations/rankings!
+The plugin was featured in these plugin recommendations / rankings!
 
 - **[Top 10 OpenRCT2 Plugins](https://youtu.be/IeLoyNDq_7A)**, by Marcel Vos
 - **[Top 5 Plugins for OpenRCT2](https://youtu.be/isfXGf9cUu4)**, by Fidwell
@@ -71,18 +71,16 @@ The plugin was also featured in the following videos (grouped by plugin version)
 
 - **[The Joy of Hacking OpenRCT2: Vehicle Hacking 101](https://youtu.be/gqQHDqQQRDw)**, by Zarathustra
 
----
-
 ## Tutorials
 
 ### Copy & paste vehicles
 
 To copy the settings of a vehicle to any other ride, you can use the copy and paste feature.
 
-1. Click the **copy** button to the left of the viewport (the two papers).
+1. Click the **copy** ![Copy button](/img/icons/copy.png) button to the left of the viewport.
    - If a copy is currently selected, the button will be in the pressed state.
 2. Select another vehicle that you want to override.
-3. Click the **paste** button to the left of the viewport (the paper off the clipboard).
+3. Click the **paste** ![Paste button](/img/icons/paste.png) button to the left of the viewport (the paper off the clipboard).
 4. All settings from the copied vehicle will be pasted onto the currently selected vehicle.
 
 ![How to copy and paste](/img/tutorials/copy-and-paste.gif)
@@ -115,7 +113,7 @@ With the **Apply** button it is possible to copy and paste the currently selecte
 When a vehicle is in a stationary position, like waiting in a closed station, it is possible to move the vehicle off the track to another position on the map.
 
 1. Put the selected vehicle in a **still-standing state**, like waiting in a station.
-2. Use the **clipper** button to the left of the viewport to pick up the selected currently vehicle.
+2. Use the **clipper** ![Clipper button](/img/icons/clipper.png) button to the left of the viewport to pick up the selected currently vehicle.
 3. Place it down at a new location on the map.
 
 For more detailed placement, it is recommended to use the X, Y and Z position settings.
