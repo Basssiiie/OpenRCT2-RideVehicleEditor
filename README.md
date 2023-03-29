@@ -2,7 +2,7 @@
 
 This plugin lets you edit vehicles on any ride in your park on the fly.
 
-![(Manticore's carrousel with edited vehicles)](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/blob/main/img/manticore-carrousel.png)
+![(Manticore's carrousel with edited vehicles)](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/manticore-carrousel.png)
 
 *<p align="right">Carrousel made by Manticore</p>*
 
@@ -33,16 +33,16 @@ This plugin lets you edit vehicles on any ride in your park on the fly.
 
 Here are some inspirations and examples of what you can do with this plugin.
 
-| ![Toy machine, by Manticore](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/blob/main/img/inspirations/manticore-toy-machine.gif)<br>Toy machine, by Manticore | ![Parking lot, by Fidwell](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/blob/main/img/inspirations/fidwell-parking-lot.png)<br>Parking lot, by Fidwell |
+| ![Toy machine, by Manticore](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/inspirations/manticore-toy-machine.gif)<br>Toy machine, by Manticore | ![Parking lot, by Fidwell](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/inspirations/fidwell-parking-lot.png)<br>Parking lot, by Fidwell |
 |--|--|
 
-| ![Bicycle parking, by Enox](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/blob/main/img/inspirations/enox-bicycle-parking.png)<br>Bicycle parking, by Enox | ![Space mine train, by Deurklink](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/blob/main/img/inspirations/deurklink-space-mine-train.png)<br>Space mine train, by Deurklink |
+| ![Bicycle parking, by Enox](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/inspirations/enox-bicycle-parking.png)<br>Bicycle parking, by Enox | ![Space mine train, by Deurklink](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/inspirations/deurklink-space-mine-train.png)<br>Space mine train, by Deurklink |
 |--|--|
 
-| ![Train with different carriages, by Emiel](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/blob/main/img/inspirations/emiel-train-travel-classes.png)<br>Train with different carriages, by Emiel | ![Shark chasing row boat, by Deurklink](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/blob/main/img/inspirations/deurklink-shark.gif)<br>Shark chasing row boat, by Deurklink |
+| ![Train with different carriages, by Emiel](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/inspirations/emiel-train-travel-classes.png)<br>Train with different carriages, by Emiel | ![Shark chasing row boat, by Deurklink](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/inspirations/deurklink-shark.gif)<br>Shark chasing row boat, by Deurklink |
 |--|--|
 
-| ![Horse carriage, by Zarathustra](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/blob/main/img/inspirations/zarathustra-and-left-handed-coffee-mug-horse-carriage.png)<br>Horse carriage, by Zarathustra | ![Dragon ships, by Mamarillas](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/blob/main/img/inspirations/mamarillas-dragons.png)<br>Dragon ships, by Mamarillas |
+| ![Horse carriage, by Zarathustra](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/inspirations/zarathustra-and-left-handed-coffee-mug-horse-carriage.png)<br>Horse carriage, by Zarathustra | ![Dragon ships, by Mamarillas](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/inspirations/mamarillas-dragons.png)<br>Dragon ships, by Mamarillas |
 |--|--|
 
 ## See it in action
@@ -77,13 +77,13 @@ The plugin was also featured in the following videos (grouped by plugin version)
 
 To copy the settings of a vehicle to any other ride, you can use the copy and paste feature.
 
-1. Click the **copy** ![Copy button](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/blob/main/img/icons/copy.png) button to the left of the viewport.
+1. Click the **copy** ![Copy button](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/icons/copy.png) button to the left of the viewport.
    - If a copy is currently selected, the button will be in the pressed state.
 2. Select another vehicle that you want to override.
-3. Click the **paste** ![Paste button](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/blob/main/img/icons/paste.png) button to the left of the viewport (the paper off the clipboard).
+3. Click the **paste** ![Paste button](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/icons/paste.png) button to the left of the viewport (the paper off the clipboard).
 4. All settings from the copied vehicle will be pasted onto the currently selected vehicle.
 
-![How to copy and paste](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/blob/main/img/tutorials/copy-and-paste.gif)
+![How to copy and paste](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/tutorials/copy-and-paste.gif)
 
 ### Synchronize changes to multiple vehicles
 
@@ -95,7 +95,7 @@ By enabling the synchronize option, all changes made to the selected vehicle wil
 
 If you only want to synchronize specific settings, you can use the checkboxes in the **Apply & synchronize** section to limit what settings should synchronize.
 
-![How to synchronize changes to multiple vehicles](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/blob/main/img/tutorials/synchronize.gif)
+![How to synchronize changes to multiple vehicles](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/tutorials/synchronize.gif)
 
 ### Apply or copy and paste changes to multiple vehicles
 
@@ -106,21 +106,21 @@ With the **Apply** button it is possible to copy and paste the currently selecte
 3. Optionally, use the checkboxes to specify which settings should be copied.
 4. Click the **Apply** button to copy and paste all settings to selected set of vehicles.
 
-![How to apply changes to multiple vehicles](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/blob/main/img/tutorials/apply-multiple.gif)
+![How to apply changes to multiple vehicles](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/tutorials/apply-multiple.gif)
 
 ### Move vehicles off the track
 
 When a vehicle is in a stationary position, like waiting in a closed station, it is possible to move the vehicle off the track to another position on the map.
 
 1. Put the selected vehicle in a **still-standing state**, like waiting in a station.
-2. Use the **clipper** ![Clipper button](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/blob/main/img/icons/clipper.png) button to the left of the viewport to pick up the selected currently vehicle.
+2. Use the **clipper** ![Clipper button](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/icons/clipper.png) button to the left of the viewport to pick up the selected currently vehicle.
 3. Place it down at a new location on the map.
 
 For more detailed placement, it is recommended to use the X, Y and Z position settings.
 
 **Note:** if a vehicle starts "moving" again (for example: leaving the station), it will teleport back to its appropriate position on the track. To make it work permanently, keep the vehicle stationary, by for example keeping the ride closed.
 
-![How to move a vehicle to another location](https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/blob/main/img/tutorials/drag-vehicle.gif)
+![How to move a vehicle to another location](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/tutorials/drag-vehicle.gif)
 
 
 ### Multiplayer! (How to setup)
