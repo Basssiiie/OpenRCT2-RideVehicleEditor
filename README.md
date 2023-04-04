@@ -54,6 +54,10 @@ The plugin was featured in these plugin recommendations / rankings!
 
 The plugin was also featured in the following videos (grouped by plugin version):
 
+### v2.0
+
+- **[Ride Vehicle Editor plugin v2.0 - OpenRCT2 tutorial](https://www.youtube.com/watch?v=R4BPUnKPPqU)**, by Fidwell
+
 ### v1.1
 
 - **[OpenRCT2 hacking: Self-powered shark](https://youtu.be/YhqCHzH9-64)**, by Fidwell
