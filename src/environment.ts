@@ -4,7 +4,7 @@
 /**
  * Returns the current version of the plugin.
  */
-export const pluginVersion = "2.0";
+export const pluginVersion = "2.0b";
 
 
 /**

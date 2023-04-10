@@ -153,7 +153,7 @@ export function getVehicleSettings(source: RideVehicle, filters: CopyFilter): Ve
  */
 export function applyToTargets(settings: VehicleSettings, targets: [number, number | null][]): void
 {
-	execute({ settings: settings, targets: targets });
+	execute({ settings, targets });
 }
 
 

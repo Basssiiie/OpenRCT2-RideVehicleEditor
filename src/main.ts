@@ -45,12 +45,9 @@ function showUpdateError(message: string): void
  */
 export function main(): void
 {
-	if (!Environment.isUiAvailable)
-	{
-		console.log("UI unavailable, plugin disabled.");
-		return;
-	}
-
 	initActions();
-	ui.registerMenuItem("Edit ride vehicles", () => openEditorWindow());
+	if (Environment.isUiAvailable)
+	{
+		ui.registerMenuItem("Edit ride vehicles", () => openEditorWindow());
+	}
 }
