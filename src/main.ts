@@ -10,16 +10,10 @@ function openEditorWindow(): void
 {
 	// Check if game is up-to-date...
 	const version = context.apiVersion;
-	if (version < 65)
+	if (version < 75)
 	{
-		// 65 => 0.4.3 release
+		// 75 => https://github.com/OpenRCT2/OpenRCT2/pull/19305
 		showUpdateError("The version of OpenRCT2 you are currently playing is too old for this plugin.");
-		return;
-	}
-	if (version < 69 && Environment.isMultiplayer())
-	{
-		// 69 => https://github.com/OpenRCT2/OpenRCT2/pull/19091
-		showUpdateError("Multiplayer is only supported in the latest develop version.");
 		return;
 	}
 

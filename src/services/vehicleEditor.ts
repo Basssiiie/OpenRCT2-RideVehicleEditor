@@ -9,13 +9,15 @@ import { forEachVehicle, VehicleSpan } from "./vehicleSpan";
 const execute = register<UpdateVehicleSettingArgs>("rve-update-car", updateVehicleSetting);
 
 
-type VehicleUpdateKeys = "rideObject" | "vehicleObject" | "trackProgress" | "spacing"
+type VehicleUpdateKeys
+	= "rideObject" | "vehicleObject" | "isReversed" | "trackProgress" | "spacing"
 	| "numSeats" | "mass" | "poweredAcceleration" | "poweredMaxSpeed" | "x" | "y" | "z"
 	| "body" | "trim" | "tertiary";
 
 const
 	rideTypeKey = "rideObject",
 	variantKey = "vehicleObject",
+	reversedKey = "isReversed",
 	trackProgressKey = "trackProgress",
 	spacingKey = "spacing",
 	seatsKey = "numSeats",
@@ -45,6 +47,14 @@ export function setRideType(vehicles: VehicleSpan[], type: RideType): void
 export function setVariant(vehicles: VehicleSpan[], variant: number): void
 {
 	updateValue(vehicles, variantKey, variant);
+}
+
+/**
+ * Sets whether the vehicle should be reversed on the track or not.
+ */
+export function setReversed(vehicles: VehicleSpan[], reversed: boolean): void
+{
+	updateValue(vehicles, reversedKey, <number><unknown>reversed);
 }
 
 /**
@@ -208,6 +218,7 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 			};
 			break;
 		}
+		case reversedKey:
 		case seatsKey:
 		case massKey:
 		case poweredAccelerationKey:
@@ -215,7 +226,7 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 		{
 			callback = (car): void =>
 			{
-				car[key] = value;
+				car[key] = <never>value;
 			};
 			break;
 		}

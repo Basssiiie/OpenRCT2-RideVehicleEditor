@@ -1,16 +1,16 @@
-import { button, checkbox, colourPicker, compute, dropdown, dropdownSpinner, DropdownSpinnerParams, FlexiblePosition, groupbox, horizontal, label, SpinnerParams, SpinnerWrapMode, toggle, twoway, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
+import { button, checkbox, CheckboxParams, colourPicker, compute, dropdown, dropdownSpinner, DropdownSpinnerParams, FlexiblePosition, groupbox, horizontal, label, SpinnerParams, SpinnerWrapMode, toggle, twoway, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
 import { isDevelopment, pluginVersion } from "../environment";
 import { RideVehicleVariant, VehicleVisibility } from "../objects/rideVehicleVariant";
 import { invoke, refreshRide } from "../services/events";
 import { applyToTargets, CopyFilter, getTargets, getVehicleSettings } from "../services/vehicleCopier";
 import { dragToolId, toggleVehicleDragger } from "../services/vehicleDragger";
-import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
+import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setReversed, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
 import { locate } from "../services/vehicleLocater";
 import { pickerToolId, toggleVehiclePicker } from "../services/vehiclePicker";
 import { cancelTools } from "../utilities/tools";
 import { VehicleViewModel } from "../viewmodels/vehicleViewModel";
 import { model as rideModel, rideWindow } from "./rideWindow";
-import { labelledSpinner, LabelledSpinnerParams, multiplier } from "./utilityControls";
+import { labelled, labelledSpinner, LabelledSpinnerParams, multiplier } from "./utilityControls";
 
 
 const model = new VehicleViewModel();
@@ -38,7 +38,7 @@ model._selectedRide.subscribe(r =>
 export const mainWindow = window({
 	title,
 	width: 500, minWidth: 465, maxWidth: 560,
-	height: 389,
+	height: 407,
 	spacing: 5,
 	onOpen: () => model._open(),
 	onClose: () =>
@@ -291,6 +291,14 @@ export const mainWindow = window({
 								selectedIndex: model._variant,
 								onChange: value => model._modifyVehicle(setVariant, value),
 							}),
+							labelled<CheckboxParams>({
+								_control: checkbox,
+								_label: { text: "Reversed:", width: controlsLabelWidth },
+								tooltip: "Look behind you!",
+								disabled: model._isEditDisabled,
+								isChecked: model._isReversed,
+								onChange: value => model._modifyVehicle(setReversed, value)
+							}),
 							horizontal([
 								label({
 									text: "Colours:",
@@ -316,7 +324,7 @@ export const mainWindow = window({
 									disabled: model._isEditDisabled,
 									onChange: value => model._modifyVehicle(setTertiaryColour, value)
 								})
-							]),
+							])
 						]
 					}),
 					groupbox({

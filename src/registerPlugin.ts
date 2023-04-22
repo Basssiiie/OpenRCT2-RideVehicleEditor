@@ -10,6 +10,6 @@ registerPlugin({
 	authors: ["Basssiiie"],
 	type: "remote",
 	licence: "MIT",
-	targetApiVersion: 69,
+	targetApiVersion: 75,
 	main,
 });
