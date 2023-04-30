@@ -164,8 +164,6 @@ This plugin supports multiplayer! A few key points to note:
 
 ## For developers: building the source code
 
-This project is based on [wisnia74's Typescript modding template](https://github.com/wisnia74/openrct2-typescript-mod-template) and uses [Nodemon](https://nodemon.io/), [ESLint](https://eslint.org/) and [TypeScript](https://www.typescriptlang.org/) from this template.
-
 1. Install latest version of [Node](https://nodejs.org/en/) and make sure to include NPM in the installation options.
 2. Clone the project to a location of your choice on your PC.
 3. Open command prompt, use `cd` to change your current directory to the root folder of this project and run `npm install`.
@@ -185,7 +183,7 @@ This plugin makes use of the [FlexUI](https://github.com/Basssiiie/OpenRCT2-Flex
 This project supports the [OpenRCT2 hot reload feature](https://github.com/OpenRCT2/OpenRCT2/blob/master/distribution/scripting.md#writing-scripts) for development.
 
 1. Make sure you've enabled it by setting `enable_hot_reloading = true` in your `/OpenRCT2/config.ini`.
-2. Open `rollup.config.dev.js` and change the output file path to your plugin folder.
+2. Open `rollup.config.js` and change the output file path to your plugin folder.
     - Example: `C:/Users/<YOUR NAME>/Documents/OpenRCT2/plugin/RideVehicleEditor.js`.
     - Make sure this path uses `/` instead of `\` slashes!
 3. Open command prompt and use `cd` to change your current directory to the root folder of this project.
