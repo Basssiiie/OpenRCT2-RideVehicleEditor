@@ -35,12 +35,19 @@ export function initActions(): void
 {
 	for (const action in registeredActions)
 	{
-		context.registerAction(action, queryPermissionCheck, (args) =>
-		{
-			const params = ("args" in args) ? args.args : args;
-			registeredActions[action](<never>params);
-			return {};
-		});
+		context.registerAction(action,
+			(args) => (hasPermissions(args.player) ? {} : getPermissionError()),
+			(args) =>
+			{
+				if (hasPermissions(args.player))
+				{
+					const params = ("args" in args) ? args.args : args;
+					registeredActions[action](<never>params);
+					return {};
+				}
+				return getPermissionError();
+			}
+		);
 	}
 }
 
@@ -52,9 +59,15 @@ export function hasPermissions(playerId: number): boolean
 {
 	if (isMultiplayer())
 	{
-		const player = network.getPlayer(playerId);
+		// Cannot use getPlayer and getGroup, because it uses indices instead of ids and player.group is an id.
+		const player = find(network.players, p => p.id === playerId);
+		if (!player)
+		{
+			Log.debug("Cannot apply update from player", playerId, ": player not found.");
+			return false;
+		}
+
 		const groupId = player.group;
-		// Cannot use getGroup, because it uses indices instead of ids and player.group is an id.
 		const group = find(network.groups, g => g.id === groupId);
 
 		if (!group)
@@ -73,15 +86,10 @@ export function hasPermissions(playerId: number): boolean
 
 
 /**
- * Callback for registered actions to check permissions.
+ * Returns an objects stating the modification has failed due to missing permissions.
  */
-function queryPermissionCheck(args: GameActionEventArgs<unknown>): GameActionResult
+function getPermissionError(): GameActionResult
 {
-	if (hasPermissions(args.player))
-	{
-		return {};
-	}
-
 	return {
 		error: 2, // GameActions::Status::Disallowed
 		errorTitle: "Missing permissions!",
