@@ -2,7 +2,7 @@
 
 This plugin lets you edit vehicles on any ride in your park on the fly.
 
-![(Manticore's carrousel with edited vehicles)](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/manticore-carrousel.png)
+![(Manticore's carrousel with edited vehicles)](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/manticore-carrousel-v2.1.png)
 
 *<p align="right">Carrousel made by Manticore</p>*
 
