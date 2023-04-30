@@ -183,14 +183,13 @@ This plugin makes use of the [FlexUI](https://github.com/Basssiiie/OpenRCT2-Flex
 This project supports the [OpenRCT2 hot reload feature](https://github.com/OpenRCT2/OpenRCT2/blob/master/distribution/scripting.md#writing-scripts) for development.
 
 1. Make sure you've enabled it by setting `enable_hot_reloading = true` in your `/OpenRCT2/config.ini`.
-2. Open `rollup.config.js` and change the output file path to your plugin folder.
-    - Example: `C:/Users/<YOUR NAME>/Documents/OpenRCT2/plugin/RideVehicleEditor.js`.
-    - Make sure this path uses `/` instead of `\` slashes!
-3. Open command prompt and use `cd` to change your current directory to the root folder of this project.
-4. Run `npm start` to start the hot reload server.
-5. Use the `/OpenRCT2/bin/openrct2.com` executable to [start OpenRCT2 with console](https://github.com/OpenRCT2/OpenRCT2/blob/master/distribution/scripting.md#writing-scripts) and load a save or start new game.
-6. Each time you save any of the files in `./src/`, the server will compile `./src/registerPlugin.ts` and place compiled plugin file inside your local OpenRCT2 plugin directory.
-7. OpenRCT2 will notice file changes and it will reload the plugin.
+2. Open command prompt and use `cd` to change your current directory to the root folder of this project.
+3. Run `npm start` to start the hot reload server.
+4. Use the `/OpenRCT2/bin/openrct2.com` executable to [start OpenRCT2 with console](https://github.com/OpenRCT2/OpenRCT2/blob/master/distribution/scripting.md#writing-scripts) and load a save or start new game.
+5. Each time you save any of the files in `./src/`, the server will compile `./src/plugin.ts` and place compiled plugin file inside your local OpenRCT2 plugin directory.
+6. OpenRCT2 will notice file changes and it will reload the plugin.
+
+If your local OpenRCT2 plugin folder is not in the default location, you can specify a custom path in `rollup.config.js`.
 
 ### Final notes
 

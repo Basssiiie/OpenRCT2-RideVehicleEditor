@@ -41,7 +41,7 @@ function getOutput()
  * @type {import("rollup").RollupOptions}
  */
 const config = {
-	input: "./src/registerPlugin.ts",
+	input: "./src/plugin.ts",
 	output: {
 		file: getOutput(),
 		format: "iife",
