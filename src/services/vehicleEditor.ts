@@ -130,7 +130,7 @@ export function setTertiaryColour(vehicles: VehicleSpan[], colour: Colour): void
 }
 
 /**
- * Sets the primary colour for this vehicle.
+ * Sets the x position for this vehicle.
  */
 export function setPositionX(vehicles: VehicleSpan[], x: number): void
 {
@@ -138,7 +138,7 @@ export function setPositionX(vehicles: VehicleSpan[], x: number): void
 }
 
 /**
- * Sets the secondary colour for this vehicle.
+ * Sets the y position for this vehicle.
  */
 export function setPositionY(vehicles: VehicleSpan[], y: number): void
 {
@@ -146,7 +146,7 @@ export function setPositionY(vehicles: VehicleSpan[], y: number): void
 }
 
 /**
- * Sets the tertiary colour for this vehicle.
+ * Sets the z position for this vehicle.
  */
 export function setPositionZ(vehicles: VehicleSpan[], z: number): void
 {
