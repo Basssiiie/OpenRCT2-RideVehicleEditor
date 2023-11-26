@@ -1,4 +1,5 @@
 import { Colour, compute, store, WritableStore } from "openrct2-flexui";
+import { BoosterPowerMode } from "../objects/boosterPowerMode";
 import { getAllRides, ParkRide } from "../objects/parkRide";
 import { createTrainFromAnyCar, RideTrain } from "../objects/rideTrain";
 import { getAllRideTypes, gigaCableLiftHillType, gigaCableLiftHillTypeId, RideType } from "../objects/rideType";
@@ -36,6 +37,7 @@ export class VehicleViewModel
 	readonly _mass = store<number>(0);
 	readonly _poweredAcceleration = store<number>(0);
 	readonly _poweredMaxSpeed = store<number>(0);
+	readonly _boosterMode = store<number>(0);
 	readonly _trackProgress = store<number>(0);
 	readonly _spacing = store<number | null>(0);
 	readonly _x = store<number>(0);
@@ -260,6 +262,7 @@ export class VehicleViewModel
 		this._seats.set(car.numSeats);
 		this._poweredAcceleration.set(car.poweredAcceleration);
 		this._poweredMaxSpeed.set(car.poweredMaxSpeed);
+		this._boosterMode.set(car.usesLegacyBoosterSpeed ? BoosterPowerMode.Ride : BoosterPowerMode.Track);
 		this._primaryColour.set(colours.body);
 		this._secondaryColour.set(colours.trim);
 		this._tertiaryColour.set(colours.tertiary);

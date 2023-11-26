@@ -1,4 +1,5 @@
 import { Colour } from "openrct2-flexui";
+import { BoosterPowerMode as BoosterBehaviourMode } from "../objects/boosterPowerMode";
 import { getRideObject, RideType } from "../objects/rideType";
 import * as Log from "../utilities/logger";
 import { register } from "./actions";
@@ -11,8 +12,8 @@ const execute = register<UpdateVehicleSettingArgs>("rve-update-car", updateVehic
 
 type VehicleUpdateKeys
 	= "rideObject" | "vehicleObject" | "isReversed" | "trackProgress" | "spacing"
-	| "numSeats" | "mass" | "poweredAcceleration" | "poweredMaxSpeed" | "x" | "y" | "z"
-	| "body" | "trim" | "tertiary";
+	| "numSeats" | "mass" | "poweredAcceleration" | "poweredMaxSpeed" | "usesLegacyBoosterSpeed"
+	| "x" | "y" | "z" | "body" | "trim" | "tertiary";
 
 const
 	rideTypeKey = "rideObject",
@@ -24,6 +25,7 @@ const
 	massKey = "mass",
 	poweredAccelerationKey = "poweredAcceleration",
 	poweredMaxSpeedKey = "poweredMaxSpeed",
+	legacyBoosterSpeedKey = "usesLegacyBoosterSpeed",
 	xPosition = "x",
 	yPosition = "y",
 	zPosition = "z",
@@ -103,6 +105,14 @@ export function setPoweredAcceleration(vehicles: VehicleSpan[], power: number): 
 export function setPoweredMaximumSpeed(vehicles: VehicleSpan[], maximumSpeed: number): void
 {
 	updateValue(vehicles, poweredMaxSpeedKey, maximumSpeed);
+}
+
+/**
+ * Sets how boosters affect this vehicle.
+ */
+export function setBoosterBehaviour(vehicles: VehicleSpan[], boosterBehaviourMode: BoosterBehaviourMode): void
+{
+	updateValue(vehicles, legacyBoosterSpeedKey, <number><unknown>(boosterBehaviourMode === BoosterBehaviourMode.Ride));
 }
 
 /**
@@ -223,6 +233,7 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 		case massKey:
 		case poweredAccelerationKey:
 		case poweredMaxSpeedKey:
+		case legacyBoosterSpeedKey:
 		{
 			callback = (car): void =>
 			{

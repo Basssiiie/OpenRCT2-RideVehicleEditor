@@ -1,10 +1,10 @@
-import { button, checkbox, CheckboxParams, colourPicker, compute, dropdown, dropdownSpinner, DropdownSpinnerParams, FlexiblePosition, groupbox, horizontal, label, SpinnerParams, SpinnerWrapMode, toggle, twoway, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
+import { button, checkbox, CheckboxParams, colourPicker, compute, dropdown, DropdownParams, dropdownSpinner, DropdownSpinnerParams, FlexiblePosition, groupbox, horizontal, label, SpinnerParams, SpinnerWrapMode, toggle, twoway, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
 import { isDevelopment, pluginVersion } from "../environment";
 import { RideVehicleVariant, VehicleVisibility } from "../objects/rideVehicleVariant";
 import { invoke, refreshRide } from "../services/events";
 import { applyToTargets, CopyFilter, getTargets, getVehicleSettings } from "../services/vehicleCopier";
 import { dragToolId, toggleVehicleDragger } from "../services/vehicleDragger";
-import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setReversed, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
+import { changeSpacing, changeTrackProgress, setBoosterBehaviour, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setReversed, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
 import { locate } from "../services/vehicleLocater";
 import { pickerToolId, toggleVehiclePicker } from "../services/vehiclePicker";
 import { cancelTools } from "../utilities/tools";
@@ -38,7 +38,7 @@ model._selectedRide.subscribe(r =>
 export const mainWindow = window({
 	title,
 	width: { value: 500, min: 465, max: 560 },
-	height: 407,
+	height: 424,
 	spacing: 5,
 	onOpen: () => model._open(),
 	onClose: () =>
@@ -428,7 +428,16 @@ export const mainWindow = window({
 								step: model._multiplier,
 								value: model._poweredMaxSpeed,
 								onChange: value => model._modifyVehicle(setPoweredMaximumSpeed, value)
-							})
+							}),
+							labelled<DropdownParams>({
+								_control: dropdown,
+								_label: { text: "Booster power:", width: controlsLabelWidth },
+								tooltip: "Whether the power of a booster is determined by the ride or by the track. For ex. a Giga Coaster ride or track will double the booster's power, while a Junior Coaster ride or track will halve the booster's power.",
+								items: [ "By track piece", "By ride  (legacy)"],
+								disabled: model._isEditDisabled,
+								selectedIndex: model._boosterMode,
+								onChange: value => model._modifyVehicle(setBoosterBehaviour, value)
+							}),
 						]
 					}),
 					multiplier(model._multiplierIndex)
