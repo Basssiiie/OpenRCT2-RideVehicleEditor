@@ -37,7 +37,7 @@ model._selectedRide.subscribe(r =>
 
 export const mainWindow = window({
 	title,
-	width: 500, minWidth: 465, maxWidth: 560,
+	width: { value: 500, min: 465, max: 560 },
 	height: 407,
 	spacing: 5,
 	onOpen: () => model._open(),

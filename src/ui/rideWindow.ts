@@ -23,7 +23,7 @@ export const model = new RideViewModel();
 export const rideWindow = window({
 	title: model._title,
 	position: "center",
-	width: 233, minWidth: 185, maxWidth: 250,
+	width: { value: 233, min: 185, max: 250 },
 	height: 252,
 	colours: [ 24, 24 ],
 	onOpen: () => model._open(),
