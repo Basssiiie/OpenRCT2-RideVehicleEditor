@@ -7,9 +7,11 @@ import { dragToolId, toggleVehicleDragger } from "../services/vehicleDragger";
 import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setReversed, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
 import { locate } from "../services/vehicleLocater";
 import { pickerToolId, toggleVehiclePicker } from "../services/vehiclePicker";
+import { loadVehicle, VehicleLoadSettings } from "../services/vehicleLoader";
 import { cancelTools } from "../utilities/tools";
 import { VehicleViewModel } from "../viewmodels/vehicleViewModel";
 import { model as rideModel, rideWindow } from "./rideWindow";
+// import { loadPresetWindow, savePresetWindow } from "./presetPickerWindow";
 import { labelled, labelledSpinner, LabelledSpinnerParams, multiplier } from "./utilityControls";
 
 
@@ -34,6 +36,7 @@ model._selectedRide.subscribe(r =>
 	rideWindow.focus();
 });
 
+let saved: VehicleLoadSettings | null = null;
 
 export const mainWindow = window({
 	title,
@@ -52,6 +55,48 @@ export const mainWindow = window({
 			horizontal([
 				label({
 					text: "Pick a ride:"
+				}),
+				button({
+					text: "Save",
+					tooltip: "Save current vehicle values",
+					disabled: model._isEditDisabled,
+					width: 100,
+					height: 14,
+					onClick: () =>
+					{
+						console.log("save called");
+						const trackLocation = model._trackLocation.get();
+						if (trackLocation !== null) {
+							saved = {
+								trackLocation: trackLocation,
+								trackProgress: model._trackProgress.get(),
+								trackType: model._trackType.get(),
+								trackDirection: model._trackDirection.get()
+							};
+							console.log(saved);
+						} else {
+							console.log("nothing to save!");
+						}
+
+						// savePresetWindow.open();
+					}
+				}),
+				button({
+					text: "Load",
+					tooltip: "Load vehicle values from a file",
+					// TODO: disabled when no current ride/loading vehicles make no sense
+					width: 100,
+					height: 14,
+					onClick: () =>
+					{
+						console.log("load called");
+						console.log(saved);
+						if (saved !== null) {
+							model._modifyVehicle(loadVehicle, saved);
+						}
+
+						// loadPresetWindow.open();
+					}
 				}),
 				button({
 					text: "Edit ride...",
