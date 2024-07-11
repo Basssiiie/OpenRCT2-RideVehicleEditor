@@ -1,13 +1,17 @@
 import { register } from "./actions";
+import { getDistanceFromProgress } from "./spacingEditor";
 import { forEachVehicle, VehicleSpan } from "./vehicleSpan";
 
 const execute = register<LoadVehicleArgs>("rve-load-car", loadVehicleSettings);
 
 export interface VehicleLoadSettings {
+    x: number,
+    y: number,
+    z: number,
     trackLocation: CoordsXYZD;
 	trackProgress: number;
+	currentTrackProgress: number | null;
     trackType: number;
-    trackDirection: Direction;
 }
 
 export interface LoadVehicleArgs
@@ -28,9 +32,8 @@ function loadVehicleSettings(args: LoadVehicleArgs): void
 
 function applyVehicleLoadSettings(car: Car, settings: VehicleLoadSettings): void
 {
+    car.travelBy(getDistanceFromProgress(car, -settings.currentTrackProgress!));
     car.trackLocation = settings.trackLocation;
     car.trackType = settings.trackType;
-    car.trackDirection = settings.trackDirection;
-    car.travelBy(settings.trackProgress);
-    console.log("CATCHME 01", settings);
+    car.travelBy(getDistanceFromProgress(car, settings.trackProgress));
 }

@@ -68,10 +68,13 @@ export const mainWindow = window({
 						const trackLocation = model._trackLocation.get();
 						if (trackLocation !== null) {
 							saved = {
+								x: model._x.get(),
+								y: model._y.get(),
+								z: model._z.get(),
 								trackLocation: trackLocation,
 								trackProgress: model._trackProgress.get(),
+								currentTrackProgress: null,
 								trackType: model._trackType.get(),
-								trackDirection: model._trackDirection.get()
 							};
 							console.log(saved);
 						} else {
@@ -92,7 +95,10 @@ export const mainWindow = window({
 						console.log("load called");
 						console.log(saved);
 						if (saved !== null) {
-							model._modifyVehicle(loadVehicle, saved);
+							model._modifyVehicle(loadVehicle, {
+								...saved,
+								currentTrackProgress: model._trackProgress.get()
+							});
 						}
 
 						// loadPresetWindow.open();

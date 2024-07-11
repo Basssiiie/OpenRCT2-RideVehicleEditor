@@ -39,7 +39,6 @@ export class VehicleViewModel
 	readonly _trackProgress = store<number>(0);
 	readonly _trackLocation = store<CoordsXYZD | null>(null);
 	readonly _trackType = store<number>(0);
-	readonly _trackDirection = store<Direction>(0);
 	readonly _spacing = store<number | null>(0);
 	readonly _x = store<number>(0);
 	readonly _y = store<number>(0);
@@ -279,7 +278,6 @@ export class VehicleViewModel
 		this._trackProgress.set(car.trackProgress);
 		this._trackLocation.set(car.trackLocation);
 		this._trackType.set(car.trackType);
-		this._trackDirection.set(car.trackDirection);
 		this._x.set(car.x);
 		this._y.set(car.y);
 		this._z.set(car.z);
