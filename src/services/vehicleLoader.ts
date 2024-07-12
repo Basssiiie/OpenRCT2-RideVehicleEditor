@@ -5,34 +5,30 @@ import { forEachVehicle, VehicleSpan } from "./vehicleSpan";
 const execute = register<LoadVehicleArgs>("rve-load-car", loadVehicleSettings);
 
 export interface VehicleLoadSettings {
-    x: number,
-    y: number,
-    z: number,
-    trackLocation: CoordsXYZD;
-	trackProgress: number;
-	currentTrackProgress: number | null;
-    trackType: number;
+    trackLocation:        CoordsXYZD;
+	trackProgress:        number;
+    trackType:            number;
 }
 
-export interface LoadVehicleArgs
+interface LoadVehicleArgs
 {
     targets:  VehicleSpan[];
-    settings: VehicleLoadSettings;
+    settings: VehicleLoadSettings[];
 }
 
-export function loadVehicle(targets: VehicleSpan[], settings: VehicleLoadSettings): void
+export function loadVehicle(targets: VehicleSpan[], settings: VehicleLoadSettings[]): void
 {
     execute({targets, settings});
 }
 
 function loadVehicleSettings(args: LoadVehicleArgs): void
 {
-    forEachVehicle(args.targets, car => applyVehicleLoadSettings(car, args.settings));
+    forEachVehicle(args.targets, (car, i) => args.settings[i] && applyVehicleLoadSettings(car, args.settings[i]));
 }
 
 function applyVehicleLoadSettings(car: Car, settings: VehicleLoadSettings): void
 {
-    car.travelBy(getDistanceFromProgress(car, -settings.currentTrackProgress!));
+    car.travelBy(getDistanceFromProgress(car, -car.trackProgress));
     car.trackLocation = settings.trackLocation;
     car.trackType = settings.trackType;
     car.travelBy(getDistanceFromProgress(car, settings.trackProgress));

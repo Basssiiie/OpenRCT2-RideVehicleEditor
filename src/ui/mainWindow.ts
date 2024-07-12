@@ -7,11 +7,12 @@ import { dragToolId, toggleVehicleDragger } from "../services/vehicleDragger";
 import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setReversed, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
 import { locate } from "../services/vehicleLocater";
 import { pickerToolId, toggleVehiclePicker } from "../services/vehiclePicker";
-import { loadVehicle, VehicleLoadSettings } from "../services/vehicleLoader";
+// import { loadVehicle, VehicleLoadSettings } from "../services/vehicleLoader";
 import { cancelTools } from "../utilities/tools";
 import { VehicleViewModel } from "../viewmodels/vehicleViewModel";
 import { model as rideModel, rideWindow } from "./rideWindow";
-// import { loadPresetWindow, savePresetWindow } from "./presetPickerWindow";
+import { model as vehiclePickerModel } from "./vehiclePickerWindow";
+import { loadVehiclesWindow, saveVehiclesWindow } from "./vehiclePickerWindow";
 import { labelled, labelledSpinner, LabelledSpinnerParams, multiplier } from "./utilityControls";
 
 
@@ -33,10 +34,11 @@ if (isDevelopment)
 model._selectedRide.subscribe(r =>
 {
 	rideModel._ride.set((r) ? r[0] : null);
+	vehiclePickerModel._ride.set((r) ? r[0] : null);
 	rideWindow.focus();
 });
 
-let saved: VehicleLoadSettings | null = null;
+// let saved: VehicleLoadSettings | null = null;
 
 export const mainWindow = window({
 	title,
@@ -64,24 +66,23 @@ export const mainWindow = window({
 					height: 14,
 					onClick: () =>
 					{
-						console.log("save called");
-						const trackLocation = model._trackLocation.get();
-						if (trackLocation !== null) {
-							saved = {
-								x: model._x.get(),
-								y: model._y.get(),
-								z: model._z.get(),
-								trackLocation: trackLocation,
-								trackProgress: model._trackProgress.get(),
-								currentTrackProgress: null,
-								trackType: model._trackType.get(),
-							};
-							console.log(saved);
-						} else {
-							console.log("nothing to save!");
-						}
+						// const trackLocation = model._trackLocation.get();
+						// if (trackLocation !== null) {
+						// 	saved = {
+						// 		x: model._x.get(),
+						// 		y: model._y.get(),
+						// 		z: model._z.get(),
+						// 		trackLocation: trackLocation,
+						// 		trackProgress: model._trackProgress.get(),
+						// 		currentTrackProgress: null,
+						// 		trackType: model._trackType.get(),
+						// 	};
+						// 	console.log(saved);
+						// } else {
+						// 	console.log("nothing to save!");
+						// }
 
-						// savePresetWindow.open();
+						saveVehiclesWindow.open();
 					}
 				}),
 				button({
@@ -92,16 +93,15 @@ export const mainWindow = window({
 					height: 14,
 					onClick: () =>
 					{
-						console.log("load called");
-						console.log(saved);
-						if (saved !== null) {
-							model._modifyVehicle(loadVehicle, {
-								...saved,
-								currentTrackProgress: model._trackProgress.get()
-							});
-						}
+						// console.log(saved);
+						// if (saved !== null) {
+						// 	model._modifyVehicle(loadVehicle, {
+						// 		...saved,
+						// 		currentTrackProgress: model._trackProgress.get()
+						// 	});
+						// }
 
-						// loadPresetWindow.open();
+						loadVehiclesWindow.open();
 					}
 				}),
 				button({

@@ -81,7 +81,7 @@ export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | n
 			}
 			case CopyOptions.AllVehiclesOnAllTrains:
 			{
-				return getTargetsOnAllTrains(ride, t => [ t._carId, null ]);
+				return getAllRideVehicles(ride);
 			}
 			case CopyOptions.PrecedingVehiclesOnAllTrains:
 			{
@@ -233,4 +233,9 @@ function applyVehicleSettings(car: Car, settings: VehicleSettings): void
 function getTargetsOnAllTrains(ride: [ParkRide, number], callback: (train: RideTrain) => [number, number | null]): [number, number | null][]
 {
 	return ride[0]._trains().map(callback);
+}
+
+export function getAllRideVehicles(ride: [ParkRide, number]): [number, number | null][]
+{
+	return getTargetsOnAllTrains(ride, t => [ t._carId, null ]);
 }
