@@ -1,8 +1,8 @@
-import { compute, store } from "openrct2-flexui";
+import { store } from "openrct2-flexui";
 import * as Log from "../utilities/logger";
 import { VehicleLoadSettings } from "../services/vehicleLoader";
 import { ParkRide } from "../objects/parkRide";
-import { forEachVehicle } from "../services/vehicleSpan";
+import { forEachVehicle, VehicleSpan } from "../services/vehicleSpan";
 import { getAllRideVehicles } from "../services/vehicleCopier";
 
 const storage = context.getParkStorage("OpenRCT2-RideVehicleEditor");
@@ -13,9 +13,22 @@ export class VehiclePickerModel
     readonly _saves = store<[string, VehicleLoadSettings[]][]>([]); // storage key, value array
 
     readonly _ride = store<ParkRide | null>(null);
-    readonly _rideVehicles = compute(this._ride, r => (r) ? getAllRideVehicles([r,0]) : []);
+    readonly _rideVehicles = store<VehicleSpan[]>([]);
 
     // private _isOpen?: boolean;
+
+    constructor()
+	{
+        this._ride.subscribe(() => {
+            this._rideVehicles.set(this._allRideVehicles());
+        });
+    }
+
+    _allRideVehicles(): VehicleSpan[]
+    {
+        const r = this._ride.get();
+        return (r) ? getAllRideVehicles([r,0]) : [];
+    }
 
 	_open(): void
 	{

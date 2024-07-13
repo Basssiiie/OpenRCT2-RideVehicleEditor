@@ -37,6 +37,10 @@ model._selectedRide.subscribe(r =>
 	vehiclePickerModel._ride.set((r) ? r[0] : null);
 	rideWindow.focus();
 });
+model._selectedVehicle.subscribe(() =>
+{
+	vehiclePickerModel._rideVehicles.set(vehiclePickerModel._allRideVehicles());
+});
 
 // let saved: VehicleLoadSettings | null = null;
 
