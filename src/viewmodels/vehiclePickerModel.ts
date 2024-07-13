@@ -70,13 +70,12 @@ export class VehiclePickerModel
             const vehicleLoadSettings: VehicleLoadSettings = {
                 trackLocation: car.trackLocation,
                 trackProgress: car.trackProgress,
-                trackType: car.trackType
             };
 
             // Push the VehicleLoadSettings object into the save array
             save.push(vehicleLoadSettings);
         });
-
+        console.log("saving", save);
         const newKey = "savedVehicles." + name;
         storage.set(newKey, save);
         this._updateSaves();

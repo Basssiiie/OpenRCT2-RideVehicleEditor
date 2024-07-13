@@ -5,9 +5,8 @@ import { forEachVehicle, VehicleSpan } from "./vehicleSpan";
 const execute = register<LoadVehicleArgs>("rve-load-car", loadVehicleSettings);
 
 export interface VehicleLoadSettings {
-    trackLocation:        CoordsXYZD;
+    trackLocation:        CarTrackLocation;
 	trackProgress:        number;
-    trackType:            number;
 }
 
 interface LoadVehicleArgs
@@ -30,6 +29,5 @@ function applyVehicleLoadSettings(car: Car, settings: VehicleLoadSettings): void
 {
     car.travelBy(getDistanceFromProgress(car, -car.trackProgress));
     car.trackLocation = settings.trackLocation;
-    car.trackType = settings.trackType;
     car.travelBy(getDistanceFromProgress(car, settings.trackProgress));
 }
