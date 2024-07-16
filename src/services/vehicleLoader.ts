@@ -4,7 +4,8 @@ import { forEachVehicle, VehicleSpan } from "./vehicleSpan";
 
 const execute = register<LoadVehicleArgs>("rve-load-car", loadVehicleSettings);
 
-export interface VehicleLoadSettings {
+export interface VehicleLoadSettings
+{
     trackLocation:        CarTrackLocation;
 	trackProgress:        number;
 }
@@ -22,7 +23,12 @@ export function loadVehicle(targets: VehicleSpan[], settings: VehicleLoadSetting
 
 function loadVehicleSettings(args: LoadVehicleArgs): void
 {
-    forEachVehicle(args.targets, (car, i) => args.settings[i] && applyVehicleLoadSettings(car, args.settings[i]));
+    let c = 0;
+    forEachVehicle(args.targets, (car) => {
+        // forEachVehicle callback i resets every train. need a global one here
+        args.settings[c] && applyVehicleLoadSettings(car, args.settings[c]);
+        c++;
+    });
 }
 
 function applyVehicleLoadSettings(car: Car, settings: VehicleLoadSettings): void
