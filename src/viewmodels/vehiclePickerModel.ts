@@ -80,9 +80,24 @@ export class VehiclePickerModel
     {
         const save : VehicleLoadSettings[] = [];
         forEachVehicle(this._rideVehicles.get(), car => {
+            // TODO: better way to do this?
             const vehicleLoadSettings: VehicleLoadSettings = {
                 trackLocation: car.trackLocation,
                 trackProgress: car.trackProgress,
+                rideObject: car.rideObject,
+                vehicleObject: car.vehicleObject,
+                spriteType: car.spriteType,
+                numSeats: car.numSeats,
+                currentStation: car.currentStation,
+                mass: car.mass,
+                acceleration: car.acceleration,
+                velocity: car.velocity,
+                bankRotation: car.bankRotation,
+                isReversed: car.isReversed,
+                colours: car.colours,
+                poweredAcceleration: car.poweredAcceleration,
+                poweredMaxSpeed: car.poweredMaxSpeed,
+                status: car.status,
             };
 
             // Push the VehicleLoadSettings object into the save array

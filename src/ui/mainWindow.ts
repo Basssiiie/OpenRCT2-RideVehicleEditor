@@ -76,7 +76,7 @@ export const mainWindow = window({
 				button({
 					text: "Load",
 					tooltip: "Load vehicle values from a file",
-					// TODO: disabled when no current ride/loading vehicles make no sense
+					disabled: model._isEditDisabled,
 					width: 100,
 					height: 14,
 					onClick: () =>
