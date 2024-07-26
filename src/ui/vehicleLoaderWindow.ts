@@ -6,7 +6,8 @@ import { loadVehicle } from "../services/vehicleLoader";
 const NewFileDesc = {
     title: "New file",
     description: "Enter a name for the new file:",
-    callback: (value: string): void => {
+    callback: (value: string): void =>
+    {
         model._createSave(value);
         saveVehiclesWindow.close();
     }
@@ -15,7 +16,8 @@ const NewFileDesc = {
 const RenameDesc = {
     title: "Rename",
     description: "Enter a new name for the file:",
-    callback: (value: string): void => {
+    callback: (value: string): void =>
+    {
         model._renameSelected(value);
     }
 };
@@ -35,7 +37,8 @@ export const saveVehiclesWindow = window({
             canSelect: true,
 			items: compute(model._saves, saves => saves.map(s => s[0])),
 			onHighlight: (item: number, column: number) => console.log(`Highlighted item ${item} in column ${column} in listview`),
-			onClick: (item: number, column: number) => {
+			onClick: (item: number, column: number) =>
+            {
                 console.log(`Clicked item ${item} in column ${column} in listview`);
                 model._select(item);
             },
@@ -84,12 +87,14 @@ export const loadVehiclesWindow = window({
         listview({
             canSelect: true,
 			items: compute(model._saves, saves => saves.map(s => s[0])),
-            selectedCell: twoway(compute(model._selectedSave, selected => {
+            selectedCell: twoway(compute(model._selectedSave, selected =>
+            {
                 selected && console.log("wtf", selected[1]);
                 return selected ? {row: selected[1], column: 0} : null;
             })),
 			onHighlight: (item: number, column: number) => console.log(`Highlighted item ${item} in column ${column} in listview`),
-			onClick: item => {
+			onClick: item =>
+            {
                 const selected = model._selectedSave.get();
                 if (selected === undefined || selected[1] !== item) {
                     model._select(item);

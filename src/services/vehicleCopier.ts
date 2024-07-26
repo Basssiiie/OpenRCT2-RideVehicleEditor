@@ -104,6 +104,13 @@ export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | n
 	return [];
 }
 
+/**
+ * Get vehicle span array containing all vehicles for a given ride.
+ */
+export function getAllRideVehicles(ride: [ParkRide, number]): [number, number | null][]
+{
+	return getTargetsOnAllTrains(ride, t => [ t._carId, null ]);
+}
 
 /**
  * Gets information about all the settings of the specified vehicle.
@@ -233,9 +240,4 @@ function applyVehicleSettings(car: Car, settings: VehicleSettings): void
 function getTargetsOnAllTrains(ride: [ParkRide, number], callback: (train: RideTrain) => [number, number | null]): [number, number | null][]
 {
 	return ride[0]._trains().map(callback);
-}
-
-export function getAllRideVehicles(ride: [ParkRide, number]): [number, number | null][]
-{
-	return getTargetsOnAllTrains(ride, t => [ t._carId, null ]);
 }

@@ -19,7 +19,8 @@ export class VehicleLoaderModel
 
     constructor()
 	{
-        this._ride.subscribe(() => {
+        this._ride.subscribe(() =>
+        {
             this._rideVehicles.set(this._allRideVehicles());
         });
     }
@@ -80,7 +81,8 @@ export class VehicleLoaderModel
     _createSave(name: string): void
     {
         const save : VehicleLoadSettings[] = [];
-        forEachVehicle(this._rideVehicles.get(), car => {
+        forEachVehicle(this._rideVehicles.get(), car =>
+        {
             // TODO: better way to do this?
             const vehicleLoadSettings: VehicleLoadSettings = {
                 trackLocation: car.trackLocation,
