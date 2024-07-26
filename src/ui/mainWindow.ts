@@ -7,12 +7,10 @@ import { dragToolId, toggleVehicleDragger } from "../services/vehicleDragger";
 import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setReversed, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
 import { locate } from "../services/vehicleLocater";
 import { pickerToolId, toggleVehiclePicker } from "../services/vehiclePicker";
-// import { loadVehicle, VehicleLoadSettings } from "../services/vehicleLoader";
 import { cancelTools } from "../utilities/tools";
 import { VehicleViewModel } from "../viewmodels/vehicleViewModel";
 import { model as rideModel, rideWindow } from "./rideWindow";
-import { model as vehiclePickerModel } from "./vehiclePickerWindow";
-import { loadVehiclesWindow, saveVehiclesWindow } from "./vehiclePickerWindow";
+import { model as vehicleLoaderModel, loadVehiclesWindow, saveVehiclesWindow } from "./vehicleLoaderWindow";
 import { labelled, labelledSpinner, LabelledSpinnerParams, multiplier } from "./utilityControls";
 
 
@@ -34,15 +32,13 @@ if (isDevelopment)
 model._selectedRide.subscribe(r =>
 {
 	rideModel._ride.set((r) ? r[0] : null);
-	vehiclePickerModel._ride.set((r) ? r[0] : null);
+	vehicleLoaderModel._ride.set((r) ? r[0] : null);
 	rideWindow.focus();
 });
 model._selectedVehicle.subscribe(() =>
 {
-	vehiclePickerModel._rideVehicles.set(vehiclePickerModel._allRideVehicles());
+	vehicleLoaderModel._rideVehicles.set(vehicleLoaderModel._allRideVehicles());
 });
-
-// let saved: VehicleLoadSettings | null = null;
 
 export const mainWindow = window({
 	title,

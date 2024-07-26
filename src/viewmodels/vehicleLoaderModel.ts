@@ -7,7 +7,7 @@ import { getAllRideVehicles } from "../services/vehicleCopier";
 
 const storage = context.getParkStorage("OpenRCT2-RideVehicleEditor");
 
-export class VehiclePickerModel
+export class VehicleLoaderModel
 {
     readonly _selectedSave = store<[VehicleLoadSettings[], number]>(); // value, index in _saves
     readonly _saves = store<[string, VehicleLoadSettings[]][]>([]); // storage key, value array
@@ -32,14 +32,14 @@ export class VehiclePickerModel
 
 	_open(): void
 	{
-        Log.debug("[VehiclePickerModel] Window opened!");
+        Log.debug("[VehicleLoaderModel] Window opened!");
         // this._isOpen = true;
         this._updateSaves();
 	}
 
 	_close(): void
 	{
-		Log.debug("[VehiclePickerModel] Window closed!");
+		Log.debug("[VehicleLoaderModel] Window closed!");
         // this._isOpen = false;
 	}
 
@@ -61,7 +61,7 @@ export class VehiclePickerModel
         if (index !== -1) {
             this._select(index);
         } else {
-            Log.debug(`[VehiclePickerModel] Save key ${saveKey} not found!`);
+            Log.debug(`[VehicleLoaderModel] Save key ${saveKey} not found!`);
         }
     }
 
@@ -70,6 +70,7 @@ export class VehiclePickerModel
         const saves = this._saves.get();
         for (let i = 0; i < saves.length; i++) {
             if (saves[i][0] === saveKey) {
+                Log.debug(`[VehicleLoaderModel] findByKey`, i);
                 return i;
             }
         }
@@ -113,12 +114,13 @@ export class VehiclePickerModel
     {
         const selected = this._selectedSave.get();
         if (selected === undefined) {
-            Log.debug("[VehiclePickerModel] Delete target is not set!");
+            Log.debug("[VehicleLoaderModel] Delete target is not set!");
             return;
         }
 
         const storageKey = this._saves.get()[selected[1]][0];
-        storage.set(storageKey, undefined);
+        storage.set("savedVehicles." + storageKey, undefined);
+        this._selectedSave.set(undefined);
         this._updateSaves();
     }
 
@@ -126,22 +128,24 @@ export class VehiclePickerModel
     {
         const selected = this._selectedSave.get();
         if (selected === undefined) {
-            Log.debug("[VehiclePickerModel] Rename target is not set!");
+            Log.debug("[VehicleLoaderModel] Rename target is not set!");
             return;
         }
 
         const storageKey = this._saves.get()[selected[1]][0];
         const newKey = "savedVehicles." + newName;
-        storage.set(storageKey, undefined);
+        storage.set("savedVehicles." + storageKey, undefined);
         storage.set(newKey, selected[0]);
 
         // Reselect old entry by new storage key
         this._updateSaves();
-        this._selectByKey(newKey);
+        this._selectByKey(newName);
     }
 }
 
 function getSavedVehicles(): [string, VehicleLoadSettings[]][] {
     const saves = storage.getAll("savedVehicles");
-    return Object.keys(saves).map(key => [key, saves[key]]);
+    return Object.keys(saves)
+        .map((key): [string, VehicleLoadSettings[]] => [key, saves[key]])
+        .sort((a, b) => a[0].localeCompare(b[0]));
 }
