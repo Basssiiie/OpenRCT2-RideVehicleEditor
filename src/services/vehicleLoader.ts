@@ -48,7 +48,13 @@ function loadVehicleSettings(args: LoadVehicleArgs): void
 
 function applyVehicleLoadSettings(car: Car, settings: VehicleLoadSettings): void
 {
-    car.travelBy(getDistanceFromProgress(car, -car.trackProgress));
+    const currentProgress = car.trackProgress;
+    const targetProgress = settings.trackProgress;
+
+    if (currentProgress > targetProgress)
+    {
+        car.travelBy(getDistanceFromProgress(car, targetProgress - currentProgress));
+    }
     // oh gee what a mess
     car.trackLocation = settings.trackLocation;
     car.rideObject = settings.rideObject;
@@ -65,5 +71,8 @@ function applyVehicleLoadSettings(car: Car, settings: VehicleLoadSettings): void
     car.poweredAcceleration = settings.poweredAcceleration;
     car.poweredMaxSpeed = settings.poweredMaxSpeed;
     car.status = settings.status;
-    car.travelBy(getDistanceFromProgress(car, settings.trackProgress));
+    if (currentProgress < targetProgress)
+    {
+        car.travelBy(getDistanceFromProgress(car, targetProgress - currentProgress));
+    }
 }
