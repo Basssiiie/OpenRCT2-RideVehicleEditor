@@ -37,8 +37,8 @@
 		"nyc": "^15.1.0",
 		"openrct2-mocks": "^0.1.0",
 		"rollup": "^4.6.0",
-		"tsimp": "^2.0.11",
 		"tslib": "^2.3.1",
+		"tsx": "^4.19.0",
 		"typescript": "^5.0.2"
 	},
 	"ava": {
@@ -49,11 +49,12 @@
 			"tests/**/*.tests.ts"
 		],
 		"nodeArguments": [
-			"--import=tsimp/import"
+			"--import=tsx"
 		],
 		"require": [
 			"./tests/_setup.cjs"
 		],
-		"verbose": true
+		"verbose": true,
+		"workerThreads": false
 	}
 }
