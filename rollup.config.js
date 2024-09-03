@@ -2,12 +2,26 @@ import resolve from "@rollup/plugin-node-resolve";
 import replace from "@rollup/plugin-replace";
 import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
-import { getConfigHome, getDocumentsFolder } from "platform-folders";
+import { exec } from "child_process";
+import { homedir } from "os";
+import { promisify } from "util";
 
 
 // Environment variables
-const build = process.env.BUILD || "development";
-const isDev = (build === "development");
+const options =
+{
+	/**
+	 * Change the file name of the output file here.
+	 */
+	filename: "RideVehicleEditor.js",
+
+	/**
+	 * Determines in what build mode the plugin should be build. The default here takes
+	 * from the environment (ex. CLI arguments) with "development" as fallback.
+	 */
+	build: process.env.BUILD || "development"
+};
+const isDev = (options.build === "development");
 
 /**
  * Tip: if you change the path here to your personal user folder,
@@ -20,19 +34,29 @@ const isDev = (build === "development");
  * > git update-index --no-skip-worktree rollup.config.js
  * ```
  */
-function getOutput()
+async function getOutput()
 {
-	if (!isDev)
-		return "./dist/RideVehicleEditor.js";
-
-	const pluginPath = "OpenRCT2/plugin/RideVehicleEditor.js";
-	if (process.platform === "win32")
+	if (options.build !== "development")
 	{
-		return `${getDocumentsFolder()}/${pluginPath}`;
+		return `./dist/${options.filename}`;
 	}
-	else // for both Mac and Linux
+
+	const platform = process.platform;
+	const pluginPath = `OpenRCT2/plugin/${options.filename}`;
+
+	if (platform === "win32") // Windows
 	{
-		return `${getConfigHome()}/${pluginPath}`;
+		const { stdout } = await promisify(exec)("powershell -command \"[Environment]::GetFolderPath('MyDocuments')\"");
+		return `${stdout.trim()}/${pluginPath}`;
+	}
+	else if (platform === "darwin") // MacOS
+	{
+		return `${homedir()}/Library/Application Support/${pluginPath}`;
+	}
+	else // Linux
+	{
+		const configFolder = process.env.XDG_CONFIG_HOME || `${homedir()}/.config`;
+		return `${configFolder}/${pluginPath}`;
 	}
 }
 
@@ -43,7 +67,7 @@ function getOutput()
 const config = {
 	input: "./src/plugin.ts",
 	output: {
-		file: getOutput(),
+		file: await getOutput(),
 		format: "iife",
 		compact: true
 	},
@@ -53,7 +77,7 @@ const config = {
 		replace({
 			preventAssignment: true,
 			values: {
-				__BUILD_CONFIGURATION__: JSON.stringify(build),
+				__BUILD_CONFIGURATION__: JSON.stringify(options.build),
 				...(isDev ? {} : {
 					"Log.debug": "//",
 					"Log.assert": "//"
