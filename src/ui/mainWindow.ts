@@ -10,6 +10,7 @@ import { pickerToolId, toggleVehiclePicker } from "../services/vehiclePicker";
 import { cancelTools } from "../utilities/tools";
 import { VehicleViewModel } from "../viewmodels/vehicleViewModel";
 import { model as rideModel, rideWindow } from "./rideWindow";
+import { model as vehicleLoaderModel, loadVehiclesWindow, saveVehiclesWindow } from "./vehicleLoaderWindow";
 import { labelled, labelledSpinner, LabelledSpinnerParams, multiplier } from "./utilityControls";
 
 
@@ -31,9 +32,13 @@ if (isDevelopment)
 model._selectedRide.subscribe(r =>
 {
 	rideModel._ride.set((r) ? r[0] : null);
+	vehicleLoaderModel._ride.set((r) ? r[0] : null);
 	rideWindow.focus();
 });
-
+model._selectedVehicle.subscribe(() =>
+{
+	vehicleLoaderModel._rideVehicles.set(vehicleLoaderModel._allRideVehicles());
+});
 
 export const mainWindow = window({
 	title,
@@ -52,6 +57,28 @@ export const mainWindow = window({
 			horizontal([
 				label({
 					text: "Pick a ride:"
+				}),
+				button({
+					text: "Save",
+					tooltip: "Save current vehicle values",
+					disabled: model._isEditDisabled,
+					width: 100,
+					height: 14,
+					onClick: () =>
+					{
+						saveVehiclesWindow.open();
+					}
+				}),
+				button({
+					text: "Load",
+					tooltip: "Load vehicle values from a file",
+					disabled: model._isEditDisabled,
+					width: 100,
+					height: 14,
+					onClick: () =>
+					{
+						loadVehiclesWindow.open();
+					}
 				}),
 				button({
 					text: "Edit ride...",

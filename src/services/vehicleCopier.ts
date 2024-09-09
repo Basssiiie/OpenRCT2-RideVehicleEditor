@@ -81,7 +81,7 @@ export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | n
 			}
 			case CopyOptions.AllVehiclesOnAllTrains:
 			{
-				return getTargetsOnAllTrains(ride, t => [ t._carId, null ]);
+				return getAllRideVehicles(ride);
 			}
 			case CopyOptions.PrecedingVehiclesOnAllTrains:
 			{
@@ -104,6 +104,13 @@ export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | n
 	return [];
 }
 
+/**
+ * Get vehicle span array containing all vehicles for a given ride.
+ */
+export function getAllRideVehicles(ride: [ParkRide, number]): [number, number | null][]
+{
+	return getTargetsOnAllTrains(ride, t => [ t._carId, null ]);
+}
 
 /**
  * Gets information about all the settings of the specified vehicle.
