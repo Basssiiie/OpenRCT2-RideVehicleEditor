@@ -44,7 +44,7 @@ export function getDistanceFromProgress(car: Car, trackProgress: number): number
 		? new ForwardIterator(trackProgress, currentProgress)
 		: new BackwardIterator(abs(trackProgress), currentProgress);
 
-	let trackPosition = currentTrackLocation;
+	let trackPosition = currentTrackLocation as CoordsXYZD;
 	let trackDistances = getTrackDistances(iteratorSegment, subposition, trackPosition.direction);
 	subpositionIterator._setInitialDistanceFromCarRemainingDistance(car.remainingDistance);
 
