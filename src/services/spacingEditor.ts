@@ -3,7 +3,7 @@ import * as Log from "../utilities/logger";
 import { getTileByCoords } from "../utilities/map";
 import { abs } from "../utilities/math";
 import { isNull, isUndefined } from "../utilities/type";
-import { getSubpositionTranslationDistance, getTrackDistances, TrackDistances } from "./subpositionHelper";
+import { getSubpositionTranslationDistance, getTrackSegmentDistances, TrackDistances } from "./subpositionHelper";
 
 
 const MaxForwardIterations = 10;
@@ -44,8 +44,10 @@ export function getDistanceFromProgress(car: Car, trackProgress: number): number
 		? new ForwardIterator(trackProgress, currentProgress)
 		: new BackwardIterator(abs(trackProgress), currentProgress);
 
+	Log.debug("Iterating", (trackProgress >= 0)?"foward":"backward", "from progress", currentProgress, "to", trackProgress);
+
 	let trackPosition: CoordsXYZD = currentTrackLocation;
-	let trackDistances = getTrackDistances(iteratorSegment, subposition, trackPosition.direction);
+	let trackDistances = getTrackSegmentDistances(iteratorSegment, subposition, trackPosition.direction);
 	subpositionIterator._setInitialDistanceFromCarRemainingDistance(car.remainingDistance);
 
 	while (subpositionIterator._remainingProgress > 0 && iteratorSegment)
@@ -79,7 +81,7 @@ export function getDistanceFromProgress(car: Car, trackProgress: number): number
 		}
 
 		const nextTrackPosition = iterator.position;
-		const nextTrackDistance = getTrackDistances(iteratorSegment, subposition, nextTrackPosition.direction);
+		const nextTrackDistance = getTrackSegmentDistances(iteratorSegment, subposition, nextTrackPosition.direction);
 		const segmentDistance = subpositionIterator._getDistanceBetweenSegments(trackPosition, trackDistances, nextTrackPosition, nextTrackDistance);
 
 		if (segmentDistance)
@@ -170,7 +172,7 @@ function calculateSpacingToPrecedingVehicle(car: Car, carInFront: Car): number |
 	}
 
 	const subposition = car.subposition;
-	let distances = getTrackDistances(iteratorSegment, subposition, currentTrackLocation.direction);
+	let distances = getTrackSegmentDistances(iteratorSegment, subposition, currentTrackLocation.direction);
 	let totalDistance = (distances._progressLength - currentProgress);
 	for (let i = 0; i < MaxForwardIterations; i++)
 	{
@@ -189,7 +191,7 @@ function calculateSpacingToPrecedingVehicle(car: Car, carInFront: Car): number |
 			return null;
 		}
 
-		distances = getTrackDistances(iteratorSegment, subposition, iteratorPosition.direction);
+		distances = getTrackSegmentDistances(iteratorSegment, subposition, iteratorPosition.direction);
 		totalDistance += distances._progressLength;
 	}
 	return null;
@@ -229,8 +231,7 @@ function getIndexForTrackElementAt(coords: CoordsXYZD): number | null
 		const element = tile.elements[i];
 		if (element.type === "track"
 			&& element.baseZ === coords.z
-			&& element.direction === coords.direction
-			&& element.sequence === 0)
+			&& element.direction === coords.direction)
 		{
 			return i;
 		}

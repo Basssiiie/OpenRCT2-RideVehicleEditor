@@ -39,6 +39,7 @@ export class VehicleViewModel
 	readonly _poweredAcceleration = store<number>(0);
 	readonly _poweredMaxSpeed = store<number>(0);
 	readonly _trackProgress = store<number>(0);
+	readonly _trackLocation = store<CarTrackLocation | null>(null);
 	readonly _spacing = store<number | null>(0);
 	readonly _x = store<number>(0);
 	readonly _y = store<number>(0);
@@ -301,7 +302,7 @@ export class VehicleViewModel
 	{
 		if (this._isOpen)
 		{
-			toggleVehicleDragger(active, this._selectedVehicle, this._x, this._y, this._z, () => this._isDragging.set(false));
+			toggleVehicleDragger(active, this._selectedVehicle, this._x, this._y, this._z, this._trackLocation, this._trackProgress, () => this._isDragging.set(false))
 		}
 	}
 
@@ -402,6 +403,7 @@ export class VehicleViewModel
 		this._variant.set(car.vehicleObject);
 		this._mass.set(car.mass);
 		this._trackProgress.set(car.trackProgress);
+		this._trackLocation.set(car.trackLocation);
 		this._x.set(car.x);
 		this._y.set(car.y);
 		this._z.set(car.z);
