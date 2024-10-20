@@ -41,6 +41,7 @@ export class VehicleViewModel
 	readonly _x = store<number>(0);
 	readonly _y = store<number>(0);
 	readonly _z = store<number>(0);
+	readonly _spin = store<number>(0);
 
 	readonly _primaryColour = store<Colour>(0);
 	readonly _secondaryColour = store<Colour>(0);
@@ -277,6 +278,7 @@ export class VehicleViewModel
 		this._x.set(car.x);
 		this._y.set(car.y);
 		this._z.set(car.z);
+		this._spin.set(car.spin);
 
 		const train = this._selectedTrain.get();
 		if (train)
