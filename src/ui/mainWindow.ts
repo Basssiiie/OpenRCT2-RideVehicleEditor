@@ -120,7 +120,7 @@ export const mainWindow = window({
 									image: 5174, // SPR_PICKUP_BTN
 									isPressed: twoway(model._isDragging),
 									disabled: model._isPositionDisabled,
-									onChange: pressed => toggleVehicleDragger(pressed, model._selectedVehicle, model._x, model._y, model._z, () => model._isDragging.set(false))
+									onChange: pressed => toggleVehicleDragger(pressed, model._selectedVehicle, model._xyz, model._trackLocation, model._trackProgress, () => model._isDragging.set(false))
 								}),
 								toggle({
 									width: buttonSize, height: buttonSize,
