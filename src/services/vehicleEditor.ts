@@ -232,6 +232,7 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 		case massKey:
 		case poweredAccelerationKey:
 		case poweredMaxSpeedKey:
+		case spinKey:
 		{
 			callback = (car): void =>
 			{
@@ -246,14 +247,6 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 			callback = (car): void =>
 			{
 				car[key] += value;
-			};
-			break;
-		}
-		case spinKey:
-		{
-			callback = (car): void =>
-			{
-				car.spin += value;
 			};
 			break;
 		}
