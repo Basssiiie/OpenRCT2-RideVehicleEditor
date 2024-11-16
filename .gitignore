@@ -50,6 +50,9 @@ typings/
 # TypeScript cache
 *.tsbuildinfo
 
+# TS-IMP build output
+.tsimp/
+
 # Optional npm cache directory
 .npm
 

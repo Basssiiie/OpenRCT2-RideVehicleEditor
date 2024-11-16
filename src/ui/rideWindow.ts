@@ -3,7 +3,7 @@ import { ParkRide } from "../objects/parkRide";
 import { setBuildMonth, setBuildYear, setCustomDesign, setExcitementRating, setFrozenRatings, setIndestructable, setIntensityRating, setNauseaRating } from "../services/rideEditor";
 import { formatRelativeDate, getDateMonth, getDateYear, monthNames } from "../utilities/date";
 import * as Log from "../utilities/logger";
-import { RideViewModel } from "../viewmodels/rideVehicleModel";
+import { RideViewModel } from "../viewmodels/rideViewModel";
 import { labelled, labelledSpinner, LabelledSpinnerParams, multiplier } from "./utilityControls";
 
 

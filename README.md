@@ -11,7 +11,7 @@ This plugin lets you edit vehicles on any ride in your park on the fly.
 - **Modify properties** like vehicle type, colour, mass, number of seats, (powered) acceleration of each vehicle.
 - Switch through **different variants** of the same ride type. (E.g. locomotive, tender or passenger car.)
 - Modify the **track position** of or **spacing** between different vehicles on the same train.
-- **[Pick up and move](#move-vehicles-off-the-track)** stationery vehicles to different places on the map.
+- **[Pick up and move](#move-vehicles-off-the-track)** stationary vehicles to different places on the map.
 - [**Copy** and **paste**](#copy--paste-vehicles) the settings of a vehicle over other completely unrelated vehicles.
 - Easily **[apply your changes to all vehicles](#apply-or-copy-and-paste-changes-to-multiple-vehicles)** on the train or the ride, or **[update multiple vehicles](#sychronize-changes-to-multiple-vehicles)** at the same time.
 - **Edit** and **freeze** the ride's excitement, intensity or nausea ratings.

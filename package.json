@@ -3,7 +3,6 @@
 	"author": "Basssiiie",
 	"license": "MIT",
 	"version": "1.0.0",
-	"main": "app.js",
 	"type": "module",
 	"scripts": {
 		"start": "nodemon --watch ./src --ext js,ts --exec \"npm run build:dev\"",
@@ -21,7 +20,7 @@
 		"url": "https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/issues"
 	},
 	"dependencies": {
-		"openrct2-flexui": "^0.1.0-prerelease.10"
+		"openrct2-flexui": "^0.1.0-prerelease.15"
 	},
 	"devDependencies": {
 		"@ava/typescript": "^4.0.0",
@@ -29,18 +28,17 @@
 		"@rollup/plugin-replace": "^5.0.2",
 		"@rollup/plugin-terser": "^0.4.0",
 		"@rollup/plugin-typescript": "^11.0.0",
-		"@typescript-eslint/eslint-plugin": "^5.2.0",
-		"@typescript-eslint/parser": "^5.2.0",
+		"@typescript-eslint/eslint-plugin": "^6.7.3",
+		"@typescript-eslint/parser": "^6.7.3",
 		"ava": "^5.1.0",
 		"eslint": "^8.1.0",
 		"eslint-plugin-import": "^2.24.0",
-		"nodemon": "^2.0.12",
+		"nodemon": "^3.0.1",
 		"nyc": "^15.1.0",
 		"openrct2-mocks": "^0.1.0",
-		"platform-folders": "^0.6.0",
-		"rollup": "^3.17.3",
+		"rollup": "^4.6.0",
 		"tslib": "^2.3.1",
-		"tsx": "^3.12.3",
+		"tsx": "^4.19.0",
 		"typescript": "^5.0.2"
 	},
 	"ava": {
@@ -51,11 +49,12 @@
 			"tests/**/*.tests.ts"
 		],
 		"nodeArguments": [
-			"--loader=tsx"
+			"--import=tsx"
 		],
 		"require": [
-			"./tests/_setup.js"
+			"./tests/_setup.cjs"
 		],
-		"verbose": true
+		"verbose": true,
+		"workerThreads": false
 	}
 }
