@@ -58,7 +58,6 @@ export const mainWindow = window({
 					tooltip: "Changes properties of the ride, that are not related to its vehicles.",
 					width: 100,
 					height: 14,
-					disabled: model._isEditDisabled,
 					onClick: () =>
 					{
 						const ride = model._selectedRide.get();
