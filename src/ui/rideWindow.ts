@@ -22,9 +22,9 @@ export const model = new RideViewModel();
  * Window to edit properties of the currently selected ride.
  */
 export const rideWindow = window({
-	title: "Edit ride",
+	title: model._title,
 	position: "center",
-	width: 233, minWidth: 185, maxWidth: 250,
+	width: { value: 233, min: 185, max: 250 },
 	height: 322,
 	colours: [ 24, 24 ],
 	onOpen: () => model._open(),
@@ -122,7 +122,6 @@ export const rideWindow = window({
 			content: [
 				label({
 					text: model._title,
-					height: 14
 				}),
 				button({
 					text: "Rename ride",
@@ -132,7 +131,10 @@ export const rideWindow = window({
 							title: "Ride/attraction name",
 							initialValue: model._title.get(),
 							description: "Enter new name for this ride/attraction:",							
-							callback: (input) => context.executeAction("ridesetname", {ride: model._ride.get()?._id, name: input})
+							callback: (input) => {
+								context.executeAction("ridesetname", {ride: model._ride.get()?._id, name: input});
+								model._title.set(input);
+							}
 						})
 					}
 				})
