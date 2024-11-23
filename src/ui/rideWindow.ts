@@ -1,4 +1,4 @@
-import { checkbox, compute, dropdown, DropdownParams, FlexiblePosition, groupbox, label, LabelParams, WidgetCreator, window } from "openrct2-flexui";
+import { button, checkbox, compute, dropdown, DropdownParams, FlexiblePosition, groupbox, label, LabelParams, WidgetCreator, window } from "openrct2-flexui";
 import { ParkRide } from "../objects/parkRide";
 import { setBuildMonth, setBuildYear, setCustomDesign, setExcitementRating, setFrozenRatings, setIndestructable, setIntensityRating, setNauseaRating } from "../services/rideEditor";
 import { formatRelativeDate, getDateMonth, getDateYear, monthNames } from "../utilities/date";
@@ -9,6 +9,7 @@ import { labelled, labelledSpinner, LabelledSpinnerParams, multiplier } from "./
 
 const int16max = 32_767, int16min = -32_768;
 const controlsLabelWidth = 85;
+const buttonSize = 24;
 
 
 /**
@@ -24,7 +25,7 @@ export const rideWindow = window({
 	title: model._title,
 	position: "center",
 	width: { value: 233, min: 185, max: 250 },
-	height: 252,
+	height: 322,
 	colours: [ 24, 24 ],
 	onOpen: () => model._open(),
 	onClose: () => model._close(),
@@ -112,6 +113,30 @@ export const rideWindow = window({
 					tooltip: "Indestructable rides cannot be demolished, even if you ask them nicely.",
 					isChecked: model._indestructable,
 					onChange: value => modifyRide(setIndestructable, value)
+				})
+			]
+		}),
+		groupbox({
+			text: "Ride name",
+			tooltip: "Edit the name of the ride",
+			content: [
+				label({
+					text: model._title,
+				}),
+				button({
+					text: "Rename ride",
+					height: buttonSize,
+					onClick: () => {
+						ui.showTextInput({
+							title: "Ride/attraction name",
+							initialValue: model._title.get(),
+							description: "Enter new name for this ride/attraction:",							
+							callback: (input) => {
+								const ride = model._ride.get();
+								if (ride) context.executeAction("ridesetname", {ride: ride._id, name: input});
+							}
+						});
+					}
 				})
 			]
 		}),
