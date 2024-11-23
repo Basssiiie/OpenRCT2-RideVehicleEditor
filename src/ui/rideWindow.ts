@@ -132,10 +132,10 @@ export const rideWindow = window({
 							initialValue: model._title.get(),
 							description: "Enter new name for this ride/attraction:",							
 							callback: (input) => {
-								context.executeAction("ridesetname", {ride: model._ride.get()?._id, name: input});
-								model._title.set(input);
+								const ride = model._ride.get();
+								if (ride) context.executeAction("ridesetname", {ride: ride._id, name: input});
 							}
-						})
+						});
 					}
 				})
 			]
