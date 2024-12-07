@@ -43,7 +43,6 @@ export class VehicleViewModel
 	readonly _y = store<number>(0);
 	readonly _z = store<number>(0);
 	readonly _spin = store<number>(0);
-	readonly _xyz = compute(this._x, this._y, this._z, (x, y, z) => { return {x, y, z}; });
 
 	readonly _primaryColour = store<Colour>(0);
 	readonly _secondaryColour = store<Colour>(0);
