@@ -23,7 +23,9 @@ export const dragToolId = "rve-drag-vehicle";
  */
 export function toggleVehicleDragger(isPressed: boolean,
 	storeVehicle: Store<[RideVehicle, number] | null>,
-	storeXYZ: Store<CoordsXYZ>,
+	storeX: Store<number>,
+	storeY: Store<number>,
+	storeZ: Store<number>,
 	storeTrackLocation: Store<CarTrackLocation | null>,
 	storeTrackProgress: Store<number>,
 	onCancel: () => void): void
@@ -35,14 +37,13 @@ export function toggleVehicleDragger(isPressed: boolean,
 		return;
 	}
 
-	const originalXYZ = storeXYZ.get();
 	const multiplayer = isMultiplayer();
 	const originalPosition =
 	{
 		revert: true,
-		x: originalXYZ.x,
-		y: originalXYZ.y,
-		z: originalXYZ.z,
+		x: storeX.get(),
+		y: storeY.get(),
+		z: storeZ.get(),
 	};
 	const originalTrackPosition = storeTrackLocation.get();
 	const originalTrackProgress = storeTrackProgress.get();
@@ -59,19 +60,14 @@ export function toggleVehicleDragger(isPressed: boolean,
 				// Limit updates to 8 fps to avoid bringing down multiplayer servers
 				return;
 			}
-			const [tilePosition, trackPosition] = getPositionFromTool(args, rideVehicle[0]._type(), rideVehicle[0]._id);
-			if (tilePosition && trackPosition && !equalCoordsXYZ(trackPosition, lastTrackPosition) ||
-				!trackPosition && tilePosition && !equalCoordsXYZ(tilePosition, lastPosition))
+			const position = getPositionFromTool(args, rideVehicle[0]._type(), rideVehicle[0]._id);
+			if (position && position.trackPosition && !equalCoordsXYZ(position.trackPosition, lastTrackPosition) ||
+				position && !equalCoordsXYZ(position.tilePosition, lastPosition))
 			{
-				const position = {
-					tilePosition,
-					trackPosition,
-					trackProgress: null,
-				};
 				updateCarPosition(rideVehicle, position, DragState.Dragging);
-				ui.tileSelection.tiles = [{ x: alignWithMap(tilePosition.x), y : alignWithMap(tilePosition.y) }];
-				lastPosition = tilePosition;
-				lastTrackPosition = trackPosition;
+				ui.tileSelection.tiles = [{ x: alignWithMap(position.tilePosition.x), y : alignWithMap(position.tilePosition.y) }];
+				lastPosition = position.tilePosition;
+				lastTrackPosition = position.trackPosition;
 			}
 		},
 		onDown: () =>
@@ -132,11 +128,11 @@ interface DragVehicleArgs
 /**
  * Get a possible position to drag the vehicle to.
  */
-function getPositionFromTool(args: ToolEventArgs, vehicleType: RideObjectVehicle | null, currentId: number): [CoordsXYZ | null, CarTrackLocation | null]
+function getPositionFromTool(args: ToolEventArgs, vehicleType: RideObjectVehicle | null, currentId: number): DragPosition | null
 {
 	const { entityId, mapCoords, tileElementIndex } = args;
 	let x: number | undefined, y: number | undefined, z: number | undefined;
-	let trackLocation: CarTrackLocation | null = null;
+	let trackPosition: CarTrackLocation | null = null;
 
 	if (!isUndefined(entityId) && entityId !== currentId)
 	{
@@ -173,7 +169,7 @@ function getPositionFromTool(args: ToolEventArgs, vehicleType: RideObjectVehicle
 		if (type === "track") {
 			const iterator = map.getTrackIterator({x, y}, tileElementIndex);
 			if (!isNull(iterator)) {
-				trackLocation = {
+				trackPosition = {
 					x: iterator.position.x-16, // back to block center
 					y: iterator.position.y-16,
 					z: iterator.position.z,
@@ -189,9 +185,9 @@ function getPositionFromTool(args: ToolEventArgs, vehicleType: RideObjectVehicle
 	}
 	else
 	{
-		return [null, null];
+		return null;
 	}
-	return [{ x, y, z }, trackLocation];
+	return {tilePosition: { x, y, z }, trackPosition, trackProgress: null};
 }
 
 /**
@@ -227,8 +223,8 @@ function updateVehicleDrag(args: DragVehicleArgs): void
 			// internally, travelBy calls MoveTo so the car will render on the holding
 			// track
 			// HACK: seems to make the vehicle update render properly
-			car.travelBy(getDistanceFromProgress(car, 1));
-			car.travelBy(getDistanceFromProgress(car, -1));
+			car.travelBy(1);
+			car.travelBy(-1);
 		}
 	}
 
