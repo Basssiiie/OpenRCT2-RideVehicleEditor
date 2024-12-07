@@ -23,7 +23,9 @@ export const dragToolId = "rve-drag-vehicle";
  */
 export function toggleVehicleDragger(isPressed: boolean,
 	storeVehicle: Store<[RideVehicle, number] | null>,
-	storeXYZ: Store<CoordsXYZ>,
+	storeX: Store<number>,
+	storeY: Store<number>,
+	storeZ: Store<number>,
 	storeTrackLocation: Store<CarTrackLocation | null>,
 	storeTrackProgress: Store<number>,
 	onCancel: () => void): void
@@ -35,19 +37,18 @@ export function toggleVehicleDragger(isPressed: boolean,
 		return;
 	}
 
-	const originalXYZ = storeXYZ.get();
 	const multiplayer = isMultiplayer();
 	const originalPosition =
 	{
 		revert: true,
-		x: originalXYZ.x,
-		y: originalXYZ.y,
-		z: originalXYZ.z,
+		x: storeX.get(),
+		y: storeY.get(),
+		z: storeZ.get(),
 	};
-	const originalTrackPosition = storeTrackLocation.get();
+	const originalTrackLocation = storeTrackLocation.get();
 	const originalTrackProgress = storeTrackProgress.get();
 	let lastPosition: CoordsXYZ = originalPosition;
-	let lastTrackPosition: CarTrackLocation | null = originalTrackPosition;
+	let lastTrackLocation: CarTrackLocation | null = originalTrackLocation;
 
 	ui.activateTool({
 		id: dragToolId,
@@ -59,19 +60,14 @@ export function toggleVehicleDragger(isPressed: boolean,
 				// Limit updates to 8 fps to avoid bringing down multiplayer servers
 				return;
 			}
-			const [tilePosition, trackPosition] = getPositionFromTool(args, rideVehicle[0]._type(), rideVehicle[0]._id);
-			if (tilePosition && trackPosition && !equalCoordsXYZ(trackPosition, lastTrackPosition) ||
-				!trackPosition && tilePosition && !equalCoordsXYZ(tilePosition, lastPosition))
+			const position = getPositionFromTool(args, rideVehicle[0]._type(), rideVehicle[0]._id);
+			if (position && position.trackLocation && !equalCoordsXYZ(position.trackLocation, lastTrackLocation) ||
+				position && !equalCoordsXYZ(position.tilePosition, lastPosition))
 			{
-				const position = {
-					tilePosition,
-					trackPosition,
-					trackProgress: null,
-				};
 				updateCarPosition(rideVehicle, position, DragState.Dragging);
-				ui.tileSelection.tiles = [{ x: alignWithMap(tilePosition.x), y : alignWithMap(tilePosition.y) }];
-				lastPosition = tilePosition;
-				lastTrackPosition = trackPosition;
+				ui.tileSelection.tiles = [{ x: alignWithMap(position.tilePosition.x), y : alignWithMap(position.tilePosition.y) }];
+				lastPosition = position.tilePosition;
+				lastTrackLocation = position.trackLocation;
 			}
 		},
 		onDown: () =>
@@ -79,7 +75,7 @@ export function toggleVehicleDragger(isPressed: boolean,
 			originalPosition.revert = false;
 			const position = {
 				tilePosition: lastPosition,
-				trackPosition: lastTrackPosition,
+				trackLocation: lastTrackLocation,
 				trackProgress: null,
 			};
 			updateCarPosition(rideVehicle, position, DragState.Complete);
@@ -91,7 +87,7 @@ export function toggleVehicleDragger(isPressed: boolean,
 			{
 				const position = {
 					tilePosition: originalPosition,
-					trackPosition: originalTrackPosition,
+					trackLocation: originalTrackLocation,
 					trackProgress: originalTrackProgress,
 				};
 				updateCarPosition(rideVehicle, position, DragState.Cancel);
@@ -115,7 +111,7 @@ const enum DragState
 interface DragPosition
 {
 	tilePosition: CoordsXYZ,
-	trackPosition: CarTrackLocation | null,
+	trackLocation: CarTrackLocation | null,
 	trackProgress: number | null,
 }
 
@@ -132,7 +128,7 @@ interface DragVehicleArgs
 /**
  * Get a possible position to drag the vehicle to.
  */
-function getPositionFromTool(args: ToolEventArgs, vehicleType: RideObjectVehicle | null, currentId: number): [CoordsXYZ | null, CarTrackLocation | null]
+function getPositionFromTool(args: ToolEventArgs, vehicleType: RideObjectVehicle | null, currentId: number): DragPosition | null
 {
 	const { entityId, mapCoords, tileElementIndex } = args;
 	let x: number | undefined, y: number | undefined, z: number | undefined;
@@ -189,9 +185,9 @@ function getPositionFromTool(args: ToolEventArgs, vehicleType: RideObjectVehicle
 	}
 	else
 	{
-		return [null, null];
+		return null;
 	}
-	return [{ x, y, z }, trackLocation];
+	return {tilePosition: { x, y, z }, trackLocation, trackProgress: null};
 }
 
 /**
@@ -214,21 +210,15 @@ function updateVehicleDrag(args: DragVehicleArgs): void
 		return;
 	}
 
-	if (isNull(args.position.trackPosition)) {
+	if (isNull(args.position.trackLocation)) {
 		const position = args.position.tilePosition;
 		car.x = position.x;
 		car.y = position.y;
 		car.z = position.z;
 	} else {
-		car.trackLocation = args.position.trackPosition;
-		if (!isNull(args.position.trackProgress)) {
-			car.travelBy(getDistanceFromProgress(car, args.position.trackProgress));
-		} else {
-			// internally, travelBy calls MoveTo so the car will render on the holding
-			// track
-			// HACK: seems to make the vehicle update render properly
-			car.travelBy(getDistanceFromProgress(car, 1));
-			car.travelBy(getDistanceFromProgress(car, -1));
+		car.trackLocation = args.position.trackLocation;
+		if (!isNull(args.position.trackProgress) && car.trackProgress != args.position.trackProgress) {
+			car.travelBy(getDistanceFromProgress(car, args.position.trackProgress - car.trackProgress));
 		}
 	}
 
