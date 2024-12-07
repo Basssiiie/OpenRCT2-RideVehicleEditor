@@ -4,7 +4,7 @@ import { RideVehicleVariant, VehicleVisibility } from "../objects/rideVehicleVar
 import { invoke, refreshRide } from "../services/events";
 import { applyToTargets, CopyFilter, getTargets, getVehicleSettings } from "../services/vehicleCopier";
 import { dragToolId, toggleVehicleDragger } from "../services/vehicleDragger";
-import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setReversed, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../services/vehicleEditor";
+import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setReversed, setRideType, setSeatCount, setSecondaryColour, setSpin, setTertiaryColour, setVariant } from "../services/vehicleEditor";
 import { locate } from "../services/vehicleLocater";
 import { pickerToolId, toggleVehiclePicker } from "../services/vehiclePicker";
 import { cancelTools } from "../utilities/tools";
@@ -37,7 +37,7 @@ model._selectedRide.subscribe(r =>
 
 export const mainWindow = window({
 	title,
-	width: { value: 500, min: 465, max: 560 },
+	width: { value: 515, min: 515, max: 560 },
 	height: 407,
 	spacing: 5,
 	onOpen: () => model._open(),
@@ -375,6 +375,16 @@ export const mainWindow = window({
 								value: model._z,
 								format: model._formatPosition,
 								onChange: (_, incr) => model._modifyVehicle(setPositionZ, incr)
+							}),
+							labelSpinner({
+								_label: { text: "Seat spin:" },
+								minimum: 0,
+								maximum: 255,
+								disabled: model._isSpinDisabled,
+								step: model._multiplier,
+								value: model._spin,
+								wrapMode: "clampThenWrap",
+								onChange: value => model._modifyVehicle(setSpin, value)
 							})
 						]
 					}),

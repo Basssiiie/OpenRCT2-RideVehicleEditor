@@ -12,7 +12,7 @@ const execute = register<UpdateVehicleSettingArgs>("rve-update-car", updateVehic
 type VehicleUpdateKeys
 	= "rideObject" | "vehicleObject" | "isReversed" | "trackProgress" | "spacing"
 	| "numSeats" | "mass" | "poweredAcceleration" | "poweredMaxSpeed" | "x" | "y" | "z"
-	| "body" | "trim" | "tertiary";
+	| "spin" | "body" | "trim" | "tertiary";
 
 const
 	rideTypeKey = "rideObject",
@@ -27,6 +27,7 @@ const
 	xPosition = "x",
 	yPosition = "y",
 	zPosition = "z",
+	spinKey = "spin",
 	primaryColour = "body",
 	secondaryColour = "trim",
 	tertiaryColour = "tertiary";
@@ -153,6 +154,14 @@ export function setPositionZ(vehicles: VehicleSpan[], z: number): void
 	updateValue(vehicles, zPosition, z);
 }
 
+/**
+ * Sets the z position for this vehicle.
+ */
+export function setSpin(vehicles: VehicleSpan[], spin: number): void
+{
+	updateValue(vehicles, spinKey, spin);
+}
+
 
 /**
  * Arguments for updating a single key in a vehicle object.
@@ -223,6 +232,7 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 		case massKey:
 		case poweredAccelerationKey:
 		case poweredMaxSpeedKey:
+		case spinKey:
 		{
 			callback = (car): void =>
 			{

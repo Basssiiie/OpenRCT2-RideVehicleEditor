@@ -1,3 +1,4 @@
+import { CAR_ENTRY_FLAG_SPINNING } from "../utilities/game";
 import * as Log from "../utilities/logger";
 import { isNumber } from "../utilities/type";
 import { getRideObject } from "./rideType";
@@ -111,5 +112,14 @@ export class RideVehicle
 	{
 		const type = this._type();
 		return !type || isPowered(type);
+	}
+
+	/**
+	 * Returns true if this car is considered a "spinning" ride type.
+	 */
+	_isSpinning(): boolean
+	{
+		const type = this._type();
+		return !!type && ((type.flags & CAR_ENTRY_FLAG_SPINNING) !== 0);
 	}
 }

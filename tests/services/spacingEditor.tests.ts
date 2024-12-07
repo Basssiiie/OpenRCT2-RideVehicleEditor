@@ -20,6 +20,11 @@ class TrackPiece
 	{
 		return new TrackPiece({ x, y, z, direction }, this.type, this.subpositions);
 	}
+
+	toLocation(): CarTrackLocation
+	{
+		return { ...this.position, trackType: this.type };
+	}
 }
 
 const flatTrackPiece = new TrackPiece({ x: 0, y: 0, z: 0, direction: 0 }, 1,
@@ -326,7 +331,7 @@ const multiTurnTest = test.macro({
 	exec(t, startTrackPiece: number, startProgress: number, progress: number, expectedResult: number): void
 	{
 		const trackPieces = [ rightTurn1TrackPiece, rightTurn2TrackPiece, steepUpTrackPiece, steepTurnTrackPiece ];
-		const trackLocation: CoordsXYZD = { ...trackPieces[startTrackPiece].position, direction: 0 };
+		const trackLocation: CarTrackLocation = { ...trackPieces[startTrackPiece].position, direction: 0, trackType: 0 };
 		setupTrackIterator(trackPieces, startTrackPiece);
 		const car = Mock.car({ trackProgress: startProgress, trackLocation, remainingDistance: (progress >= 0) ? ForwardRemainingDistance : 0 });
 
@@ -405,8 +410,8 @@ test("Flat track: get spacing to preceding vehicle 1 step away", t =>
 {
 	const mapMock = setupTrackIterator([ flatTrackPiece ]);
 	const train = createTrain(mapMock, [
-		{ trackProgress: 17, trackLocation: flatTrackPiece.position }, // front car
-		{ trackProgress: 16, trackLocation: flatTrackPiece.position }
+		{ trackProgress: 17, trackLocation: flatTrackPiece.toLocation() }, // front car
+		{ trackProgress: 16, trackLocation: flatTrackPiece.toLocation() }
 	]);
 
 	const spacing = getSpacingToPrecedingVehicle(train, train._at(1)._car(), 1);
@@ -419,8 +424,8 @@ test("Flat track: get spacing to preceding vehicle 10 step away", t =>
 {
 	const mapMock = setupTrackIterator([ flatTrackPiece ]);
 	const train = createTrain(mapMock, [
-		{ trackProgress: 17, trackLocation: flatTrackPiece.position }, // front car
-		{ trackProgress: 7, trackLocation: flatTrackPiece.position }
+		{ trackProgress: 17, trackLocation: flatTrackPiece.toLocation() }, // front car
+		{ trackProgress: 7, trackLocation: flatTrackPiece.toLocation() }
 	]);
 
 	const spacing = getSpacingToPrecedingVehicle(train, train._at(1)._car(), 1);
@@ -433,8 +438,8 @@ test("Flat track: get spacing to preceding vehicle 31 step away", t =>
 {
 	const mapMock = setupTrackIterator([ flatTrackPiece ]);
 	const train = createTrain(mapMock, [
-		{ trackProgress: 31, trackLocation: flatTrackPiece.position }, // front car
-		{ trackProgress: 0, trackLocation: flatTrackPiece.position } // back car
+		{ trackProgress: 31, trackLocation: flatTrackPiece.toLocation() }, // front car
+		{ trackProgress: 0, trackLocation: flatTrackPiece.toLocation() } // back car
 	]);
 
 	const spacing = getSpacingToPrecedingVehicle(train, train._at(1)._car(), 1);
@@ -447,8 +452,8 @@ test("Flat track: get spacing to preceding vehicle is too far away", t =>
 {
 	const mapMock = setupTrackIterator([ flatTrackPiece ]);
 	const train = createTrain(mapMock, [
-		{ trackProgress: 15, trackLocation: { x: 10, y: 10, z: 10, direction: 0 } }, // front car
-		{ trackProgress: 10, trackLocation: flatTrackPiece.position }
+		{ trackProgress: 15, trackLocation: { x: 10, y: 10, z: 10, direction: 0, trackType: 0 } }, // front car
+		{ trackProgress: 10, trackLocation: flatTrackPiece.toLocation()}
 	]);
 
 	const spacing = getSpacingToPrecedingVehicle(train, train._at(1)._car(), 1);
@@ -462,8 +467,8 @@ test("Two flat tracks: get spacing to next track piece by 1", t =>
 	const pieces = [ flatTrackPiece.copyTo(32, 64), flatTrackPiece.copyTo(32, 32) ];
 	const mapMock = setupTrackIterator(pieces);
 	const train = createTrain(mapMock, [
-		{ trackProgress: 0, trackLocation: pieces[1].position }, // front car
-		{ trackProgress: 31, trackLocation: pieces[0].position } // back car
+		{ trackProgress: 0, trackLocation: pieces[1].toLocation() }, // front car
+		{ trackProgress: 31, trackLocation: pieces[0].toLocation() } // back car
 	]);
 	const car = train._at(1)._car();
 
@@ -478,8 +483,8 @@ test("Two flat tracks: get spacing to next track piece by 10", t =>
 	const pieces = [ flatTrackPiece.copyTo(32, 64), flatTrackPiece.copyTo(32, 32) ];
 	const mapMock = setupTrackIterator(pieces);
 	const train = createTrain(mapMock, [
-		{ trackProgress: 3, trackLocation: pieces[1].position }, // front car
-		{ trackProgress: 25, trackLocation: pieces[0].position } // back car
+		{ trackProgress: 3, trackLocation: pieces[1].toLocation() }, // front car
+		{ trackProgress: 25, trackLocation: pieces[0].toLocation() } // back car
 	]);
 	const car = train._at(1)._car();
 
@@ -494,8 +499,8 @@ test("Three flat tracks: get spacing to next track piece by 50", t =>
 	const pieces = [ flatTrackPiece.copyTo(32, 96), flatTrackPiece.copyTo(32, 64), flatTrackPiece.copyTo(32, 32) ];
 	const mapMock = setupTrackIterator(pieces);
 	const train = createTrain(mapMock, [
-		{ trackProgress: 5, trackLocation: pieces[2].position }, // front car
-		{ trackProgress: 19, trackLocation: pieces[0].position } // back car
+		{ trackProgress: 5, trackLocation: pieces[2].toLocation() }, // front car
+		{ trackProgress: 19, trackLocation: pieces[0].toLocation() } // back car
 	]);
 	const car = train._at(1)._car();
 

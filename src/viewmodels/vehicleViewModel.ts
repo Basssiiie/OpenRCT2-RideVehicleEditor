@@ -41,6 +41,7 @@ export class VehicleViewModel
 	readonly _x = store<number>(0);
 	readonly _y = store<number>(0);
 	readonly _z = store<number>(0);
+	readonly _spin = store<number>(0);
 
 	readonly _primaryColour = store<Colour>(0);
 	readonly _secondaryColour = store<Colour>(0);
@@ -51,6 +52,7 @@ export class VehicleViewModel
 	readonly _isPicking = store<boolean>(false);
 	readonly _isDragging = store<boolean>(false);
 	readonly _isEditDisabled = compute(this._selectedVehicle, v => !v);
+	readonly _isSpinDisabled = compute(this._selectedVehicle, v => !v || !v[0]._isSpinning());
 	readonly _isPositionDisabled = compute(this._isMoving, this._isEditDisabled, (m, e) => m || e);
 	readonly _formatPosition = (pos: number): string => (this._isEditDisabled.get() ? "Not available" : pos.toString());
 	readonly _multiplierIndex = store<number>(0);
@@ -277,6 +279,7 @@ export class VehicleViewModel
 		this._x.set(car.x);
 		this._y.set(car.y);
 		this._z.set(car.z);
+		this._spin.set(car.spin);
 
 		const train = this._selectedTrain.get();
 		if (train)

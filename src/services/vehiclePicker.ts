@@ -73,7 +73,7 @@ export function toggleVehiclePicker(isPressed: boolean, onPick: (car: Car) => vo
 /**
  * Finds a car within a certain range of the selected tile element.
  */
-function findCarNearbyTileElement(coords: CoordsXYZ, elementIdx: number): Car | undefined
+function findCarNearbyTileElement(coords: CoordsXY, elementIdx: number): Car | undefined
 {
 	const element = getTileElement(coords.x, coords.y, elementIdx);
 	const entitiesOnTile = map.getAllEntitiesOnTile("car", coords);
