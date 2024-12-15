@@ -3,7 +3,7 @@ import * as Log from "../utilities/logger";
 import { getTileByCoords } from "../utilities/map";
 import { abs } from "../utilities/math";
 import { isNull, isUndefined } from "../utilities/type";
-import { getSubpositionTranslationDistance, getTrackDistances, TrackDistances } from "./subpositionHelper";
+import { getSubpositionTranslationDistance, getTrackSegmentDistances, TrackDistances } from "./subpositionHelper";
 
 
 const MaxForwardIterations = 10;
@@ -44,8 +44,10 @@ export function getDistanceFromProgress(car: Car, trackProgress: number): number
 		? new ForwardIterator(trackProgress, currentProgress)
 		: new BackwardIterator(abs(trackProgress), currentProgress);
 
+	Log.debug("Iterating", (trackProgress >= 0)?"foward":"backward", "from progress", currentProgress, "to", trackProgress);
+
 	let trackPosition: CoordsXYZD = currentTrackLocation;
-	let trackDistances = getTrackDistances(iteratorSegment, subposition, trackPosition.direction);
+	let trackDistances = getTrackSegmentDistances(iteratorSegment, subposition, trackPosition.direction);
 	subpositionIterator._setInitialDistanceFromCarRemainingDistance(car.remainingDistance);
 
 	while (subpositionIterator._remainingProgress > 0 && iteratorSegment)
@@ -79,7 +81,7 @@ export function getDistanceFromProgress(car: Car, trackProgress: number): number
 		}
 
 		const nextTrackPosition = iterator.position;
-		const nextTrackDistance = getTrackDistances(iteratorSegment, subposition, nextTrackPosition.direction);
+		const nextTrackDistance = getTrackSegmentDistances(iteratorSegment, subposition, nextTrackPosition.direction);
 
 		subpositionIterator._remainingProgress--;
 		subpositionIterator._totalDistance += subpositionIterator._getDistanceBetweenSegments(trackPosition, trackDistances, nextTrackPosition, nextTrackDistance);
@@ -164,7 +166,7 @@ function calculateSpacingToPrecedingVehicle(car: Car, carInFront: Car): number |
 	}
 
 	const subposition = car.subposition;
-	let distances = getTrackDistances(iteratorSegment, subposition, currentTrackLocation.direction);
+	let distances = getTrackSegmentDistances(iteratorSegment, subposition, currentTrackLocation.direction);
 	let totalDistance = (distances._progressLength - currentProgress);
 	for (let i = 0; i < MaxForwardIterations; i++)
 	{
@@ -183,7 +185,7 @@ function calculateSpacingToPrecedingVehicle(car: Car, carInFront: Car): number |
 			return null;
 		}
 
-		distances = getTrackDistances(iteratorSegment, subposition, iteratorPosition.direction);
+		distances = getTrackSegmentDistances(iteratorSegment, subposition, iteratorPosition.direction);
 		totalDistance += distances._progressLength;
 	}
 	return null;
@@ -223,8 +225,7 @@ function getIndexForTrackElementAt(coords: CoordsXYZD): number | null
 		const element = tile.elements[i];
 		if (element.type === "track"
 			&& element.baseZ === coords.z
-			&& element.direction === coords.direction
-			&& element.sequence === 0)
+			&& element.direction === coords.direction)
 		{
 			return i;
 		}
@@ -304,7 +305,7 @@ class ForwardIterator extends SubpositionIterator
 		for (; distanceIdx < trackPieceLength && remainingProgress > 0; distanceIdx++)
 		{
 			this._totalDistance += distances[distanceIdx];
-			Log.debug("total +=", distances[distanceIdx], "=", this._totalDistance, "(step:", distanceIdx, ", remaining:", remainingProgress, ")");
+			Log.debug("total +=", distances[distanceIdx], "=", this._totalDistance, "(forward step:", distanceIdx, "/", distances.length, ", remaining:", remainingProgress, ")");
 			remainingProgress--;
 		}
 
@@ -350,7 +351,7 @@ class BackwardIterator extends SubpositionIterator
 		while (--distanceIdx >= 0 && remainingProgress > 0)
 		{
 			this._totalDistance += distances[distanceIdx];
-			Log.debug("total +=", distances[distanceIdx], "=", this._totalDistance, "(step:", distanceIdx, ", remaining:", remainingProgress, ")");
+			Log.debug("total +=", distances[distanceIdx], "=", this._totalDistance, "(backward step:", distanceIdx, "/", distances.length, ", remaining:", remainingProgress, ")");
 			remainingProgress--;
 		}
 		this._remainingProgress = remainingProgress;
