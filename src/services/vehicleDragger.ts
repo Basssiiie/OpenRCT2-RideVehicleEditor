@@ -1,14 +1,15 @@
 import { Store } from "openrct2-flexui";
 import { isMultiplayer } from "../environment";
 import { getCarById, RideVehicle } from "../objects/rideVehicle";
+import * as Log from "../utilities/logger";
 import { getTileElement } from "../utilities/map";
 import { floor } from "../utilities/math";
 import { cancelCurrentTool, cancelTools } from "../utilities/tools";
-import { isNull, isUndefined } from "../utilities/type";
+import { isNumber, isUndefined } from "../utilities/type";
 import { register } from "./actions";
 import { invoke, refreshVehicle } from "./events";
 import { getDistanceFromProgress } from "./spacingEditor";
-import { equalCoordsXYZ } from "../utilities/coords";
+import { getTrackTypeDistances } from "./subpositionHelper";
 
 
 const execute = register<DragVehicleArgs>("rve-drag-car", updateVehicleDrag);
@@ -21,14 +22,8 @@ export const dragToolId = "rve-drag-vehicle";
 /**
  * Enable or disable a tool to drag the vehicle to a new location.
  */
-export function toggleVehicleDragger(isPressed: boolean,
-	storeVehicle: Store<[RideVehicle, number] | null>,
-	storeX: Store<number>,
-	storeY: Store<number>,
-	storeZ: Store<number>,
-	storeTrackLocation: Store<CarTrackLocation | null>,
-	storeTrackProgress: Store<number>,
-	onCancel: () => void): void
+export function toggleVehicleDragger(isPressed: boolean, storeVehicle: Store<[RideVehicle, number] | null>, storeX: Store<number>, storeY: Store<number>, storeZ: Store<number>,
+	storeTrackLocation: Store<CarTrackLocation | null>, storeTrackProgress: Store<number>, onCancel: () => void): void
 {
 	const rideVehicle = storeVehicle.get();
 	if (!isPressed || !rideVehicle)
@@ -44,11 +39,10 @@ export function toggleVehicleDragger(isPressed: boolean,
 		x: storeX.get(),
 		y: storeY.get(),
 		z: storeZ.get(),
+		track: storeTrackLocation.get(),
+		progress: storeTrackProgress.get()
 	};
-	const originalTrackLocation = storeTrackLocation.get();
-	const originalTrackProgress = storeTrackProgress.get();
-	let lastPosition: CoordsXYZ = originalPosition;
-	let lastTrackLocation: CarTrackLocation | null = originalTrackLocation;
+	let lastPosition: DragPosition = originalPosition;
 
 	ui.activateTool({
 		id: dragToolId,
@@ -60,37 +54,27 @@ export function toggleVehicleDragger(isPressed: boolean,
 				// Limit updates to 8 fps to avoid bringing down multiplayer servers
 				return;
 			}
-			const position = getPositionFromTool(args, rideVehicle[0]._type(), rideVehicle[0]._id);
-			if (position && position.trackLocation && !equalCoordsXYZ(position.trackLocation, lastTrackLocation) ||
-				position && !equalCoordsXYZ(position.tilePosition, lastPosition))
+			const vehicle = rideVehicle[0];
+			const position = getPositionFromTool(args, vehicle);
+			if (position && (position.x !== lastPosition.x || position.y !== lastPosition.y || position.z !== lastPosition.z))
 			{
+				Log.debug("Selected position:", JSON.stringify(position));
 				updateCarPosition(rideVehicle, position, DragState.Dragging);
-				ui.tileSelection.tiles = [{ x: alignWithMap(position.tilePosition.x), y : alignWithMap(position.tilePosition.y) }];
-				lastPosition = position.tilePosition;
-				lastTrackLocation = position.trackLocation;
+				ui.tileSelection.tiles = [{ x: alignWithMap(position.x), y : alignWithMap(position.y) }];
+				lastPosition = position;
 			}
 		},
 		onDown: () =>
 		{
 			originalPosition.revert = false;
-			const position = {
-				tilePosition: lastPosition,
-				trackLocation: lastTrackLocation,
-				trackProgress: null,
-			};
-			updateCarPosition(rideVehicle, position, DragState.Complete);
+			updateCarPosition(rideVehicle, lastPosition, DragState.Complete);
 			cancelCurrentTool();
 		},
 		onFinish: () =>
 		{
 			if (originalPosition.revert)
 			{
-				const position = {
-					tilePosition: originalPosition,
-					trackLocation: originalTrackLocation,
-					trackProgress: originalTrackProgress,
-				};
-				updateCarPosition(rideVehicle, position, DragState.Cancel);
+				updateCarPosition(rideVehicle, lastPosition, DragState.Cancel);
 			}
 			ui.tileSelection.tiles = [];
 			onCancel();
@@ -108,11 +92,13 @@ const enum DragState
 	Cancel
 }
 
-interface DragPosition
+/**
+ * Position currently selected by the drag tool.
+ */
+interface DragPosition extends CoordsXYZ
 {
-	tilePosition: CoordsXYZ,
-	trackLocation: CarTrackLocation | null,
-	trackProgress: number | null,
+	track?: CarTrackLocation | null;
+	progress?: number | null;
 }
 
 /**
@@ -128,13 +114,13 @@ interface DragVehicleArgs
 /**
  * Get a possible position to drag the vehicle to.
  */
-function getPositionFromTool(args: ToolEventArgs, vehicleType: RideObjectVehicle | null, currentId: number): DragPosition | null
+function getPositionFromTool(args: ToolEventArgs, vehicle: RideVehicle): DragPosition | null
 {
 	const { entityId, mapCoords, tileElementIndex } = args;
+	const result = <DragPosition>{};
 	let x: number | undefined, y: number | undefined, z: number | undefined;
-	let trackLocation: CarTrackLocation | null = null;
 
-	if (!isUndefined(entityId) && entityId !== currentId)
+	if (!isUndefined(entityId) && entityId !== vehicle._id)
 	{
 		const entity = map.getEntity(entityId);
 		x = entity.x;
@@ -143,18 +129,19 @@ function getPositionFromTool(args: ToolEventArgs, vehicleType: RideObjectVehicle
 	}
 	else if (mapCoords && !isUndefined(tileElementIndex))
 	{
-		x = (mapCoords.x + 16);
-		y = (mapCoords.y + 16);
+		x = mapCoords.x;
+		y = mapCoords.y;
 		const element = getTileElement(x, y, tileElementIndex);
 		const type = element.type;
+		const vehicleType = vehicle._type();
 		const tabHeight = (vehicleType) ? vehicleType.tabHeight : 0;
 
-		z = (type === "footpath" || type === "banner" || type === "wall" || type === "track")
+		z = (type === "footpath" || type === "banner" || type === "wall")
 			? element.baseZ : element.clearanceZ;
 
-		// Custom heights for surface elements
 		if (type === "surface")
 		{
+			// Adjust height for surface elements slopes and water
 			const waterZ = element.waterHeight;
 			if (waterZ > z)
 			{
@@ -165,20 +152,25 @@ function getPositionFromTool(args: ToolEventArgs, vehicleType: RideObjectVehicle
 				z += 8;
 			}
 		}
+		else if (type === "track")
+		{
+			// Find correct track offsets for track pieces
+			const sequence = element.sequence;
+			if (isNumber(sequence))
+			{
+				const trackType = element.trackType;
+				const subposition = vehicle._car().subposition;
+				const distances = getTrackTypeDistances(trackType, subposition, element.direction);
+				const origin = <CarTrackLocation>distances._origin(x, y, element.baseZ, sequence);
 
-		if (type === "track") {
-			const iterator = map.getTrackIterator({x, y}, tileElementIndex);
-			if (!isNull(iterator)) {
-				trackLocation = {
-					x: iterator.position.x-16, // back to block center
-					y: iterator.position.y-16,
-					z: iterator.position.z,
-					direction: element.direction,
-					trackType: element.trackType
-				};
+				origin.trackType = trackType;
+				result.track = origin;
+				result.progress = distances._sequences[sequence].progress;
 			}
 		}
 
+		x += 16;
+		y += 16;
 		// Increase height for certain vehicles like inverted ones based on the height in the tab icon
 		//  29 for actual inverted, inverted tabheight for other negatives, 0 for big cars
 		z += (tabHeight < -10) ? 29 : (tabHeight < 0) ? -tabHeight : 0;
@@ -187,7 +179,12 @@ function getPositionFromTool(args: ToolEventArgs, vehicleType: RideObjectVehicle
 	{
 		return null;
 	}
-	return {tilePosition: { x, y, z }, trackLocation, trackProgress: null};
+
+	result.x = x;
+	result.y = y;
+	result.z = z;
+
+	return result;
 }
 
 /**
@@ -210,16 +207,23 @@ function updateVehicleDrag(args: DragVehicleArgs): void
 		return;
 	}
 
-	if (isNull(args.position.trackLocation)) {
-		const position = args.position.tilePosition;
+	const position = args.position;
+	const track = position.track;
+	const progress = position.progress;
+	if (track && isNumber(progress))
+	{
+		track.x = alignWithMap(track.x);
+		track.y = alignWithMap(track.y);
+
+		car.trackLocation = track;
+		Log.debug("Travel to", JSON.stringify(position), "by:", progress, "-", car.trackProgress, "=", progress - car.trackProgress);
+		car.travelBy(getDistanceFromProgress(car, progress - car.trackProgress));
+	}
+	else
+	{
 		car.x = position.x;
 		car.y = position.y;
 		car.z = position.z;
-	} else {
-		car.trackLocation = args.position.trackLocation;
-		if (!isNull(args.position.trackProgress) && car.trackProgress != args.position.trackProgress) {
-			car.travelBy(getDistanceFromProgress(car, args.position.trackProgress - car.trackProgress));
-		}
 	}
 
 	invoke(refreshVehicle, id);
