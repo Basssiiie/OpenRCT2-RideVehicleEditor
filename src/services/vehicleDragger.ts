@@ -97,7 +97,7 @@ const enum DragState
  */
 interface DragPosition extends CoordsXYZ
 {
-	track?: CarTrackLocation | null;
+	trackElementIndex?: number | null
 	progress?: number | null;
 }
 
@@ -161,10 +161,8 @@ function getPositionFromTool(args: ToolEventArgs, vehicle: RideVehicle): DragPos
 				const trackType = element.trackType;
 				const subposition = vehicle._car().subposition;
 				const distances = getTrackTypeDistances(trackType, subposition, element.direction);
-				const origin = <CarTrackLocation>distances._origin(x, y, element.baseZ, sequence);
 
-				origin.trackType = trackType;
-				result.track = origin;
+				result.trackElementIndex = tileElementIndex;
 				result.progress = distances._sequences[sequence].progress;
 			}
 		}
@@ -208,15 +206,9 @@ function updateVehicleDrag(args: DragVehicleArgs): void
 	}
 
 	const position = args.position;
-	const track = position.track;
 	const progress = position.progress;
-	if (track && isNumber(progress))
-	{
-		track.x = alignWithMap(track.x);
-		track.y = alignWithMap(track.y);
-
-		car.trackLocation = track;
-		Log.debug("Travel to", JSON.stringify(position), "by:", progress, "-", car.trackProgress, "=", progress - car.trackProgress);
+	if (isNumber(position.trackElementIndex) && isNumber(progress)) {
+		car.moveToTrack({x: position.x-16, y: position.y-16}, position.trackElementIndex);
 		car.travelBy(getDistanceFromProgress(car, progress - car.trackProgress));
 	}
 	else
