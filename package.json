@@ -36,7 +36,7 @@
 		"nodemon": "^3.0.1",
 		"nyc": "^15.1.0",
 		"openrct2-mocks": "^0.1.0",
-		"rollup": "^4.6.0",
+		"rollup": "^4.35.0",
 		"tslib": "^2.3.1",
 		"tsx": "^4.19.0",
 		"typescript": "^5.0.2"
