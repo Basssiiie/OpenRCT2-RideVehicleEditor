@@ -1,4 +1,4 @@
-import { button, checkbox, CheckboxParams, colourPicker, compute, dropdown, dropdownSpinner, DropdownSpinnerParams, FlexiblePosition, groupbox, horizontal, label, SpinnerParams, SpinnerWrapMode, toggle, twoway, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
+import { button, checkbox, CheckboxParams, colourPicker, compute, dropdown, dropdownSpinner, DropdownSpinnerParams, FlexiblePosition, groupbox, horizontal, label, SpinnerParams, toggle, twoway, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
 import { isDevelopment, pluginVersion } from "../environment";
 import { RideVehicleVariant, VehicleVisibility } from "../objects/rideVehicleVariant";
 import { invoke, refreshRide } from "../services/events";
@@ -18,7 +18,6 @@ const buttonSize = 24;
 const controlsWidth = 244;
 const controlsLabelWidth = 82;
 const controlsSpinnerWidth = controlsWidth - (controlsLabelWidth + 4 + 12); // include spacing
-const clampThenWrapMode: SpinnerWrapMode = "clampThenWrap";
 
 // Tips that are used multiple times
 const applyOptionsTip = "Copy the selected vehicle settings to a specific set of other vehicles on this ride.";
@@ -341,39 +340,39 @@ export const mainWindow = window({
 							labelSpinner({
 								_label: { text: "Spacing:" },
 								tooltip: "Choose whether either tailgating or social distancing is the best for your vehicle",
-								minimum: 0,
 								disabled: compute(model._isEditDisabled, model._selectedVehicle, (noEdit, vehicle) => (noEdit || !vehicle || vehicle[1] === 0)),
 								step: model._multiplier,
 								value: compute(model._spacing, v => v || 0),
-								format: (v: number) => (v > 0) ? v.toString() : "Too far away",
+								format: () =>
+								{
+									const spacing = model._spacing.get();
+									return (spacing === null) ? "Too far away" : spacing.toString();
+								},
 								onChange: (_, incr) => model._modifyVehicle(changeSpacing, incr)
 							}),
 							positionSpinner({
 								_label: { text: "X position:" },
-								minimum: 0,
 								disabled: model._isPositionDisabled,
 								step: model._multiplier,
 								value: model._x,
 								format: model._formatPosition,
-								onChange: (_, incr) => model._modifyVehicle(setPositionX, incr),
+								onChange: value => model._modifyVehicle(setPositionX, value),
 							}),
 							positionSpinner({
 								_label: { text: "Y position:" },
-								minimum: 0,
 								disabled: model._isPositionDisabled,
 								step: model._multiplier,
 								value: model._y,
 								format: model._formatPosition,
-								onChange: (_, incr) => model._modifyVehicle(setPositionY, incr)
+								onChange: value => model._modifyVehicle(setPositionY, value)
 							}),
 							positionSpinner({
 								_label: { text: "Z position:" },
-								minimum: 0,
 								disabled: model._isPositionDisabled,
 								step: model._multiplier,
 								value: model._z,
 								format: model._formatPosition,
-								onChange: (_, incr) => model._modifyVehicle(setPositionZ, incr)
+								onChange: value => model._modifyVehicle(setPositionZ, value)
 							}),
 							labelSpinner({
 								_label: { text: "Seat spin:" },
@@ -382,7 +381,6 @@ export const mainWindow = window({
 								disabled: model._isSpinDisabled,
 								step: model._multiplier,
 								value: model._spin,
-								wrapMode: "clampThenWrap",
 								onChange: value => model._modifyVehicle(setSpin, value)
 							})
 						]
@@ -396,7 +394,6 @@ export const mainWindow = window({
 								tooltip: "Total amount of passengers that can cuddle up in this vehicle",
 								minimum: 0,
 								maximum: 32, // vehicles refuse more than 32 guests, leaving them stuck just before entering.
-								wrapMode: clampThenWrapMode,
 								disabled: model._isEditDisabled,
 								step: model._multiplier,
 								value: model._seats,
@@ -407,7 +404,6 @@ export const mainWindow = window({
 								tooltip: "Total amount of mass (weight) of this vehicle, including all its passengers and your mom",
 								minimum: 0,
 								maximum: 65_535,
-								wrapMode: clampThenWrapMode,
 								disabled: model._isEditDisabled,
 								step: model._multiplier,
 								value: model._mass,
@@ -419,7 +415,6 @@ export const mainWindow = window({
 								disabledMessage: "Powered vehicles only",
 								minimum: 0,
 								maximum: 255,
-								wrapMode: clampThenWrapMode,
 								disabled: model._isUnpowered,
 								step: model._multiplier,
 								value: model._poweredAcceleration,
@@ -431,7 +426,6 @@ export const mainWindow = window({
 								disabledMessage: "Powered vehicles only",
 								minimum: 1,
 								maximum: 255,
-								wrapMode: clampThenWrapMode,
 								disabled: model._isUnpowered,
 								step: model._multiplier,
 								value: model._poweredMaxSpeed,
@@ -444,7 +438,7 @@ export const mainWindow = window({
 			})
 		]),
 		label({ // credits
-			padding: [ -1, 20, 0, 20 ], // do not cover the resize corner
+			padding: [ -1, 80, 0, 80 ], // do not cover the resize corner
 			text: "github.com/Basssiiie/OpenRCT2-RideVehicleEditor",
 			tooltip: "Go to this URL to check for the latest updates",
 			alignment: "centred",
@@ -508,6 +502,8 @@ function labelSpinner<T extends (SpinnerParams | DropdownSpinnerParams) = Spinne
 function positionSpinner(params: LabelledSpinnerParams & FlexiblePosition): WidgetCreator<FlexiblePosition>
 {
 	params.tooltip = "The fantastic map location of your vehicle and where to find it. Only works when the vehicle is not moving.";
+	params.minimum = 0;
+	params.wrapMode = "clamp";
 	params._noDisabledMessage = true;
 	return labelSpinner(params);
 }

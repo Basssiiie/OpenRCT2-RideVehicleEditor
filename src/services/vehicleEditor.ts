@@ -232,6 +232,9 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 		case massKey:
 		case poweredAccelerationKey:
 		case poweredMaxSpeedKey:
+		case xPosition:
+		case yPosition:
+		case zPosition:
 		case spinKey:
 		{
 			callback = (car): void =>
@@ -240,22 +243,11 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 			};
 			break;
 		}
-		case xPosition:
-		case yPosition:
-		case zPosition:
-		{
-			callback = (car): void =>
-			{
-				car[key] += value;
-			};
-			break;
-		}
 		case trackProgressKey:
 		{
 			callback = (car): void =>
 			{
-				const distance = getDistanceFromProgress(car, value);
-				car.travelBy(distance);
+				moveCar(car, getDistanceFromProgress(car, value));
 			};
 			break;
 		}
@@ -263,8 +255,7 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 		{
 			callback = (car, index): void =>
 			{
-				const distance = getDistanceFromProgress(car, value * -(index + 1));
-				car.travelBy(distance);
+				moveCar(car, getDistanceFromProgress(car, value * -(index + 1)));
 			};
 			break;
 		}
@@ -288,4 +279,20 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 	}
 
 	forEachVehicle(targets, callback);
+}
+
+/**
+ * Moves the car and restores the original velocity and acceleration afterwards,
+ * to avoid the vehicle shooting away at high speed when the game is unpaused.
+ */
+function moveCar(car: Car, distance: number): void
+{
+	const velocity = car.velocity;
+	const acceleration = car.acceleration;
+
+	car.travelBy(distance);
+
+	// Reset velocity and acceleration after traveling.
+	car.velocity = velocity;
+	car.acceleration = acceleration;
 }
