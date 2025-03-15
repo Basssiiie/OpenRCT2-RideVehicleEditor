@@ -35,7 +35,7 @@ export function toggleVehiclePicker(isPressed: boolean, onPick: (car: Car) => vo
 			const entityId = args.entityId;
 			Log.debug("[VehiclePicker] Pick args:", JSON.stringify(args));
 
-			if (entityId)
+			if (entityId !== undefined)
 			{
 				const entity = getCarById(entityId);
 				if (entity)
