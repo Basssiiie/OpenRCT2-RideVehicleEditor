@@ -333,10 +333,9 @@ export const mainWindow = window({
 							labelSpinner({
 								_label: { text: "Track progress:" },
 								tooltip: "Distance in steps of how far the vehicle has progressed along the current track piece",
-								minimum: 0,
 								disabled: model._isEditDisabled,
 								step: model._multiplier,
-								value: model._trackProgress,
+								value: twoway(model._trackProgress),
 								onChange: (_, incr) => model._modifyVehicle(changeTrackProgress, incr)
 							}),
 							labelSpinner({

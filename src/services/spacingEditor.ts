@@ -129,7 +129,6 @@ export function getSpacingToPrecedingVehicle(train: RideTrain, car: Car, carInde
 		|| followingCarX !== lastFollowingVehicleX || followingCarY !== lastFollowingVehicleY || followingCarZ !== lastFollowingVehicleZ
 		|| precedingCarX !== lastPrecedingVehicleX || precedingCarY !== lastPrecedingVehicleY || precedingCarZ !== lastPrecedingVehicleZ)
 	{
-		Log.debug("Cached spacing value invalid; recalculate...");
 		lastFollowingVehicleX = followingCarX;
 		lastFollowingVehicleY = followingCarY;
 		lastFollowingVehicleZ = followingCarZ;
@@ -137,6 +136,7 @@ export function getSpacingToPrecedingVehicle(train: RideTrain, car: Car, carInde
 		lastPrecedingVehicleY = precedingCarY;
 		lastPrecedingVehicleZ = precedingCarZ;
 		lastSpacingResult = calculateSpacingToPrecedingVehicle(car, carInFront);
+		Log.debug("Cached spacing value invalid; recalculate to", lastSpacingResult);
 	}
 	return lastSpacingResult;
 }
