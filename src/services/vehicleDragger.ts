@@ -1,6 +1,7 @@
 import { Store } from "openrct2-flexui";
 import { isMultiplayer } from "../environment";
 import { getCarById, RideVehicle } from "../objects/rideVehicle";
+import * as Log from "../utilities/logger";
 import { getTileElement } from "../utilities/map";
 import { floor } from "../utilities/math";
 import { cancelCurrentTool, cancelTools } from "../utilities/tools";
@@ -59,6 +60,7 @@ export function toggleVehicleDragger(isPressed: boolean, storeVehicle: Store<[Ri
 		onDown: () =>
 		{
 			originalPosition.revert = false;
+			Log.debug("[VehicleDragger] Place down vehicle at", lastPosition);
 			updateCarPosition(rideVehicle, lastPosition, DragState.Complete);
 			cancelCurrentTool();
 		},
@@ -66,6 +68,7 @@ export function toggleVehicleDragger(isPressed: boolean, storeVehicle: Store<[Ri
 		{
 			if (originalPosition.revert)
 			{
+				Log.debug("[VehicleDragger] Finish tool & revert position to", originalPosition, rideVehicle[0]._car());
 				updateCarPosition(rideVehicle, originalPosition, DragState.Cancel);
 			}
 			ui.tileSelection.tiles = [];

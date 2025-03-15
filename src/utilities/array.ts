@@ -64,3 +64,19 @@ export function orderByName(left: { name: string }, right: { name: string }): nu
 {
 	return left.name.localeCompare(right.name);
 }
+
+/**
+ * Sorting function that can order an array by name alphabetically, followed by order by id if the names are equal.
+ */
+export function orderByNameThenById(left: { id: number, name: string }, right: { id: number, name: string }): number
+{
+	return orderByName(left, right) || left.id - right.id;
+}
+
+/**
+ * Sorting function that can order an array by name alphabetically, followed by order by identifier if the names are equal.
+ */
+export function orderByNameThenByIdentifier(left: { identifier: string, name: string }, right: { identifier: string, name: string }): number
+{
+	return orderByName(left, right) || left.identifier.localeCompare(right.identifier);
+}

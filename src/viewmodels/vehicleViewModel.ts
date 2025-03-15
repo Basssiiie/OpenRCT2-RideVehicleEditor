@@ -10,7 +10,7 @@ import { dragToolId, toggleVehicleDragger } from "../services/vehicleDragger";
 import { locate } from "../services/vehicleLocater";
 import { pickerToolId, toggleVehiclePicker } from "../services/vehiclePicker";
 import { VehicleSpan } from "../services/vehicleSpan";
-import { find, findIndex, orderByName } from "../utilities/array";
+import { find, findIndex, orderByNameThenByIdentifier } from "../utilities/array";
 import * as Log from "../utilities/logger";
 import { cancelTools } from "../utilities/tools";
 import { isNull } from "../utilities/type";
@@ -369,7 +369,7 @@ export class VehicleViewModel
 			Log.debug("Adding special Giga cable lift ride type");
 			types = types
 				.concat(gigaCableLiftHillType)
-				.sort((l, r) => orderByName(l._object(), r._object()));
+				.sort((l, r) => orderByNameThenByIdentifier(l._object(), r._object()));
 
 			typeIdx = findIndex(types, t => t._id === gigaCableLiftHillTypeId);
 			Log.assert(!isNull(typeIdx));

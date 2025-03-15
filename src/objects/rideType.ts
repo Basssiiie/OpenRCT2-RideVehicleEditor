@@ -1,4 +1,4 @@
-import { orderByName } from "../utilities/array";
+import { orderByNameThenByIdentifier } from "../utilities/array";
 import * as Log from "../utilities/logger";
 import { isNumber } from "../utilities/type";
 import { getVisibility, RideVehicleVariant } from "./rideVehicleVariant";
@@ -12,7 +12,7 @@ export function getAllRideTypes(): RideType[]
 	return context
 		.getAllObjects("ride")
 		.filter(r => r.carsPerFlatRide !== 0) // tracked rides == 255, flatrides >= 1, shops == 0
-		.sort(orderByName)
+		.sort(orderByNameThenByIdentifier)
 		.map(r => new RideType(r));
 }
 
@@ -132,6 +132,7 @@ export const gigaCableLiftHillTypeId = 65_535;
 const gigaCableLiftObject =
 {
 	index: gigaCableLiftHillTypeId,
+	identifier: "rve.giga-lift",
 	name: "Giga Coaster Cable Lift Hill",
 	vehicles: [
 		gigaCableLiftHillEntry(100, 80, 20, 29_110, 10),
