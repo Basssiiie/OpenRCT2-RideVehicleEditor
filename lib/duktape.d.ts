@@ -21,6 +21,18 @@ interface Duktape
 	 */
 	act(depth: number): DukStackEntry;
 
+	/**
+	 * Encodes its argument value into chosen format.
+	 */
+	enc(format: "hex" | "base64", value: any): string;
+	enc(format: "jx" | "jc", value: any, replacer?: (this: any, key: string, value: any) => any, space?: string | number): string;
+	enc(format: "jx" | "jc", value: any, replacer?: (number | string)[] | null, space?: string | number): string;
+
+	/**
+	 * Decodes and parses its argument value from chosen format into a value.
+	 */
+	dec(format: "hex" | "base64", value: string): any;
+	dec(format: "jx" | "jc", value: string, reviver?: (this: any, key: string, value: any) => any): any;
 
 	/**
 	 * Callback that gets triggered after an ECMAScript error has occured.

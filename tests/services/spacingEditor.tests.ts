@@ -12,7 +12,7 @@ class TrackPiece
 {
 	constructor(
 		public position: CoordsXYZD,
-		public type: number,
+		public type: number, // must be unique in this test file to avoid cache collisions
 		public subpositions: CoordsXYZ[])
 	{}
 
@@ -46,7 +46,7 @@ function setupTrackIterator(trackPieces: TrackPiece[], trackStartIndex?: number)
 			x: Math.floor(p.position.x / 32),
 			y: Math.floor(p.position.y / 32),
 			elements: [
-				Mock.trackElement({ type: "track", baseZ: p.position.z })
+				Mock.trackElement({ type: "track", baseZ: p.position.z, direction: p.position.direction })
 			]
 		})),
 		getTrackIterator()
@@ -331,9 +331,12 @@ const multiTurnTest = test.macro({
 	exec(t, startTrackPiece: number, startProgress: number, progress: number, expectedResult: number): void
 	{
 		const trackPieces = [ rightTurn1TrackPiece, rightTurn2TrackPiece, steepUpTrackPiece, steepTurnTrackPiece ];
-		const trackLocation: CarTrackLocation = { ...trackPieces[startTrackPiece].position, direction: 0, trackType: 0 };
 		setupTrackIterator(trackPieces, startTrackPiece);
-		const car = Mock.car({ trackProgress: startProgress, trackLocation, remainingDistance: (progress >= 0) ? ForwardRemainingDistance : 0 });
+		const car = Mock.car({
+			trackProgress: startProgress,
+			trackLocation: trackPieces[startTrackPiece].toLocation(),
+			remainingDistance: (progress >= 0) ? ForwardRemainingDistance : 0
+		});
 
 		const distance = getDistanceFromProgress(car, progress);
 
@@ -379,6 +382,36 @@ test("Flat track: move backwards by 1 and account for remaining distance cap", t
 	const distance = getDistanceFromProgress(car, -1);
 
 	t.is(distance, -(8716 + (6000 - 3277)));
+});
+
+
+const steepToSlopedDownwardsTrackPiece = new TrackPiece({ x: 64, y: 64, z: 16, direction: 2 }, 21,
+[
+	{ x: 16, y: 0, z: 31 }, { x: 16, y: 10, z: 16 }, { x: 16, y: 32, z: 0 },
+]);
+const slopedToFlatDownwardsTrackPiece = new TrackPiece({ x: 64, y: 96, z: 8, direction: 2 }, 22,
+[
+	{ x: 16, y: 0, z: 8 }, { x: 16, y: 16, z: 1 }, { x: 16, y: 31, z: 0 },
+]);
+
+test("Downward slope: move extra step forward if end point overlaps with start point", t =>
+{
+	setupTrackIterator([ steepToSlopedDownwardsTrackPiece, slopedToFlatDownwardsTrackPiece ], 0);
+	const car = Mock.car({ trackProgress: 2, remainingDistance: ForwardRemainingDistance, trackLocation: steepToSlopedDownwardsTrackPiece.toLocation() });
+
+	const distance = getDistanceFromProgress(car, 1);
+
+	t.is(distance, 10_905);
+});
+
+test("Downward slope: move extra step backwards if end point overlaps with start point", t =>
+{
+	setupTrackIterator([ steepToSlopedDownwardsTrackPiece, slopedToFlatDownwardsTrackPiece ], 1);
+	const car = Mock.car({ trackProgress: 0, remainingDistance: 0, trackLocation: slopedToFlatDownwardsTrackPiece.toLocation() });
+
+	const distance = getDistanceFromProgress(car, -1);
+
+	t.is(distance, -10_905);
 });
 
 

@@ -21,7 +21,11 @@ const isDuktapeAvailable = (typeof Duktape !== "undefined");
  */
 function print(level: LogLevel, messages: unknown[]): void
 {
-	console.log(`<RVE/${level}> ${messages.join(" ")}`);
+	const message = messages
+		.map(v => (Array.isArray(v) ? `[${v}]` : typeof v == "object" ? Duktape.enc('jx', v) : v))
+		.join(" ");
+
+	console.log(`\x1b[1;33m<RVE/${level}>\x1b[37m ${message}`);
 }
 
 

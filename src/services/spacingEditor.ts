@@ -50,7 +50,7 @@ export function getDistanceFromProgress(car: Car, trackProgress: number): number
 
 	while (subpositionIterator._remainingProgress > 0 && iteratorSegment)
 	{
-		Log.debug("Remaining progress:", subpositionIterator._remainingProgress, ", total:", subpositionIterator._totalDistance);
+		Log.debug("getDistanceFromProgress(): remaining:", subpositionIterator._remainingProgress, ", total:", subpositionIterator._totalDistance);
 
 		const trackPieceLength = trackDistances._progressLength;
 
@@ -59,7 +59,7 @@ export function getDistanceFromProgress(car: Car, trackProgress: number): number
 			// Quick add whole segment.
 			subpositionIterator._totalDistance += trackDistances._totalDistance;
 			subpositionIterator._remainingProgress -= trackPieceLength;
-			Log.debug("total +=", trackDistances._totalDistance, "=", subpositionIterator._totalDistance, "(whole segment)");
+			Log.debug("getDistanceFromProgress(): total +=", trackDistances._totalDistance, "=", subpositionIterator._totalDistance);
 		}
 		else
 		{
@@ -80,15 +80,21 @@ export function getDistanceFromProgress(car: Car, trackProgress: number): number
 
 		const nextTrackPosition = iterator.position;
 		const nextTrackDistance = getTrackDistances(iteratorSegment, subposition, nextTrackPosition.direction);
+		const segmentDistance = subpositionIterator._getDistanceBetweenSegments(trackPosition, trackDistances, nextTrackPosition, nextTrackDistance);
 
-		subpositionIterator._remainingProgress--;
-		subpositionIterator._totalDistance += subpositionIterator._getDistanceBetweenSegments(trackPosition, trackDistances, nextTrackPosition, nextTrackDistance);
+		if (segmentDistance)
+		{
+			// If segment distance is 0, the end and start positions overlap and another step should to be taken.
+			subpositionIterator._totalDistance += segmentDistance;
+			subpositionIterator._remainingProgress--;
+		}
+
 		trackPosition = nextTrackPosition;
 		trackDistances = nextTrackDistance;
 	}
 
 	const totalDistance = subpositionIterator._totalDistance;
-	Log.debug("Move vehicle", totalDistance, "; progress change:", trackProgress);
+	Log.debug("getDistanceFromProgress(): Move vehicle", totalDistance, ", progress change:", trackProgress, ", final progress:", trackDistances._totalDistance, totalDistance > 0 ? "" : "\x1b[93m[WARNING] VEHICLE DID NOT MOVE");
 	return (trackProgress < 0) ? -totalDistance : totalDistance;
 }
 
@@ -250,8 +256,13 @@ function isLocationEqual(left: CoordsXYZD, right: CoordsXYZD): boolean
  */
 abstract class SubpositionIterator
 {
+	/** Amount of track progress that's still to be iterated. */
 	_remainingProgress: number;
+
+	/** Position of the car on the current track piece. */
 	_distanceIndex: number;
+
+	/** Total distance travelled by the iterator. */
 	_totalDistance: number = 0;
 
 	constructor (remainingProgress: number, currentProgress: number)
@@ -304,7 +315,7 @@ class ForwardIterator extends SubpositionIterator
 		for (; distanceIdx < trackPieceLength && remainingProgress > 0; distanceIdx++)
 		{
 			this._totalDistance += distances[distanceIdx];
-			Log.debug("total +=", distances[distanceIdx], "=", this._totalDistance, "(step:", distanceIdx, ", remaining:", remainingProgress, ")");
+			Log.debug("forward(): total +=", distances[distanceIdx], "=", this._totalDistance, "(step:", distanceIdx, "/", trackPieceLength, ", remaining:", remainingProgress, ")");
 			remainingProgress--;
 		}
 
@@ -313,6 +324,7 @@ class ForwardIterator extends SubpositionIterator
 	}
 	override _jumpSegment(trackIterator: TrackIterator): boolean
 	{
+		Log.debug("forward(): next segment:", trackIterator.position, "->", trackIterator.nextPosition);
 		return trackIterator.next();
 	}
 	override _getDistanceBetweenSegments(previousTile: CoordsXYZ, previousTrack: Readonly<TrackDistances>, nextTile: CoordsXYZ, nextTrack: Readonly<TrackDistances>): number
@@ -350,7 +362,7 @@ class BackwardIterator extends SubpositionIterator
 		while (--distanceIdx >= 0 && remainingProgress > 0)
 		{
 			this._totalDistance += distances[distanceIdx];
-			Log.debug("total +=", distances[distanceIdx], "=", this._totalDistance, "(step:", distanceIdx, ", remaining:", remainingProgress, ")");
+			Log.debug("backward(): total +=", distances[distanceIdx], "=", this._totalDistance, "(step:", distanceIdx, "/", trackPieceLength, ", remaining:", remainingProgress, ")");
 			remainingProgress--;
 		}
 		this._remainingProgress = remainingProgress;
@@ -358,6 +370,7 @@ class BackwardIterator extends SubpositionIterator
 	}
 	override _jumpSegment(trackIterator: TrackIterator): boolean
 	{
+		Log.debug("backward(): previous segment:", trackIterator.position, "->", trackIterator.previousPosition);
 		return trackIterator.previous();
 	}
 	override _getDistanceBetweenSegments(previousTile: CoordsXYZ, previousTrack: Readonly<TrackDistances>, nextTile: CoordsXYZ, nextTrack: Readonly<TrackDistances>): number
