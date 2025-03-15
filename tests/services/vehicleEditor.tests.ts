@@ -3,7 +3,7 @@
 import test from "ava";
 import Mock from "openrct2-mocks";
 import { RideType } from "../../src/objects/rideType";
-import { initActions } from "../../src/services/actions";
+import { registerActions } from "../../src/services/actions";
 import { setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setRideType, setSeatCount, setSecondaryColour, setTertiaryColour, setVariant } from "../../src/services/vehicleEditor";
 
 
@@ -36,7 +36,7 @@ test.before(() =>
 	globalThis.network = Mock.network({
 		groups: [ Mock.playerGroup({ permissions: [ "ride_properties" ] })]
 	});
-	initActions();
+	registerActions();
 });
 
 

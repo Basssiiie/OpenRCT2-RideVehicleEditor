@@ -5,8 +5,10 @@ import { getAllRideTypes, gigaCableLiftHillType, gigaCableLiftHillTypeId, RideTy
 import { RideVehicle } from "../objects/rideVehicle";
 import { refreshVehicle } from "../services/events";
 import { getSpacingToPrecedingVehicle } from "../services/spacingEditor";
-import { CopyFilter, CopyOptions, getTargets, VehicleSettings } from "../services/vehicleCopier";
-import { dragToolId } from "../services/vehicleDragger";
+import { applyToTargets, CopyFilter, CopyOptions, getTargets, getVehicleSettings, VehicleSettings } from "../services/vehicleCopier";
+import { dragToolId, toggleVehicleDragger } from "../services/vehicleDragger";
+import { locate } from "../services/vehicleLocater";
+import { pickerToolId, toggleVehiclePicker } from "../services/vehiclePicker";
 import { VehicleSpan } from "../services/vehicleSpan";
 import { find, findIndex, orderByName } from "../utilities/array";
 import * as Log from "../utilities/logger";
@@ -64,7 +66,7 @@ export class VehicleViewModel
 	readonly _synchronizeTargets = store<boolean>(false);
 	readonly _clipboard = store<VehicleSettings | null>(null);
 
-	private _isOpen?: boolean;
+	_isOpen?: boolean;
 	private _isRefreshing?: boolean;
 	private _onPlayerAction?: IDisposable;
 	private _onGameTick?: IDisposable;
@@ -119,6 +121,8 @@ export class VehicleViewModel
 	_close(): void
 	{
 		Log.debug("[VehicleViewModel] Window closed!");
+		cancelTools(pickerToolId, dragToolId);
+
 		this._isOpen = false;
 		if (this._onPlayerAction)
 		{
@@ -137,9 +141,60 @@ export class VehicleViewModel
 	}
 
 	/**
+	 * Select a specific ride by index.
+	 */
+	_selectRide(index: number): void
+	{
+		const rides = this._rides.get();
+		const count = rides.length;
+		const idx = (index + count) % count;
+
+		if (!this._isOpen || !count)
+		{
+			return;
+		}
+
+		this._selectedRide.set([rides[idx], idx]);
+	}
+
+	/**
+	 * Select a specific train by index.
+	 */
+	_selectTrain(index: number): void
+	{
+		const trains = this._trains.get();
+		const count = trains.length;
+		const idx = (index + count) % count;
+
+		if (!this._isOpen || !count)
+		{
+			return;
+		}
+
+		this._selectedTrain.set([trains[idx], idx]);
+	}
+
+	/**
+	 * Select a specific vehicle by index.
+	 */
+	_selectVehicle(index: number): void
+	{
+		const vehicles = this._vehicles.get();
+		const count = vehicles.length;
+		const idx = (index + count) % count;
+
+		if (!this._isOpen || !count)
+		{
+			return;
+		}
+
+		this._selectedVehicle.set([vehicles[idx], idx]);
+	}
+
+	/**
 	 * Select a specific car entity.
 	 */
-	_select(car: Car): void
+	_selectCar(car: Car): void
 	{
 		const
 			rides = this._rides.get(),
@@ -219,6 +274,77 @@ export class VehicleViewModel
 			? (enabledFilters | filter)
 			: (enabledFilters & ~filter)
 		);
+	}
+
+	/**
+	 * Toggle the vehicle picker on or off.
+	 */
+	_setPicker(active: boolean, onSelect?: () => void): void
+	{
+		this._isPicking.set(true);
+		toggleVehiclePicker(active, c =>
+			{
+				if (onSelect)
+				{
+					onSelect();
+				}
+				this._selectCar(c);
+			},
+			() => this._isPicking.set(false)
+		);
+	}
+
+	/**
+	 * Toggle the vehicle dragger on or off.
+	 */
+	_setDragger(active: boolean): void
+	{
+		if (this._isOpen)
+		{
+			toggleVehicleDragger(active, this._selectedVehicle, this._x, this._y, this._z, () => this._isDragging.set(false));
+		}
+	}
+
+	/**
+	 * Copies the currently selected vehicle to the clipboard, or clears clipboard.
+	 */
+	_copy(active: boolean): void
+	{
+		if (this._isOpen)
+		{
+			const vehicle = this._selectedVehicle.get();
+			this._clipboard.set((active && vehicle) ? getVehicleSettings(vehicle[0], CopyFilter.All) : null);
+		}
+	}
+
+	/**
+	 * Pastes the vehicle settings on the clipboard to the currently selected vehicle.
+	 */
+	_paste(): void
+	{
+		if (!this._isOpen)
+		{
+			return;
+		}
+
+		const vehicle = this._selectedVehicle.get();
+		const settings = this._clipboard.get();
+		if (vehicle && settings)
+		{
+			applyToTargets(settings, [[ vehicle[0]._id, 1 ]]);
+		}
+	}
+
+	/**
+	 * Locates the currently selected vehicle on the main viewport.
+	 */
+	_locate(): void
+	{
+		const vehicle = this._selectedVehicle.get();
+		if (this._isOpen && vehicle)
+		{
+			locate(vehicle[0]);
+		}
 	}
 
 	/**
@@ -330,7 +456,7 @@ export class VehicleViewModel
 				if (currentVehicle)
 				{
 					// Reselect same vehicle
-					this._select(currentVehicle[0]._car());
+					this._selectCar(currentVehicle[0]._car());
 				}
 				else if (currentRide)
 				{

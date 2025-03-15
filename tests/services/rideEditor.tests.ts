@@ -4,7 +4,7 @@ import test from "ava";
 import Mock from "openrct2-mocks";
 import { ParkRide } from "../../src/objects/parkRide";
 import { RideLifeCycleFlags } from "../../src/objects/rideLifeCycleFlags";
-import { initActions } from "../../src/services/actions";
+import { registerActions } from "../../src/services/actions";
 import { setBuildMonth, setBuildYear, setCustomDesign, setExcitementRating, setFrozenRatings, setIndestructable, setIntensityRating, setNauseaRating } from "../../src/services/rideEditor";
 
 
@@ -23,7 +23,7 @@ test.before(() =>
 	globalThis.context = Mock.context({
 		getTypeIdForAction: () => 80
 	});
-	initActions();
+	registerActions();
 });
 
 

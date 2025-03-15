@@ -3,17 +3,31 @@ import { isDevelopment, pluginVersion } from "../environment";
 import { RideVehicleVariant, VehicleVisibility } from "../objects/rideVehicleVariant";
 import { invoke, refreshRide } from "../services/events";
 import { applyToTargets, CopyFilter, getTargets, getVehicleSettings } from "../services/vehicleCopier";
-import { dragToolId, toggleVehicleDragger } from "../services/vehicleDragger";
 import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setReversed, setRideType, setSeatCount, setSecondaryColour, setSpin, setTertiaryColour, setVariant } from "../services/vehicleEditor";
-import { locate } from "../services/vehicleLocater";
-import { pickerToolId, toggleVehiclePicker } from "../services/vehiclePicker";
-import { cancelTools } from "../utilities/tools";
+import { isValidGameVersion } from "../services/versionChecker";
 import { VehicleViewModel } from "../viewmodels/vehicleViewModel";
 import { model as rideModel, rideWindow } from "./rideWindow";
 import { labelled, labelledSpinner, LabelledSpinnerParams, multiplier } from "./utilityControls";
 
 
-const model = new VehicleViewModel();
+/**
+ * Opens the ride editor window.
+ */
+export function openEditorWindow(): void
+{
+	// Check if game is up-to-date...
+	if (isValidGameVersion())
+	{
+		// Show the current instance if one is active.
+		mainWindow.open();
+	}
+}
+
+/**
+ * The viewmodel for the vehicle editor.
+ */
+export const model = new VehicleViewModel();
+
 const buttonSize = 24;
 const controlsWidth = 244;
 const controlsLabelWidth = 82;
@@ -33,8 +47,7 @@ model._selectedRide.subscribe(r =>
 	rideWindow.focus();
 });
 
-
-export const mainWindow = window({
+const mainWindow = window({
 	title,
 	width: { value: 515, min: 515, max: 560 },
 	height: 407,
@@ -42,7 +55,6 @@ export const mainWindow = window({
 	onOpen: () => model._open(),
 	onClose: () =>
 	{
-		cancelTools(pickerToolId, dragToolId);
 		rideWindow.close();
 		model._close();
 	},
@@ -75,7 +87,7 @@ export const mainWindow = window({
 					disabledMessage: "No rides in this park",
 					autoDisable: "empty",
 					selectedIndex: compute(model._selectedRide, r => r ? r[1] : 0),
-					onChange: idx => model._selectedRide.set([model._rides.get()[idx], idx]),
+					onChange: idx => model._selectRide(idx),
 				}),
 				dropdownSpinner({ // train list
 					items: compute(model._trains, c => c.map((t, i) => ("Train " + (t._special ? "?" : (i + 1))))),
@@ -84,7 +96,7 @@ export const mainWindow = window({
 					disabledMessage: "No trains available",
 					autoDisable: "single",
 					selectedIndex: compute(model._selectedTrain, t => t ? t[1] : 0),
-					onChange: idx => model._selectedTrain.set([model._trains.get()[idx], idx]),
+					onChange: idx => model._selectTrain(idx),
 				}),
 				dropdownSpinner({ // vehicle list
 					items: compute(model._vehicles, c => c.map((_, i) => ("Vehicle " + (i + 1)))),
@@ -110,8 +122,8 @@ export const mainWindow = window({
 									width: buttonSize, height: buttonSize,
 									tooltip: "Use the picker to select a vehicle by clicking it",
 									image: "eyedropper", // SPR_G2_EYEDROPPER
-									isPressed: twoway(model._isPicking),
-									onChange: pressed => toggleVehiclePicker(pressed, c => model._select(c), () => model._isPicking.set(false))
+									isPressed: model._isPicking,
+									onChange: pressed => model._setPicker(pressed)
 								}),
 								toggle({
 									width: buttonSize, height: buttonSize,
@@ -119,7 +131,7 @@ export const mainWindow = window({
 									image: 5174, // SPR_PICKUP_BTN
 									isPressed: twoway(model._isDragging),
 									disabled: model._isPositionDisabled,
-									onChange: pressed => toggleVehicleDragger(pressed, model._selectedVehicle, model._x, model._y, model._z, () => model._isDragging.set(false))
+									onChange: pressed => model._setDragger(pressed)
 								}),
 								toggle({
 									width: buttonSize, height: buttonSize,
@@ -127,39 +139,21 @@ export const mainWindow = window({
 									image: "copy", // SPR_G2_COPY,
 									disabled: model._isEditDisabled,
 									isPressed: compute(model._clipboard, clip => !!clip),
-									onChange: pressed =>
-									{
-										const vehicle = model._selectedVehicle.get();
-										model._clipboard.set((pressed && vehicle) ? getVehicleSettings(vehicle[0], CopyFilter.All) : null);
-									}
+									onChange: pressed => model._copy(pressed)
 								}),
 								button({
 									width: buttonSize, height: buttonSize,
 									tooltip: "Pastes the previously copied vehicle settings over the currently selected vehicle",
 									image: "paste", // SPR_G2_PASTE,
 									disabled: compute(model._isEditDisabled, model._clipboard, (edit, clip) => edit || !clip),
-									onClick: () =>
-									{
-										const vehicle = model._selectedVehicle.get(), settings = model._clipboard.get();
-										if (vehicle && settings)
-										{
-											applyToTargets(settings, [[ vehicle[0]._id, 1 ]]);
-										}
-									}
+									onClick: () => model._paste()
 								}),
 								button({
 									width: buttonSize, height: buttonSize,
 									tooltip: "Locate your vehicle when you've lost it (again)",
 									image: 5167, // SPR_LOCATE,
 									disabled: model._isEditDisabled,
-									onClick: () =>
-									{
-										const vehicle = model._selectedVehicle.get();
-										if (vehicle)
-										{
-											locate(vehicle[0]);
-										}
-									}
+									onClick: () => model._locate()
 								}),
 							]
 						}),

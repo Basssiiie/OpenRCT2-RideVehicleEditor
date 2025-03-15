@@ -4,7 +4,7 @@ import test from "ava";
 import Mock from "openrct2-mocks";
 import { ParkRide } from "../../src/objects/parkRide";
 import { RideVehicle } from "../../src/objects/rideVehicle";
-import { initActions } from "../../src/services/actions";
+import { registerActions } from "../../src/services/actions";
 import { applyToTargets, CopyFilter, CopyOptions, getTargets, getVehicleSettings, VehicleSettings } from "../../src/services/vehicleCopier";
 
 
@@ -203,7 +203,7 @@ function initActionTestHelpers(permissions: PermissionType[] = [ "ride_propertie
 	globalThis.network = Mock.network({
 		groups: [ Mock.playerGroup({ permissions })]
 	});
-	initActions();
+	registerActions();
 }
 
 
