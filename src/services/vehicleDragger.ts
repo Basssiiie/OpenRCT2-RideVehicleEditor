@@ -208,7 +208,7 @@ function updateVehicleDrag(args: DragVehicleArgs): void
 	const position = args.position;
 	const progress = position.progress;
 	if (isNumber(position.trackElementIndex) && isNumber(progress)) {
-		car.moveToTrack({x: position.x-16, y: position.y-16}, position.trackElementIndex);
+		car.moveToTrack(position.x-16, position.y-16, position.trackElementIndex);
 		car.travelBy(getDistanceFromProgress(car, progress - car.trackProgress));
 	}
 	else
