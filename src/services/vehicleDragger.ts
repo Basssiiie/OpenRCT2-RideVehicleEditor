@@ -208,7 +208,7 @@ function updateVehicleDrag(args: DragVehicleArgs): void
 	const position = args.position;
 	const progress = position.progress;
 	if (isNumber(position.trackElementIndex) && isNumber(progress)) {
-		car.moveToTrack(position.x-16, position.y-16, position.trackElementIndex);
+		car.moveToTrack(tileCoordinate(position.x), tileCoordinate(position.y-16), position.trackElementIndex);
 		car.travelBy(getDistanceFromProgress(car, progress - car.trackProgress));
 	}
 	else
@@ -227,4 +227,12 @@ function updateVehicleDrag(args: DragVehicleArgs): void
 function alignWithMap(coordinate: number): number
 {
 	return floor(coordinate / 32) * 32;
+}
+
+/**
+ * Align the coordinate with the edge of a map tile.
+ */
+function tileCoordinate(coordinate: number): number
+{
+	return floor(coordinate / 32);
 }
