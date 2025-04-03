@@ -2,8 +2,7 @@ import { Store } from "openrct2-flexui";
 import { isMultiplayer } from "../environment";
 import { getCarById, RideVehicle } from "../objects/rideVehicle";
 import * as Log from "../utilities/logger";
-import { getTileElement } from "../utilities/map";
-import { floor } from "../utilities/math";
+import { alignWithMap, getTileElement, toTileUnit } from "../utilities/map";
 import { cancelCurrentTool, cancelTools } from "../utilities/tools";
 import { isNumber, isUndefined } from "../utilities/type";
 import { register } from "./actions";
@@ -209,8 +208,9 @@ function updateVehicleDrag(args: DragVehicleArgs): void
 
 	const position = args.position;
 	const progress = position.progress;
-	if (isNumber(position.trackElementIndex) && isNumber(progress)) {
-		car.moveToTrack(tileCoordinate(position.x), tileCoordinate(position.y-16), position.trackElementIndex);
+	if (isNumber(position.trackElementIndex) && isNumber(progress))
+	{
+		car.moveToTrack(toTileUnit(position.x), toTileUnit(position.y), position.trackElementIndex);
 		car.travelBy(getDistanceFromProgress(car, progress - car.trackProgress));
 	}
 	else
@@ -221,20 +221,4 @@ function updateVehicleDrag(args: DragVehicleArgs): void
 	}
 
 	invoke(refreshVehicle, id);
-}
-
-/**
- * Align the coordinate with the edge of a map tile.
- */
-function alignWithMap(coordinate: number): number
-{
-	return floor(coordinate / 32) * 32;
-}
-
-/**
- * Align the coordinate with the edge of a map tile.
- */
-function tileCoordinate(coordinate: number): number
-{
-	return floor(coordinate / 32);
 }
