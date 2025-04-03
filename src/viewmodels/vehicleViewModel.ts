@@ -302,7 +302,7 @@ export class VehicleViewModel
 	{
 		if (this._isOpen)
 		{
-			toggleVehicleDragger(active, this._selectedVehicle, this._x, this._y, this._z, this._trackLocation, this._trackProgress, () => this._isDragging.set(false))
+			toggleVehicleDragger(active, this._selectedVehicle, this._x, this._y, this._z, this._trackLocation, this._trackProgress, () => this._isDragging.set(false));
 		}
 	}
 
