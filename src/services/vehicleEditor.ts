@@ -2,7 +2,6 @@ import { Colour } from "openrct2-flexui";
 import { getRideObject, RideType } from "../objects/rideType";
 import * as Log from "../utilities/logger";
 import { register } from "./actions";
-import { getDistanceFromProgress } from "./spacingEditor";
 import { forEachVehicle, VehicleSpan } from "./vehicleSpan";
 
 
@@ -247,7 +246,7 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 		{
 			callback = (car): void =>
 			{
-				moveCar(car, getDistanceFromProgress(car, value));
+				moveCar(car, value);
 			};
 			break;
 		}
@@ -255,7 +254,7 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 		{
 			callback = (car, index): void =>
 			{
-				moveCar(car, getDistanceFromProgress(car, value * -(index + 1)));
+				moveCar(car, value * -(index + 1));
 			};
 			break;
 		}

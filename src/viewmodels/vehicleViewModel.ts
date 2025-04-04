@@ -102,14 +102,18 @@ export class VehicleViewModel
 		{
 			if (!this._isOpen)
 			{
-				Log.debug("[VehicleViewModel] Refresh ignored, window not open.");
+				Log.debug("[VehicleViewModel] Refresh of vehicle", id, "ignored, window not open.");
 				return;
 			}
-			Log.debug("[VehicleViewModel] Refresh vehicle!");
 			const vehicle = this._selectedVehicle.get();
 			if (vehicle && vehicle[0]._id === id)
 			{
+				Log.debug("[VehicleViewModel] Refresh of vehicle:", id, "(selected)");
 				this._updateVehicleInfo(vehicle[0], vehicle[1]);
+			}
+			else
+			{
+				Log.debug("[VehicleViewModel] Refresh of vehicle:", id);
 			}
 		});
 	}

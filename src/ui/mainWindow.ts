@@ -2,8 +2,10 @@ import { button, checkbox, CheckboxParams, colourPicker, compute, dropdown, drop
 import { isDevelopment, pluginVersion } from "../environment";
 import { RideVehicleVariant, VehicleVisibility } from "../objects/rideVehicleVariant";
 import { invoke, refreshRide } from "../services/events";
+import { getDistanceFromProgress } from "../services/spacingEditor";
 import { applyToTargets, CopyFilter, getTargets, getVehicleSettings } from "../services/vehicleCopier";
 import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setReversed, setRideType, setSeatCount, setSecondaryColour, setSpin, setTertiaryColour, setVariant } from "../services/vehicleEditor";
+import { VehicleSpan } from "../services/vehicleSpan";
 import { isValidGameVersion } from "../services/versionChecker";
 import { VehicleViewModel } from "../viewmodels/vehicleViewModel";
 import { model as rideModel, rideWindow } from "./rideWindow";
@@ -330,7 +332,7 @@ const mainWindow = window({
 								disabled: model._isEditDisabled,
 								step: model._multiplier,
 								value: twoway(model._trackProgress),
-								onChange: (_, incr) => model._modifyVehicle(changeTrackProgress, incr)
+								onChange: (_, incr) => applyTrackProgressChange(changeTrackProgress, incr)
 							}),
 							labelSpinner({
 								_label: { text: "Spacing:" },
@@ -343,7 +345,7 @@ const mainWindow = window({
 									const spacing = model._spacing.get();
 									return (spacing === null) ? "Too far away" : spacing.toString();
 								},
-								onChange: (_, incr) => model._modifyVehicle(changeSpacing, incr)
+								onChange: (_, incr) => applyTrackProgressChange(changeSpacing, incr)
 							}),
 							positionSpinner({
 								_label: { text: "X position:" },
@@ -464,6 +466,19 @@ function applySelectedSettingsToRide(): void
 			getVehicleSettings(vehicle[0], model._copyFilters.get()),
 			getTargets(model._copyTargetOption.get(), model._selectedRide.get(), model._selectedTrain.get(), vehicle)
 		);
+	}
+}
+
+/**
+ * Apply the same amount of track progress to all selected vehicles based on the currently selected car.
+ */
+function applyTrackProgressChange(action: (vehicles: VehicleSpan[], value: number) => void, increment: number): void
+{
+	const selectedVehicle = model._selectedVehicle.get();
+	if (selectedVehicle)
+	{
+		const distance = getDistanceFromProgress(selectedVehicle[0]._car(), increment);
+		model._modifyVehicle(action, distance);
 	}
 }
 
