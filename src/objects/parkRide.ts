@@ -26,6 +26,8 @@ export class ParkRide
 	private _rideObj?: Ride | null;
 	private _trainsObj?: RideTrain[] | null;
 
+	_missing?: boolean;
+
 
 	/**
 	 * Creates a new park ride object.

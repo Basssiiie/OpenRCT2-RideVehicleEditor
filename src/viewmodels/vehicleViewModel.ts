@@ -71,13 +71,25 @@ export class VehicleViewModel
 	private _isRefreshing?: boolean;
 	private _onPlayerAction?: IDisposable;
 	private _onGameTick?: IDisposable;
+	private _missingRideEntity?: ParkRide;
 
 	constructor()
 	{
-		this._rides.subscribe(r => updateSelectionOrNull(this._selectedRide, r));
-		this._trains.subscribe(t => updateSelectionOrNull(this._selectedTrain, t));
-		this._vehicles.subscribe(v => updateSelectionOrNull(this._selectedVehicle, v));
-
+		this._rides.subscribe(r =>
+		{
+			Log.debug("rides.set():", r);
+			updateSelectionOrNull(this._selectedRide, r);
+		});
+		this._trains.subscribe(t =>
+		{
+			Log.debug("trains.set():", t);
+			updateSelectionOrNull(this._selectedTrain, t);
+		});
+		this._vehicles.subscribe(v =>
+		{
+			Log.debug("vehicles.set():", v);
+			updateSelectionOrNull(this._selectedVehicle, v);
+		});
 		this._selectedVehicle.subscribe(vehicle =>
 		{
 			cancelTools(dragToolId);
@@ -156,6 +168,7 @@ export class VehicleViewModel
 		}
 
 		this._selectedRide.set([rides[idx], idx]);
+		this._checkMissingRideEntry(this._missingRideEntity, rides);
 	}
 
 	/**
@@ -197,36 +210,65 @@ export class VehicleViewModel
 	 */
 	_selectCar(car: Car): void
 	{
-		const
-			rides = this._rides.get(),
-			carId = car.id,
-			rideId = car.ride,
-			carRideIndex = findIndex(rides, r => r._id === rideId);
+		const rides = this._rides.get();
+		const carId = car.id;
+		const rideId = car.ride;
+		const carRideIndex = findIndex(rides, r => r._id === rideId);
+		const selectedRide = this._selectedRide;
+		let trains: RideTrain[];
 
-		if (isNull(carRideIndex))
+		if (isNull(carRideIndex)) // Fallback for missing ride id.
 		{
-			Log.debug("Could not find ride id", rideId, "for selected entity id", carId);
-			return;
-		}
+			Log.debug("Could not find ride id", rideId, "for selected entity id", carId, ", adding special ride");
+			const missingRide = this._missingRideEntity ||= new ParkRide(<never>{
+				id: -1,
+				name: "(missing ride)",
+				vehicles: []
+			});
+			const missingRideIdx = rides.indexOf(missingRide);
+			missingRide._missing = true;
 
-		this._selectedRide.set([ rides[carRideIndex], carRideIndex ]);
-
-		const trains = this._trains.get();
-		for (let t = 0; t < trains.length; t++)
-		{
-			const vehicles = trains[t]._vehicles();
-			for (let v = 0; v < vehicles.length; v++)
+			if (missingRideIdx === -1) // Add to rides list, if not there yet.
 			{
-				if (vehicles[v]._id === carId)
+				this._rides.set(rides.concat(missingRide));
+				selectedRide.set([ missingRide, rides.length ]);
+			}
+			else // Else try to select it if not yet selected
+			{
+				const selected = selectedRide.get();
+				if (!selected || selected[0] !== missingRide)
 				{
-					this._selectedTrain.set([ trains[t], t ]);
-					this._selectedVehicle.set([ vehicles[v], v ]);
-					return;
+					selectedRide.set([ missingRide, missingRideIdx ]);
 				}
 			}
+
+			trains = [];
+		}
+		else
+		{
+			this._checkMissingRideEntry(this._missingRideEntity, rides);
+
+			selectedRide.set([ rides[carRideIndex], carRideIndex ]);
+			trains = this._trains.get();
+
+			for (let t = 0; t < trains.length; t++)
+			{
+				const vehicles = trains[t]._vehicles();
+				for (let v = 0; v < vehicles.length; v++)
+				{
+					if (vehicles[v]._id === carId)
+					{
+						this._selectedTrain.set([ trains[t], t ]);
+						this._selectedVehicle.set([ vehicles[v], v ]);
+						return;
+					}
+				}
+			}
+
+			Log.debug("Could not find vehicle entity id", carId, "on ride id", rideId, ", adding special train");
 		}
 
-		Log.debug("Could not find vehicle entity id", carId, "on ride id", rideId, ", adding special train");
+		// Fallback for creating unknown train.
 		const [specialTrain, carIndex] = createTrainFromAnyCar(car);
 		const vehicle = specialTrain._vehicles()[carIndex];
 
@@ -504,6 +546,18 @@ export class VehicleViewModel
 
 		Log.debug("<", action, ">\n\t- type:", event.type, "(client:", event.isClientOnly, ")\n\t- args:", JSON.stringify(event.args), "\n\t- result:", JSON.stringify(event.result));
 	}
+
+	/**
+	 * Removes the missing ride entry if it is present in the rides list.
+	 */
+	private _checkMissingRideEntry(missingRide: ParkRide | undefined, rides: ParkRide[]): void
+	{
+		if (missingRide && rides.indexOf(missingRide) != -1)
+		{
+			Log.debug("Clearing missing ride entry from rides list");
+			this._rides.set(rides.filter(ride => ride !== missingRide));
+		}
+	}
 }
 
 
@@ -519,7 +573,7 @@ function updateSelectionOrNull<T>(value: WritableStore<[T, number] | null>, item
 		const selectedIdx = (previous && previous[1] < items.length) ? previous[1] : 0;
 		selection = [ items[selectedIdx], selectedIdx ];
 	}
-	Log.debug("[updateSelectionOrNull] =>", selection);
+	Log.debug("updateSelectionOrNull():", selection);
 	value.set(selection);
 }
 

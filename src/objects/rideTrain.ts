@@ -36,7 +36,10 @@ export function createTrainFromAnyCar(car: Car): [RideTrain, number]
 		}
 		vehicles.push(new RideVehicle(currentCar));
 	}
-	return [new RideTrain(vehicles, true), carIndex];
+
+	const train = new RideTrain(vehicles);
+	train._special = true;
+	return [train, carIndex];
 }
 
 
@@ -46,9 +49,9 @@ export function createTrainFromAnyCar(car: Car): [RideTrain, number]
 export class RideTrain
 {
 	readonly _carId: number;
-	readonly _special?: boolean;
 	private _rideVehicles?: RideVehicle[] | null;
 
+	_special?: boolean;
 
 	/**
 	 * Creates a new train for a ride.
@@ -57,9 +60,9 @@ export class RideTrain
 	 * @param special Sets it as a special hidden train, which does not show up in
 	 * the regular ride window (like Giga lifthill entities).
 	 */
-	constructor(frontCarId: number, special?: boolean);
-	constructor(vehicles: RideVehicle[], special?: boolean);
-	constructor(param: number | RideVehicle[], special?: boolean)
+	constructor(frontCarId: number);
+	constructor(vehicles: RideVehicle[]);
+	constructor(param: number | RideVehicle[])
 	{
 		if (isNumber(param))
 		{
@@ -73,7 +76,6 @@ export class RideTrain
 			this._carId = param[0]._id;
 			this._rideVehicles = param;
 		}
-		this._special = special;
 	}
 
 

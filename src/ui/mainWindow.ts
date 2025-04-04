@@ -69,6 +69,7 @@ const mainWindow = window({
 					tooltip: "Changes properties of the ride, that are not related to its vehicles.",
 					width: 100,
 					height: 14,
+					disabled: compute(model._selectedRide, r => !r || !!r[0]._missing),
 					onClick: () =>
 					{
 						const ride = model._selectedRide.get();
