@@ -90,7 +90,7 @@ const mainWindow = window({
 					disabledMessage: "No rides in this park",
 					autoDisable: "empty",
 					selectedIndex: compute(model._selectedRide, r => r ? r[1] : 0),
-					onChange: idx => model._selectRide(idx),
+					onChange: idx => model._selectRide(idx)
 				}),
 				dropdownSpinner({ // train list
 					items: compute(model._trains, c => c.map((t, i) => ("Train " + (t._special ? "?" : (i + 1))))),
@@ -99,7 +99,7 @@ const mainWindow = window({
 					disabledMessage: "No trains available",
 					autoDisable: "single",
 					selectedIndex: compute(model._selectedTrain, t => t ? t[1] : 0),
-					onChange: idx => model._selectTrain(idx),
+					onChange: idx => model._selectTrain(idx)
 				}),
 				dropdownSpinner({ // vehicle list
 					items: compute(model._vehicles, c => c.map((_, i) => ("Vehicle " + (i + 1)))),
@@ -108,7 +108,7 @@ const mainWindow = window({
 					disabledMessage: "No vehicles available",
 					autoDisable: "single",
 					selectedIndex: compute(model._selectedVehicle, v => v ? v[1] : 0),
-					onChange: idx => model._selectedVehicle.set([model._vehicles.get()[idx], idx]),
+					onChange: idx => model._selectedVehicle.set([model._vehicles.get()[idx], idx])
 				})
 			])
 		]),
@@ -157,14 +157,14 @@ const mainWindow = window({
 									image: 5167, // SPR_LOCATE,
 									disabled: model._isEditDisabled,
 									onClick: () => model._locate()
-								}),
+								})
 							]
 						}),
 						viewport({
 							tooltip: "I can see my house from here!",
 							target: compute(model._selectedVehicle, c => (c) ? c[0]._id : null),
-							disabled: model._isEditDisabled,
-						}),
+							disabled: model._isEditDisabled
+						})
 					]),
 					groupbox({
 						text: "Apply & synchronize",
@@ -195,7 +195,7 @@ const mainWindow = window({
 										tooltip: "Copy the selected spacing to other vehicles.",
 										isChecked: compute(model._copyFilters, f => !!(f & CopyFilter.Spacing)),
 										onChange: c => model._setFilter(CopyFilter.Spacing, c)
-									}),
+									})
 								]),
 								vertical([
 									checkbox({
@@ -221,7 +221,7 @@ const mainWindow = window({
 										tooltip: "Copy the selected maximum powered speed to other vehicles.",
 										isChecked: compute(model._copyFilters, f => !!(f & CopyFilter.PoweredMaxSpeed)),
 										onChange: c => model._setFilter(CopyFilter.PoweredMaxSpeed, c)
-									}),
+									})
 								])
 							]),
 							dropdown({
@@ -232,7 +232,7 @@ const mainWindow = window({
 									"All vehicles on all trains",
 									"Preceding vehicles on all trains",
 									"Following vehicles on all trains",
-									"Same vehicle number on all trains",
+									"Same vehicle number on all trains"
 								],
 								tooltip: applyOptionsTip,
 								selectedIndex: model._copyTargetOption,
@@ -284,7 +284,7 @@ const mainWindow = window({
 								wrapMode: "wrap",
 								disabled: compute(model._isEditDisabled, model._variants, (noEdit, variants) => (noEdit || variants.length < 2)),
 								selectedIndex: model._variant,
-								onChange: value => model._modifyVehicle(setVariant, value),
+								onChange: value => model._modifyVehicle(setVariant, value)
 							}),
 							labelled<CheckboxParams>({
 								_control: checkbox,
@@ -299,7 +299,7 @@ const mainWindow = window({
 									text: "Colours:",
 									tooltip: "The three important boxes that make the vehicle pretty on demand.",
 									width: controlsLabelWidth,
-									disabled: model._isEditDisabled,
+									disabled: model._isEditDisabled
 								}),
 								colourPicker({
 									tooltip: "The primary (body) colour of the vehicle.",
@@ -353,7 +353,7 @@ const mainWindow = window({
 								step: model._multiplier,
 								value: model._x,
 								format: model._formatPosition,
-								onChange: value => model._modifyVehicle(setPositionX, value),
+								onChange: value => model._modifyVehicle(setPositionX, value)
 							}),
 							positionSpinner({
 								_label: { text: "Y position:" },

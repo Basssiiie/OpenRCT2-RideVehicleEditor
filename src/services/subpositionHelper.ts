@@ -13,11 +13,11 @@ const subpositionTranslationDistances =
 	6554,   // Z translation
 	10905,  // XZ translation
 	10905,  // YZ translation
-	13961,  // XYZ translation
+	13961   // XYZ translation
 ];
 
 
-const distanceCache: Record<string, TrackDistances> = {};
+const distanceCache: Record<string, TrackDistances | undefined> = {};
 
 
 /**

@@ -5,7 +5,7 @@ import { isNull } from "./type";
  * @param array The array to check.
  * @param index The index to check.
  */
-export function isValidIndex<T>(array: T[] | null, index: number | null): boolean
+export function isValidIndex(array: unknown[] | null, index: number | null): boolean
 {
 	return (array != null && index != null && index >= 0 && index < array.length);
 }
@@ -68,7 +68,7 @@ export function orderByName(left: { name: string }, right: { name: string }): nu
 /**
  * Sorting function that can order an array by name alphabetically, followed by order by id if the names are equal.
  */
-export function orderByNameThenById(left: { id: number, name: string }, right: { id: number, name: string }): number
+export function orderByNameThenById(left: { id: number; name: string }, right: { id: number; name: string }): number
 {
 	return orderByName(left, right) || left.id - right.id;
 }
@@ -76,7 +76,7 @@ export function orderByNameThenById(left: { id: number, name: string }, right: {
 /**
  * Sorting function that can order an array by name alphabetically, followed by order by identifier if the names are equal.
  */
-export function orderByNameThenByIdentifier(left: { identifier: string, name: string }, right: { identifier: string, name: string }): number
+export function orderByNameThenByIdentifier(left: { identifier: string; name: string }, right: { identifier: string; name: string }): number
 {
 	return orderByName(left, right) || left.identifier.localeCompare(right.identifier);
 }

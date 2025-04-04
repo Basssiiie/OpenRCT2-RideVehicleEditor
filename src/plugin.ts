@@ -11,5 +11,5 @@ registerPlugin({
 	type: "remote",
 	licence: "MIT",
 	targetApiVersion: 75,
-	main,
+	main
 });

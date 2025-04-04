@@ -92,7 +92,7 @@ test("Ride vehicle is powered", t =>
 {
 	globalThis.context = Mock.context({ objects: [
 		Mock.rideObject({ index: 24, name: "Monorail", vehicles: [
-			Mock.rideObjectVehicle({ flags: (1 << 19) }),
+			Mock.rideObjectVehicle({ flags: (1 << 19) })
 		]})
 	]});
 	globalThis.map = Mock.map({ entities: [
@@ -109,7 +109,7 @@ test("Ride vehicle is not powered", t =>
 {
 	globalThis.context = Mock.context({ objects: [
 		Mock.rideObject({ index: 9, name: "Monorail", vehicles: [
-			Mock.rideObjectVehicle({ flags: (1 << 18) }),
+			Mock.rideObjectVehicle({ flags: (1 << 18) })
 		]})
 	]});
 	globalThis.map = Mock.map({ entities: [

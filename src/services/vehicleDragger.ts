@@ -59,7 +59,7 @@ export function toggleVehicleDragger(isPressed: boolean, storeVehicle: Store<[Ri
 			{
 				Log.debug("Selected position:", JSON.stringify(position));
 				updateCarPosition(rideVehicle, position, DragState.Dragging);
-				ui.tileSelection.tiles = [{ x: alignWithMap(position.x), y : alignWithMap(position.y) }];
+				ui.tileSelection.tiles = [{ x: alignWithMap(position.x), y: alignWithMap(position.y) }];
 				lastPosition = position;
 			}
 		},
@@ -98,7 +98,7 @@ const enum DragState
  */
 interface DragPosition extends CoordsXYZ
 {
-	trackElementIndex?: number | null
+	trackElementIndex?: number | null;
 	progress?: number | null;
 }
 

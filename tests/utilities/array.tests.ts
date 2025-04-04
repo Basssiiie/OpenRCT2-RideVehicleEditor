@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import test from "ava";
 import * as ArrayHelper from "../../src/utilities/array";
 

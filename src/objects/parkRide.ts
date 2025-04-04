@@ -56,7 +56,7 @@ export class ParkRide
 	{
 		Log.debug("Park ride refresh()");
 		this._trainsObj = null;
-		const ride = map.getRide(this._id);
+		const ride = <Ride | null>map.getRide(this._id);
 		if (ride)
 		{
 			this._rideObj = ride;
@@ -73,7 +73,8 @@ export class ParkRide
 	_ride(): Ride
 	{
 		Log.assert(!!this._rideObj, "Selected ride with id", this._id, "is missing.");
-		return <Ride>this._rideObj;
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		return this._rideObj!;
 	}
 
 

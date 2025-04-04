@@ -1,3 +1,4 @@
+/* eslint-disable @stylistic/ts/indent */
 /// <reference path="../../lib/openrct2.d.ts" />
 
 import test from "ava";
@@ -16,7 +17,7 @@ class TrackPiece
 		public subpositions: CoordsXYZ[])
 	{}
 
-	copyTo(x: number, y: number, z: number = 0, direction: Direction = 0): TrackPiece
+	copyTo(x: number, y: number, z = 0, direction: Direction = 0): TrackPiece
 	{
 		return new TrackPiece({ x, y, z, direction }, this.type, this.subpositions);
 	}
@@ -59,7 +60,7 @@ function setupTrackIterator(trackPieces: TrackPiece[], trackStartIndex?: number)
 				trackPieces: trackPieces.map(piece => <TrackPieceMock>({ trackType: piece.type, location: piece.position })),
 				trackPieceIndex: trackStartIndex || 0
 			});
-		},
+		}
 	});
 	globalThis.map = mock;
 	return mock;
@@ -307,19 +308,19 @@ test(curvyTest, 1, -1, -8716);
 //       | . . .
 const rightTurn1TrackPiece = new TrackPiece({ x: 32, y: 32, z: 8, direction: 0 }, 10,
 [
-	{ x: 16, y: 0, z: 0 }, { x: 31, y: 16, z: 0 },
+	{ x: 16, y: 0, z: 0 }, { x: 31, y: 16, z: 0 }
 ]);
 const rightTurn2TrackPiece = new TrackPiece({ x: 64, y: 32, z: 8, direction: 1 }, 11,
 [
-	{ x: 0, y: 16, z: 0 }, { x: 16, y: 31, z: 0 },
+	{ x: 0, y: 16, z: 0 }, { x: 16, y: 31, z: 0 }
 ]);
 const steepUpTrackPiece = new TrackPiece({ x: 64, y: 64, z: 8, direction: 2 }, 12,
 [
-	{ x: 16, y: 0, z: 0 }, { x: 16, y: 31, z: 23 },
+	{ x: 16, y: 0, z: 0 }, { x: 16, y: 31, z: 23 }
 ]);
 const steepTurnTrackPiece = new TrackPiece({ x: 64, y: 96, z: 32, direction: 2 }, 13,
 [
-	{ x: 16, y: 0, z: 0 }, { x: 31, y: 16, z: 63 },
+	{ x: 16, y: 0, z: 0 }, { x: 31, y: 16, z: 63 }
 ]);
 
 const multiTurnTest = test.macro({
@@ -387,11 +388,11 @@ test("Flat track: move backwards by 1 and account for remaining distance cap", t
 
 const steepToSlopedDownwardsTrackPiece = new TrackPiece({ x: 64, y: 64, z: 16, direction: 2 }, 21,
 [
-	{ x: 16, y: 0, z: 31 }, { x: 16, y: 10, z: 16 }, { x: 16, y: 32, z: 0 },
+	{ x: 16, y: 0, z: 31 }, { x: 16, y: 10, z: 16 }, { x: 16, y: 32, z: 0 }
 ]);
 const slopedToFlatDownwardsTrackPiece = new TrackPiece({ x: 64, y: 96, z: 8, direction: 2 }, 22,
 [
-	{ x: 16, y: 0, z: 8 }, { x: 16, y: 16, z: 1 }, { x: 16, y: 31, z: 0 },
+	{ x: 16, y: 0, z: 8 }, { x: 16, y: 16, z: 1 }, { x: 16, y: 31, z: 0 }
 ]);
 
 test("Downward slope: move extra step forward if end point overlaps with start point", t =>
@@ -424,7 +425,7 @@ function createTrain(mapMock: GameMapMock, cars: Partial<Car>[]): RideTrain
 	for (let idx = length - 1; idx >= 0; idx--)
 	{
 		const mock =  Mock.car(cars[idx]);
-		mock.x = <number>mock.id; // break caching
+		mock.x = mock.id!; // break caching
 		mock.y = Math.floor(Math.random() * 0xFFFF_FFFF_FFFF);
 		mock.nextCarOnTrain = lastId;
 		lastId = mock.id;

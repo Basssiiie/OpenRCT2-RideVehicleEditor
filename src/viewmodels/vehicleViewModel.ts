@@ -305,7 +305,7 @@ export class VehicleViewModel
 		}
 		else
 		{
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
 			Log.debug("Failed to modify vehicle with", (<any>action).name, "to", value, "; none is selected.");
 		}
 	}
@@ -329,7 +329,8 @@ export class VehicleViewModel
 	_setPicker(active: boolean, onSelect?: () => void): void
 	{
 		this._isPicking.set(true);
-		toggleVehiclePicker(active, c =>
+		toggleVehiclePicker(
+			active, c =>
 			{
 				if (onSelect)
 				{
@@ -421,7 +422,8 @@ export class VehicleViewModel
 			typeIdx = findIndex(types, t => t._id === gigaCableLiftHillTypeId);
 			Log.assert(!isNull(typeIdx));
 
-			type = [ gigaCableLiftHillType, <number>typeIdx ];
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			type = [ gigaCableLiftHillType, typeIdx! ];
 			this._rideTypes.set(types);
 		}
 		else
@@ -486,7 +488,7 @@ export class VehicleViewModel
 		{
 			return;
 		}
-		const action = event.action as ActionType;
+		const action = <ActionType>event.action;
 		switch (action)
 		{
 			case "ridecreate":

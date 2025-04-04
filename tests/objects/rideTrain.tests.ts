@@ -25,7 +25,7 @@ test("Ride train gets created from multiple car ids", t =>
 		Mock.car({ id: 12 }),
 		Mock.car({ id: 15, nextCarOnTrain: 66 }),
 		Mock.car({ id: 7, nextCarOnTrain: 12 }),
-		Mock.car({ id: 66, nextCarOnTrain: 7 }),
+		Mock.car({ id: 66, nextCarOnTrain: 7 })
 	]});
 
 	const rideTrain = new RideTrain(15);
@@ -55,7 +55,7 @@ test("Ride train with invalid head car id fails", t =>
 test("Ride train with invalid car id in train ends train", t =>
 {
 	globalThis.map = Mock.map({ entities: [
-		Mock.car({ id: 6, nextCarOnTrain: invalidId }),
+		Mock.car({ id: 6, nextCarOnTrain: invalidId })
 	]});
 
 	const rideTrain = new RideTrain(6);
@@ -77,7 +77,7 @@ const atIndexTest = test.macro({
 			Mock.car({ id: 5, nextCarOnTrain: 7 }),
 			Mock.car({ id: 6 }),
 			Mock.car({ id: 8, nextCarOnTrain: 5 }),
-			Mock.car({ id: 7, nextCarOnTrain: 6 }),
+			Mock.car({ id: 7, nextCarOnTrain: 6 })
 		]});
 
 		const rideTrain = new RideTrain(8);
@@ -104,7 +104,7 @@ const fromyAnyCarTest = test.macro({
 			Mock.car({ id: 5, nextCarOnTrain: 7, previousCarOnRide: 8 }),
 			Mock.car({ id: 6, previousCarOnRide: 7 }),
 			Mock.car({ id: 8, nextCarOnTrain: 5, previousCarOnRide: 6 }),
-			Mock.car({ id: 7, nextCarOnTrain: 6, previousCarOnRide: 5 }),
+			Mock.car({ id: 7, nextCarOnTrain: 6, previousCarOnRide: 5 })
 		]});
 
 		const car = map.getEntity(id);

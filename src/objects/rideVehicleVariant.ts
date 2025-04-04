@@ -5,7 +5,7 @@ export const enum VehicleVisibility
 {
 	GreenSquare,
 	Visible,
-	Invisible,
+	Invisible
 }
 
 /**

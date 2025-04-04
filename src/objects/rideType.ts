@@ -9,7 +9,7 @@ import { getVisibility, RideVehicleVariant } from "./rideVehicleVariant";
  */
 export function getAllRideTypes(): RideType[]
 {
-	return context
+	return objectManager
 		.getAllObjects("ride")
 		.filter(r => r.carsPerFlatRide !== 0) // tracked rides == 255, flatrides >= 1, shops == 0
 		.sort(orderByNameThenByIdentifier)
@@ -25,7 +25,7 @@ export function getRideObject(index: number): RideObject
 	{
 		return gigaCableLiftObject;
 	}
-	return context.getObject("ride", index);
+	return objectManager.getObject("ride", index);
 }
 
 
@@ -49,7 +49,7 @@ export class RideType
 		if (isNumber(param))
 		{
 			this._id = param;
-			this._rideObject = getRideObject(this._id) || null;
+			this._rideObject = <RideObject | null>getRideObject(this._id) || null;
 		}
 		else
 		{
@@ -64,7 +64,8 @@ export class RideType
 	_object(): RideObject
 	{
 		Log.assert(!!this._rideObject, "Selected ride object with id", this._id, "is missing.");
-		return <RideObject>this._rideObject;
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		return this._rideObject!;
 	}
 
 	/**
@@ -108,7 +109,7 @@ export class RideType
  */
 function gigaCableLiftHillEntry(mass: number, acceleration: number, maxSpeed: number, imageId: number, spriteSize: number): RideObjectVehicle
 {
-	return {
+	return <RideObjectVehicle>{
 		carMass: mass,
 		poweredAcceleration: acceleration,
 		poweredMaxSpeed: maxSpeed,
@@ -118,7 +119,7 @@ function gigaCableLiftHillEntry(mass: number, acceleration: number, maxSpeed: nu
 		spriteWidth: spriteSize,
 		spriteHeightPositive: spriteSize,
 		tabHeight: 0
-	} as RideObjectVehicle;
+	};
 }
 
 /**
@@ -129,8 +130,7 @@ export const gigaCableLiftHillTypeId = 65_535;
 /**
  * A cached object of the cable lift hill for the Giga Coaster.
  */
-const gigaCableLiftObject =
-{
+const gigaCableLiftObject = <RideObject>{
 	index: gigaCableLiftHillTypeId,
 	identifier: "rve.giga-lift",
 	name: "Giga Coaster Cable Lift Hill",
@@ -138,7 +138,7 @@ const gigaCableLiftObject =
 		gigaCableLiftHillEntry(100, 80, 20, 29_110, 10),
 		gigaCableLiftHillEntry(0, 0, 0, 0, 0)
 	]
-} as RideObject;
+};
 
 /**
  * A ride type for the cable lift hill of the Giga Coaster.

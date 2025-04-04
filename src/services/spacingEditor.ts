@@ -44,13 +44,13 @@ export function getDistanceFromProgress(car: Car, trackProgress: number): number
 		? new ForwardIterator(trackProgress, currentProgress)
 		: new BackwardIterator(abs(trackProgress), currentProgress);
 
-	Log.debug("Iterating", (trackProgress >= 0)?"foward":"backward", "from progress", currentProgress, "to", trackProgress);
+	Log.debug("Iterating", (trackProgress >= 0) ? "foward" : "backward", "from progress", currentProgress, "to", trackProgress);
 
 	let trackPosition: CoordsXYZD = currentTrackLocation;
 	let trackDistances = getTrackSegmentDistances(iteratorSegment, subposition, trackPosition.direction);
 	subpositionIterator._setInitialDistanceFromCarRemainingDistance(car.remainingDistance);
 
-	while (subpositionIterator._remainingProgress > 0 && iteratorSegment)
+	while (subpositionIterator._remainingProgress > 0)
 	{
 		Log.debug("getDistanceFromProgress(): remaining:", subpositionIterator._remainingProgress, ", total:", subpositionIterator._totalDistance);
 
@@ -264,9 +264,9 @@ abstract class SubpositionIterator
 	_distanceIndex: number;
 
 	/** Total distance travelled by the iterator. */
-	_totalDistance: number = 0;
+	_totalDistance = 0;
 
-	constructor (remainingProgress: number, currentProgress: number)
+	constructor(remainingProgress: number, currentProgress: number)
 	{
 		this._remainingProgress = remainingProgress;
 		this._distanceIndex = currentProgress;

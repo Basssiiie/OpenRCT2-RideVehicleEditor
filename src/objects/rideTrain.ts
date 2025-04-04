@@ -13,7 +13,7 @@ export function createTrainFromAnyCar(car: Car): [RideTrain, number]
 
 	// Insert all vehicles in front
 	let currentCar: Car | null = car, currentCarId: number | null;
-	while(!isNull(currentCarId = currentCar.previousCarOnRide))
+	while (!isNull(currentCarId = currentCar.previousCarOnRide))
 	{
 		currentCar = getCarById(currentCarId);
 		if (!currentCar || isNull(currentCar.nextCarOnTrain))
@@ -115,7 +115,8 @@ export class RideTrain
 	_vehicles(): RideVehicle[]
 	{
 		Log.assert(!!this._rideVehicles, "Selected train with car id", this._carId, "is missing.");
-		return <RideVehicle[]>this._rideVehicles;
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		return this._rideVehicles!;
 	}
 
 

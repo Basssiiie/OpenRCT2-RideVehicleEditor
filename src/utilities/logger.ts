@@ -22,7 +22,7 @@ const isDuktapeAvailable = (typeof Duktape !== "undefined");
 function print(level: LogLevel, messages: unknown[]): void
 {
 	const message = messages
-		.map(v => typeof v === "string" ? v : Duktape.enc('jx', v))
+		.map(v => typeof v === "string" ? v : Duktape.enc("jx", v))
 		.join(" ");
 
 	console.log(`\x1b[1;33m<RVE/${level}>\x1b[37m ${message}`);
@@ -40,7 +40,7 @@ function stacktrace(): string
 	}
 
 	const depth = -4; // skips act(), stacktrace() and the calling method.
-	let entry: DukStackEntry, result = "";
+	let entry: DukStackEntry | undefined, result = "";
 
 	for (let i = depth; (entry = Duktape.act(i)); i--)
 	{

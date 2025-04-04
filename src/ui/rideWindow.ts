@@ -100,7 +100,7 @@ export const rideWindow = window({
 					_control: label,
 					_label: { text: "Construction:", width: controlsLabelWidth },
 					text: compute(model._buildMonth, model._currentMonth, (build, current) => formatRelativeDate(build - current)),
-					tooltip: "The amount of time ago the ride was built, in months and years. Rides get older as well, just like you.",
+					tooltip: "The amount of time ago the ride was built, in months and years. Rides get older as well, just like you."
 				}),
 				checkbox({
 					text: "Custom design",
@@ -121,17 +121,19 @@ export const rideWindow = window({
 			tooltip: "Edit the name of the ride",
 			content: [
 				label({
-					text: model._title,
+					text: model._title
 				}),
 				button({
 					text: "Rename ride",
 					height: buttonSize,
-					onClick: () => {
+					onClick: () =>
+					{
 						ui.showTextInput({
 							title: "Ride/attraction name",
 							initialValue: model._title.get(),
-							description: "Enter new name for this ride/attraction:",							
-							callback: (input) => {
+							description: "Enter new name for this ride/attraction:",
+							callback: (input) =>
+							{
 								const ride = model._ride.get();
 								if (ride) context.executeAction("ridesetname", {ride: ride._id, name: input});
 							}

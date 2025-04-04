@@ -10,7 +10,7 @@ import { isPowered } from "./rideVehicleVariant";
  */
 export function getCarById(id: number): Car | null
 {
-	const entity = map.getEntity(id);
+	const entity = <Entity | null>map.getEntity(id);
 	return (entity && isCar(entity)) ? entity : null;
 }
 
@@ -77,7 +77,8 @@ export class RideVehicle
 	{
 		Log.assert(!!this._entity, "Selected car with id", this._id, "is missing.");
 		Log.assert(this._entity?.type === "car", "Selected car with id", this._id, "is not of type 'car', but of type", this._entity?.type);
-		return <Car>this._entity;
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		return this._entity!;
 	}
 
 	/**
@@ -92,7 +93,7 @@ export class RideVehicle
 
 		if (!this._vehicleObject || hash !== this._typeHash)
 		{
-			const rideObject = getRideObject(rideObj);
+			const rideObject = <RideObject | null>getRideObject(rideObj);
 			if (!rideObject)
 			{
 				return null;

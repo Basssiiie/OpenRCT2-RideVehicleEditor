@@ -19,7 +19,7 @@ interface Duktape
 	/**
 	 * Returns an entry on the call stack.
 	 */
-	act(depth: number): DukStackEntry;
+	act(depth: number): DukStackEntry | undefined;
 
 	/**
 	 * Encodes its argument value into chosen format.

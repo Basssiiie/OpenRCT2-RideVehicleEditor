@@ -1,10 +1,10 @@
 import { ParkRide } from "../objects/parkRide";
 import { RideTrain } from "../objects/rideTrain";
 import { RideVehicle } from "../objects/rideVehicle";
-import { register } from "./actions";
 import * as Log from "../utilities/logger";
-import { forEachVehicle, VehicleSpan } from "./vehicleSpan";
 import { isUndefined } from "../utilities/type";
+import { register } from "./actions";
+import { forEachVehicle, VehicleSpan } from "./vehicleSpan";
 
 
 const execute = register<PasteVehicleSettingsArgs>("rve-paste-car", pasteVehicleSettings);
@@ -21,22 +21,21 @@ export const enum CopyOptions
 	AllVehiclesOnAllTrains,
 	PrecedingVehiclesOnAllTrains,
 	FollowingVehiclesOnAllTrains,
-	SameVehicleOnAllTrains,
+	SameVehicleOnAllTrains
 }
 
 /**
  * The available copy options.
  */
-export const copyOptions =
-[
+export const copyOptions = <const>[
 	"All vehicles on this train",
 	"Preceding vehicles on this train",
 	"Following vehicles on this train",
 	"All vehicles on all trains",
 	"Preceding vehicles on all trains",
 	"Following vehicles on all trains",
-	"Same vehicle number on all trains",
-] as const;
+	"Same vehicle number on all trains"
+];
 
 
 /**
@@ -65,7 +64,7 @@ export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | n
 {
 	if (ride && train && vehicle)
 	{
-		switch(copyOption)
+		switch (copyOption)
 		{
 			case CopyOptions.AllVehiclesOnTrain:
 			{

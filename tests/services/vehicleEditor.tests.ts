@@ -28,8 +28,8 @@ test.before(() =>
 				Mock.rideObjectVehicle({ carMass: 800, numSeats: 10, poweredAcceleration: 40, poweredMaxSpeed: 35 }),
 				Mock.rideObjectVehicle({ carMass: 550, numSeats: 1 })
 			]}),
-			Mock.rideObject({ index: 55 ,vehicles: [
-				Mock.rideObjectVehicle({ carMass: 265, numSeats: 12 }),
+			Mock.rideObject({ index: 55, vehicles: [
+				Mock.rideObjectVehicle({ carMass: 265, numSeats: 12 })
 			]})
 		]
 	});

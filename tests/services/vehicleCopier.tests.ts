@@ -15,7 +15,7 @@ function createTrain(startIndex: number): Car[]
 		Mock.car({ id: startIndex++, nextCarOnTrain: startIndex }),
 		Mock.car({ id: startIndex++, nextCarOnTrain: startIndex }),
 		Mock.car({ id: startIndex++, nextCarOnTrain: startIndex }),
-		Mock.car({ id: startIndex }),
+		Mock.car({ id: startIndex })
 	];
 }
 
@@ -26,7 +26,7 @@ const getTargetsMacro = test.macro((t, option: CopyOptions, trainIndex: number, 
 		...createTrain(30),
 		...createTrain(20),
 		...createTrain(10),
-		...createTrain(40),
+		...createTrain(40)
 	]});
 	const ride = new ParkRide(Mock.ride({ vehicles: [ 10, 20, 30, 40 ] }));
 	const train = ride._trains()[trainIndex];
@@ -184,7 +184,7 @@ test("Get no powered settings of unpowered vehicle", t =>
 		rideObject: 28,
 		vehicleObject: 0,
 		poweredAcceleration: 10,
-		poweredMaxSpeed: 20,
+		poweredMaxSpeed: 20
 	});
 	const vehicle = new RideVehicle(car);
 
@@ -213,7 +213,7 @@ test("Paste all vehicle settings on single car", t =>
 	globalThis.map = Mock.map({ entities: [
 		Mock.car({ id: 98, rideObject: 2 }),
 		Mock.car({ id: 99, rideObject: 2 }),
-		Mock.car({ id: 97, rideObject: 2 }),
+		Mock.car({ id: 97, rideObject: 2 })
 	]});
 
 	const settings: VehicleSettings = {
@@ -247,7 +247,7 @@ test("Paste all vehicle settings on a car does not affect other cars", t =>
 	globalThis.map = Mock.map({ entities: [
 		Mock.car({ id: 98, rideObject: 2 }),
 		Mock.car({ id: 99, rideObject: 2 }),
-		Mock.car({ id: 97, rideObject: 2 }),
+		Mock.car({ id: 97, rideObject: 2 })
 	]});
 
 	const settings: VehicleSettings = {
@@ -286,7 +286,7 @@ test("Paste empty vehicle settings on single car does not do anything", t =>
 	globalThis.map = Mock.map({ entities: [
 		Mock.car({ id: 98, rideObject: 2 }),
 		Mock.car({ id: 99, rideObject: 2 }),
-		Mock.car({ id: 97, rideObject: 2 }),
+		Mock.car({ id: 97, rideObject: 2 })
 	]});
 
 	const settings: VehicleSettings = {};
@@ -310,7 +310,7 @@ test("Paste all vehicle settings on multiple trains car affects all", t =>
 		Mock.car({ id: 98, rideObject: 2, nextCarOnTrain: 99 }),
 		Mock.car({ id: 99, rideObject: 2 }),
 		Mock.car({ id: 97, rideObject: 2, nextCarOnTrain: 90 }),
-		Mock.car({ id: 90, rideObject: 2 }),
+		Mock.car({ id: 90, rideObject: 2 })
 	]});
 
 	const settings: VehicleSettings = {

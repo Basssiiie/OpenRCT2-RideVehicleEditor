@@ -31,8 +31,8 @@ export function multiplier(multiplierIndex: WritableStore<number>): WidgetCreato
  */
 export type LabelledControlParams<TParams extends ElementParams = ElementParams> = TParams &
 {
-	_control: (params: TParams) => WidgetCreator<FlexiblePosition>
-	_label: { text: string, width?: Scale };
+	_control: (params: TParams) => WidgetCreator<FlexiblePosition>;
+	_label: { text: string; width?: Scale };
 };
 
 /**

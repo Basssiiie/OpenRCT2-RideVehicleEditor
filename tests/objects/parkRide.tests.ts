@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /// <reference path="../../lib/openrct2.d.ts" />
 
 import test from "ava";
@@ -10,7 +9,7 @@ test("getAllRides() returns park's rides", t =>
 {
 	globalThis.map = Mock.map({ rides: [
 		Mock.ride({ classification: "ride", name: "Freefall", id: 1 }),
-		Mock.ride({ classification: "ride", name: "Twister", id: 2 }),
+		Mock.ride({ classification: "ride", name: "Twister", id: 2 })
 	]});
 
 	const rides = getAllRides();
@@ -30,7 +29,7 @@ test("getAllRides() returns park's rides sorted alphabetically", t =>
 	globalThis.map = Mock.map({ rides: [
 		Mock.ride({ classification: "ride", name: "Corkscrew Coaster", id: 2 }),
 		Mock.ride({ classification: "ride", name: "Dipper", id: 3 }),
-		Mock.ride({ classification: "ride", name: "Bob Coaster", id: 4 }),
+		Mock.ride({ classification: "ride", name: "Bob Coaster", id: 4 })
 	]});
 
 	const rides = getAllRides();
@@ -53,7 +52,7 @@ test("getAllRides() does not return stalls or facilities", t =>
 	globalThis.map = Mock.map({ rides: [
 		Mock.ride({ classification: "stall", name: "Pizza Stall", id: 10 }),
 		Mock.ride({ classification: "ride", name: "Car Ride", id: 11 }),
-		Mock.ride({ classification: "facility", name: "Restroom", id: 12 }),
+		Mock.ride({ classification: "facility", name: "Restroom", id: 12 })
 	]});
 
 	const rides = getAllRides();

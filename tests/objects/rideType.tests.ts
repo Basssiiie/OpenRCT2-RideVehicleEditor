@@ -12,7 +12,7 @@ test("getAllRideTypes() gets all ride types", t =>
 	globalThis.context = Mock.context({ objects: [
 		Mock.rideObject({ index: 3, carsPerFlatRide: 255, name: "Log flume" }),
 		Mock.rideObject({ index: 4, carsPerFlatRide: 4, name: "Space Rings" }),
-		Mock.rideObject({ index: 5, carsPerFlatRide: 1, name: "Twister" }),
+		Mock.rideObject({ index: 5, carsPerFlatRide: 1, name: "Twister" })
 	]});
 
 	const rideTypes = getAllRideTypes();
@@ -32,7 +32,7 @@ test("getAllRideTypes() sorts ride types alphabetically", t =>
 	globalThis.context = Mock.context({ objects: [
 		Mock.rideObject({ index: 3, carsPerFlatRide: 1, name: "Twister" }),
 		Mock.rideObject({ index: 4, carsPerFlatRide: 255, name: "Log flume" }),
-		Mock.rideObject({ index: 5, carsPerFlatRide: 4, name: "Space Rings" }),
+		Mock.rideObject({ index: 5, carsPerFlatRide: 4, name: "Space Rings" })
 	]});
 
 	const rideTypes = getAllRideTypes();
@@ -52,7 +52,7 @@ test("getAllRideTypes() skips stalls", t =>
 	globalThis.context = Mock.context({ objects: [
 		Mock.rideObject({ index: 5, carsPerFlatRide: 0, name: "Info Kiosk" }),
 		Mock.rideObject({ index: 6, carsPerFlatRide: 255, name: "Log flume" }),
-		Mock.rideObject({ index: 7, carsPerFlatRide: 0, name: "Pizza Stall" }),
+		Mock.rideObject({ index: 7, carsPerFlatRide: 0, name: "Pizza Stall" })
 	]});
 
 	const rideTypes = getAllRideTypes();
@@ -67,7 +67,7 @@ test("Ride type gets created from type id", t =>
 {
 	globalThis.context = Mock.context({ objects: [
 		Mock.rideObject({ index: 5, carsPerFlatRide: 0, name: "Info Kiosk" }),
-		Mock.rideObject({ index: 12, carsPerFlatRide: 255, name: "Log flume" }),
+		Mock.rideObject({ index: 12, carsPerFlatRide: 255, name: "Log flume" })
 	]});
 
 	const rideType = new RideType(12);
@@ -117,7 +117,7 @@ test("Ride type recognises gaps in variants", t =>
 			Mock.rideObjectVehicle({ baseImageId: 0 }),
 			Mock.rideObjectVehicle({ baseImageId: 0 }),
 			Mock.rideObjectVehicle({ baseImageId: 125, spriteWidth: 1, spriteHeightPositive: 1 }),
-			Mock.rideObjectVehicle({ baseImageId: 5 }),
+			Mock.rideObjectVehicle({ baseImageId: 5 })
 		]
 	});
 

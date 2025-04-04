@@ -29,8 +29,8 @@ export function getTileByCoords(x: number, y: number): Tile
 /**
  * Gets a tile element on the map at the specified position and index.
  */
-export function getTileElement<T extends TileElement = TileElement>(x: number, y: number, elementIdx: number): T
+export function getTileElement(x: number, y: number, elementIdx: number): TileElement
 {
 	const tile = getTileByCoords(x, y);
-	return tile.getElement<T>(elementIdx);
+	return tile.getElement(elementIdx);
 }

@@ -27,7 +27,8 @@ test.before(() =>
 });
 
 
-test("Set excitement rating", t => {
+test("Set excitement rating", t =>
+{
 	const ride = setupRideMock(25);
 
 	setExcitementRating(new ParkRide(25), 567);
@@ -38,7 +39,8 @@ test("Set excitement rating", t => {
 });
 
 
-test("Set intensity rating", t => {
+test("Set intensity rating", t =>
+{
 	const ride = setupRideMock(74);
 
 	setIntensityRating(new ParkRide(74), 345);
@@ -49,7 +51,8 @@ test("Set intensity rating", t => {
 });
 
 
-test("Set nausea rating", t => {
+test("Set nausea rating", t =>
+{
 	const ride = setupRideMock(11);
 
 	setNauseaRating(new ParkRide(11), 1);
@@ -60,7 +63,8 @@ test("Set nausea rating", t => {
 });
 
 
-test("Freeze ratings", t => {
+test("Freeze ratings", t =>
+{
 	const ride = setupRideMock(32);
 
 	setFrozenRatings(new ParkRide(32), true);
@@ -71,7 +75,8 @@ test("Freeze ratings", t => {
 });
 
 
-test("Set build month", t => {
+test("Set build month", t =>
+{
 	const ride = setupRideMock(74);
 
 	setBuildMonth(new ParkRide(74), 6);
@@ -82,7 +87,8 @@ test("Set build month", t => {
 });
 
 
-test("Set build year", t => {
+test("Set build year", t =>
+{
 	const ride = setupRideMock(74);
 
 	setBuildYear(new ParkRide(74), 12);
@@ -93,7 +99,8 @@ test("Set build year", t => {
 });
 
 
-test("Set custom design", t => {
+test("Set custom design", t =>
+{
 	const ride = setupRideMock(54);
 
 	setCustomDesign(new ParkRide(54), true);
@@ -104,7 +111,8 @@ test("Set custom design", t => {
 });
 
 
-test("Set indestructable", t => {
+test("Set indestructable", t =>
+{
 	const ride = setupRideMock(37);
 
 	setIndestructable(new ParkRide(37), false);
