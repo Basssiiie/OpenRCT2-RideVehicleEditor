@@ -2,7 +2,7 @@ import { Store } from "openrct2-flexui";
 import { isMultiplayer } from "../environment";
 import { getCarById, RideVehicle } from "../objects/rideVehicle";
 import * as Log from "../utilities/logger";
-import { alignWithMap, getTileElement, toTileUnit } from "../utilities/map";
+import { alignWithMap, getTileElement, toTileUnit, getIndexForTrackElementAt } from "../utilities/map";
 import { cancelCurrentTool, cancelTools } from "../utilities/tools";
 import { isNumber, isUndefined } from "../utilities/type";
 import { register } from "./actions";
@@ -32,16 +32,28 @@ export function toggleVehicleDragger(isPressed: boolean, storeVehicle: Store<[Ri
 	}
 
 	const multiplayer = isMultiplayer();
-	const originalPosition =
+	const trackLocation = storeTrackLocation.get();
+	const originalPosition = <DragPosition>
 	{
-		revert: true,
-		x: storeX.get(),
-		y: storeY.get(),
-		z: storeZ.get(),
-		track: storeTrackLocation.get(),
 		progress: storeTrackProgress.get()
 	};
+
+	if (trackLocation)
+	{
+		originalPosition.x = trackLocation.x;
+		originalPosition.y = trackLocation.y;
+		originalPosition.z = trackLocation.z;
+		originalPosition.trackElementIndex = getIndexForTrackElementAt(trackLocation, trackLocation.trackType);
+	}
+	else
+	{
+		originalPosition.x = storeX.get();
+		originalPosition.y = storeY.get();
+		originalPosition.z = storeZ.get();
+	}
+
 	let lastPosition: DragPosition = originalPosition;
+	let revert = true;
 
 	ui.activateTool({
 		id: dragToolId,
@@ -65,14 +77,14 @@ export function toggleVehicleDragger(isPressed: boolean, storeVehicle: Store<[Ri
 		},
 		onDown: () =>
 		{
-			originalPosition.revert = false;
+			revert = false;
 			Log.debug("[VehicleDragger] Place down vehicle at", lastPosition);
 			updateCarPosition(rideVehicle, lastPosition, DragState.Complete);
 			cancelCurrentTool();
 		},
 		onFinish: () =>
 		{
-			if (originalPosition.revert)
+			if (revert)
 			{
 				Log.debug("[VehicleDragger] Finish tool & revert position to", originalPosition, rideVehicle[0]._car());
 				updateCarPosition(rideVehicle, originalPosition, DragState.Cancel);
