@@ -372,7 +372,7 @@ const mainWindow = window({
 								onChange: value => model._modifyVehicle(setPositionZ, value)
 							}),
 							labelSpinner({
-								_label: { text: "Seat spin:" },
+								_label: { text: "Spin angle:" },
 								minimum: 0,
 								maximum: 255,
 								disabled: model._isSpinDisabled,

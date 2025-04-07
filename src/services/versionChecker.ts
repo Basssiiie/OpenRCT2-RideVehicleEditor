@@ -4,9 +4,9 @@
 export function isValidGameVersion(): boolean
 {
 	const version = context.apiVersion;
-	if (version < 98)
+	if (version < 105)
 	{
-		// 98 => https://github.com/OpenRCT2/OpenRCT2/pull/22392
+		// 105 => https://github.com/OpenRCT2/OpenRCT2/pull/23359
 		showUpdateError("The version of OpenRCT2 you are currently playing is too old for this plugin.");
 		return false;
 	}
