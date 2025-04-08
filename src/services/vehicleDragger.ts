@@ -2,7 +2,7 @@ import { Store } from "openrct2-flexui";
 import { isMultiplayer } from "../environment";
 import { getCarById, RideVehicle } from "../objects/rideVehicle";
 import * as Log from "../utilities/logger";
-import { alignWithMap, getTileElement, toTileUnit } from "../utilities/map";
+import { alignWithMap, getTileElement, toTileUnit, getIndexForTrackElementAt } from "../utilities/map";
 import { cancelCurrentTool, cancelTools } from "../utilities/tools";
 import { isNumber, isUndefined } from "../utilities/type";
 import { register } from "./actions";
@@ -32,16 +32,23 @@ export function toggleVehicleDragger(isPressed: boolean, storeVehicle: Store<[Ri
 	}
 
 	const multiplayer = isMultiplayer();
-	const originalPosition =
+	const trackLocation = storeTrackLocation.get();
+	const originalPosition = <DragPosition>
 	{
-		revert: true,
-		x: storeX.get(),
-		y: storeY.get(),
-		z: storeZ.get(),
-		track: storeTrackLocation.get(),
-		progress: storeTrackProgress.get()
+		rawCoords: {
+			x: storeX.get(),
+			y: storeY.get(),
+			z: storeZ.get()
+		},
+		trackState: trackLocation ? {
+			trackElementIndex: getIndexForTrackElementAt(trackLocation, trackLocation.trackType),
+			trackTile: { x: toTileUnit(trackLocation.x), y: toTileUnit(trackLocation.y) },
+			progress: storeTrackProgress.get()
+		} : null
 	};
+
 	let lastPosition: DragPosition = originalPosition;
+	let revert = true;
 
 	ui.activateTool({
 		id: dragToolId,
@@ -55,24 +62,31 @@ export function toggleVehicleDragger(isPressed: boolean, storeVehicle: Store<[Ri
 			}
 			const vehicle = rideVehicle[0];
 			const position = getPositionFromTool(args, vehicle);
-			if (position && (position.x !== lastPosition.x || position.y !== lastPosition.y || position.z !== lastPosition.z))
+			if (position && isNewPosition(position, lastPosition))
 			{
-				Log.debug("Selected position:", JSON.stringify(position));
 				updateCarPosition(rideVehicle, position, DragState.Dragging);
-				ui.tileSelection.tiles = [{ x: alignWithMap(position.x), y: alignWithMap(position.y) }];
+				const selection = position.trackState 
+					? position.trackState.trackTile
+					: position.rawCoords
+						? { x: alignWithMap(position.rawCoords.x), y: alignWithMap(position.rawCoords.y) }
+						: null;
+				if (selection)
+				{
+					ui.tileSelection.tiles = [selection];
+				}
 				lastPosition = position;
 			}
 		},
 		onDown: () =>
 		{
-			originalPosition.revert = false;
+			revert = false;
 			Log.debug("[VehicleDragger] Place down vehicle at", lastPosition);
 			updateCarPosition(rideVehicle, lastPosition, DragState.Complete);
 			cancelCurrentTool();
 		},
 		onFinish: () =>
 		{
-			if (originalPosition.revert)
+			if (revert)
 			{
 				Log.debug("[VehicleDragger] Finish tool & revert position to", originalPosition, rideVehicle[0]._car());
 				updateCarPosition(rideVehicle, originalPosition, DragState.Cancel);
@@ -81,6 +95,27 @@ export function toggleVehicleDragger(isPressed: boolean, storeVehicle: Store<[Ri
 			onCancel();
 		}
 	});
+}
+
+function isNewPosition(position: DragPosition, lastPosition: DragPosition): boolean
+{
+	if (position.rawCoords && (lastPosition.rawCoords == null
+		|| position.rawCoords.x !== lastPosition.rawCoords.x
+		|| position.rawCoords.y !== lastPosition.rawCoords.y
+		|| position.rawCoords.z !== lastPosition.rawCoords.z))
+	{
+		return true;
+	}
+	if (position.trackState && (lastPosition.trackState == null
+		|| position.trackState.trackElementIndex !== lastPosition.trackState.trackElementIndex
+		|| position.trackState.trackTile.x !== lastPosition.trackState.trackTile.x
+		|| position.trackState.trackTile.y !== lastPosition.trackState.trackTile.y
+		|| position.trackState.progress !== lastPosition.trackState.progress))
+	{
+		return true;
+	}
+	
+	return false;
 }
 
 /**
@@ -93,13 +128,20 @@ const enum DragState
 	Cancel
 }
 
+interface TrackState
+{
+	trackElementIndex: number;
+	trackTile: CoordsXY;
+	progress: number;
+}
+
 /**
  * Position currently selected by the drag tool.
  */
-interface DragPosition extends CoordsXYZ
+interface DragPosition
 {
-	trackElementIndex?: number | null;
-	progress?: number | null;
+	rawCoords?: CoordsXYZ | null;
+	trackState?: TrackState | null;
 }
 
 /**
@@ -117,19 +159,22 @@ interface DragVehicleArgs
  */
 function getPositionFromTool(args: ToolEventArgs, vehicle: RideVehicle): DragPosition | null
 {
-	const { entityId, mapCoords, tileElementIndex } = args;
-	const result = <DragPosition>{};
-	let x: number | undefined, y: number | undefined, z: number | undefined;
+	const { entityId, mapCoords, tileElementIndex } = args;	
 
 	if (!isUndefined(entityId) && entityId !== vehicle._id)
 	{
 		const entity = map.getEntity(entityId);
-		x = entity.x;
-		y = entity.y;
-		z = entity.z;
+		return {
+			rawCoords: {
+				x: entity.x,
+				y: entity.y,
+				z: entity.z
+			}
+		};
 	}
 	else if (mapCoords && !isUndefined(tileElementIndex))
 	{
+		let x: number, y: number, z: number;
 		x = mapCoords.x;
 		y = mapCoords.y;
 		const element = getTileElement(x, y, tileElementIndex);
@@ -163,8 +208,17 @@ function getPositionFromTool(args: ToolEventArgs, vehicle: RideVehicle): DragPos
 				const subposition = vehicle._car().subposition;
 				const distances = getTrackTypeDistances(trackType, subposition, element.direction);
 
-				result.trackElementIndex = tileElementIndex;
-				result.progress = distances._sequences[sequence].progress;
+				const progress = distances._sequences[sequence].progress;
+				if (progress)
+				{
+					return {
+						trackState: {
+							trackElementIndex: tileElementIndex,
+							trackTile: { x: toTileUnit(x), y: toTileUnit(y) },
+							progress
+						}
+					};
+				}
 			}
 		}
 
@@ -173,17 +227,15 @@ function getPositionFromTool(args: ToolEventArgs, vehicle: RideVehicle): DragPos
 		// Increase height for certain vehicles like inverted ones based on the height in the tab icon
 		//  29 for actual inverted, inverted tabheight for other negatives, 0 for big cars
 		z += (tabHeight < -10) ? 29 : (tabHeight < 0) ? -tabHeight : 0;
+
+		return {
+			rawCoords: { x, y, z }
+		};
 	}
 	else
 	{
 		return null;
 	}
-
-	result.x = x;
-	result.y = y;
-	result.z = z;
-
-	return result;
 }
 
 /**
@@ -206,18 +258,19 @@ function updateVehicleDrag(args: DragVehicleArgs): void
 		return;
 	}
 
-	const position = args.position;
-	const progress = position.progress;
-	if (isNumber(position.trackElementIndex) && isNumber(progress))
+	if (args.position.trackState)
 	{
-		car.moveToTrack(toTileUnit(position.x), toTileUnit(position.y), position.trackElementIndex);
-		car.travelBy(getDistanceFromProgress(car, progress - car.trackProgress));
+		const trackState = args.position.trackState;
+		car.moveToTrack(trackState.trackTile.x, trackState.trackTile.y, trackState.trackElementIndex);
+		car.travelBy(getDistanceFromProgress(car, trackState.progress - car.trackProgress));
 	}
-	else
+
+	if (args.position.rawCoords)
 	{
-		car.x = position.x;
-		car.y = position.y;
-		car.z = position.z;
+		const rawCoords = args.position.rawCoords;
+		car.x = rawCoords.x;
+		car.y = rawCoords.y;
+		car.z = rawCoords.z;
 	}
 
 	invoke(refreshVehicle, id);

@@ -1,6 +1,6 @@
 import { RideTrain } from "../objects/rideTrain";
 import * as Log from "../utilities/logger";
-import { getTileByCoords } from "../utilities/map";
+import { getIndexForTrackElementAt } from "../utilities/map";
 import { abs } from "../utilities/math";
 import { isNull, isUndefined } from "../utilities/type";
 import { getSubpositionTranslationDistance, getTrackSegmentDistances, TrackDistances } from "./subpositionHelper";
@@ -216,27 +216,6 @@ function getTrackIteratorAtLocation(trackLocation: CoordsXYZD): TrackIterator | 
 		return null;
 	}
 	return iterator;
-}
-
-/**
- * Finds the index of a matching track element on the specified tile.
- */
-function getIndexForTrackElementAt(coords: CoordsXYZD): number | null
-{
-	const tile = getTileByCoords(coords.x, coords.y);
-	const allElements = tile.elements, len = allElements.length;
-
-	for (let i = 0; i < len; i++)
-	{
-		const element = tile.elements[i];
-		if (element.type === "track"
-			&& element.baseZ === coords.z
-			&& element.direction === coords.direction)
-		{
-			return i;
-		}
-	}
-	return null;
 }
 
 /**
