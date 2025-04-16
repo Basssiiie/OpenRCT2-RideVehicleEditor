@@ -34,3 +34,25 @@ export function getTileElement(x: number, y: number, elementIdx: number): TileEl
 	const tile = getTileByCoords(x, y);
 	return tile.getElement(elementIdx);
 }
+
+/**
+ * Finds the index of a matching track element on the specified tile.
+ */
+export function getIndexForTrackElementAt(location: CarTrackLocation): number | null
+{
+	const tile = getTileByCoords(location.x, location.y);
+	const allElements = tile.elements, len = allElements.length;
+
+	for (let i = 0; i < len; i++)
+	{
+		const element = tile.elements[i];
+		if (element.type === "track"
+			&& element.baseZ === location.z
+			&& element.direction === location.direction
+			&& element.trackType === location.trackType)
+		{
+			return i;
+		}
+	}
+	return null;
+}

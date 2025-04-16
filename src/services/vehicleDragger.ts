@@ -2,7 +2,7 @@ import { Store } from "openrct2-flexui";
 import { isMultiplayer } from "../environment";
 import { getCarById, RideVehicle } from "../objects/rideVehicle";
 import * as Log from "../utilities/logger";
-import { alignWithMap, getTileElement, toTileUnit } from "../utilities/map";
+import { alignWithMap, getIndexForTrackElementAt, getTileElement, toTileUnit } from "../utilities/map";
 import { cancelCurrentTool, cancelTools } from "../utilities/tools";
 import { isNumber, isUndefined } from "../utilities/type";
 import { register } from "./actions";
@@ -21,8 +21,7 @@ export const dragToolId = "rve-drag-vehicle";
 /**
  * Enable or disable a tool to drag the vehicle to a new location.
  */
-export function toggleVehicleDragger(isPressed: boolean, storeVehicle: Store<[RideVehicle, number] | null>, storeX: Store<number>, storeY: Store<number>, storeZ: Store<number>,
-	storeTrackLocation: Store<CarTrackLocation | null>, storeTrackProgress: Store<number>, onCancel: () => void): void
+export function toggleVehicleDragger(isPressed: boolean, storeVehicle: Store<[RideVehicle, number] | null>, storeX: Store<number>, storeY: Store<number>, storeZ: Store<number>, storeTrackLocation: Store<CarTrackLocation | null>, storeTrackProgress: Store<number>, onCancel: () => void): void
 {
 	const rideVehicle = storeVehicle.get();
 	if (!isPressed || !rideVehicle)
@@ -75,6 +74,13 @@ export function toggleVehicleDragger(isPressed: boolean, storeVehicle: Store<[Ri
 			if (originalPosition.revert)
 			{
 				Log.debug("[VehicleDragger] Finish tool & revert position to", originalPosition, rideVehicle[0]._car());
+
+				const track = originalPosition.track;
+				if (track)
+				{
+					(<DragPosition>originalPosition).trackElementIndex = getIndexForTrackElementAt(track);
+				}
+
 				updateCarPosition(rideVehicle, originalPosition, DragState.Cancel);
 			}
 			ui.tileSelection.tiles = [];
@@ -100,6 +106,9 @@ interface DragPosition extends CoordsXYZ
 {
 	trackElementIndex?: number | null;
 	progress?: number | null;
+
+	/** The track to move on to. Only available when cancelling the tool. */
+	track?: CarTrackLocation | null;
 }
 
 /**
@@ -201,6 +210,7 @@ function updateVehicleDrag(args: DragVehicleArgs): void
 {
 	const id = args.target;
 	const car = getCarById(args.target);
+
 	if (!car)
 	{
 		return;
@@ -208,12 +218,23 @@ function updateVehicleDrag(args: DragVehicleArgs): void
 
 	const position = args.position;
 	const progress = position.progress;
+	let skipCarXYZ: boolean | undefined;
+
 	if (isNumber(position.trackElementIndex) && isNumber(progress))
 	{
-		car.moveToTrack(toTileUnit(position.x), toTileUnit(position.y), position.trackElementIndex);
+		const track: CoordsXY = position.track || position;
+
+		car.moveToTrack(toTileUnit(track.x), toTileUnit(track.y), position.trackElementIndex);
 		car.travelBy(getDistanceFromProgress(car, progress - car.trackProgress));
+
+		// If cancelling, also update the car XYZ, as it may be different from the track.
+		if (args.state !== DragState.Cancel)
+		{
+			skipCarXYZ = true;
+		}
 	}
-	else
+
+	if (!skipCarXYZ)
 	{
 		car.x = position.x;
 		car.y = position.y;
