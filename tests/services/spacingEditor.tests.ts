@@ -47,7 +47,7 @@ function setupTrackIterator(trackPieces: TrackPiece[], trackStartIndex?: number)
 			x: Math.floor(p.position.x / 32),
 			y: Math.floor(p.position.y / 32),
 			elements: [
-				Mock.trackElement({ type: "track", baseZ: p.position.z, direction: p.position.direction })
+				Mock.trackElement({ type: "track", baseZ: p.position.z, direction: p.position.direction, trackType: p.type })
 			]
 		})),
 		getTrackIterator()
@@ -70,7 +70,7 @@ function setupTrackIterator(trackPieces: TrackPiece[], trackStartIndex?: number)
 test("Flat track: move forward by 1", t =>
 {
 	setupTrackIterator([ flatTrackPiece ]);
-	const car = Mock.car({ trackProgress: 5, remainingDistance: ForwardRemainingDistance });
+	const car = Mock.car({ trackProgress: 5, remainingDistance: ForwardRemainingDistance, trackLocation: flatTrackPiece.toLocation() });
 
 	const distance = getDistanceFromProgress(car, 1);
 
@@ -81,7 +81,7 @@ test("Flat track: move forward by 1", t =>
 test("Flat track: move forward by 10", t =>
 {
 	setupTrackIterator([ flatTrackPiece ]);
-	const car = Mock.car({ trackProgress: 5, remainingDistance: ForwardRemainingDistance });
+	const car = Mock.car({ trackProgress: 5, remainingDistance: ForwardRemainingDistance, trackLocation: flatTrackPiece.toLocation() });
 
 	const distance = getDistanceFromProgress(car, 10);
 
@@ -92,7 +92,7 @@ test("Flat track: move forward by 10", t =>
 test("Flat track: move forward by 31", t =>
 {
 	setupTrackIterator([ flatTrackPiece ]);
-	const car = Mock.car({ trackProgress: 0, remainingDistance: ForwardRemainingDistance });
+	const car = Mock.car({ trackProgress: 0, remainingDistance: ForwardRemainingDistance, trackLocation: flatTrackPiece.toLocation() });
 
 	const distance = getDistanceFromProgress(car, 31);
 
@@ -103,7 +103,7 @@ test("Flat track: move forward by 31", t =>
 test("Flat track: move forward by 10 until end of track", t =>
 {
 	setupTrackIterator([ flatTrackPiece ]);
-	const car = Mock.car({ trackProgress: 25, remainingDistance: ForwardRemainingDistance });
+	const car = Mock.car({ trackProgress: 25, remainingDistance: ForwardRemainingDistance, trackLocation: flatTrackPiece.toLocation() });
 
 	const distance = getDistanceFromProgress(car, 10);
 
@@ -114,7 +114,7 @@ test("Flat track: move forward by 10 until end of track", t =>
 test("Flat track: jump forward by 50 until end of track", t =>
 {
 	setupTrackIterator([ flatTrackPiece ]);
-	const car = Mock.car({ trackProgress: 0, remainingDistance: ForwardRemainingDistance });
+	const car = Mock.car({ trackProgress: 0, remainingDistance: ForwardRemainingDistance, trackLocation: flatTrackPiece.toLocation() });
 
 	const distance = getDistanceFromProgress(car, 50);
 
@@ -125,7 +125,7 @@ test("Flat track: jump forward by 50 until end of track", t =>
 test("Flat track: move backwards by 1", t =>
 {
 	setupTrackIterator([ flatTrackPiece ]);
-	const car = Mock.car({ trackProgress: 21 });
+	const car = Mock.car({ trackProgress: 21, trackLocation: flatTrackPiece.toLocation() });
 
 	const distance = getDistanceFromProgress(car, -1);
 
@@ -136,7 +136,7 @@ test("Flat track: move backwards by 1", t =>
 test("Flat track: move backwards by 10", t =>
 {
 	setupTrackIterator([ flatTrackPiece ]);
-	const car = Mock.car({ trackProgress: 21 });
+	const car = Mock.car({ trackProgress: 21, trackLocation: flatTrackPiece.toLocation() });
 
 	const distance = getDistanceFromProgress(car, -10);
 
@@ -147,7 +147,7 @@ test("Flat track: move backwards by 10", t =>
 test("Flat track: move backwards by 31", t =>
 {
 	setupTrackIterator([ flatTrackPiece ]);
-	const car = Mock.car({ trackProgress: 31 });
+	const car = Mock.car({ trackProgress: 31, trackLocation: flatTrackPiece.toLocation() });
 
 	const distance = getDistanceFromProgress(car, -31);
 
@@ -158,7 +158,7 @@ test("Flat track: move backwards by 31", t =>
 test("Flat track: move backwards by 10 until end of track", t =>
 {
 	setupTrackIterator([ flatTrackPiece ]);
-	const car = Mock.car({ trackProgress: 5 });
+	const car = Mock.car({ trackProgress: 5, trackLocation: flatTrackPiece.toLocation() });
 
 	const distance = getDistanceFromProgress(car, -10);
 
@@ -169,7 +169,7 @@ test("Flat track: move backwards by 10 until end of track", t =>
 test("Flat track: jump backwards by 50 until end of track", t =>
 {
 	setupTrackIterator([ flatTrackPiece ]);
-	const car = Mock.car({ trackProgress: 31 });
+	const car = Mock.car({ trackProgress: 31, trackLocation: flatTrackPiece.toLocation() });
 
 	const distance = getDistanceFromProgress(car, -50);
 
@@ -180,7 +180,7 @@ test("Flat track: jump backwards by 50 until end of track", t =>
 test("Two flat tracks: move to next by 1", t =>
 {
 	setupTrackIterator([ flatTrackPiece, flatTrackPiece ]);
-	const car = Mock.car({ trackProgress: 31, remainingDistance: ForwardRemainingDistance });
+	const car = Mock.car({ trackProgress: 31, remainingDistance: ForwardRemainingDistance, trackLocation: flatTrackPiece.toLocation() });
 
 	const distance = getDistanceFromProgress(car, 1);
 
@@ -191,7 +191,7 @@ test("Two flat tracks: move to next by 1", t =>
 test("Two flat tracks: move to next by 10", t =>
 {
 	setupTrackIterator([ flatTrackPiece, flatTrackPiece ]);
-	const car = Mock.car({ trackProgress: 28, remainingDistance: ForwardRemainingDistance });
+	const car = Mock.car({ trackProgress: 28, remainingDistance: ForwardRemainingDistance, trackLocation: flatTrackPiece.toLocation() });
 
 	const distance = getDistanceFromProgress(car, 10);
 
@@ -202,7 +202,7 @@ test("Two flat tracks: move to next by 10", t =>
 test("Two flat tracks: move to previous by 1", t =>
 {
 	setupTrackIterator([ flatTrackPiece, flatTrackPiece ], 1);
-	const car = Mock.car({ trackProgress: 0 });
+	const car = Mock.car({ trackProgress: 0, trackLocation: flatTrackPiece.toLocation() });
 
 	const distance = getDistanceFromProgress(car, -1);
 
@@ -213,7 +213,7 @@ test("Two flat tracks: move to previous by 1", t =>
 test("Two flat tracks: move to previous by 10", t =>
 {
 	setupTrackIterator([ flatTrackPiece, flatTrackPiece ], 1);
-	const car = Mock.car({ trackProgress: 4 });
+	const car = Mock.car({ trackProgress: 4, trackLocation: flatTrackPiece.toLocation() });
 
 	const distance = getDistanceFromProgress(car, -10);
 
@@ -224,7 +224,7 @@ test("Two flat tracks: move to previous by 10", t =>
 test("Three flat tracks: jump piece with move to next by 50", t =>
 {
 	setupTrackIterator([ flatTrackPiece, flatTrackPiece, flatTrackPiece ]);
-	const car = Mock.car({ trackProgress: 27, remainingDistance: ForwardRemainingDistance });
+	const car = Mock.car({ trackProgress: 27, remainingDistance: ForwardRemainingDistance, trackLocation: flatTrackPiece.toLocation() });
 
 	const distance = getDistanceFromProgress(car, 50);
 
@@ -235,7 +235,7 @@ test("Three flat tracks: jump piece with move to next by 50", t =>
 test("Three flat tracks: jump piece with move to previous by 50", t =>
 {
 	setupTrackIterator([ flatTrackPiece, flatTrackPiece, flatTrackPiece ], 2);
-	const car = Mock.car({ trackProgress: 3 });
+	const car = Mock.car({ trackProgress: 3, trackLocation: flatTrackPiece.toLocation() });
 
 	const distance = getDistanceFromProgress(car, -50);
 
@@ -265,7 +265,7 @@ const curvyTest = test.macro({
 	exec(t, start: number, progress: number, expectedResult: number): void
 	{
 		setupTrackIterator([ curvyTrackPiece ]);
-		const car = Mock.car({ trackProgress: start, remainingDistance: (progress >= 0) ? ForwardRemainingDistance : 0 });
+		const car = Mock.car({ trackProgress: start, remainingDistance: (progress >= 0) ? ForwardRemainingDistance : 0, trackLocation: curvyTrackPiece.toLocation() });
 
 		const distance = getDistanceFromProgress(car, progress);
 
@@ -367,7 +367,7 @@ test(multiTurnTest, 3, 1, -8, -(13961 + 10905 + 10905 + 8716 + 12327 + 8716 + 12
 test("Flat track: move forward by 1 and account for remaining distance cap", t =>
 {
 	setupTrackIterator([ flatTrackPiece ]);
-	const car = Mock.car({ trackProgress: 5, remainingDistance: 1000 });
+	const car = Mock.car({ trackProgress: 5, remainingDistance: 1000, trackLocation: flatTrackPiece.toLocation() });
 
 	const distance = getDistanceFromProgress(car, 1);
 
@@ -378,7 +378,7 @@ test("Flat track: move forward by 1 and account for remaining distance cap", t =
 test("Flat track: move backwards by 1 and account for remaining distance cap", t =>
 {
 	setupTrackIterator([ flatTrackPiece ]);
-	const car = Mock.car({ trackProgress: 21, remainingDistance: 6000 });
+	const car = Mock.car({ trackProgress: 21, remainingDistance: 6000, trackLocation: flatTrackPiece.toLocation() });
 
 	const distance = getDistanceFromProgress(car, -1);
 
