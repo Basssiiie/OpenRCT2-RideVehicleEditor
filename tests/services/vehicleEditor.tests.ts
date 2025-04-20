@@ -183,11 +183,11 @@ test("Set x position", t =>
 	setPositionX([[ 29, 1 ]], 10);
 	t.is(car.x, 10);
 
-	setPositionX([[ 29, 1 ]], 10_100);
-	t.is(car.x, 10_100);
+	setPositionX([[ 29, 1 ]], 10_090);
+	t.is(car.x, 10 + 10_090);
 
 	setPositionX([[ 29, 1 ]], -3);
-	t.is(car.x, -3);
+	t.is(car.x, 10 + 10_090 - 3);
 });
 
 
@@ -199,10 +199,10 @@ test("Set y position", t =>
 	t.is(car.y, 5020);
 
 	setPositionY([[ 10, 1 ]], -302_010);
-	t.is(car.y, -302_010);
+	t.is(car.y, 5020 - 302_010);
 
 	setPositionY([[ 10, 1 ]], 15);
-	t.is(car.y, 15);
+	t.is(car.y, 5020 - 302_010 + 15);
 });
 
 
@@ -214,8 +214,8 @@ test("Set z position", t =>
 	t.is(car.z, -698);
 
 	setPositionZ([[ 101, 1 ]], 653);
-	t.is(car.z, 653);
+	t.is(car.z, -698 + 653);
 
 	setPositionZ([[ 101, 1 ]], -10);
-	t.is(car.z, -10);
+	t.is(car.z, -698 + 653 - 10);
 });
