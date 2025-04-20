@@ -285,7 +285,7 @@ export class VehicleViewModel
 	/**
 	 * Attempt to modify the vehicle with the specified action, if a vehicle is selected.
 	 */
-	_modifyVehicle<T>(action: (vehicles: VehicleSpan[], value: T) => void, value: T): void
+	_modifyVehicle<T>(action: (vehicles: VehicleSpan[], value: T) => void, value: T, filter: CopyFilter): void
 	{
 		if (this._isRefreshing)
 		{
@@ -295,7 +295,8 @@ export class VehicleViewModel
 		const vehicle = this._selectedVehicle.get();
 		if (vehicle)
 		{
-			if (this._synchronizeTargets.get())
+			// Only apply if action matches filter.
+			if (this._synchronizeTargets.get() && (!filter || ((this._copyFilters.get() || CopyFilter.All) & filter)))
 			{
 				action(this._copyTargets.get(), value);
 			}

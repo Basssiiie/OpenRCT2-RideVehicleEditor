@@ -43,15 +43,17 @@ export const copyOptions = <const>[
  */
 export const enum CopyFilter
 {
-	Default =               (0),
+	Default =             (0),
 	TypeAndVariant =      (1 << 0),
 	Colours =             (1 << 1),
 	TrackProgress =       (1 << 2),
 	Spacing =             (1 << 3),
-	Seats =               (1 << 4),
-	Mass =                (1 << 5),
-	PoweredAcceleration = (1 << 6),
-	PoweredMaxSpeed =     (1 << 7),
+	Position =            (1 << 4),
+	Seats =               (1 << 5),
+	Mass =                (1 << 6),
+	PoweredAcceleration = (1 << 7),
+	PoweredMaxSpeed =     (1 << 8),
+	Spin =                (1 << 9),
 	All = -1
 }
 
@@ -144,6 +146,10 @@ export function getVehicleSettings(source: RideVehicle, filters: CopyFilter): Ve
 		const cols = car.colours;
 		settings.colours = [ cols.body, cols.trim, cols.tertiary ];
 	}
+	if (filters & CopyFilter.Spin)
+	{
+		settings.spin = car.spin;
+	}
 	return settings;
 }
 
@@ -170,6 +176,7 @@ export interface VehicleSettings
 	poweredAcceleration?: number;
 	poweredMaxSpeed?: number;
 	colours?: number[];
+	spin?: number;
 }
 
 
@@ -217,6 +224,7 @@ function applyVehicleSettings(car: Car, settings: VehicleSettings): void
 	apply("mass", settings.mass);
 	apply("poweredAcceleration", settings.poweredAcceleration);
 	apply("poweredMaxSpeed", settings.poweredMaxSpeed);
+	apply("spin", settings.spin);
 
 	const colours = settings.colours;
 	if (colours)

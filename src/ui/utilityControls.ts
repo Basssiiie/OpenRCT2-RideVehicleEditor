@@ -8,21 +8,23 @@ export function multiplier(multiplierIndex: WritableStore<number>): WidgetCreato
 {
 	const multiplierTip = "Multiplies all spinner controls by the specified amount";
 
-	return horizontal([
-		label({
-			text: "Multiplier:",
-			tooltip: multiplierTip,
-			width: 60,
-			padding: { left: "1w" }
-		}),
-		dropdown({
-			tooltip: multiplierTip,
-			width: 45,
-			padding: { right: 6 },
-			items: ["x1", "x10", "x100"],
-			selectedIndex: twoway(multiplierIndex)
-		})
-	]);
+	return horizontal({
+		padding: { top: -4, right: 1 },
+		content: [
+			label({
+				text: "Multiplier:",
+				tooltip: multiplierTip,
+				width: 60,
+				padding: { left: "1w" }
+			}),
+			dropdown({
+				tooltip: multiplierTip,
+				width: 45,
+				items: ["x1", "x10", "x100"],
+				selectedIndex: twoway(multiplierIndex)
+			})
+		]
+	});
 }
 
 

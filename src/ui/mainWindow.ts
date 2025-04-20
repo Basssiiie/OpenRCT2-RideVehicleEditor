@@ -53,7 +53,7 @@ model._selectedRide.subscribe(r =>
 const mainWindow = window({
 	title,
 	width: { value: 515, min: 515, max: 560 },
-	height: 407,
+	height: 415,
 	spacing: 5,
 	onOpen: () => model._open(),
 	onClose: () =>
@@ -187,15 +187,21 @@ const mainWindow = window({
 									}),
 									checkbox({
 										text: "Track progress",
-										tooltip: "Copy the selected track progress to other vehicles.",
+										tooltip: "Synchronize the selected track progress changes to other vehicles (apply not supported).",
 										isChecked: compute(model._copyFilters, f => !!(f & CopyFilter.TrackProgress)),
 										onChange: c => model._setFilter(CopyFilter.TrackProgress, c)
 									}),
 									checkbox({
 										text: "Spacing",
-										tooltip: "Copy the selected spacing to other vehicles.",
+										tooltip: "Synchronize the selected spacing changes to other vehicles (apply not supported).",
 										isChecked: compute(model._copyFilters, f => !!(f & CopyFilter.Spacing)),
 										onChange: c => model._setFilter(CopyFilter.Spacing, c)
+									}),
+									checkbox({
+										text: "Position",
+										tooltip: "Synchronize the selected position changes to other vehicles (apply not supported).",
+										isChecked: compute(model._copyFilters, f => !!(f & CopyFilter.Position)),
+										onChange: c => model._setFilter(CopyFilter.Position, c)
 									})
 								]),
 								vertical([
@@ -222,6 +228,12 @@ const mainWindow = window({
 										tooltip: "Copy the selected maximum powered speed to other vehicles.",
 										isChecked: compute(model._copyFilters, f => !!(f & CopyFilter.PoweredMaxSpeed)),
 										onChange: c => model._setFilter(CopyFilter.PoweredMaxSpeed, c)
+									}),
+									checkbox({
+										text: "Spin",
+										tooltip: "Copy the selected spin to other vehicles.",
+										isChecked: compute(model._copyFilters, f => !!(f & CopyFilter.Spin)),
+										onChange: c => model._setFilter(CopyFilter.Spin, c)
 									})
 								])
 							]),
@@ -285,7 +297,7 @@ const mainWindow = window({
 								wrapMode: "wrap",
 								disabled: compute(model._isEditDisabled, model._variants, (noEdit, variants) => (noEdit || variants.length < 2)),
 								selectedIndex: model._variant,
-								onChange: value => model._modifyVehicle(setVariant, value)
+								onChange: value => model._modifyVehicle(setVariant, value, CopyFilter.TypeAndVariant)
 							}),
 							labelled<CheckboxParams>({
 								_control: checkbox,
@@ -293,7 +305,7 @@ const mainWindow = window({
 								tooltip: "Look behind you!",
 								disabled: model._isEditDisabled,
 								isChecked: model._isReversed,
-								onChange: value => model._modifyVehicle(setReversed, value)
+								onChange: value => model._modifyVehicle(setReversed, value, CopyFilter.TypeAndVariant)
 							}),
 							horizontal([
 								label({
@@ -306,19 +318,19 @@ const mainWindow = window({
 									tooltip: "The primary (body) colour of the vehicle.",
 									colour: model._primaryColour,
 									disabled: model._isEditDisabled,
-									onChange: value => model._modifyVehicle(setPrimaryColour, value)
+									onChange: value => model._modifyVehicle(setPrimaryColour, value, CopyFilter.Colours)
 								}),
 								colourPicker({
 									tooltip: "The secondary (trim) colour of the vehicle.",
 									colour: model._secondaryColour,
 									disabled: model._isEditDisabled,
-									onChange: value => model._modifyVehicle(setSecondaryColour, value)
+									onChange: value => model._modifyVehicle(setSecondaryColour, value, CopyFilter.Colours)
 								}),
 								colourPicker({
 									tooltip: "The tertiary (detail) colour of the vehicle.",
 									colour: model._tertiaryColour,
 									disabled: model._isEditDisabled,
-									onChange: value => model._modifyVehicle(setTertiaryColour, value)
+									onChange: value => model._modifyVehicle(setTertiaryColour, value, CopyFilter.Colours)
 								})
 							])
 						]
@@ -333,7 +345,7 @@ const mainWindow = window({
 								disabled: model._isEditDisabled,
 								step: model._multiplier,
 								value: twoway(model._trackProgress),
-								onChange: (_, incr) => applyTrackProgressChange(changeTrackProgress, incr)
+								onChange: (_, incr) => applyTrackProgressChange(changeTrackProgress, incr, CopyFilter.TrackProgress)
 							}),
 							labelSpinner({
 								_label: { text: "Spacing:" },
@@ -346,7 +358,7 @@ const mainWindow = window({
 									const spacing = model._spacing.get();
 									return (spacing === null) ? "Too far away" : spacing.toString();
 								},
-								onChange: (_, incr) => applyTrackProgressChange(changeSpacing, incr)
+								onChange: (_, incr) => applyTrackProgressChange(changeSpacing, incr, CopyFilter.Spacing)
 							}),
 							positionSpinner({
 								_label: { text: "X position:" },
@@ -354,7 +366,7 @@ const mainWindow = window({
 								step: model._multiplier,
 								value: model._x,
 								format: model._formatPosition,
-								onChange: (_, incr) => model._modifyVehicle(setPositionX, incr)
+								onChange: (_, incr) => model._modifyVehicle(setPositionX, incr, CopyFilter.Position)
 							}),
 							positionSpinner({
 								_label: { text: "Y position:" },
@@ -362,7 +374,7 @@ const mainWindow = window({
 								step: model._multiplier,
 								value: model._y,
 								format: model._formatPosition,
-								onChange: (_, incr) => model._modifyVehicle(setPositionY, incr)
+								onChange: (_, incr) => model._modifyVehicle(setPositionY, incr, CopyFilter.Position)
 							}),
 							positionSpinner({
 								_label: { text: "Z position:" },
@@ -370,7 +382,7 @@ const mainWindow = window({
 								step: model._multiplier,
 								value: model._z,
 								format: model._formatPosition,
-								onChange: (_, incr) => model._modifyVehicle(setPositionZ, incr)
+								onChange: (_, incr) => model._modifyVehicle(setPositionZ, incr, CopyFilter.Position)
 							}),
 							labelSpinner({
 								_label: { text: "Spin angle:" },
@@ -379,7 +391,7 @@ const mainWindow = window({
 								disabled: model._isSpinDisabled,
 								step: model._multiplier,
 								value: compute(model._spin, model._spinFrames, (spin, frames) => floor((spin * frames) / 256)),
-								onChange: (_, incr) => model._modifyVehicle(setSpin, floor((incr * 256) / model._spinFrames.get()))
+								onChange: (_, incr) => model._modifyVehicle(setSpin, floor((incr * 256) / model._spinFrames.get()), CopyFilter.Spin)
 							})
 						]
 					}),
@@ -395,7 +407,7 @@ const mainWindow = window({
 								disabled: model._isEditDisabled,
 								step: model._multiplier,
 								value: model._seats,
-								onChange: value => model._modifyVehicle(setSeatCount, value)
+								onChange: value => model._modifyVehicle(setSeatCount, value, CopyFilter.Seats)
 							}),
 							labelSpinner({
 								_label: { text: "Mass:" },
@@ -405,7 +417,7 @@ const mainWindow = window({
 								disabled: model._isEditDisabled,
 								step: model._multiplier,
 								value: model._mass,
-								onChange: value => model._modifyVehicle(setMass, value)
+								onChange: value => model._modifyVehicle(setMass, value, CopyFilter.Mass)
 							}),
 							labelSpinner({
 								_label: { text: "Acceleration:" },
@@ -416,7 +428,7 @@ const mainWindow = window({
 								disabled: model._isUnpowered,
 								step: model._multiplier,
 								value: model._poweredAcceleration,
-								onChange: value => model._modifyVehicle(setPoweredAcceleration, value)
+								onChange: value => model._modifyVehicle(setPoweredAcceleration, value, CopyFilter.PoweredAcceleration)
 							}),
 							labelSpinner({
 								_label: { text: "Max. speed:" },
@@ -427,7 +439,7 @@ const mainWindow = window({
 								disabled: model._isUnpowered,
 								step: model._multiplier,
 								value: model._poweredMaxSpeed,
-								onChange: value => model._modifyVehicle(setPoweredMaximumSpeed, value)
+								onChange: value => model._modifyVehicle(setPoweredMaximumSpeed, value, CopyFilter.PoweredMaxSpeed)
 							})
 						]
 					}),
@@ -452,7 +464,7 @@ const mainWindow = window({
 function updateVehicleType(typeIdx: number): void
 {
 	const type = model._rideTypes.get()[typeIdx];
-	model._modifyVehicle(setRideType, type);
+	model._modifyVehicle(setRideType, type, CopyFilter.TypeAndVariant);
 }
 
 /**
@@ -473,13 +485,13 @@ function applySelectedSettingsToRide(): void
 /**
  * Apply the same amount of track progress to all selected vehicles based on the currently selected car.
  */
-function applyTrackProgressChange(action: (vehicles: VehicleSpan[], value: number) => void, increment: number): void
+function applyTrackProgressChange(action: (vehicles: VehicleSpan[], value: number) => void, increment: number, filter: CopyFilter): void
 {
 	const selectedVehicle = model._selectedVehicle.get();
 	if (selectedVehicle)
 	{
 		const distance = getDistanceFromProgress(selectedVehicle[0]._car(), increment);
-		model._modifyVehicle(action, distance);
+		model._modifyVehicle(action, distance, filter);
 	}
 }
 
