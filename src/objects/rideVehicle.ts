@@ -116,11 +116,12 @@ export class RideVehicle
 	}
 
 	/**
-	 * Returns true if this car is considered a "spinning" ride type.
+	 * Returns the mask for getting spin frames if this car is considered a "spinning" ride type.
 	 */
-	_isSpinning(): boolean
+	_getSpinFrames(): number
 	{
 		const type = this._type();
-		return !!type && ((type.flags & CAR_ENTRY_FLAG_SPINNING) !== 0);
+		// todo: OpenRCT2 only supports/reports 32 at the moment.
+		return !!type && ((type.flags & CAR_ENTRY_FLAG_SPINNING) !== 0) ? 32 : 0;
 	}
 }

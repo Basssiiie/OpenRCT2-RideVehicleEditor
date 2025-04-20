@@ -231,14 +231,30 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 		case massKey:
 		case poweredAccelerationKey:
 		case poweredMaxSpeedKey:
-		case xPosition:
-		case yPosition:
-		case zPosition:
-		case spinKey:
 		{
 			callback = (car): void =>
 			{
 				car[key] = <never>value;
+			};
+			break;
+		}
+		case xPosition:
+		case yPosition:
+		case zPosition:
+		{
+			callback = (car): void =>
+			{
+				car[key] += value;
+			};
+			break;
+		}
+		case spinKey:
+		{
+			callback = (car): void =>
+			{
+				// Spin does not support negative numbers and must be wrapped
+				const result = car[key] + value;
+				car[key] = (result < 0) ? (256 + result) : result;
 			};
 			break;
 		}

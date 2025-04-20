@@ -7,6 +7,7 @@ import { applyToTargets, CopyFilter, getTargets, getVehicleSettings } from "../s
 import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setReversed, setRideType, setSeatCount, setSecondaryColour, setSpin, setTertiaryColour, setVariant } from "../services/vehicleEditor";
 import { VehicleSpan } from "../services/vehicleSpan";
 import { isValidGameVersion } from "../services/versionChecker";
+import { floor } from "../utilities/math";
 import { VehicleViewModel } from "../viewmodels/vehicleViewModel";
 import { model as rideModel, rideWindow } from "./rideWindow";
 import { labelled, labelledSpinner, LabelledSpinnerParams, multiplier } from "./utilityControls";
@@ -353,7 +354,7 @@ const mainWindow = window({
 								step: model._multiplier,
 								value: model._x,
 								format: model._formatPosition,
-								onChange: value => model._modifyVehicle(setPositionX, value)
+								onChange: (_, incr) => model._modifyVehicle(setPositionX, incr)
 							}),
 							positionSpinner({
 								_label: { text: "Y position:" },
@@ -361,7 +362,7 @@ const mainWindow = window({
 								step: model._multiplier,
 								value: model._y,
 								format: model._formatPosition,
-								onChange: value => model._modifyVehicle(setPositionY, value)
+								onChange: (_, incr) => model._modifyVehicle(setPositionY, incr)
 							}),
 							positionSpinner({
 								_label: { text: "Z position:" },
@@ -369,16 +370,16 @@ const mainWindow = window({
 								step: model._multiplier,
 								value: model._z,
 								format: model._formatPosition,
-								onChange: value => model._modifyVehicle(setPositionZ, value)
+								onChange: (_, incr) => model._modifyVehicle(setPositionZ, incr)
 							}),
 							labelSpinner({
 								_label: { text: "Spin angle:" },
 								minimum: 0,
-								maximum: 255,
+								maximum: compute(model._spinFrames, frames => frames > 0 ? frames - 1 : 0),
 								disabled: model._isSpinDisabled,
 								step: model._multiplier,
-								value: model._spin,
-								onChange: value => model._modifyVehicle(setSpin, value)
+								value: compute(model._spin, model._spinFrames, (spin, frames) => floor((spin * frames) / 256)),
+								onChange: (_, incr) => model._modifyVehicle(setSpin, floor((incr * 256) / model._spinFrames.get()))
 							})
 						]
 					}),
