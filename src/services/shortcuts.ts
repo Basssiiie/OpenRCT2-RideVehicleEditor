@@ -17,6 +17,7 @@ export function registerShortcuts(): void
 	createShortcut("train-previous", "[RVE] Select previous train", null, () => navigateTrains(-1));
 	createShortcut("vehicle-next", "[RVE] Select next vehicle", null, () => navigateVehicles(1));
 	createShortcut("vehicle-previous", "[RVE] Select previous vehicle", null, () => navigateVehicles(-1));
+	createShortcut("multiplier", "[RVE] Select next multiplier option", null, () => model._toggleMultiplier());
 }
 
 /**

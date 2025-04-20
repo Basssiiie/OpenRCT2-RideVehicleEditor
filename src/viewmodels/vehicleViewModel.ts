@@ -398,6 +398,18 @@ export class VehicleViewModel
 	}
 
 	/**
+	 * Toggles to the next multiplier option.
+	 */
+	_toggleMultiplier(): void
+	{
+		if (this._isOpen)
+		{
+			const index = this._multiplierIndex.get();
+			this._multiplierIndex.set((index + 1) % 3);
+		}
+	}
+
+	/**
 	 * Updates the viewmodel with refreshed information from a ride vehicle.
 	 */
 	private _updateVehicleInfo(vehicle: RideVehicle, index: number): void
