@@ -1,5 +1,6 @@
 import { button, checkbox, CheckboxParams, colourPicker, compute, dropdown, dropdownSpinner, DropdownSpinnerParams, FlexiblePosition, groupbox, horizontal, label, SpinnerParams, toggle, twoway, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
 import { isDevelopment, pluginVersion } from "../environment";
+import { RideType } from "../objects/rideType";
 import { RideVehicleVariant, VehicleVisibility } from "../objects/rideVehicleVariant";
 import { invoke, refreshRide } from "../services/events";
 import { getDistanceFromProgress } from "../services/spacingEditor";
@@ -7,6 +8,7 @@ import { applyToTargets, CopyFilter, getTargets, getVehicleSettings } from "../s
 import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setReversed, setRideType, setSeatCount, setSecondaryColour, setSpin, setTertiaryColour, setVariant } from "../services/vehicleEditor";
 import { VehicleSpan } from "../services/vehicleSpan";
 import { isValidGameVersion } from "../services/versionChecker";
+import * as Log from "../utilities/logger";
 import { floor } from "../utilities/math";
 import { VehicleViewModel } from "../viewmodels/vehicleViewModel";
 import { model as rideModel, rideWindow } from "./rideWindow";
@@ -281,7 +283,7 @@ const mainWindow = window({
 						text: "Visuals",
 						content: [
 							dropdown({ // vehicle type editor
-								items: compute(model._rideTypes, c => c.map(t => t._object().name)),
+								items: compute(model._rideTypes, getUniqueRideTypeNames),
 								tooltip: "All ride types currently available in the park",
 								disabledMessage: "No ride types available",
 								disabled: compute(model._isEditDisabled, model._type, (noEdit, type) => (noEdit || !type)),
@@ -529,4 +531,37 @@ function positionSpinner(params: LabelledSpinnerParams & FlexiblePosition): Widg
 	params.wrapMode = "clamp";
 	params._noDisabledMessage = true;
 	return labelSpinner(params);
+}
+
+/**
+ * Hack: make ride type names unique so they don't get mixed up.
+ */
+function getUniqueRideTypeNames(rideTypes: RideType[]): string[]
+{
+	const length = rideTypes.length;
+	const array = Array<string>(length);
+	let streak: string | undefined;
+	let last: string | undefined;
+	let current: string | undefined;
+	let idx = 0;
+
+	for (; idx < length; idx++)
+	{
+		current = rideTypes[idx]._object().name;
+
+		if (current === streak)
+		{
+			last += " "; // Add invisible space to add difference.
+		}
+		else
+		{
+			streak = last = current;
+		}
+
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		array[idx] = last!;
+	}
+
+	Log.debug("getUniqueRideTypeNames():", array);
+	return array;
 }
