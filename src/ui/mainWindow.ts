@@ -135,8 +135,8 @@ const mainWindow = window({
 									width: buttonSize, height: buttonSize,
 									tooltip: "Drag stationary vehicles to new places on the map",
 									image: 5174, // SPR_PICKUP_BTN
-									isPressed: twoway(model._isDragging),
 									disabled: model._isPositionDisabled,
+									isPressed: model._isDragging,
 									onChange: pressed => model._setDragger(pressed)
 								}),
 								toggle({

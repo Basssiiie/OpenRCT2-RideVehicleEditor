@@ -330,15 +330,16 @@ export class VehicleViewModel
 	 */
 	_setPicker(active: boolean, onSelect?: () => void): void
 	{
-		this._isPicking.set(true);
+		this._isPicking.set(active);
 		toggleVehiclePicker(
-			active, c =>
+			active,
+			car =>
 			{
 				if (onSelect)
 				{
 					onSelect();
 				}
-				this._selectCar(c);
+				this._selectCar(car);
 			},
 			() => this._isPicking.set(false)
 		);
@@ -351,6 +352,7 @@ export class VehicleViewModel
 	{
 		if (this._isOpen)
 		{
+			this._isDragging.set(active);
 			toggleVehicleDragger(active, this._selectedVehicle, this._x, this._y, this._z, this._trackLocation, this._trackProgress, () => this._isDragging.set(false));
 		}
 	}

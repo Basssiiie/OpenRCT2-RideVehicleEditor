@@ -21,10 +21,10 @@ export const dragToolId = "rve-drag-vehicle";
 /**
  * Enable or disable a tool to drag the vehicle to a new location.
  */
-export function toggleVehicleDragger(isPressed: boolean, storeVehicle: Store<[RideVehicle, number] | null>, storeX: Store<number>, storeY: Store<number>, storeZ: Store<number>, storeTrackLocation: Store<CarTrackLocation | null>, storeTrackProgress: Store<number>, onCancel: () => void): void
+export function toggleVehicleDragger(active: boolean, storeVehicle: Store<[RideVehicle, number] | null>, storeX: Store<number>, storeY: Store<number>, storeZ: Store<number>, storeTrackLocation: Store<CarTrackLocation | null>, storeTrackProgress: Store<number>, onCancel: () => void): void
 {
 	const rideVehicle = storeVehicle.get();
-	if (!isPressed || !rideVehicle)
+	if (!active || !rideVehicle)
 	{
 		cancelTools(dragToolId);
 		return;

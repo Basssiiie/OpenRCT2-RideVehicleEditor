@@ -7,6 +7,7 @@ export function registerShortcuts(): void
 {
 	createShortcut("open", "[RVE] Open window", ["E"], () => openEditorWindow());
 	createShortcut("pick", "[RVE] Activate picker", ["CTRL+E", "GUI+E"], () => model._setPicker(!model._isPicking.get(), () => model._isOpen || openEditorWindow()));
+	createShortcut("drag", "[RVE] Activate drag tool for selected vehicle", ["CTRL+D", "GUI+D"], () => model._setDragger(!model._isDragging.get()));
 	createShortcut("copy", "[RVE] Copy selected vehicle", null, () => model._copy(true));
 	createShortcut("paste", "[RVE] Paste copied vehicle", null, () => model._paste());
 	createShortcut("locate", "[RVE] Move camera to selected vehicle", null, () => model._locate());
