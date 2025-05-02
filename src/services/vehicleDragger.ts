@@ -41,6 +41,7 @@ export function toggleVehicleDragger(isPressed: boolean, storeVehicle: Store<[Ri
 		progress: storeTrackProgress.get()
 	};
 	let lastPosition: DragPosition = originalPosition;
+	let resetTrack: CarTrackLocation | null | undefined;
 
 	ui.activateTool({
 		id: dragToolId,
@@ -56,6 +57,20 @@ export function toggleVehicleDragger(isPressed: boolean, storeVehicle: Store<[Ri
 			const position = getPositionFromTool(args, vehicle);
 			if (position && (position.x !== lastPosition.x || position.y !== lastPosition.y || position.z !== lastPosition.z))
 			{
+				if (isNumber(position.trackElementIndex))
+				{
+					// Remember where to reset track location to when moving off track again.
+					resetTrack ||= originalPosition.track;
+				}
+				else if (resetTrack)
+				{
+					// Reset back to original track piece.
+					position.track = resetTrack;
+					position.trackElementIndex = getIndexForTrackElementAt(resetTrack);
+					position.progress = originalPosition.progress;
+					resetTrack = null;
+				}
+
 				Log.debug("Selected position:", JSON.stringify(position));
 				updateCarPosition(rideVehicle, position, DragState.Dragging);
 				ui.tileSelection.tiles = [{ x: alignWithMap(position.x), y: alignWithMap(position.y) }];
@@ -222,16 +237,14 @@ function updateVehicleDrag(args: DragVehicleArgs): void
 
 	if (isNumber(position.trackElementIndex) && isNumber(progress))
 	{
-		const track: CoordsXY = position.track || position;
+		const track = position.track;
+		const target: CoordsXY = track || position;
 
-		car.moveToTrack(toTileUnit(track.x), toTileUnit(track.y), position.trackElementIndex);
+		car.moveToTrack(toTileUnit(target.x), toTileUnit(target.y), position.trackElementIndex);
 		car.travelBy(getDistanceFromProgress(car, progress - car.trackProgress));
 
-		// If cancelling, also update the car XYZ, as it may be different from the track.
-		if (args.state !== DragState.Cancel)
-		{
-			skipCarXYZ = true;
-		}
+		// If track variable available, then apply XYZ as preferred vehicle position.
+		skipCarXYZ = !track;
 	}
 
 	if (!skipCarXYZ)
