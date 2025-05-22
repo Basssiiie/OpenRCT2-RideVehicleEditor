@@ -252,7 +252,8 @@ const mainWindow = window({
 								],
 								tooltip: applyOptionsTip,
 								selectedIndex: model._copyTargetOption,
-								onChange: idx =>{
+								onChange: idx =>
+								{
 									idx === CopyOptions.CustomSelectionOfVehiclesOnTrain ? model._isSequence.set(true) : model._isSequence.set(false);
 									model._copyTargetOption.set(idx);
 								}
