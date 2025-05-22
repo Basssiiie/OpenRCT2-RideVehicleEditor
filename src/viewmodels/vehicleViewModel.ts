@@ -361,6 +361,18 @@ export class VehicleViewModel
 	}
 
 	/**
+	 * Toggle the visibilty of custom set of vehicles options.
+	 */
+	_setSequence(index: number): void
+	{
+		if (index === CopyOptions.CustomSelectionOfVehiclesOnTrain)
+		{
+			this._isSequence.set(true);
+		}
+		this._isSequence.set(false);
+	}
+
+	/**
 	 * Copies the currently selected vehicle to the clipboard, or clears clipboard.
 	 */
 	_copy(active: boolean): void

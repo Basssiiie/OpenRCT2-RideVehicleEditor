@@ -4,7 +4,7 @@ import { RideType } from "../objects/rideType";
 import { RideVehicleVariant, VehicleVisibility } from "../objects/rideVehicleVariant";
 import { invoke, refreshRide } from "../services/events";
 import { getDistanceFromProgress } from "../services/spacingEditor";
-import { applyToTargets, CopyFilter, CopyOptions, getTargets, getVehicleSettings } from "../services/vehicleCopier";
+import { applyToTargets, CopyFilter, getTargets, getVehicleSettings } from "../services/vehicleCopier";
 import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setReversed, setRideType, setSeatCount, setSecondaryColour, setSpin, setTertiaryColour, setVariant } from "../services/vehicleEditor";
 import { VehicleSpan } from "../services/vehicleSpan";
 import { isValidGameVersion } from "../services/versionChecker";
@@ -254,7 +254,7 @@ const mainWindow = window({
 								selectedIndex: model._copyTargetOption,
 								onChange: idx =>
 								{
-									idx === CopyOptions.CustomSelectionOfVehiclesOnTrain ? model._isSequence.set(true) : model._isSequence.set(false);
+									model._setSequence(idx);
 									model._copyTargetOption.set(idx);
 								}
 							}),
