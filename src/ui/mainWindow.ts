@@ -244,7 +244,7 @@ const mainWindow = window({
 									"All vehicles on this train",
 									"Preceding vehicles on this train",
 									"Following vehicles on this train",
-									"Custom selection of vehicles on this train",
+									"Specific vehicles on this train",
 									"All vehicles on all trains",
 									"Preceding vehicles on all trains",
 									"Following vehicles on all trains",
