@@ -18,6 +18,7 @@ export const enum CopyOptions
 	AllVehiclesOnTrain,
 	PrecedingVehiclesOnTrain,
 	FollowingVehiclesOnTrain,
+	CustomSelectionOfVehiclesOnTrain,
 	AllVehiclesOnAllTrains,
 	PrecedingVehiclesOnAllTrains,
 	FollowingVehiclesOnAllTrains,
@@ -31,6 +32,7 @@ export const copyOptions = <const>[
 	"All vehicles on this train",
 	"Preceding vehicles on this train",
 	"Following vehicles on this train",
+	"Custom selection of vehicles on this train",
 	"All vehicles on all trains",
 	"Preceding vehicles on all trains",
 	"Following vehicles on all trains",
@@ -62,7 +64,7 @@ export const enum CopyFilter
  * Gets the targeted vehicles based on the selected copy option, in the following
  * format; [[ car id, amount of following cars (inclusive) ], ...].
  */
-export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | null, train: [RideTrain, number] | null, vehicle: [RideVehicle, number] | null):  [number, number | null][]
+export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | null, train: [RideTrain, number] | null, vehicle: [RideVehicle, number] | null, sequence: number, lastVehicle: number):  [number, number | null][]
 {
 	if (ride && train && vehicle)
 	{
@@ -79,6 +81,11 @@ export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | n
 			case CopyOptions.FollowingVehiclesOnTrain:
 			{
 				return [[ vehicle[0]._id, null ]];
+			}
+			case CopyOptions.CustomSelectionOfVehiclesOnTrain:
+			{
+				const index = vehicle[1];
+				return vehicleSequence(ride, index, lastVehicle, sequence, v => [ v._id, 1 ]);
 			}
 			case CopyOptions.AllVehiclesOnAllTrains:
 			{
@@ -240,4 +247,18 @@ function applyVehicleSettings(car: Car, settings: VehicleSettings): void
 function getTargetsOnAllTrains(ride: [ParkRide, number], callback: (train: RideTrain) => [number, number | null]): [number, number | null][]
 {
 	return ride[0]._trains().map(callback);
+}
+
+export function vehicleSequence(ride: [ParkRide, number], index: number, lastVehicle: number, sequence: number, callback: (vehicle: RideVehicle) => [number, number | null]): [number, number | null][]
+{
+	const train = ride[0]._trains()[0];
+	const vehicles = train._vehicles();
+	let idxArr = vehicles.slice(index, lastVehicle);
+	let newArr: RideVehicle[] = [];
+	idxArr.forEach((e, i) => {
+		if (i % sequence === 0) {
+			newArr.push(e);
+		}
+	});
+	return newArr.map(callback);
 }

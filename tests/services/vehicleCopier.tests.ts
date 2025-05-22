@@ -32,7 +32,7 @@ const getTargetsMacro = test.macro((t, option: CopyOptions, trainIndex: number, 
 	const train = ride._trains()[trainIndex];
 	const vehicle = train._at(vehicleIndex);
 
-	const targets = getTargets(option, [ride, 25], [train, trainIndex], [vehicle, vehicleIndex]);
+	const targets = getTargets(option, [ride, 25], [train, trainIndex], [vehicle, vehicleIndex], 1, 1);
 
 	t.deepEqual(targets, expectedTargets);
 });

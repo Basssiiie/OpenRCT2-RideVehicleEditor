@@ -1,10 +1,10 @@
-import { button, checkbox, CheckboxParams, colourPicker, compute, dropdown, dropdownSpinner, DropdownSpinnerParams, FlexiblePosition, groupbox, horizontal, label, SpinnerParams, toggle, twoway, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
+import { button, checkbox, CheckboxParams, colourPicker, compute, dropdown, dropdownSpinner, DropdownSpinnerParams, FlexiblePosition, groupbox, horizontal, label, spinner, SpinnerParams, toggle, twoway, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
 import { isDevelopment, pluginVersion } from "../environment";
 import { RideType } from "../objects/rideType";
 import { RideVehicleVariant, VehicleVisibility } from "../objects/rideVehicleVariant";
 import { invoke, refreshRide } from "../services/events";
 import { getDistanceFromProgress } from "../services/spacingEditor";
-import { applyToTargets, CopyFilter, getTargets, getVehicleSettings } from "../services/vehicleCopier";
+import { applyToTargets, CopyFilter, CopyOptions, getTargets, getVehicleSettings } from "../services/vehicleCopier";
 import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setReversed, setRideType, setSeatCount, setSecondaryColour, setSpin, setTertiaryColour, setVariant } from "../services/vehicleEditor";
 import { VehicleSpan } from "../services/vehicleSpan";
 import { isValidGameVersion } from "../services/versionChecker";
@@ -55,7 +55,7 @@ model._selectedRide.subscribe(r =>
 const mainWindow = window({
 	title,
 	width: { value: 515, min: 515, max: 560 },
-	height: 415,
+	height: 430,
 	spacing: 5,
 	onOpen: () => model._open(),
 	onClose: () =>
@@ -244,6 +244,7 @@ const mainWindow = window({
 									"All vehicles on this train",
 									"Preceding vehicles on this train",
 									"Following vehicles on this train",
+									"Custom selection of vehicles on this train",
 									"All vehicles on all trains",
 									"Preceding vehicles on all trains",
 									"Following vehicles on all trains",
@@ -251,7 +252,52 @@ const mainWindow = window({
 								],
 								tooltip: applyOptionsTip,
 								selectedIndex: model._copyTargetOption,
-								onChange: idx => model._copyTargetOption.set(idx)
+								onChange: idx => {
+									idx === CopyOptions.CustomSelectionOfVehiclesOnTrain ? model._isSequence.set(true) : model._isSequence.set(false);
+									model._copyTargetOption.set(idx);
+								}
+							}),
+							horizontal({
+								padding: { top: -4, right: 1 },								
+								content: [
+									label({
+										text: "Apply to every # vehicle(s):",
+										tooltip: "Applies settings to every selected number of vehicles",
+										width: 180,
+										visibility: compute(model._isSequence, s => s ? "visible" : "none")
+									}),
+									spinner({
+										tooltip: "Applies settings to every selected number of vehicles",
+										width: 60,
+										value: 1,
+										minimum: 1,
+										maximum: compute(model._vehicles, c => c.length || 1),
+										step: model._multiplier,
+										visibility: compute(model._isSequence, s => s ? "visible" : "none"),
+										onChange: v => model._sequenceValue.set(v)
+									})
+								]
+							}),
+							horizontal({
+								padding: { top: -4, right: 1 },								
+								content: [
+									label({
+										text: "Last vehicle of train to modify",
+										tooltip: "Selects which vehicle of the train is the last to modify",
+										width: 180,
+										visibility: compute(model._isSequence, s => s ? "visible" : "none")
+									}),
+									spinner({
+										tooltip: "Selects which vehicle of the train is the last to modify",
+										width: 60,
+										value: compute(model._vehicles, c => c.length || 1),
+										minimum: 1,
+										maximum: compute(model._vehicles, c => c.length || 1),
+										step: model._multiplier,
+										visibility: compute(model._isSequence, s => s ? "visible" : "none"),
+										onChange: v => model._lastVehicle.set(v)
+									})
+								]
 							}),
 							horizontal([
 								button({
@@ -479,7 +525,7 @@ function applySelectedSettingsToRide(): void
 	{
 		applyToTargets(
 			getVehicleSettings(vehicle[0], model._copyFilters.get()),
-			getTargets(model._copyTargetOption.get(), model._selectedRide.get(), model._selectedTrain.get(), vehicle)
+			getTargets(model._copyTargetOption.get(), model._selectedRide.get(), model._selectedTrain.get(), vehicle, model._sequenceValue.get(), model._lastVehicle.get())
 		);
 	}
 }
