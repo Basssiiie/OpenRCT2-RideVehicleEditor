@@ -253,8 +253,8 @@ export function vehicleSequence(ride: [ParkRide, number], index: number, lastVeh
 {
 	const train = ride[0]._trains()[0];
 	const vehicles = train._vehicles();
-	let idxArr = vehicles.slice(index, lastVehicle);
-	let newArr: RideVehicle[] = [];
+	const idxArr = vehicles.slice(index, lastVehicle);
+	const newArr: RideVehicle[] = [];
 	idxArr.forEach((e, i) => {
 		if (i % sequence === 0) {
 			newArr.push(e);
