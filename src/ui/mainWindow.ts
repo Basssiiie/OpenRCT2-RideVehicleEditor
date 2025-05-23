@@ -248,12 +248,14 @@ const mainWindow = window({
 									"All vehicles on all trains",
 									"Preceding vehicles on all trains",
 									"Following vehicles on all trains",
-									"Same vehicle number on all trains"
+									"Same vehicle number on all trains",
+									"Specific vehicles on all trains"
 								],
 								tooltip: applyOptionsTip,
 								selectedIndex: model._copyTargetOption,
 								onChange: idx =>
 								{
+									console.log(idx);
 									model._setSequence(idx);
 									model._copyTargetOption.set(idx);
 								}

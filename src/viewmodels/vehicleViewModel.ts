@@ -366,7 +366,7 @@ export class VehicleViewModel
 	 */
 	_setSequence(index: number): void
 	{
-		this._isSequence.set(index === CopyOptions.SpecificVehiclesOnTrain);
+		this._isSequence.set(index === CopyOptions.SpecificVehiclesOnTrain || index === CopyOptions.SpecificVehiclesOnAllTrains);
 	}
 
 	/**
