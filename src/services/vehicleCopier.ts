@@ -22,7 +22,8 @@ export const enum CopyOptions
 	AllVehiclesOnAllTrains,
 	PrecedingVehiclesOnAllTrains,
 	FollowingVehiclesOnAllTrains,
-	SameVehicleOnAllTrains
+	SameVehicleOnAllTrains,
+	SpecificVehiclesOnAllTrains
 }
 
 /**
@@ -36,7 +37,8 @@ export const copyOptions = <const>[
 	"All vehicles on all trains",
 	"Preceding vehicles on all trains",
 	"Following vehicles on all trains",
-	"Same vehicle number on all trains"
+	"Same vehicle number on all trains",
+	"Specific vehicles on all trains"
 ];
 
 
@@ -104,6 +106,11 @@ export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | n
 			{
 				const index = vehicle[1];
 				return getTargetsOnAllTrains(ride, t => [ t._at(index)._id, 1 ]);
+			}
+			case CopyOptions.SpecificVehiclesOnAllTrains:
+			{
+				const index = vehicle[1];
+				return vehicleSequence(ride, index, amount, sequence, v => [ v._id, 1 ]);
 			}
 		}
 	}
