@@ -87,7 +87,7 @@ export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | n
 			case CopyOptions.SpecificVehiclesOnTrain:
 			{
 				const index = vehicle[1];
-				return vehicleSequence(ride, index, amount, sequence, v => [ v._id, 1 ]);
+				return vehicleSequence(ride, index, amount, sequence, false, v => [ v._id, 1 ]);
 			}
 			case CopyOptions.AllVehiclesOnAllTrains:
 			{
@@ -111,7 +111,7 @@ export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | n
 			case CopyOptions.SpecificVehiclesOnAllTrains:
 			{
 				const index = vehicle[1];
-				return vehicleSequence(ride, index, amount, sequence, v => [ v._id, 1 ]);
+				return vehicleSequence(ride, index, amount, sequence, true, v => [ v._id, 1 ]);
 			}
 		}
 	}
