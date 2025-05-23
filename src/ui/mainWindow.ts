@@ -283,13 +283,13 @@ const mainWindow = window({
 								padding: { top: -4, right: 1 },								
 								content: [
 									label({
-										text: "Last vehicle of train to modify",
+										text: "Amount of vehicles to modify",
 										tooltip: "Selects which vehicle of the train is the last to modify",
 										width: 180,
 										visibility: compute(model._isSequence, s => s ? "visible" : "none")
 									}),
 									spinner({
-										tooltip: "Selects which vehicle of the train is the last to modify",
+										tooltip: "Sets the amount of vehicles to modify",
 										width: 60,
 										value: compute(model._vehicles, c => c.length || 1),
 										minimum: 1,
