@@ -29,7 +29,7 @@ export class VehicleViewModel
 	readonly _rides = store<ParkRide[]>([]);
 	readonly _trains = compute(this._selectedRide, r => (r) ? r[0]._trains() : []);
 	readonly _vehicles = compute(this._selectedTrain, t => (t) ? t[0]._vehicles() : []);
-	readonly _lastVehicle = store<number>(0);
+	readonly _lastVehicle = compute(this.vehicles, v => v.length);
 
 	readonly _type = store<[RideType, number] | null>(null);
 	readonly _variants = compute(this._type, t => (t) ? t[0]._variants() : []);
