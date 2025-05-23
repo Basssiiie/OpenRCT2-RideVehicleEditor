@@ -249,7 +249,7 @@ function getTargetsOnAllTrains(ride: [ParkRide, number], callback: (train: RideT
 	return ride[0]._trains().map(callback);
 }
 
-export function vehicleSequence(ride: [ParkRide, number], index: number, lastVehicle: number, sequence: number, callback: (vehicle: RideVehicle) => [number, number | null]): [number, number | null][]
+function vehicleSequence(ride: [ParkRide, number], index: number, lastVehicle: number, sequence: number, callback: (vehicle: RideVehicle) => [number, number | null]): [number, number | null][]
 {
 	const train = ride[0]._trains()[0];
 	const vehicles = train._vehicles();
