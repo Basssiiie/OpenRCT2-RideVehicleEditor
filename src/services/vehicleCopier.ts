@@ -110,7 +110,7 @@ export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | n
 			case CopyOptions.SpecificVehiclesOnAllTrains:
 			{
 				const index = vehicle[1];
-				return vehicleSequence(ride, index, amount, sequence, v => [ v._id, 1 ]);
+				return getTargetsOnAllTrains(ride, t => [ t._at(index)._id, amount ]);
 			}
 		}
 	}
