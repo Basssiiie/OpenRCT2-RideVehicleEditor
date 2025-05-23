@@ -363,7 +363,8 @@ export class VehicleViewModel
 	/**
 	 * Toggle the visibilty of specific vehicles options.
 	 */
-	_setSequence(index: number): void {
+	_setSequence(index: number): void
+	{
 		this._isSequence.set(index === CopyOptions.SpecificVehiclesOnTrain);
 	}
 
