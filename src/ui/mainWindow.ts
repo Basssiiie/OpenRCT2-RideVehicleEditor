@@ -255,7 +255,6 @@ const mainWindow = window({
 								selectedIndex: model._copyTargetOption,
 								onChange: idx =>
 								{
-									console.log(idx);
 									model._setSequence(idx);
 									model._copyTargetOption.set(idx);
 								}

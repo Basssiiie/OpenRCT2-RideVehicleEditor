@@ -256,18 +256,22 @@ function getTargetsOnAllTrains(ride: [ParkRide, number], callback: (train: RideT
 	return ride[0]._trains().map(callback);
 }
 
-function vehicleSequence(ride: [ParkRide, number], index: number, amount: number, sequence: number, callback: (vehicle: RideVehicle) => [number, number | null]): [number, number | null][]
-{
-	const train = ride[0]._trains()[0];
-	const vehicles = train._vehicles();
-	const idxArr = vehicles.slice(index, index + amount);
+function vehicleSequence(ride: [ParkRide, number], index: number, amount: number, sequence: number, allTrainsSelected: boolean, callback: (vehicle: RideVehicle) => [number, number | null]): [number, number | null][] {
 	const newArr: RideVehicle[] = [];
-	idxArr.forEach((e, i) =>
-	{
-		if (i % sequence === 0)
-		{
-			newArr.push(e);
-		}
-	});
+	const train = ride[0]._trains()[0];
+	const allTrains = ride[0]._trains();
+	if (allTrainsSelected) {
+		allTrains.map(test);
+	}
+	else { test(train) }
+	function test(train: RideTrain) {
+		const vehicles = train._vehicles();
+		const idxArr = vehicles.slice(index, index + amount);
+		idxArr.forEach((e, i) => {
+			if (i % sequence === 0) {
+				newArr.push(e);
+			}
+		});
+	}
 	return newArr.map(callback);
 }
