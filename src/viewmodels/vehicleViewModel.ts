@@ -29,7 +29,6 @@ export class VehicleViewModel
 	readonly _rides = store<ParkRide[]>([]);
 	readonly _trains = compute(this._selectedRide, r => (r) ? r[0]._trains() : []);
 	readonly _vehicles = compute(this._selectedTrain, t => (t) ? t[0]._vehicles() : []);
-	readonly _lastVehicle = compute(this._vehicles, v => v.length);
 
 	readonly _type = store<[RideType, number] | null>(null);
 	readonly _variants = compute(this._type, t => (t) ? t[0]._variants() : []);
@@ -63,11 +62,13 @@ export class VehicleViewModel
 	readonly _formatPosition = (pos: number): string => (this._isEditDisabled.get() ? "Not available" : pos.toString());
 	readonly _multiplierIndex = store<number>(0);
 	readonly _multiplier = compute(this._multiplierIndex, idx => (10 ** idx));
-	readonly _sequenceValue = store<number>(1);
+
+	readonly _sequence = store<number>(1);
+	readonly _amount = compute(this._vehicles, c => c.length);
 
 	readonly _copyFilters = store(CopyFilter.Default);
 	readonly _copyTargetOption = store<CopyOptions>(0);
-	readonly _copyTargets = compute(this._copyTargetOption, this._selectedVehicle, this._sequenceValue, this._lastVehicle, (o, v, s, l) => getTargets(o, this._selectedRide.get(), this._selectedTrain.get(), v, s, l ));
+	readonly _copyTargets = compute(this._copyTargetOption, this._selectedVehicle, this._sequence, this._amount, (o, v, s, a) => getTargets(o, this._selectedRide.get(), this._selectedTrain.get(), v, s, a ));
 	readonly _synchronizeTargets = store<boolean>(false);
 	readonly _clipboard = store<VehicleSettings | null>(null);
 

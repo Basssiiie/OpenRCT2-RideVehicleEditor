@@ -275,7 +275,7 @@ const mainWindow = window({
 										maximum: compute(model._vehicles, c => c.length || 1),
 										step: model._multiplier,
 										visibility: compute(model._isSequence, s => s ? "visible" : "none"),
-										onChange: v => model._sequenceValue.set(v)
+										onChange: v => model._sequence.set(v)
 									})
 								]
 							}),
@@ -291,12 +291,12 @@ const mainWindow = window({
 									spinner({
 										tooltip: "Sets the amount of vehicles to modify",
 										width: 60,
-										value: compute(model._vehicles, c => c.length || 1),
+										value: compute(model._vehicles, c => c.length),
 										minimum: 1,
-										maximum: compute(model._vehicles, c => c.length || 1),
+										maximum: compute(model._vehicles, model._selectedVehicle, (c, s) => (s) ? c.length - s[1] : 1),										
 										step: model._multiplier,
 										visibility: compute(model._isSequence, s => s ? "visible" : "none"),
-										onChange: v => model._lastVehicle.set(v)
+										onChange: v => model._amount.set(v)
 									})
 								]
 							}),
@@ -526,7 +526,7 @@ function applySelectedSettingsToRide(): void
 	{
 		applyToTargets(
 			getVehicleSettings(vehicle[0], model._copyFilters.get()),
-			getTargets(model._copyTargetOption.get(), model._selectedRide.get(), model._selectedTrain.get(), vehicle, model._sequenceValue.get(), model._lastVehicle.get())
+			getTargets(model._copyTargetOption.get(), model._selectedRide.get(), model._selectedTrain.get(), vehicle, model._sequence.get(), model._amount.get())
 		);
 	}
 }
