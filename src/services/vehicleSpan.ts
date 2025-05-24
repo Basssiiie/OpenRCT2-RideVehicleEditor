@@ -15,7 +15,7 @@ export type VehicleSpan = [number, number | null];
 /**
  * Applies a specific callback for each vehicle in the specified list of vehicle spans.
  */
-export function forEachVehicle(vehicles: VehicleSpan[], action: (car: Car, index: number) => void): void
+export function forEachVehicle(vehicles: VehicleSpan[], sequence: number, action: (car: Car, index: number) => void): void
 {
 	for (let s = 0, sl = vehicles.length; s < sl; s++)
 	{
@@ -29,10 +29,11 @@ export function forEachVehicle(vehicles: VehicleSpan[], action: (car: Car, index
 			const car = getCarById(currentId);
 			if (!car)
 				break;
-
-			action(car, count);
+			if (count % sequence === 0)
+			{
+				action(car, count);
+			}
 			invoke(refreshVehicle, currentId);
-
 			const nextId = car.nextCarOnTrain;
 			if (isNull(nextId))
 				break;

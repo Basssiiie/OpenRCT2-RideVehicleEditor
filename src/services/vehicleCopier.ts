@@ -64,7 +64,7 @@ export const enum CopyFilter
  * Gets the targeted vehicles based on the selected copy option, in the following
  * format; [[ car id, amount of following cars (inclusive) ], ...].
  */
-export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | null, train: [RideTrain, number] | null, vehicle: [RideVehicle, number] | null, sequence: number, amount: number):  [number, number | null][]
+export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | null, train: [RideTrain, number] | null, vehicle: [RideVehicle, number] | null, amount: number):  [number, number | null][]
 {
 	if (ride && train && vehicle)
 	{
@@ -84,8 +84,7 @@ export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | n
 			}
 			case CopyOptions.SpecificVehiclesOnTrain:
 			{
-				const index = vehicle[1];
-				return vehicleSequence(ride, index, amount, sequence, v => [ v._id, 1 ]);
+				return [[ vehicle[0]._id, amount ]];
 			}
 			case CopyOptions.AllVehiclesOnAllTrains:
 			{
@@ -164,9 +163,9 @@ export function getVehicleSettings(source: RideVehicle, filters: CopyFilter): Ve
 /**
  * Applies the set of vehicle settings to the specified targets.
  */
-export function applyToTargets(settings: VehicleSettings, targets: [number, number | null][]): void
+export function applyToTargets(settings: VehicleSettings, targets: [number, number | null][], sequence: number): void
 {
-	execute({ settings, targets });
+	execute({ settings, targets, sequence });
 }
 
 
@@ -199,6 +198,7 @@ interface PasteVehicleSettingsArgs
 {
 	settings: VehicleSettings;
 	targets: VehicleSpan[];
+	sequence: number;
 }
 
 
@@ -207,7 +207,7 @@ interface PasteVehicleSettingsArgs
  */
 function pasteVehicleSettings(args: PasteVehicleSettingsArgs): void
 {
-	forEachVehicle(args.targets, car => applyVehicleSettings(car, args.settings));
+	forEachVehicle(args.targets, args.sequence, car => applyVehicleSettings(car, args.settings));
 }
 
 
@@ -247,20 +247,4 @@ function applyVehicleSettings(car: Car, settings: VehicleSettings): void
 function getTargetsOnAllTrains(ride: [ParkRide, number], callback: (train: RideTrain) => [number, number | null]): [number, number | null][]
 {
 	return ride[0]._trains().map(callback);
-}
-
-function vehicleSequence(ride: [ParkRide, number], index: number, amount: number, sequence: number, callback: (vehicle: RideVehicle) => [number, number | null]): [number, number | null][]
-{
-	const train = ride[0]._trains()[0];
-	const vehicles = train._vehicles();
-	const idxArr = vehicles.slice(index, index + amount);
-	const newArr: RideVehicle[] = [];
-	idxArr.forEach((e, i) =>
-	{
-		if (i % sequence === 0)
-		{
-			newArr.push(e);
-		}
-	});
-	return newArr.map(callback);
 }

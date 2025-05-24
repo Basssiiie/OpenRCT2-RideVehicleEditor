@@ -526,7 +526,8 @@ function applySelectedSettingsToRide(): void
 	{
 		applyToTargets(
 			getVehicleSettings(vehicle[0], model._copyFilters.get()),
-			getTargets(model._copyTargetOption.get(), model._selectedRide.get(), model._selectedTrain.get(), vehicle, model._sequence.get(), model._amount.get())
+			getTargets(model._copyTargetOption.get(), model._selectedRide.get(), model._selectedTrain.get(), vehicle, model._amount.get()),
+			model._sequence.get()
 		);
 	}
 }
@@ -534,7 +535,7 @@ function applySelectedSettingsToRide(): void
 /**
  * Apply the same amount of track progress to all selected vehicles based on the currently selected car.
  */
-function applyTrackProgressChange(action: (vehicles: VehicleSpan[], value: number) => void, increment: number, filter: CopyFilter): void
+function applyTrackProgressChange(action: (vehicles: VehicleSpan[], value: number, sequence: number) => void, increment: number, filter: CopyFilter): void
 {
 	const selectedVehicle = model._selectedVehicle.get();
 	if (selectedVehicle)

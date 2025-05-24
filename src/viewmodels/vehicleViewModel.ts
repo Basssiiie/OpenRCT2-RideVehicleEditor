@@ -68,7 +68,7 @@ export class VehicleViewModel
 
 	readonly _copyFilters = store(CopyFilter.Default);
 	readonly _copyTargetOption = store<CopyOptions>(0);
-	readonly _copyTargets = compute(this._copyTargetOption, this._selectedVehicle, this._sequence, this._amount, (o, v, s, a) => getTargets(o, this._selectedRide.get(), this._selectedTrain.get(), v, s, a ));
+	readonly _copyTargets = compute(this._copyTargetOption, this._selectedVehicle, this._amount, (o, v, a) => getTargets(o, this._selectedRide.get(), this._selectedTrain.get(), v, a ));
 	readonly _synchronizeTargets = store<boolean>(false);
 	readonly _clipboard = store<VehicleSettings | null>(null);
 
@@ -289,7 +289,7 @@ export class VehicleViewModel
 	/**
 	 * Attempt to modify the vehicle with the specified action, if a vehicle is selected.
 	 */
-	_modifyVehicle<T>(action: (vehicles: VehicleSpan[], value: T) => void, value: T, filter: CopyFilter): void
+	_modifyVehicle<T>(action: (vehicles: VehicleSpan[], value: T, sequence: number) => void, value: T, filter: CopyFilter): void
 	{
 		if (this._isRefreshing)
 		{
@@ -302,11 +302,11 @@ export class VehicleViewModel
 			// Only apply if action matches filter.
 			if (this._synchronizeTargets.get() && (!filter || ((this._copyFilters.get() || CopyFilter.All) & filter)))
 			{
-				action(this._copyTargets.get(), value);
+				action(this._copyTargets.get(), value, this._sequence.get());
 			}
 			else
 			{
-				action([[ vehicle[0]._id, 1 ]], value);
+				action([[ vehicle[0]._id, 1 ]], value, this._sequence.get());
 			}
 		}
 		else
@@ -395,7 +395,7 @@ export class VehicleViewModel
 		const settings = this._clipboard.get();
 		if (vehicle && settings)
 		{
-			applyToTargets(settings, [[ vehicle[0]._id, 1 ]]);
+			applyToTargets(settings, [[ vehicle[0]._id, 1 ]], this._sequence.get());
 		}
 	}
 
