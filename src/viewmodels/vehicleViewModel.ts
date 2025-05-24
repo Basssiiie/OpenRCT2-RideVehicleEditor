@@ -64,7 +64,7 @@ export class VehicleViewModel
 	readonly _multiplier = compute(this._multiplierIndex, idx => (10 ** idx));
 
 	readonly _sequence = store<number>(1);
-	readonly _amount = store<number>(this._vehicles.get().length);
+	readonly _amount = compute(this._vehicles, c => c.length);
 
 	readonly _copyFilters = store(CopyFilter.Default);
 	readonly _copyTargetOption = store<CopyOptions>(0);
