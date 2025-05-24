@@ -261,10 +261,10 @@ function vehicleSequence(ride: [ParkRide, number], index: number, amount: number
 	const train = ride[0]._trains()[0];
 	const allTrains = ride[0]._trains();
 	if (allTrainsSelected) {
-		allTrains.map(test);
+		allTrains.map(createSequence);
 	}
-	else { test(train) }
-	function test(train: RideTrain) {
+	else { createSequence(train) }
+	function createSequence(train: RideTrain) {
 		const vehicles = train._vehicles();
 		const idxArr = vehicles.slice(index, index + amount);
 		idxArr.forEach((e, i) => {
