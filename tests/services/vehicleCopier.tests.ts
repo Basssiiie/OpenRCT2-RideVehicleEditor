@@ -32,7 +32,7 @@ const getTargetsMacro = test.macro((t, option: CopyOptions, trainIndex: number, 
 	const train = ride._trains()[trainIndex];
 	const vehicle = train._at(vehicleIndex);
 
-	const targets = getTargets(option, [ride, 25], [train, trainIndex], [vehicle, vehicleIndex], 1);
+	const targets = getTargets(option, [ride, 25], [train, trainIndex], [vehicle, vehicleIndex], 1, 1);
 
 	t.deepEqual(targets, expectedTargets);
 });
@@ -226,7 +226,7 @@ test("Paste all vehicle settings on single car", t =>
 		colours: [ 13, 15, 18 ]
 	};
 
-	applyToTargets(settings, [[ 99, 1]], 1);
+	applyToTargets(settings, [[ 99, 1, 1]]);
 
 	const targetCar = <Car>map.getEntity(99);
 	t.is(targetCar.rideObject, 21);
@@ -260,7 +260,7 @@ test("Paste all vehicle settings on a car does not affect other cars", t =>
 		colours: [ 13, 15, 18 ]
 	};
 
-	applyToTargets(settings, [[ 99, 3 ], [ 99, null ]], 1);
+	applyToTargets(settings, [[ 99, 3, 1 ], [ 99, null, 1 ]]);
 
 	function testUnaffectedCar(carId: number): void
 	{
@@ -291,7 +291,7 @@ test("Paste empty vehicle settings on single car does not do anything", t =>
 
 	const settings: VehicleSettings = {};
 
-	applyToTargets(settings, [[ 99, 1]], 1);
+	applyToTargets(settings, [[ 99, 1, 1]]);
 
 	const targetCar = <Car>map.getEntity(99);
 	t.is(targetCar.rideObject, 2);
@@ -323,7 +323,7 @@ test("Paste all vehicle settings on multiple trains car affects all", t =>
 		colours: [ 8, 6, 5 ]
 	};
 
-	applyToTargets(settings, [[ 98, 4 ], [ 97, null ]], 1);
+	applyToTargets(settings, [[ 98, 4, 1 ], [ 97, null, 1 ]]);
 
 	function testAffectedCar(carId: number): void
 	{
