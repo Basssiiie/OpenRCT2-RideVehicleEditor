@@ -369,7 +369,10 @@ export class VehicleViewModel
 	{
 		const check = index === CopyOptions.SpecificVehiclesOnTrain || index === CopyOptions.SpecificVehiclesOnAllTrains;
 		this._isSequence.set(check);
-		if (!check) { this._sequence.set(1) };
+		if (!check)
+		{
+			this._sequence.set(1);
+		}
 	}
 
 	/**

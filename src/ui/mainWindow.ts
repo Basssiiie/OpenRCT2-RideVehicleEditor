@@ -527,7 +527,7 @@ function applySelectedSettingsToRide(): void
 	{
 		applyToTargets(
 			getVehicleSettings(vehicle[0], model._copyFilters.get()),
-			getTargets(model._copyTargetOption.get(), model._selectedRide.get(), model._selectedTrain.get(), vehicle, model._amount.get(), model._sequence.get()),
+			getTargets(model._copyTargetOption.get(), model._selectedRide.get(), model._selectedTrain.get(), vehicle, model._amount.get(), model._sequence.get())
 		);
 	}
 }

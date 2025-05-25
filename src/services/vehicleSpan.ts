@@ -23,7 +23,7 @@ export function forEachVehicle(vehicles: VehicleSpan[], action: (car: Car, index
 	{
 		const span = vehicles[s];
 		const maximum = span[1];
-		const sequence = span[2]
+		const sequence = span[2];
 		let currentId = span[0];
 		let count = 0;
 
