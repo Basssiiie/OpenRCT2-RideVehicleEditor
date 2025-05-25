@@ -20,7 +20,7 @@ function createTrain(startIndex: number): Car[]
 }
 
 
-const getTargetsMacro = test.macro((t, option: CopyOptions, trainIndex: number, vehicleIndex: number, expectedTargets: [number, number | null][]) =>
+const getTargetsMacro = test.macro((t, option: CopyOptions, trainIndex: number, vehicleIndex: number, expectedTargets: [number, number | null, number][]) =>
 {
 	globalThis.map = Mock.map({ entities: [
 		...createTrain(30),
@@ -38,29 +38,29 @@ const getTargetsMacro = test.macro((t, option: CopyOptions, trainIndex: number, 
 });
 
 
-test("Get targets of all vehicles on first train, first car", getTargetsMacro, CopyOptions.AllVehiclesOnTrain, 0, 0, [[ 10, null ]]);
-test("Get targets of all vehicles on third train, third car", getTargetsMacro, CopyOptions.AllVehiclesOnTrain, 2, 2, [[ 30, null ]]);
-test("Get targets of all vehicles on last train, last car", getTargetsMacro, CopyOptions.AllVehiclesOnTrain, 3, 4, [[ 40, null ]]);
-test("Get targets of preceding vehicles on first train, first car", getTargetsMacro, CopyOptions.PrecedingVehiclesOnTrain, 0, 0, [[ 10, 1 ]]);
-test("Get targets of preceding vehicles on third train, third car", getTargetsMacro, CopyOptions.PrecedingVehiclesOnTrain, 2, 2, [[ 30, 3 ]]);
-test("Get targets of preceding vehicles on last train, last car", getTargetsMacro, CopyOptions.PrecedingVehiclesOnTrain, 3, 4, [[ 40, 5 ]]);
-test("Get targets of following vehicles on first train, first car", getTargetsMacro, CopyOptions.FollowingVehiclesOnTrain, 0, 0, [[ 10, null ]]);
-test("Get targets of following vehicles on third train, third car", getTargetsMacro, CopyOptions.FollowingVehiclesOnTrain, 2, 2, [[ 32, null ]]);
-test("Get targets of following vehicles on last train, last car", getTargetsMacro, CopyOptions.FollowingVehiclesOnTrain, 3, 4, [[ 44, null ]]);
+test("Get targets of all vehicles on first train, first car", getTargetsMacro, CopyOptions.AllVehiclesOnTrain, 0, 0, [[ 10, null, 1 ]]);
+test("Get targets of all vehicles on third train, third car", getTargetsMacro, CopyOptions.AllVehiclesOnTrain, 2, 2, [[ 30, null, 1 ]]);
+test("Get targets of all vehicles on last train, last car", getTargetsMacro, CopyOptions.AllVehiclesOnTrain, 3, 4, [[ 40, null, 1 ]]);
+test("Get targets of preceding vehicles on first train, first car", getTargetsMacro, CopyOptions.PrecedingVehiclesOnTrain, 0, 0, [[ 10, 1, 1 ]]);
+test("Get targets of preceding vehicles on third train, third car", getTargetsMacro, CopyOptions.PrecedingVehiclesOnTrain, 2, 2, [[ 30, 3, 1 ]]);
+test("Get targets of preceding vehicles on last train, last car", getTargetsMacro, CopyOptions.PrecedingVehiclesOnTrain, 3, 4, [[ 40, 5, 1 ]]);
+test("Get targets of following vehicles on first train, first car", getTargetsMacro, CopyOptions.FollowingVehiclesOnTrain, 0, 0, [[ 10, null, 1 ]]);
+test("Get targets of following vehicles on third train, third car", getTargetsMacro, CopyOptions.FollowingVehiclesOnTrain, 2, 2, [[ 32, null, 1 ]]);
+test("Get targets of following vehicles on last train, last car", getTargetsMacro, CopyOptions.FollowingVehiclesOnTrain, 3, 4, [[ 44, null, 1 ]]);
 
-test("Get targets of all vehicles on all trains from first train, first car", getTargetsMacro, CopyOptions.AllVehiclesOnAllTrains, 0, 0, [[ 10, null ], [ 20, null ], [ 30, null ], [ 40, null ]]);
-test("Get targets of all vehicles on all trains from third train, third car", getTargetsMacro, CopyOptions.AllVehiclesOnAllTrains, 2, 2, [[ 10, null ], [ 20, null ], [ 30, null ], [ 40, null ]]);
-test("Get targets of all vehicles on all trains from last train, last car", getTargetsMacro, CopyOptions.AllVehiclesOnAllTrains, 3, 4, [[ 10, null ], [ 20, null ], [ 30, null ], [ 40, null ]]);
-test("Get targets of preceding vehicles on all trains from first train, first car", getTargetsMacro, CopyOptions.PrecedingVehiclesOnAllTrains, 0, 0, [[ 10, 1 ], [ 20, 1 ], [ 30, 1 ], [ 40, 1 ]]);
-test("Get targets of preceding vehicles on all trains from third train, third car", getTargetsMacro, CopyOptions.PrecedingVehiclesOnAllTrains, 2, 2, [[ 10, 3 ], [ 20, 3 ], [ 30, 3 ], [ 40, 3 ]]);
-test("Get targets of preceding vehicles on all trains from last train, last car", getTargetsMacro, CopyOptions.PrecedingVehiclesOnAllTrains, 3, 4, [[ 10, 5 ], [ 20, 5 ], [ 30, 5 ], [ 40, 5 ]]);
-test("Get targets of following vehicles on all trains from first train, first car", getTargetsMacro, CopyOptions.FollowingVehiclesOnAllTrains, 0, 0, [[ 10, null ], [ 20, null ], [ 30, null ], [ 40, null ]]);
-test("Get targets of following vehicles on all trains from third train, third car", getTargetsMacro, CopyOptions.FollowingVehiclesOnAllTrains, 2, 2, [[ 12, null ], [ 22, null ], [ 32, null ], [ 42, null ]]);
-test("Get targets of following vehicles on all trains from last train, last car", getTargetsMacro, CopyOptions.FollowingVehiclesOnAllTrains, 3, 4, [[ 14, null ], [ 24, null ], [ 34, null ], [ 44, null ]]);
+test("Get targets of all vehicles on all trains from first train, first car", getTargetsMacro, CopyOptions.AllVehiclesOnAllTrains, 0, 0, [[ 10, null, 1 ], [ 20, null, 1 ], [ 30, null, 1 ], [ 40, null, 1 ]]);
+test("Get targets of all vehicles on all trains from third train, third car", getTargetsMacro, CopyOptions.AllVehiclesOnAllTrains, 2, 2, [[ 10, null, 1 ], [ 20, null, 1 ], [ 30, null, 1 ], [ 40, null, 1 ]]);
+test("Get targets of all vehicles on all trains from last train, last car", getTargetsMacro, CopyOptions.AllVehiclesOnAllTrains, 3, 4, [[ 10, null, 1 ], [ 20, null, 1 ], [ 30, null, 1 ], [ 40, null, 1 ]]);
+test("Get targets of preceding vehicles on all trains from first train, first car", getTargetsMacro, CopyOptions.PrecedingVehiclesOnAllTrains, 0, 0, [[ 10, 1, 1 ], [ 20, 1, 1 ], [ 30, 1, 1 ], [ 40, 1, 1 ]]);
+test("Get targets of preceding vehicles on all trains from third train, third car", getTargetsMacro, CopyOptions.PrecedingVehiclesOnAllTrains, 2, 2, [[ 10, 3, 1 ], [ 20, 3, 1 ], [ 30, 3, 1 ], [ 40, 3, 1 ]]);
+test("Get targets of preceding vehicles on all trains from last train, last car", getTargetsMacro, CopyOptions.PrecedingVehiclesOnAllTrains, 3, 4, [[ 10, 5, 1 ], [ 20, 5, 1 ], [ 30, 5, 1 ], [ 40, 5, 1 ]]);
+test("Get targets of following vehicles on all trains from first train, first car", getTargetsMacro, CopyOptions.FollowingVehiclesOnAllTrains, 0, 0, [[ 10, null, 1 ], [ 20, null, 1 ], [ 30, null, 1 ], [ 40, null, 1 ]]);
+test("Get targets of following vehicles on all trains from third train, third car", getTargetsMacro, CopyOptions.FollowingVehiclesOnAllTrains, 2, 2, [[ 12, null, 1 ], [ 22, null, 1 ], [ 32, null, 1 ], [ 42, null, 1 ]]);
+test("Get targets of following vehicles on all trains from last train, last car", getTargetsMacro, CopyOptions.FollowingVehiclesOnAllTrains, 3, 4, [[ 14, null, 1 ], [ 24, null, 1 ], [ 34, null, 1 ], [ 44, null, 1 ]]);
 
-test("Get targets of same vehicle on all trains from first train, first car", getTargetsMacro, CopyOptions.SameVehicleOnAllTrains, 0, 0, [[ 10, 1 ], [ 20, 1 ], [ 30, 1 ], [ 40, 1 ]]);
-test("Get targets of same vehicle on all trains from third train, third car", getTargetsMacro, CopyOptions.SameVehicleOnAllTrains, 2, 2, [[ 12, 1 ], [ 22, 1 ], [ 32, 1 ], [ 42, 1 ]]);
-test("Get targets of same vehicle on all trains from last train, last car", getTargetsMacro, CopyOptions.SameVehicleOnAllTrains, 3, 4, [[ 14, 1 ], [ 24, 1 ], [ 34, 1 ], [ 44, 1 ]]);
+test("Get targets of same vehicle on all trains from first train, first car", getTargetsMacro, CopyOptions.SameVehicleOnAllTrains, 0, 0, [[ 10, 1, 1 ], [ 20, 1, 1 ], [ 30, 1, 1 ], [ 40, 1, 1 ]]);
+test("Get targets of same vehicle on all trains from third train, third car", getTargetsMacro, CopyOptions.SameVehicleOnAllTrains, 2, 2, [[ 12, 1, 1 ], [ 22, 1, 1 ], [ 32, 1, 1 ], [ 42, 1, 1 ]]);
+test("Get targets of same vehicle on all trains from last train, last car", getTargetsMacro, CopyOptions.SameVehicleOnAllTrains, 3, 4, [[ 14, 1, 1 ], [ 24, 1, 1 ], [ 34, 1, 1 ], [ 44, 1, 1 ]]);
 
 
 test("Get all settings of the vehicle", t =>
