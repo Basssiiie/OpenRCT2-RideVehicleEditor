@@ -66,7 +66,7 @@ export const enum CopyFilter
  * Gets the targeted vehicles based on the selected copy option, in the following
  * format; [[ car id, amount of following cars (inclusive) ], ...].
  */
-export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | null, train: [RideTrain, number] | null, vehicle: [RideVehicle, number] | null, amount: number):  [number, number | null][]
+export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | null, train: [RideTrain, number] | null, vehicle: [RideVehicle, number] | null, amount: number, sequence: number):  [number, number | null, number][]
 {
 	if (ride && train && vehicle)
 	{
@@ -74,43 +74,43 @@ export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | n
 		{
 			case CopyOptions.AllVehiclesOnTrain:
 			{
-				return [[ train[0]._carId, null ]];
+				return [[ train[0]._carId, null, 1 ]];
 			}
 			case CopyOptions.PrecedingVehiclesOnTrain:
 			{
-				return [[ train[0]._carId, vehicle[1] + 1 ]];
+				return [[ train[0]._carId, vehicle[1] + 1, 1 ]];
 			}
 			case CopyOptions.FollowingVehiclesOnTrain:
 			{
-				return [[ vehicle[0]._id, null ]];
+				return [[ vehicle[0]._id, null, 1 ]];
 			}
 			case CopyOptions.SpecificVehiclesOnTrain:
 			{
-				return [[ vehicle[0]._id, amount ]];
+				return [[ vehicle[0]._id, amount, sequence ]];
 			}
 			case CopyOptions.AllVehiclesOnAllTrains:
 			{
-				return getTargetsOnAllTrains(ride, t => [ t._carId, null ]);
+				return getTargetsOnAllTrains(ride, t => [ t._carId, null, 1 ]);
 			}
 			case CopyOptions.PrecedingVehiclesOnAllTrains:
 			{
 				const amountOfVehicles = (vehicle[1] + 1);
-				return getTargetsOnAllTrains(ride, t => [ t._carId, amountOfVehicles ]);
+				return getTargetsOnAllTrains(ride, t => [ t._carId, amountOfVehicles, 1 ]);
 			}
 			case CopyOptions.FollowingVehiclesOnAllTrains:
 			{
 				const index = vehicle[1];
-				return getTargetsOnAllTrains(ride, t => [ t._at(index)._id, null ]);
+				return getTargetsOnAllTrains(ride, t => [ t._at(index)._id, null, 1 ]);
 			}
 			case CopyOptions.SameVehicleOnAllTrains:
 			{
 				const index = vehicle[1];
-				return getTargetsOnAllTrains(ride, t => [ t._at(index)._id, 1 ]);
+				return getTargetsOnAllTrains(ride, t => [ t._at(index)._id, 1, 1 ]);
 			}
 			case CopyOptions.SpecificVehiclesOnAllTrains:
 			{
 				const index = vehicle[1];
-				return getTargetsOnAllTrains(ride, t => [ t._at(index)._id, amount ]);
+				return getTargetsOnAllTrains(ride, t => [ t._at(index)._id, amount, sequence ]);
 			}
 		}
 	}
@@ -170,9 +170,9 @@ export function getVehicleSettings(source: RideVehicle, filters: CopyFilter): Ve
 /**
  * Applies the set of vehicle settings to the specified targets.
  */
-export function applyToTargets(settings: VehicleSettings, targets: [number, number | null][], sequence: number): void
+export function applyToTargets(settings: VehicleSettings, targets: [number, number | null, number][]): void
 {
-	execute({ settings, targets, sequence });
+	execute({ settings, targets });
 }
 
 
@@ -205,7 +205,6 @@ interface PasteVehicleSettingsArgs
 {
 	settings: VehicleSettings;
 	targets: VehicleSpan[];
-	sequence: number;
 }
 
 
@@ -214,7 +213,7 @@ interface PasteVehicleSettingsArgs
  */
 function pasteVehicleSettings(args: PasteVehicleSettingsArgs): void
 {
-	forEachVehicle(args.targets, args.sequence, car => applyVehicleSettings(car, args.settings));
+	forEachVehicle(args.targets, car => applyVehicleSettings(car, args.settings));
 }
 
 
@@ -251,7 +250,7 @@ function applyVehicleSettings(car: Car, settings: VehicleSettings): void
 /**
  * Finds the matching targets on all trains of the specified ride.
  */
-function getTargetsOnAllTrains(ride: [ParkRide, number], callback: (train: RideTrain) => [number, number | null]): [number, number | null][]
+function getTargetsOnAllTrains(ride: [ParkRide, number], callback: (train: RideTrain) => [number, number | null, number]): [number, number | null, number][]
 {
 	return ride[0]._trains().map(callback);
 }

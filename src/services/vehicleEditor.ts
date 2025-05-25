@@ -36,129 +36,129 @@ const
  * Sets the ride type for this vehicle. Resets all other properties
  * to their default values for that type.
  */
-export function setRideType(vehicles: VehicleSpan[], type: RideType, sequence: number): void
+export function setRideType(vehicles: VehicleSpan[], type: RideType): void
 {
-	updateValue(vehicles, rideTypeKey, type._id, sequence);
+	updateValue(vehicles, rideTypeKey, type._id);
 }
 
 /**
  * Sets the vehicle sprite variant. (e.g. locomotive, tender or passenger car)
  */
-export function setVariant(vehicles: VehicleSpan[], variant: number, sequence: number): void
+export function setVariant(vehicles: VehicleSpan[], variant: number): void
 {
-	updateValue(vehicles, variantKey, variant, sequence);
+	updateValue(vehicles, variantKey, variant);
 }
 
 /**
  * Sets whether the vehicle should be reversed on the track or not.
  */
-export function setReversed(vehicles: VehicleSpan[], reversed: boolean, sequence: number): void
+export function setReversed(vehicles: VehicleSpan[], reversed: boolean): void
 {
-	updateValue(vehicles, reversedKey, <number><unknown>reversed, sequence);
+	updateValue(vehicles, reversedKey, <number><unknown>reversed);
 }
 
 /**
  * Moves the vehicle a relative distance along the track.
  */
-export function changeTrackProgress(vehicles: VehicleSpan[], trackProgress: number, sequence: number): void
+export function changeTrackProgress(vehicles: VehicleSpan[], trackProgress: number): void
 {
-	updateValue(vehicles, trackProgressKey, trackProgress, sequence);
+	updateValue(vehicles, trackProgressKey, trackProgress);
 }
 
 /**
  * Moves the vehicle a relative distance away from the vehicle before it.
  */
-export function changeSpacing(vehicles: VehicleSpan[], trackProgress: number, sequence: number): void
+export function changeSpacing(vehicles: VehicleSpan[], trackProgress: number): void
 {
-	updateValue(vehicles, spacingKey, trackProgress, sequence);
+	updateValue(vehicles, spacingKey, trackProgress);
 }
 
 /**
  * Sets the maximum number of seats for this vehicle.
  */
-export function setSeatCount(vehicles: VehicleSpan[], seats: number, sequence: number): void
+export function setSeatCount(vehicles: VehicleSpan[], seats: number): void
 {
-	updateValue(vehicles, seatsKey, seats, sequence);
+	updateValue(vehicles, seatsKey, seats);
 }
 
 /**
  * Sets the mass for this vehicle.
  */
-export function setMass(vehicles: VehicleSpan[], mass: number, sequence: number): void
+export function setMass(vehicles: VehicleSpan[], mass: number): void
 {
-	updateValue(vehicles, massKey, mass, sequence);
+	updateValue(vehicles, massKey, mass);
 }
 
 /**
  * Sets the powered acceleration for this vehicle.
  */
-export function setPoweredAcceleration(vehicles: VehicleSpan[], power: number, sequence: number): void
+export function setPoweredAcceleration(vehicles: VehicleSpan[], power: number): void
 {
-	updateValue(vehicles, poweredAccelerationKey, power, sequence);
+	updateValue(vehicles, poweredAccelerationKey, power);
 }
 
 /**
  * Sets the powered acceleration for this vehicle.
  */
-export function setPoweredMaximumSpeed(vehicles: VehicleSpan[], maximumSpeed: number, sequence: number): void
+export function setPoweredMaximumSpeed(vehicles: VehicleSpan[], maximumSpeed: number): void
 {
-	updateValue(vehicles, poweredMaxSpeedKey, maximumSpeed, sequence);
+	updateValue(vehicles, poweredMaxSpeedKey, maximumSpeed);
 }
 
 /**
  * Sets the primary colour for this vehicle.
  */
-export function setPrimaryColour(vehicles: VehicleSpan[], colour: Colour, sequence: number): void
+export function setPrimaryColour(vehicles: VehicleSpan[], colour: Colour): void
 {
-	updateValue(vehicles, primaryColour, colour, sequence);
+	updateValue(vehicles, primaryColour, colour);
 }
 
 /**
  * Sets the secondary colour for this vehicle.
  */
-export function setSecondaryColour(vehicles: VehicleSpan[], colour: Colour, sequence: number): void
+export function setSecondaryColour(vehicles: VehicleSpan[], colour: Colour): void
 {
-	updateValue(vehicles, secondaryColour, colour, sequence);
+	updateValue(vehicles, secondaryColour, colour);
 }
 
 /**
  * Sets the tertiary colour for this vehicle.
  */
-export function setTertiaryColour(vehicles: VehicleSpan[], colour: Colour, sequence: number): void
+export function setTertiaryColour(vehicles: VehicleSpan[], colour: Colour): void
 {
-	updateValue(vehicles, tertiaryColour, colour, sequence);
+	updateValue(vehicles, tertiaryColour, colour);
 }
 
 /**
  * Sets the x position for this vehicle.
  */
-export function setPositionX(vehicles: VehicleSpan[], x: number, sequence: number): void
+export function setPositionX(vehicles: VehicleSpan[], x: number): void
 {
-	updateValue(vehicles, xPosition, x, sequence);
+	updateValue(vehicles, xPosition, x);
 }
 
 /**
  * Sets the y position for this vehicle.
  */
-export function setPositionY(vehicles: VehicleSpan[], y: number, sequence: number): void
+export function setPositionY(vehicles: VehicleSpan[], y: number): void
 {
-	updateValue(vehicles, yPosition, y, sequence);
+	updateValue(vehicles, yPosition, y);
 }
 
 /**
  * Sets the z position for this vehicle.
  */
-export function setPositionZ(vehicles: VehicleSpan[], z: number, sequence: number): void
+export function setPositionZ(vehicles: VehicleSpan[], z: number): void
 {
-	updateValue(vehicles, zPosition, z, sequence);
+	updateValue(vehicles, zPosition, z);
 }
 
 /**
  * Sets the z position for this vehicle.
  */
-export function setSpin(vehicles: VehicleSpan[], spin: number, sequence: number): void
+export function setSpin(vehicles: VehicleSpan[], spin: number): void
 {
-	updateValue(vehicles, spinKey, spin, sequence);
+	updateValue(vehicles, spinKey, spin);
 }
 
 
@@ -170,15 +170,14 @@ interface UpdateVehicleSettingArgs
 	targets: VehicleSpan[];
 	key: VehicleUpdateKeys;
 	value: number;
-	sequence: number;
 }
 
 /**
  * Dispatches an update game action to other clients to update the specified key.
  */
-function updateValue(vehicles: VehicleSpan[], key: VehicleUpdateKeys, value: number, sequence: number): void
+function updateValue(vehicles: VehicleSpan[], key: VehicleUpdateKeys, value: number): void
 {
-	execute({ targets: vehicles, key, value, sequence });
+	execute({ targets: vehicles, key, value });
 }
 
 /**
@@ -293,8 +292,7 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 			return;
 		}
 	}
-
-	forEachVehicle(targets, args.sequence, callback);
+	forEachVehicle(targets, callback);
 }
 
 /**
