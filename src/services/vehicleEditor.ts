@@ -292,7 +292,6 @@ function updateVehicleSetting(args: UpdateVehicleSettingArgs): void
 			return;
 		}
 	}
-
 	forEachVehicle(targets, callback);
 }
 

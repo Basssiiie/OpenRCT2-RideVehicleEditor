@@ -55,16 +55,21 @@ export class VehicleViewModel
 	readonly _isUnpowered = compute(this._selectedVehicle, this._type, this._variant, v => !v || !v[0]._isPowered());
 	readonly _isPicking = store<boolean>(false);
 	readonly _isDragging = store<boolean>(false);
+	readonly _isSequence = store<boolean>(false);
 	readonly _isEditDisabled = compute(this._selectedVehicle, v => !v);
 	readonly _isSpinDisabled = compute(this._spinFrames, v => !v);
 	readonly _isPositionDisabled = compute(this._isMoving, this._isEditDisabled, (m, e) => m || e);
+	readonly _isSequenceVisible = compute(this._isSequence, s => s ? "visible" : "none");
 	readonly _formatPosition = (pos: number): string => (this._isEditDisabled.get() ? "Not available" : pos.toString());
 	readonly _multiplierIndex = store<number>(0);
 	readonly _multiplier = compute(this._multiplierIndex, idx => (10 ** idx));
 
+	readonly _sequence = store<number>(1);
+	readonly _amount = compute(this._vehicles, c => c.length);
+
 	readonly _copyFilters = store(CopyFilter.Default);
 	readonly _copyTargetOption = store<CopyOptions>(0);
-	readonly _copyTargets = compute(this._copyTargetOption, this._selectedVehicle, (o, v) => getTargets(o, this._selectedRide.get(), this._selectedTrain.get(), v));
+	readonly _copyTargets = compute(this._copyTargetOption, this._selectedVehicle, this._amount, this._sequence, (o, v, a, s) => getTargets(o, this._selectedRide.get(), this._selectedTrain.get(), v, a, s ));
 	readonly _synchronizeTargets = store<boolean>(false);
 	readonly _clipboard = store<VehicleSettings | null>(null);
 
@@ -302,7 +307,7 @@ export class VehicleViewModel
 			}
 			else
 			{
-				action([[ vehicle[0]._id, 1 ]], value);
+				action([[ vehicle[0]._id, 1, this._sequence.get()]], value);
 			}
 		}
 		else
@@ -358,6 +363,19 @@ export class VehicleViewModel
 	}
 
 	/**
+	 * Toggle the visibilty of specific vehicles options.
+	 */
+	_setSequence(index: number): void
+	{
+		const check = index === CopyOptions.SpecificVehiclesOnTrain || index === CopyOptions.SpecificVehiclesOnAllTrains;
+		this._isSequence.set(check);
+		if (!check)
+		{
+			this._sequence.set(1);
+		}
+	}
+
+	/**
 	 * Copies the currently selected vehicle to the clipboard, or clears clipboard.
 	 */
 	_copy(active: boolean): void
@@ -383,7 +401,7 @@ export class VehicleViewModel
 		const settings = this._clipboard.get();
 		if (vehicle && settings)
 		{
-			applyToTargets(settings, [[ vehicle[0]._id, 1 ]]);
+			applyToTargets(settings, [[ vehicle[0]._id, 1, this._sequence.get()]]);
 		}
 	}
 
