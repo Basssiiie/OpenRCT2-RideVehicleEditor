@@ -266,7 +266,7 @@ const mainWindow = window({
 										text: "Apply to every # vehicle(s):",
 										tooltip: "Applies settings to every selected number of vehicles",
 										width: 180,
-										visibility: compute(model._isSequence, s => s ? "visible" : "none")
+										visibility: model._isSequenceVisible
 									}),
 									spinner({
 										tooltip: "Applies settings to every selected number of vehicles",
@@ -275,7 +275,7 @@ const mainWindow = window({
 										minimum: 1,
 										maximum: compute(model._vehicles, c => c.length || 1),
 										step: model._multiplier,
-										visibility: compute(model._isSequence, s => s ? "visible" : "none"),
+										visibility: model._isSequenceVisible,
 										onChange: v => model._sequence.set(v)
 									})
 								]
@@ -287,7 +287,7 @@ const mainWindow = window({
 										text: "Amount of vehicles to modify",
 										tooltip: "Selects which vehicle of the train is the last to modify",
 										width: 180,
-										visibility: compute(model._isSequence, s => s ? "visible" : "none")
+										visibility: model._isSequenceVisible
 									}),
 									spinner({
 										tooltip: "Sets the amount of vehicles to modify",
@@ -296,7 +296,7 @@ const mainWindow = window({
 										minimum: 1,
 										maximum: compute(model._vehicles, model._selectedVehicle, (c, s) => (s) ? c.length - s[1] : 1),										
 										step: model._multiplier,
-										visibility: compute(model._isSequence, s => s ? "visible" : "none"),
+										visibility: model._isSequenceVisible,
 										onChange: v => model._amount.set(v)
 									})
 								]

@@ -59,6 +59,7 @@ export class VehicleViewModel
 	readonly _isEditDisabled = compute(this._selectedVehicle, v => !v);
 	readonly _isSpinDisabled = compute(this._spinFrames, v => !v);
 	readonly _isPositionDisabled = compute(this._isMoving, this._isEditDisabled, (m, e) => m || e);
+	readonly _isSequenceVisible = compute(this._isSequence, s => s ? "visible" : "none");
 	readonly _formatPosition = (pos: number): string => (this._isEditDisabled.get() ? "Not available" : pos.toString());
 	readonly _multiplierIndex = store<number>(0);
 	readonly _multiplier = compute(this._multiplierIndex, idx => (10 ** idx));
