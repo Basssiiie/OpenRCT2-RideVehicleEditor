@@ -2,7 +2,7 @@
 
 This plugin lets you edit vehicles on any ride in your park on the fly.
 
-![(Manticore's carrousel with edited vehicles)](img/timmytuner-header-v2.2.png)
+![(TimmyTuner's factory conveyor belt)](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/timmytuner-header-v2.2.png)
 
 *<p align="right">Factory conveyor belt made by [TimmyTuner](https://www.dkmp.wtf/contest-parks/rcc65_timmytuner)</p>*
 
