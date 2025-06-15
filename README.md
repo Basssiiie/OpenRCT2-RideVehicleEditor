@@ -2,9 +2,9 @@
 
 This plugin lets you edit vehicles on any ride in your park on the fly.
 
-![(Manticore's carrousel with edited vehicles)](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/manticore-carrousel-v2.1.png)
+![(Manticore's carrousel with edited vehicles)](img/timmytuner-header-v2.2.png)
 
-*<p align="right">Carrousel made by Manticore</p>*
+*<p align="right">Factory conveyor belt made by [TimmyTuner](https://www.dkmp.wtf/contest-parks/rcc65_timmytuner)</p>*
 
 ## Current features
 - Select and switch through **all ride vehicles** in your park, or use the **picker** to click on the vehicle directly.
@@ -137,9 +137,9 @@ The plugin supports various keyboard shortcuts to speed up working with the plug
 To configure the keyboard shortcut keys:
 
 1. Open a **park** or **scenario**.
-   - Due to OpenRCT2 limitations, it's not possible to edit them in the main menu or the scenario editor.
+   - Due to OpenRCT2 limitations, it's not possible to edit them in the main menu.
 2. Open the **options** window under the **diskette** ![Diskette button](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/icons/diskette.png) icon in the top toolbar.
-3. Go to the **gears** ![Gears tab](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/icons/gears.png) tab.
+3. Go to the **controls** ![Controls tab](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/icons/controls.png) tab.
 4. Click the **Shortcut keys...** button.
 5. Go to the **wrench** ![Wrench tab](https://raw.githubusercontent.com/Basssiiie/OpenRCT2-RideVehicleEditor/main/img/icons/wrench.png) tab.
 6. Find the shortcut keys marked with **[RVE]** and configure them to your desire!
