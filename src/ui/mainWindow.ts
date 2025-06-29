@@ -1,4 +1,4 @@
-import { button, checkbox, CheckboxParams, colourPicker, compute, dropdown, dropdownSpinner, DropdownSpinnerParams, FlexiblePosition, groupbox, horizontal, label, SpinnerParams, toggle, twoway, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
+import { button, checkbox, CheckboxParams, colourPicker, compute, dropdown, dropdownSpinner, DropdownSpinnerParams, FlexiblePosition, groupbox, horizontal, label, spinner, SpinnerParams, toggle, twoway, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
 import { isDevelopment, pluginVersion } from "../environment";
 import { RideType } from "../objects/rideType";
 import { RideVehicleVariant, VehicleVisibility } from "../objects/rideVehicleVariant";
@@ -55,7 +55,7 @@ model._selectedRide.subscribe(r =>
 const mainWindow = window({
 	title,
 	width: { value: 515, min: 515, max: 560 },
-	height: 415,
+	height: 430,
 	spacing: 5,
 	onOpen: () => model._open(),
 	onClose: () =>
@@ -244,14 +244,62 @@ const mainWindow = window({
 									"All vehicles on this train",
 									"Preceding vehicles on this train",
 									"Following vehicles on this train",
+									"Specific vehicles on this train",
 									"All vehicles on all trains",
 									"Preceding vehicles on all trains",
 									"Following vehicles on all trains",
-									"Same vehicle number on all trains"
+									"Same vehicle number on all trains",
+									"Specific vehicles on all trains"
 								],
 								tooltip: applyOptionsTip,
 								selectedIndex: model._copyTargetOption,
-								onChange: idx => model._copyTargetOption.set(idx)
+								onChange: idx =>
+								{
+									model._setSequence(idx);
+									model._copyTargetOption.set(idx);
+								}
+							}),
+							horizontal({
+								padding: { top: -4, right: 1 },								
+								content: [
+									label({
+										text: "Apply to every # vehicle(s):",
+										tooltip: "Applies settings to every selected number of vehicles",
+										width: 180,
+										visibility: model._isSequenceVisible
+									}),
+									spinner({
+										tooltip: "Applies settings to every selected number of vehicles",
+										width: 60,
+										value: compute(model._sequence, s => s),
+										minimum: 1,
+										maximum: compute(model._vehicles, c => c.length || 1),
+										step: model._multiplier,
+										visibility: model._isSequenceVisible,
+										onChange: v => model._sequence.set(v)
+									})
+								]
+							}),
+							horizontal({
+								padding: { top: -4, right: 1 },								
+								content: [
+									label({
+										text: "Amount of vehicles to modify",
+										tooltip: "Selects which vehicle of the train is the last to modify",
+										width: 180,
+										visibility: model._isSequenceVisible
+									}),
+									spinner({
+										tooltip: "Sets the amount of vehicles to modify",
+										width: 60,
+										value: compute(model._vehicles, c => c.length),
+										minimum: 1,
+										maximum: compute(model._vehicles, model._selectedVehicle, (c, s) => (s) ? c.length - s[1] : 1),										
+										step: model._multiplier,
+										visibility: model._isSequenceVisible,
+										onChange: v => model._amount.set(v)
+									})
+								]
 							}),
 							horizontal([
 								button({
@@ -479,7 +527,7 @@ function applySelectedSettingsToRide(): void
 	{
 		applyToTargets(
 			getVehicleSettings(vehicle[0], model._copyFilters.get()),
-			getTargets(model._copyTargetOption.get(), model._selectedRide.get(), model._selectedTrain.get(), vehicle)
+			getTargets(model._copyTargetOption.get(), model._selectedRide.get(), model._selectedTrain.get(), vehicle, model._amount.get(), model._sequence.get())
 		);
 	}
 }
