@@ -4,8 +4,7 @@ import { abs } from "../utilities/math";
 /**
  * @see https://github.com/OpenRCT2/OpenRCT2/blob/develop/src/openrct2/ride/VehicleData.cpp#L801
  */
-const subpositionTranslationDistances =
-[
+const subpositionTranslationDistances = [
 	0,      // no movement
 	8716,   // X translation
 	8716,   // Y translation
@@ -29,7 +28,7 @@ export function getTrackSegmentDistances(track: TrackSegment, subpositionType: n
 	let value = distanceCache[key];
 	if (!value)
 	{
-		value =  new TrackDistances(track, subpositionType, direction);
+		value = new TrackDistances(track, subpositionType, direction);
 		distanceCache[key] = value;
 	}
 	return value;

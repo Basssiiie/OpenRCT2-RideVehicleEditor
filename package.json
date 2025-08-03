@@ -20,27 +20,27 @@
 		"url": "https://github.com/Basssiiie/OpenRCT2-RideVehicleEditor/issues"
 	},
 	"dependencies": {
-		"openrct2-flexui": "^0.1.0-prerelease.20"
+		"openrct2-flexui": "0.1.0-prerelease.20"
 	},
 	"devDependencies": {
-		"@ava/typescript": "^5.0.0",
-		"@eslint/js": "^9.24.0",
-		"@rollup/plugin-node-resolve": "^16.0.1",
-		"@rollup/plugin-replace": "^6.0.2",
-		"@rollup/plugin-terser": "^0.4.0",
-		"@rollup/plugin-typescript": "^12.1.2",
-		"@stylistic/eslint-plugin-ts": "^4.2.0",
-		"@types/eslint__js": "^8.42.3",
-		"ava": "^6.2.0",
-		"eslint": "^9.24.0",
-		"nodemon": "^3.0.1",
-		"nyc": "^17.1.0",
-		"openrct2-mocks": "^0.1.0",
-		"rollup": "^4.6.0",
-		"tslib": "^2.3.1",
-		"tsx": "^4.19.0",
-		"typescript": "^5.0.2",
-		"typescript-eslint": "^8.29.0"
+		"@ava/typescript": "6.0.0",
+		"@eslint/js": "9.32.0",
+		"@rollup/plugin-node-resolve": "16.0.1",
+		"@rollup/plugin-replace": "6.0.2",
+		"@rollup/plugin-terser": "0.4.4",
+		"@rollup/plugin-typescript": "12.1.4",
+		"@stylistic/eslint-plugin": "5.2.2",
+		"@types/eslint__js": "8.42.3",
+		"ava": "6.4.1",
+		"eslint": "9.32.0",
+		"nodemon": "3.1.10",
+		"nyc": "17.1.0",
+		"openrct2-mocks": "0.1.6",
+		"rollup": "4.46.2",
+		"tslib": "2.8.1",
+		"tsx": "4.20.3",
+		"typescript": "5.8.3",
+		"typescript-eslint": "8.38.0"
 	},
 	"ava": {
 		"extensions": {

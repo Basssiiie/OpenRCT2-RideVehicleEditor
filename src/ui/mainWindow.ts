@@ -92,7 +92,7 @@ const mainWindow = window({
 					tooltip: "List of rides in the park",
 					disabledMessage: "No rides in this park",
 					autoDisable: "empty",
-					selectedIndex: compute(model._selectedRide, r => r ? r[1] : 0),
+					selectedIndex: compute(model._selectedRide, r => (r ? r[1] : 0)),
 					onChange: idx => model._selectRide(idx)
 				}),
 				dropdownSpinner({ // train list
@@ -101,7 +101,7 @@ const mainWindow = window({
 					tooltip: "List of trains on the currently selected ride",
 					disabledMessage: "No trains available",
 					autoDisable: "single",
-					selectedIndex: compute(model._selectedTrain, t => t ? t[1] : 0),
+					selectedIndex: compute(model._selectedTrain, t => (t ? t[1] : 0)),
 					onChange: idx => model._selectTrain(idx)
 				}),
 				dropdownSpinner({ // vehicle list
@@ -110,7 +110,7 @@ const mainWindow = window({
 					tooltip: "List of vehicles on the currently selected train",
 					disabledMessage: "No vehicles available",
 					autoDisable: "single",
-					selectedIndex: compute(model._selectedVehicle, v => v ? v[1] : 0),
+					selectedIndex: compute(model._selectedVehicle, v => (v ? v[1] : 0)),
 					onChange: idx => model._selectedVehicle.set([model._vehicles.get()[idx], idx])
 				})
 			])
@@ -121,7 +121,7 @@ const mainWindow = window({
 				content: [ // toolbar
 					horizontal([
 						vertical({
-							padding: [ "1w", 0 ],
+							padding: ["1w", 0],
 							spacing: 6,
 							content: [ // buttons
 								toggle({
@@ -165,7 +165,7 @@ const mainWindow = window({
 						}),
 						viewport({
 							tooltip: "I can see my house from here!",
-							target: compute(model._selectedVehicle, c => (c) ? c[0]._id : null),
+							target: compute(model._selectedVehicle, c => (c ? c[0]._id : null)),
 							disabled: model._isEditDisabled
 						})
 					]),
@@ -288,7 +288,7 @@ const mainWindow = window({
 								disabledMessage: "No ride types available",
 								disabled: compute(model._isEditDisabled, model._type, (noEdit, type) => (noEdit || !type)),
 								autoDisable: "empty",
-								selectedIndex: twoway(compute(model._type, t => (t) ? t[1] : 0)),
+								selectedIndex: twoway(compute(model._type, t => (t ? t[1] : 0))),
 								onChange: idx => updateVehicleType(idx)
 							}),
 							labelSpinner<DropdownSpinnerParams>({
@@ -389,7 +389,7 @@ const mainWindow = window({
 							labelSpinner({
 								_label: { text: "Spin angle:" },
 								minimum: 0,
-								maximum: compute(model._spinFrames, frames => frames > 0 ? frames - 1 : 0),
+								maximum: compute(model._spinFrames, frames => (frames > 0 ? frames - 1 : 0)),
 								disabled: model._isSpinDisabled,
 								step: model._multiplier,
 								value: compute(model._spin, model._spinFrames, (spin, frames) => floor((spin * frames) / 256)),
@@ -450,7 +450,7 @@ const mainWindow = window({
 			})
 		]),
 		label({ // credits
-			padding: [ -1, 80, 0, 80 ], // do not cover the resize corner
+			padding: [-1, 80, 0, 80], // do not cover the resize corner
 			text: "github.com/Basssiiie/OpenRCT2-RideVehicleEditor",
 			tooltip: "Go to this URL to check for the latest updates",
 			alignment: "centred",

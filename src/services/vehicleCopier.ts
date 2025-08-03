@@ -43,6 +43,7 @@ export const copyOptions = <const>[
  */
 export const enum CopyFilter
 {
+	/* eslint-disable @stylistic/no-multi-spaces */
 	Default =             (0),
 	TypeAndVariant =      (1 << 0),
 	Colours =             (1 << 1),
@@ -55,6 +56,7 @@ export const enum CopyFilter
 	PoweredMaxSpeed =     (1 << 8),
 	Spin =                (1 << 9),
 	All = -1
+	/* eslint-enable @stylistic/no-multi-spaces */
 }
 
 
@@ -62,7 +64,7 @@ export const enum CopyFilter
  * Gets the targeted vehicles based on the selected copy option, in the following
  * format; [[ car id, amount of following cars (inclusive) ], ...].
  */
-export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | null, train: [RideTrain, number] | null, vehicle: [RideVehicle, number] | null):  [number, number | null][]
+export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | null, train: [RideTrain, number] | null, vehicle: [RideVehicle, number] | null): [number, number | null][]
 {
 	if (ride && train && vehicle)
 	{
@@ -70,34 +72,34 @@ export function getTargets(copyOption: CopyOptions, ride: [ParkRide, number] | n
 		{
 			case CopyOptions.AllVehiclesOnTrain:
 			{
-				return [[ train[0]._carId, null ]];
+				return [[train[0]._carId, null]];
 			}
 			case CopyOptions.PrecedingVehiclesOnTrain:
 			{
-				return [[ train[0]._carId, vehicle[1] + 1 ]];
+				return [[train[0]._carId, vehicle[1] + 1]];
 			}
 			case CopyOptions.FollowingVehiclesOnTrain:
 			{
-				return [[ vehicle[0]._id, null ]];
+				return [[vehicle[0]._id, null]];
 			}
 			case CopyOptions.AllVehiclesOnAllTrains:
 			{
-				return getTargetsOnAllTrains(ride, t => [ t._carId, null ]);
+				return getTargetsOnAllTrains(ride, t => [t._carId, null]);
 			}
 			case CopyOptions.PrecedingVehiclesOnAllTrains:
 			{
 				const amountOfVehicles = (vehicle[1] + 1);
-				return getTargetsOnAllTrains(ride, t => [ t._carId, amountOfVehicles ]);
+				return getTargetsOnAllTrains(ride, t => [t._carId, amountOfVehicles]);
 			}
 			case CopyOptions.FollowingVehiclesOnAllTrains:
 			{
 				const index = vehicle[1];
-				return getTargetsOnAllTrains(ride, t => [ t._at(index)._id, null ]);
+				return getTargetsOnAllTrains(ride, t => [t._at(index)._id, null]);
 			}
 			case CopyOptions.SameVehicleOnAllTrains:
 			{
 				const index = vehicle[1];
-				return getTargetsOnAllTrains(ride, t => [ t._at(index)._id, 1 ]);
+				return getTargetsOnAllTrains(ride, t => [t._at(index)._id, 1]);
 			}
 		}
 	}
@@ -144,7 +146,7 @@ export function getVehicleSettings(source: RideVehicle, filters: CopyFilter): Ve
 	if (filters & CopyFilter.Colours)
 	{
 		const cols = car.colours;
-		settings.colours = [ cols.body, cols.trim, cols.tertiary ];
+		settings.colours = [cols.body, cols.trim, cols.tertiary];
 	}
 	if (filters & CopyFilter.Spin)
 	{

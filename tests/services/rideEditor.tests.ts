@@ -8,14 +8,14 @@ import { registerActions } from "../../src/services/actions";
 import { setBuildMonth, setBuildYear, setCustomDesign, setExcitementRating, setFrozenRatings, setIndestructable, setIntensityRating, setNauseaRating } from "../../src/services/rideEditor";
 
 
-function setupRideMock(rideId: number, permissions: PermissionType[] = [ "ride_properties" ]): Ride
+function setupRideMock(rideId: number, permissions: PermissionType[] = ["ride_properties"]): Ride
 {
 	globalThis.network = Mock.network({
-		groups: [ Mock.playerGroup({ permissions })]
+		groups: [Mock.playerGroup({ permissions })]
 	});
 
 	const ride = Mock.ride({ id: rideId, buildDate: 0 });
-	globalThis.map = Mock.map({ rides: [ ride ]});
+	globalThis.map = Mock.map({ rides: [ride]});
 	return ride;
 }
 test.before(() =>

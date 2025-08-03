@@ -1,11 +1,11 @@
-import { abs, floor } from "./math";
 import * as Log from "../utilities/logger";
+import { abs, floor } from "./math";
 
 
 /**
  * The names of all the months in the game.
  */
-export const monthNames = [ "March", "April", "May", "June", "July", "August", "September", "October" ];
+export const monthNames = ["March", "April", "May", "June", "July", "August", "September", "October"];
 
 /**
  * The amount of months in the game.

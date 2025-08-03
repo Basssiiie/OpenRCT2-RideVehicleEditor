@@ -36,8 +36,8 @@ export function registerActions(): void
 	for (const action in registeredActions)
 	{
 		context.registerAction(action,
-			(args) => (hasPermissions(args.player) ? {} : getPermissionError()),
-			(args) =>
+			args => (hasPermissions(args.player) ? {} : getPermissionError()),
+			args =>
 			{
 				if (hasPermissions(args.player))
 				{
@@ -46,8 +46,7 @@ export function registerActions(): void
 					return {};
 				}
 				return getPermissionError();
-			}
-		);
+			});
 	}
 }
 

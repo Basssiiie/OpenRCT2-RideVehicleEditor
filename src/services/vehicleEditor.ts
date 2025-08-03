@@ -10,8 +10,8 @@ const execute = register<UpdateVehicleSettingArgs>("rve-update-car", updateVehic
 
 type VehicleUpdateKeys
 	= "rideObject" | "vehicleObject" | "isReversed" | "trackProgress" | "spacing"
-	| "numSeats" | "mass" | "poweredAcceleration" | "poweredMaxSpeed" | "x" | "y" | "z"
-	| "spin" | "body" | "trim" | "tertiary";
+		| "numSeats" | "mass" | "poweredAcceleration" | "poweredMaxSpeed" | "x" | "y" | "z"
+		| "spin" | "body" | "trim" | "tertiary";
 
 const
 	rideTypeKey = "rideObject",

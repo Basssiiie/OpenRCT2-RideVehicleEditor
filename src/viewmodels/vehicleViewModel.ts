@@ -27,11 +27,11 @@ export class VehicleViewModel
 
 	readonly _rideTypes = store<RideType[]>([]);
 	readonly _rides = store<ParkRide[]>([]);
-	readonly _trains = compute(this._selectedRide, r => (r) ? r[0]._trains() : []);
-	readonly _vehicles = compute(this._selectedTrain, t => (t) ? t[0]._vehicles() : []);
+	readonly _trains = compute(this._selectedRide, r => (r ? r[0]._trains() : []));
+	readonly _vehicles = compute(this._selectedTrain, t => (t ? t[0]._vehicles() : []));
 
 	readonly _type = store<[RideType, number] | null>(null);
-	readonly _variants = compute(this._type, t => (t) ? t[0]._variants() : []);
+	readonly _variants = compute(this._type, t => (t ? t[0]._variants() : []));
 	readonly _variant = store<number>(0);
 	readonly _isReversed = store<boolean>(false);
 	readonly _seats = store<number>(0);
@@ -45,7 +45,7 @@ export class VehicleViewModel
 	readonly _y = store<number>(0);
 	readonly _z = store<number>(0);
 	readonly _spin = store<number>(0);
-	readonly _spinFrames = compute(this._selectedVehicle, this._type, this._variant, v => v ? v[0]._getSpinFrames() : 0);
+	readonly _spinFrames = compute(this._selectedVehicle, this._type, this._variant, v => (v ? v[0]._getSpinFrames() : 0));
 
 	readonly _primaryColour = store<Colour>(0);
 	readonly _secondaryColour = store<Colour>(0);
@@ -236,14 +236,14 @@ export class VehicleViewModel
 			if (missingRideIdx === -1) // Add to rides list, if not there yet.
 			{
 				this._rides.set(rides.concat(missingRide));
-				selectedRide.set([ missingRide, rides.length ]);
+				selectedRide.set([missingRide, rides.length]);
 			}
 			else // Else try to select it if not yet selected
 			{
 				const selected = selectedRide.get();
 				if (!selected || selected[0] !== missingRide)
 				{
-					selectedRide.set([ missingRide, missingRideIdx ]);
+					selectedRide.set([missingRide, missingRideIdx]);
 				}
 			}
 
@@ -253,7 +253,7 @@ export class VehicleViewModel
 		{
 			this._checkMissingRideEntry(this._missingRideEntity, rides);
 
-			selectedRide.set([ rides[carRideIndex], carRideIndex ]);
+			selectedRide.set([rides[carRideIndex], carRideIndex]);
 			trains = this._trains.get();
 
 			for (let t = 0; t < trains.length; t++)
@@ -263,8 +263,8 @@ export class VehicleViewModel
 				{
 					if (vehicles[v]._id === carId)
 					{
-						this._selectedTrain.set([ trains[t], t ]);
-						this._selectedVehicle.set([ vehicles[v], v ]);
+						this._selectedTrain.set([trains[t], t]);
+						this._selectedVehicle.set([vehicles[v], v]);
 						return;
 					}
 				}
@@ -278,8 +278,8 @@ export class VehicleViewModel
 		const vehicle = specialTrain._vehicles()[carIndex];
 
 		this._trains.set(trains.concat(specialTrain));
-		this._selectedTrain.set([ specialTrain, trains.length ]);
-		this._selectedVehicle.set([ vehicle, carIndex ]);
+		this._selectedTrain.set([specialTrain, trains.length]);
+		this._selectedVehicle.set([vehicle, carIndex]);
 	}
 
 	/**
@@ -302,7 +302,7 @@ export class VehicleViewModel
 			}
 			else
 			{
-				action([[ vehicle[0]._id, 1 ]], value);
+				action([[vehicle[0]._id, 1]], value);
 			}
 		}
 		else
@@ -321,8 +321,7 @@ export class VehicleViewModel
 
 		this._copyFilters.set((toggle)
 			? (enabledFilters | filter)
-			: (enabledFilters & ~filter)
-		);
+			: (enabledFilters & ~filter));
 	}
 
 	/**
@@ -383,7 +382,7 @@ export class VehicleViewModel
 		const settings = this._clipboard.get();
 		if (vehicle && settings)
 		{
-			applyToTargets(settings, [[ vehicle[0]._id, 1 ]]);
+			applyToTargets(settings, [[vehicle[0]._id, 1]]);
 		}
 	}
 
@@ -426,7 +425,7 @@ export class VehicleViewModel
 
 		if (!isNull(typeIdx))
 		{
-			type = [ types[typeIdx], typeIdx ];
+			type = [types[typeIdx], typeIdx];
 		}
 		else if (rideObjectId === gigaCableLiftHillTypeId) // Special Giga Lifthill
 		{
@@ -439,7 +438,7 @@ export class VehicleViewModel
 			Log.assert(!isNull(typeIdx));
 
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			type = [ gigaCableLiftHillType, typeIdx! ];
+			type = [gigaCableLiftHillType, typeIdx!];
 			this._rideTypes.set(types);
 		}
 		else
@@ -593,12 +592,11 @@ function updateSelectionOrNull<T>(value: WritableStore<[T, number] | null>, item
 	{
 		const previous = value.get();
 		const selectedIdx = (previous && previous[1] < items.length) ? previous[1] : 0;
-		selection = [ items[selectedIdx], selectedIdx ];
+		selection = [items[selectedIdx], selectedIdx];
 	}
 	Log.debug("updateSelectionOrNull():", selection);
 	value.set(selection);
 }
-
 
 
 /**

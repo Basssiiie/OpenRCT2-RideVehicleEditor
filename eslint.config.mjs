@@ -1,5 +1,5 @@
 import eslint from '@eslint/js';
-import stylisticTs from '@stylistic/eslint-plugin-ts';
+import stylisticTs from '@stylistic/eslint-plugin';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
@@ -29,16 +29,29 @@ export default tseslint.config(
 			"@typescript-eslint/restrict-template-expressions": ["error", { allowArray: true, allowBoolean: true, allowNullish: true, allowNumber: true }],
     		"@typescript-eslint/triple-slash-reference": "off", // needed for openrct2 symbols
 			"@typescript-eslint/unified-signatures": "off", // signatures are split for easier readability
-			"@stylistic/ts/brace-style": ["error", "allman"],
-			"@stylistic/ts/indent": ["error", "tab", { "flatTernaryExpressions": true, "ignoredNodes": ["ArrowFunctionExpression", "ImportDeclaration", "ObjectExpression"], "SwitchCase": 1 }],
-			"@stylistic/ts/keyword-spacing": ["error", { "overrides": { "this": { "before": false } } }],
-			"@stylistic/ts/space-before-function-paren": ["error", "never"],
-			"@stylistic/ts/quote-props": "off",
-			"@stylistic/ts/lines-around-comment": "off",
-			"@stylistic/ts/lines-between-class-members": "off",
-			"@stylistic/ts/no-extra-parens": "off",
-			"@stylistic/ts/object-curly-spacing": "off",
-			"@stylistic/ts/object-property-newline": "off",
+			"@stylistic/array-bracket-newline": ["error", "consistent"],
+			"@stylistic/array-element-newline": ["error", "consistent"],
+			"@stylistic/arrow-parens": ["error", "as-needed"],
+			"@stylistic/brace-style": ["error", "allman"],
+			"@stylistic/dot-location": ["error", "property"],
+			"@stylistic/function-call-argument-newline": ["error", "consistent"],
+			"@stylistic/function-paren-newline": ["error", "consistent"],
+			"@stylistic/indent": ["error", "tab", { "flatTernaryExpressions": true, "ignoredNodes": ["ArrowFunctionExpression", "ImportDeclaration", "ObjectExpression"], "SwitchCase": 1 }],
+			"@stylistic/indent-binary-ops": ["error", "tab"],
+			"@stylistic/keyword-spacing": ["error", { "overrides": { "this": { "before": false } } }],
+			"@stylistic/linebreak-style": ["error", "windows"],
+			"@stylistic/lines-around-comment": "off",
+			"@stylistic/lines-between-class-members": "off",
+			"@stylistic/multiline-ternary": ["error", "always-multiline"],
+			"@stylistic/nonblock-statement-body-position": ["error", "below"],
+			"@stylistic/operator-linebreak": ["error", "before"],
+			"@stylistic/no-extra-parens": "off",
+			"@stylistic/no-multi-spaces": ["error", { ignoreEOLComments: true }],
+			"@stylistic/padded-blocks": "off", // not needed with Allman braces
+			"@stylistic/quote-props": "off",
+			"@stylistic/object-curly-spacing": "off",
+			"@stylistic/object-property-newline": "off",
+			"@stylistic/space-before-function-paren": ["error", "never"],
 		}
 	},
 	{
@@ -48,7 +61,7 @@ export default tseslint.config(
 		rules: {
 			"@typescript-eslint/dot-notation": "off", // by-passes allowed in tests
     		"@typescript-eslint/no-non-null-assertion": "off", // allowed in tests
-			"@stylistic/ts/brace-style": ["error", "allman", { "allowSingleLine": true }], // single lines allowed in tests
+			"@stylistic/brace-style": ["error", "allman", { "allowSingleLine": true }], // single lines allowed in tests
 		}
 	},
 	{

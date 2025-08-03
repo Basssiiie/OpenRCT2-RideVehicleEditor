@@ -5,7 +5,6 @@ import Mock from "openrct2-mocks";
 import { getVisibility, isPowered, VehicleVisibility } from "../../src/objects/rideVehicleVariant";
 
 
-
 test("Vehicle is visible", t =>
 {
 	const vehicles = [

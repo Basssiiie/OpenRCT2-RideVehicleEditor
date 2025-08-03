@@ -31,8 +31,7 @@ export function toggleVehicleDragger(active: boolean, storeVehicle: Store<[RideV
 	}
 
 	const multiplayer = isMultiplayer();
-	const originalPosition =
-	{
+	const originalPosition = {
 		revert: true,
 		x: storeX.get(),
 		y: storeY.get(),
@@ -162,7 +161,8 @@ function getPositionFromTool(args: ToolEventArgs, vehicle: RideVehicle): DragPos
 		const tabHeight = (vehicleType) ? vehicleType.tabHeight : 0;
 
 		z = (type === "footpath" || type === "banner" || type === "wall")
-			? element.baseZ : element.clearanceZ;
+			? element.baseZ
+			: element.clearanceZ;
 
 		if (type === "surface")
 		{
@@ -194,8 +194,10 @@ function getPositionFromTool(args: ToolEventArgs, vehicle: RideVehicle): DragPos
 
 		x += 16;
 		y += 16;
-		// Increase height for certain vehicles like inverted ones based on the height in the tab icon
-		//  29 for actual inverted, inverted tabheight for other negatives, 0 for big cars
+		/*
+		 * Increase height for certain vehicles like inverted ones based on the height in the tab icon
+		 *  29 for actual inverted, inverted tabheight for other negatives, 0 for big cars
+		 */
 		z += (tabHeight < -10) ? 29 : (tabHeight < 0) ? -tabHeight : 0;
 	}
 	else

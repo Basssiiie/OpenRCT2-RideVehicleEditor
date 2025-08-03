@@ -6,7 +6,6 @@ import { getAllRideTypes, RideType } from "../../src/objects/rideType";
 import { VehicleVisibility } from "../../src/objects/rideVehicleVariant";
 
 
-
 test("getAllRideTypes() gets all ride types", t =>
 {
 	globalThis.context = Mock.context({ objects: [

@@ -124,8 +124,13 @@ export function getSpacingToPrecedingVehicle(train: RideTrain, car: Car, carInde
 	const carInFront = train._at(carIndex - 1)._car();
 
 	// Check if spacing calculation is already cached:
-	const followingCarX = car.x, followingCarY = car.y, followingCarZ = car.z,
-		precedingCarX = carInFront.x, precedingCarY = carInFront.y, precedingCarZ = carInFront.z;
+	const
+		followingCarX = car.x,
+		followingCarY = car.y,
+		followingCarZ = car.z,
+		precedingCarX = carInFront.x,
+		precedingCarY = carInFront.y,
+		precedingCarZ = carInFront.z;
 
 	if (isUndefined(lastSpacingResult)
 		|| followingCarX !== lastFollowingVehicleX || followingCarY !== lastFollowingVehicleY || followingCarZ !== lastFollowingVehicleZ

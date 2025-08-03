@@ -41,7 +41,8 @@ export function getTileElement(x: number, y: number, elementIdx: number): TileEl
 export function getIndexForTrackElementAt(location: CarTrackLocation): number | null
 {
 	const tile = getTileByCoords(location.x, location.y);
-	const allElements = tile.elements, len = allElements.length;
+	const allElements = tile.elements;
+	const len = allElements.length;
 
 	for (let i = 0; i < len; i++)
 	{

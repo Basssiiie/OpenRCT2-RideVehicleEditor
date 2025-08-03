@@ -12,7 +12,9 @@ export function createTrainFromAnyCar(car: Car): [RideTrain, number]
 	const vehicles: RideVehicle[] = [];
 
 	// Insert all vehicles in front
-	let currentCar: Car | null = car, currentCarId: number | null;
+	let currentCar: Car | null = car,
+		currentCarId: number | null;
+
 	while (!isNull(currentCarId = currentCar.previousCarOnRide))
 	{
 		currentCar = getCarById(currentCarId);

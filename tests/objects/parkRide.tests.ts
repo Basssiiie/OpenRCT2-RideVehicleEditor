@@ -93,7 +93,7 @@ test("Park ride gets created from id", t =>
 test("Park ride refreshes correctly", t =>
 {
 	const ride = Mock.ride({ classification: "ride", name: "Crooked House", id: 37 });
-	globalThis.map = Mock.map({ rides: [ ride ]	});
+	globalThis.map = Mock.map({ rides: [ride]	});
 
 	const parkRide = new ParkRide(37);
 
@@ -147,7 +147,7 @@ test("Park ride is cached", t =>
 
 test("Park ride gets all trains", t =>
 {
-	const ride = Mock.ride({ classification: "ride", name: "River Rapids", id: 2, vehicles: [ 5, 6, 7 ] });
+	const ride = Mock.ride({ classification: "ride", name: "River Rapids", id: 2, vehicles: [5, 6, 7] });
 	const parkRide = new ParkRide(ride);
 
 	const trains = parkRide._trains();
@@ -161,7 +161,7 @@ test("Park ride gets all trains", t =>
 
 test("Park ride trains are cached", t =>
 {
-	const ride = Mock.ride({ classification: "ride", name: "River Rapids", id: 2, vehicles: [ 5, 6, 7 ] });
+	const ride = Mock.ride({ classification: "ride", name: "River Rapids", id: 2, vehicles: [5, 6, 7] });
 	const parkRide = new ParkRide(ride);
 
 	const trains1 = parkRide._trains();
@@ -176,7 +176,7 @@ test("Park ride trains are cached", t =>
 
 test("Park ride ignores invalid trains", t =>
 {
-	const ride = Mock.ride({ classification: "ride", name: "River Rapids", id: 2, vehicles: [ 5, 0xFFFF, 7 ] });
+	const ride = Mock.ride({ classification: "ride", name: "River Rapids", id: 2, vehicles: [5, 0xFFFF, 7] });
 	const parkRide = new ParkRide(ride);
 
 	const trains = parkRide._trains();

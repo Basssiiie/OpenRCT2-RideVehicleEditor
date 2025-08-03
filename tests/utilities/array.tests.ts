@@ -4,7 +4,7 @@ import * as ArrayHelper from "../../src/utilities/array";
 
 test("isValidIndex()", t =>
 {
-	const array = [ "one", "two", "three" ];
+	const array = ["one", "two", "three"];
 
 	t.true(ArrayHelper.isValidIndex(array, 0));
 	t.true(ArrayHelper.isValidIndex(array, 1));
@@ -23,7 +23,7 @@ test("isValidIndex()", t =>
 
 test("getAtIndex()", t =>
 {
-	const array = [ "one", "two", "three" ];
+	const array = ["one", "two", "three"];
 
 	t.is(ArrayHelper.getAtIndex(array, 0), "one");
 	t.is(ArrayHelper.getAtIndex(array, 1), "two");
@@ -42,7 +42,7 @@ test("getAtIndex()", t =>
 
 test("findIndex()", t =>
 {
-	const array = [ "one", "two", "three" ];
+	const array = ["one", "two", "three"];
 
 	t.is(ArrayHelper.findIndex(array, i => i.indexOf("o") === 0), 0);
 	t.is(ArrayHelper.findIndex(array, i => i.indexOf("tw") === 0), 1);

@@ -31,11 +31,11 @@ export function multiplier(multiplierIndex: WritableStore<number>): WidgetCreato
 /**
  * Parameters for a label-control combination.
  */
-export type LabelledControlParams<TParams extends ElementParams = ElementParams> = TParams &
-{
-	_control: (params: TParams) => WidgetCreator<FlexiblePosition>;
-	_label: { text: string; width?: Scale };
-};
+export type LabelledControlParams<TParams extends ElementParams = ElementParams> = TParams
+	& {
+		_control: (params: TParams) => WidgetCreator<FlexiblePosition>;
+		_label: { text: string; width?: Scale };
+	};
 
 /**
  * A control with a label on the left side.
@@ -56,11 +56,11 @@ export function labelled<TParams extends ElementParams>(params: LabelledControlP
 /**
  * Parameters for a label-spinner combination.
  */
-export type LabelledSpinnerParams<TParams extends (SpinnerParams | DropdownSpinnerParams) = SpinnerParams> = Omit<LabelledControlParams<TParams>, "_control"> &
-{
-	_control?: (typeof spinner | typeof dropdownSpinner);
-	_noDisabledMessage?: boolean;
-};
+export type LabelledSpinnerParams<TParams extends (SpinnerParams | DropdownSpinnerParams) = SpinnerParams> = Omit<LabelledControlParams<TParams>, "_control">
+	& {
+		_control?: (typeof spinner | typeof dropdownSpinner);
+		_noDisabledMessage?: boolean;
+	};
 
 /**
  * A spinner with a label on the left side.

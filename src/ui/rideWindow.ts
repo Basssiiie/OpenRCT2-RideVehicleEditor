@@ -7,7 +7,8 @@ import { RideViewModel } from "../viewmodels/rideViewModel";
 import { labelled, labelledSpinner, LabelledSpinnerParams, multiplier } from "./utilityControls";
 
 
-const int16max = 32_767, int16min = -32_768;
+const int16max = 32_767;
+const int16min = -32_768;
 const controlsLabelWidth = 85;
 const buttonSize = 24;
 
@@ -26,7 +27,7 @@ export const rideWindow = window({
 	position: "center",
 	width: { value: 233, min: 185, max: 250 },
 	height: 322,
-	colours: [ 24, 24 ],
+	colours: [24, 24],
 	onOpen: () => model._open(),
 	onClose: () => model._close(),
 	content: [
@@ -132,10 +133,13 @@ export const rideWindow = window({
 							title: "Ride/attraction name",
 							initialValue: model._title.get(),
 							description: "Enter new name for this ride/attraction:",
-							callback: (input) =>
+							callback: input =>
 							{
 								const ride = model._ride.get();
-								if (ride) context.executeAction("ridesetname", {ride: ride._id, name: input});
+								if (ride)
+								{
+									context.executeAction("ridesetname", {ride: ride._id, name: input});
+								}
 							}
 						});
 					}
