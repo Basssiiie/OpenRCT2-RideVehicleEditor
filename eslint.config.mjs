@@ -36,6 +36,7 @@ export default tseslint.config(
 			"@stylistic/dot-location": ["error", "property"],
 			"@stylistic/function-call-argument-newline": ["error", "consistent"],
 			"@stylistic/function-paren-newline": ["error", "consistent"],
+			"@stylistic/implicit-arrow-linebreak": "off", // depends on situation
 			"@stylistic/indent": ["error", "tab", { "flatTernaryExpressions": true, "ignoredNodes": ["ArrowFunctionExpression", "ImportDeclaration", "ObjectExpression"], "SwitchCase": 1 }],
 			"@stylistic/indent-binary-ops": ["error", "tab"],
 			"@stylistic/keyword-spacing": ["error", { "overrides": { "this": { "before": false } } }],
