@@ -1,20 +1,45 @@
-import { compute, store } from "openrct2-flexui";
+import { store } from "openrct2-flexui";
 import { ParkRide } from "../objects/parkRide";
 import { RideLifeCycleFlags } from "../objects/rideLifeCycleFlags";
-import { refreshRide } from "../services/events";
 import * as Log from "../utilities/logger";
+import { TabViewModel } from "./tabViewModel";
+import { setBuildMonth, setBuildYear, setCustomDesign, setExcitementRating, setFrozenRatings, setIndestructable, setIntensityRating, setNauseaRating } from "../services/rideEditor";
+import { SelectionViewModel } from "./selectionViewModel";
+import { refreshRide, watch } from "../services/events";
 
 
-export class RideViewModel
+const ratingFunctions = [
+	setExcitementRating,
+	setIntensityRating,
+	setNauseaRating
+];
+
+const rideFlagFunctions = [
+	setFrozenRatings,
+	setCustomDesign,
+	setIndestructable
+];
+
+
+export const enum Rating
 {
-	readonly _ride = store<ParkRide | null>(null);
-	readonly _title = store<string>("");
+	Excitement,
+	Intensity,
+	Nauseas
+}
 
+export const enum RideFlag
+{
+	FrozenRatings,
+	CustomDesign,
+	Indestructable
+}
+
+export class RideViewModel implements TabViewModel
+{
 	readonly _excitement = store<number>(0);
 	readonly _intensity = store<number>(0);
 	readonly _nausea = store<number>(0);
-	readonly _multiplierIndex = store<number>(0);
-	readonly _multiplier = compute(this._multiplierIndex, idx => (10 ** idx));
 	readonly _freezeStats = store<boolean>(false);
 
 	readonly _buildMonth = store<number>(0);
@@ -22,54 +47,69 @@ export class RideViewModel
 	readonly _customDesign = store<boolean>(false);
 	readonly _indestructable = store<boolean>(false);
 
-	private _isOpen?: boolean;
-	private _rideSubscription?: () => void;
-	private _ratingCalculationHook?: IDisposable;
-	private _dayIntervalHook?: IDisposable;
+	private _onRideSelect?: () => void;
+	private _onRideUpdate?: () => void;
+	private _onRatingCalculated?: IDisposable;
+	private _onDayChange?: IDisposable;
 
-	constructor()
+	private readonly _ride;
+
+	constructor(selection: SelectionViewModel)
 	{
-		refreshRide.push(id =>
-		{
-			if (!this._isOpen)
-			{
-				Log.debug("[RideViewModel] Refresh ignored, window not open.");
-				return;
-			}
-			Log.debug("[RideViewModel] Refresh ride!");
-			const ride = this._ride.get();
-			if (ride && ride._id === id)
-			{
-				this._updateRideInfo(ride);
-			}
-		});
+		this._ride = selection._ride;
+	}
+
+	_setRating(rating: Rating, value: number): void
+	{
+		this._modifyRide(ratingFunctions[rating], value);
+	}
+
+	_setRideFlag(flag: RideFlag, value: boolean): void
+	{
+		this._modifyRide(rideFlagFunctions[flag], value);
+	}
+
+	_setBuildMonth(month: number): void
+	{
+		this._modifyRide(setBuildMonth, month);
+	}
+
+	_setBuildYear(year: number): void
+	{
+		this._modifyRide(setBuildYear, year);
 	}
 
 	_open(): void
 	{
-		Log.debug("[RideViewModel] Window opened!");
-		this._isOpen = true;
+		Log.debug("[RideViewModel] Tab opened!");
 		this._currentMonth.set(date.monthsElapsed);
 
-		this._rideSubscription = this._ride.subscribe(r =>
+		this._onRideSelect = this._ride.subscribe(r =>
 		{
 			if (r)
 			{
-				this._updateRideInfo(r);
+				this._updateRide(r[0]._ride());
 			}
 		});
-		this._ratingCalculationHook = context.subscribe("ride.ratings.calculate", args =>
+		this._onRideUpdate = watch(refreshRide, (id: number) =>
+		{
+			Log.debug("[RideViewModel] Refresh ride!");
+			const ride = this._ride.get();
+			if (ride && ride[0]._id === id)
+			{
+				this._updateRide(ride[0]._ride());
+			}
+		});
+		this._onRatingCalculated = context.subscribe("ride.ratings.calculate", args =>
 		{
 			const ride = this._ride.get();
-			if (ride && args.rideId === ride._id)
+			if (ride && args.rideId === ride[0]._id)
 			{
 				Log.debug("Update ratings for selected ride", args.rideId);
-				this._excitement.set(args.excitement);
-				this._intensity.set(args.intensity);
-				this._nausea.set(args.nausea);
+				this._updateRideRatings(ride[0]._ride());
 			}
 		});
-		this._dayIntervalHook = context.subscribe("interval.day", () =>
+		this._onDayChange = context.subscribe("interval.day", () =>
 		{
 			const ride = this._ride.get();
 			if (ride)
@@ -81,43 +121,57 @@ export class RideViewModel
 
 	_close(): void
 	{
-		Log.debug("[RideViewModel] Window closed!");
-		this._isOpen = false;
-		if (this._rideSubscription)
+		Log.debug("[RideViewModel] Tab closed!");
+		if (this._onRideSelect)
 		{
-			this._rideSubscription();
+			this._onRideSelect();
 		}
-		if (this._ratingCalculationHook)
+		if (this._onRideUpdate)
 		{
-			this._ratingCalculationHook.dispose();
+			this._onRideUpdate();
 		}
-		if (this._dayIntervalHook)
+		if (this._onRatingCalculated)
 		{
-			this._dayIntervalHook.dispose();
+			this._onRatingCalculated.dispose();
 		}
-		this._rideSubscription = undefined;
-		this._ratingCalculationHook = undefined;
-		this._dayIntervalHook = undefined;
-
-		// Reset values
-		this._multiplierIndex.set(0);
+		if (this._onDayChange)
+		{
+			this._onDayChange.dispose();
+		}
+		this._onRideSelect = undefined;
+		this._onRatingCalculated = undefined;
+		this._onDayChange = undefined;
 	}
 
-	private _updateRideInfo(parkRide: ParkRide): void
+	_updateRide(ride: Ride): void
 	{
-		Log.debug("[RideViewModel] Update ride info to", parkRide._ride().name);
-		const ride = parkRide._ride();
-		this._title.set(ride.name);
-
-		this._excitement.set(ride.excitement);
-		this._intensity.set(ride.intensity);
-		this._nausea.set(ride.nausea);
+		this._updateRideRatings(ride);
 		this._freezeStats.set(hasLifeCycleFlag(ride, RideLifeCycleFlags.FixedRatings));
-
 		this._buildMonth.set(ride.buildDate);
 		this._customDesign.set(!hasLifeCycleFlag(ride, RideLifeCycleFlags.NotCustomDesign));
 		this._indestructable.set(hasLifeCycleFlag(ride, RideLifeCycleFlags.Indestructable));
 	}
+
+	private _updateRideRatings(ride: Ride): void
+	{
+		this._excitement.set(ride.excitement);
+		this._intensity.set(ride.intensity);
+		this._nausea.set(ride.nausea);
+	}
+
+	private _modifyRide<T>(action: (ride: ParkRide, value: T) => void, value: T): void
+	{
+		const ride = this._ride.get();
+		if (ride)
+		{
+			action(ride[0], value);
+		}
+		else
+		{
+			Log.debug("Failed to modify ride with", action, "to", value, "; none is selected.");
+		}
+	}
+
 }
 
 

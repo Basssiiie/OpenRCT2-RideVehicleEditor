@@ -11,7 +11,6 @@ import { invoke, refreshVehicle } from "./events";
  */
 export type VehicleSpan = [number, number | null];
 
-
 /**
  * Applies a specific callback for each vehicle in the specified list of vehicle spans.
  */

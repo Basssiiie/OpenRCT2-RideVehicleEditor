@@ -17,6 +17,25 @@ export function invoke(event: Event, params?: never): void
 	}
 }
 
+/**
+ * Watches the event for invocations and calls the specified callback.
+ * @returns a function to dispose the watch.
+ */
+export function watch(event: Event, callback: () => void): () => void;
+export function watch<T>(event: Event<T>, callback: (params: T) => void): () => void;
+export function watch(event: Event, callback: (params?: unknown) => void): () => void
+{
+	event.push(callback);
+	return function()
+	{
+		const index = event.indexOf(callback);
+		if (index >= 0)
+		{
+			event.splice(index, 1);
+		}
+	};
+}
+
 
 /**
  * Event to indicate the specified vehicle should be refreshed.

@@ -17,7 +17,6 @@ const
 	nausea = "nausea",
 	buildDate = "buildDate";
 
-
 /**
  * Sets the ride's excitement rating.
  */

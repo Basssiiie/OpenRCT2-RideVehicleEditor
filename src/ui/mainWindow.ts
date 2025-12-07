@@ -1,18 +1,16 @@
-import { button, checkbox, CheckboxParams, colourPicker, compute, dropdown, dropdownSpinner, DropdownSpinnerParams, FlexiblePosition, groupbox, horizontal, label, SpinnerParams, toggle, twoway, vertical, viewport, WidgetCreator, window } from "openrct2-flexui";
+/* eslint-disable @stylistic/multiline-comment-style */
+import { button, checkbox, compute, dropdown, dropdownSpinner, groupbox, horizontal, label, toggle, twoway, vertical, viewport, window } from "openrct2-flexui";
 import { isDevelopment, pluginVersion } from "../environment";
-import { RideType } from "../objects/rideType";
-import { RideVehicleVariant, VehicleVisibility } from "../objects/rideVehicleVariant";
 import { invoke, refreshRide } from "../services/events";
-import { getDistanceFromProgress } from "../services/spacingEditor";
 import { applyToTargets, CopyFilter, getTargets, getVehicleSettings } from "../services/vehicleCopier";
-import { changeSpacing, changeTrackProgress, setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setPrimaryColour, setReversed, setRideType, setSeatCount, setSecondaryColour, setSpin, setTertiaryColour, setVariant } from "../services/vehicleEditor";
-import { VehicleSpan } from "../services/vehicleSpan";
+import { setMass, setPositionX, setPositionY, setPositionZ, setPoweredAcceleration, setPoweredMaximumSpeed, setRideType, setSeatCount, setSpin } from "../services/vehicleEditor";
 import { isValidGameVersion } from "../services/versionChecker";
-import * as Log from "../utilities/logger";
 import { floor } from "../utilities/math";
 import { VehicleViewModel } from "../viewmodels/vehicleViewModel";
 import { model as rideModel, rideWindow } from "./rideWindow";
-import { labelled, labelledSpinner, LabelledSpinnerParams, multiplier } from "./utilityControls";
+import { multiplier } from "./utilityControls";
+import { labelSpinner } from "./widgets/labelSpinner";
+import { positionSpinner } from "./widgets/positionSpinner";
 
 
 /**
@@ -282,7 +280,7 @@ const mainWindow = window({
 					groupbox({
 						text: "Visuals",
 						content: [
-							dropdown({ // vehicle type editor
+							/* dropdown({ // vehicle type editor
 								items: compute(model._rideTypes, getUniqueRideTypeNames),
 								tooltip: "All ride types currently available in the park",
 								disabledMessage: "No ride types available",
@@ -334,7 +332,7 @@ const mainWindow = window({
 									disabled: model._isEditDisabled,
 									onChange: value => model._modifyVehicle(setTertiaryColour, value, CopyFilter.Colours)
 								})
-							])
+							]) */
 						]
 					}),
 					groupbox({
@@ -347,7 +345,7 @@ const mainWindow = window({
 								disabled: model._isEditDisabled,
 								step: model._multiplier,
 								value: twoway(model._trackProgress),
-								onChange: (_, incr) => applyTrackProgressChange(changeTrackProgress, incr, CopyFilter.TrackProgress)
+								//onChange: (_, incr) => applyTrackProgressChange(changeTrackProgress, incr, CopyFilter.TrackProgress)
 							}),
 							labelSpinner({
 								_label: { text: "Spacing:" },
@@ -360,7 +358,7 @@ const mainWindow = window({
 									const spacing = model._spacing.get();
 									return (spacing === null) ? "Too far away" : spacing.toString();
 								},
-								onChange: (_, incr) => applyTrackProgressChange(changeSpacing, incr, CopyFilter.Spacing)
+								//onChange: (_, incr) => applyTrackProgressChange(changeSpacing, incr, CopyFilter.Spacing)
 							}),
 							positionSpinner({
 								_label: { text: "X position:" },
@@ -484,10 +482,11 @@ function applySelectedSettingsToRide(): void
 	}
 }
 
+
 /**
  * Apply the same amount of track progress to all selected vehicles based on the currently selected car.
  */
-function applyTrackProgressChange(action: (vehicles: VehicleSpan[], value: number) => void, increment: number, filter: CopyFilter): void
+/* function applyTrackProgressChange(action: (vehicles: VehicleSpan[], value: number) => void, increment: number, filter: CopyFilter): void
 {
 	const selectedVehicle = model._selectedVehicle.get();
 	if (selectedVehicle)
@@ -497,10 +496,11 @@ function applyTrackProgressChange(action: (vehicles: VehicleSpan[], value: numbe
 	}
 }
 
+ */
 /**
  * Format function that labels variants invisible if they are.
  */
-function formatVariant(variant: RideVehicleVariant, index: number): string
+/* function formatVariant(variant: RideVehicleVariant, index: number): string
 {
 	const visibility = variant._visibility;
 	if (visibility === VehicleVisibility.Visible)
@@ -509,34 +509,26 @@ function formatVariant(variant: RideVehicleVariant, index: number): string
 	}
 	const visibilityLabel = (!visibility) ? "green square" : "invisible";
 	return (index + "  (" + visibilityLabel + ")");
-}
+} */
 
-/**
- * Combines a label and a spinner into one widget creator.
- */
-function labelSpinner<T extends (SpinnerParams | DropdownSpinnerParams) = SpinnerParams>(params: LabelledSpinnerParams<T> & FlexiblePosition): WidgetCreator<FlexiblePosition>
-{
-	params.width = controlsSpinnerWidth;
-	params._label.width = controlsLabelWidth;
-	return labelledSpinner(params);
-}
+
 
 /**
  * Combines a label and a spinner into one widget creator, with the same tooltip for the location spinners.
  */
-function positionSpinner(params: LabelledSpinnerParams & FlexiblePosition): WidgetCreator<FlexiblePosition>
+/* function positionSpinner(params: LabelledSpinnerParams & FlexiblePosition): WidgetCreator<FlexiblePosition>
 {
 	params.tooltip = "The fantastic map location of your vehicle and where to find it. Only works when the vehicle is not moving.";
 	params.minimum = 0;
 	params.wrapMode = "clamp";
 	params._noDisabledMessage = true;
 	return labelSpinner(params);
-}
+} */
 
 /**
  * Hack: make ride type names unique so they don't get mixed up.
  */
-function getUniqueRideTypeNames(rideTypes: RideType[]): string[]
+/* function getUniqueRideTypeNames(rideTypes: RideType[]): string[]
 {
 	const length = rideTypes.length;
 	const array = Array<string>(length);
@@ -565,3 +557,4 @@ function getUniqueRideTypeNames(rideTypes: RideType[]): string[]
 	Log.debug("getUniqueRideTypeNames():", array);
 	return array;
 }
+ */

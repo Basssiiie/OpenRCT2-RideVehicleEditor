@@ -1,7 +1,6 @@
 import * as Environment from "./environment";
 import { registerActions } from "./services/actions";
-import { registerShortcuts } from "./services/shortcuts";
-import { openEditorWindow } from "./ui/mainWindow";
+import { openViewportWindow } from "./ui/viewportWindow";
 
 
 /**
@@ -12,7 +11,11 @@ export function main(): void
 	registerActions();
 	if (Environment.isUiAvailable)
 	{
-		registerShortcuts();
-		ui.registerMenuItem("Edit ride vehicles", () => openEditorWindow());
+		//registerShortcuts();
+		//ui.registerMenuItem("Edit ride vehicles", () => openEditorWindow());
+		ui.registerMenuItem("Edit ride vehicles (new ui)", () =>
+		{
+			openViewportWindow();
+		});
 	}
 }

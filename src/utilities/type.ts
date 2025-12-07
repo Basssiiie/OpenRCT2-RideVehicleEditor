@@ -21,3 +21,11 @@ export function isNumber(value: unknown): value is number
 {
 	return (typeof value === "number");
 }
+
+/**
+ * Checks whether the target is an array or not.
+ */
+export function isArray<T>(value: unknown): value is T[]
+{
+	return Array.isArray(value);
+}

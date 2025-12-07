@@ -21,9 +21,9 @@ export const dragToolId = "rve-drag-vehicle";
 /**
  * Enable or disable a tool to drag the vehicle to a new location.
  */
-export function toggleVehicleDragger(active: boolean, storeVehicle: Store<[RideVehicle, number] | null>, storeX: Store<number>, storeY: Store<number>, storeZ: Store<number>, storeTrackLocation: Store<CarTrackLocation | null>, storeTrackProgress: Store<number>, onCancel: () => void): void
+export function toggleVehicleDragger(active: boolean, vehicleStore: Store<[RideVehicle, number] | null>, onCancel: () => void): void
 {
-	const rideVehicle = storeVehicle.get();
+	const rideVehicle = vehicleStore.get();
 	if (!active || !rideVehicle)
 	{
 		cancelTools(dragToolId);
@@ -31,13 +31,14 @@ export function toggleVehicleDragger(active: boolean, storeVehicle: Store<[RideV
 	}
 
 	const multiplayer = isMultiplayer();
+	const car = rideVehicle[0]._car();
 	const originalPosition = {
 		revert: true,
-		x: storeX.get(),
-		y: storeY.get(),
-		z: storeZ.get(),
-		track: storeTrackLocation.get(),
-		progress: storeTrackProgress.get()
+		x: car.x,
+		y: car.y,
+		z: car.z,
+		track: car.trackLocation,
+		progress: car.trackProgress
 	};
 	let lastPosition: DragPosition = originalPosition;
 	let resetTrack: CarTrackLocation | null | undefined;
