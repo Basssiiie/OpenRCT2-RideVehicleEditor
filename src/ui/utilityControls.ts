@@ -9,19 +9,18 @@ export function multiplier(multiplierIndex: WritableStore<number>): WidgetCreato
 	const multiplierTip = "Multiplies all spinner controls by the specified amount";
 
 	return horizontal({
-		padding: { top: -4, right: 1 },
+		padding: { left: "1w", top: 9, rest: 6 },
 		content: [
 			label({
 				text: "Multiplier:",
 				tooltip: multiplierTip,
-				width: 60,
-				padding: { left: "1w" }
+				width: 60
 			}),
 			dropdown({
 				tooltip: multiplierTip,
-				width: 45,
 				items: ["x1", "x10", "x100"],
-				selectedIndex: twoway(multiplierIndex)
+				selectedIndex: twoway(multiplierIndex),
+				width: 45
 			})
 		]
 	});

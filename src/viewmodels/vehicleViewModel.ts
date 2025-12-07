@@ -1,4 +1,4 @@
-import { Colour, compute, store, WritableStore } from "openrct2-flexui";
+import { Colour, compute, OpenWindow, store, WritableStore } from "openrct2-flexui";
 import { getAllRides, ParkRide } from "../objects/parkRide";
 import { createTrainFromAnyCar, RideTrain } from "../objects/rideTrain";
 import { getAllRideTypes, gigaCableLiftHillType, gigaCableLiftHillTypeId, RideType } from "../objects/rideType";
@@ -14,6 +14,7 @@ import { find, findIndex, orderByNameThenByIdentifier } from "../utilities/array
 import * as Log from "../utilities/logger";
 import { cancelTools } from "../utilities/tools";
 import { isNull } from "../utilities/type";
+import { RideViewModel } from "./rideViewModel";
 
 
 /**
@@ -21,6 +22,10 @@ import { isNull } from "../utilities/type";
  */
 export class VehicleViewModel
 {
+	readonly _ride: RideViewModel = new RideViewModel();
+	readonly _editorWindow = store<OpenWindow | null>(null);
+	readonly _synchronizationWindow = store<OpenWindow | null>(null);
+
 	readonly _selectedRide = store<[ParkRide, number] | null>(null);
 	readonly _selectedTrain = store<[RideTrain, number] | null>(null);
 	readonly _selectedVehicle = store<[RideVehicle, number] | null>(null);
@@ -67,6 +72,7 @@ export class VehicleViewModel
 	readonly _copyTargets = compute(this._copyTargetOption, this._selectedVehicle, (o, v) => getTargets(o, this._selectedRide.get(), this._selectedTrain.get(), v));
 	readonly _synchronizeTargets = store<boolean>(false);
 	readonly _clipboard = store<VehicleSettings | null>(null);
+	readonly _title = compute(this._selectedRide, ride => (ride ? ride[0]._ride().name : "<unknown ride>"));
 
 	_isOpen?: boolean;
 	private _isRefreshing?: boolean;
